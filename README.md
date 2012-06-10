@@ -1,5 +1,4 @@
-imap-backup [![Build Status](https://secure.travis-ci.org/joeyates/imap-backup.png)][Continuous Integration]
-===========
+# imap-backup [![Build Status](https://secure.travis-ci.org/joeyates/imap-backup.png)][Continuous Integration]
 
 *Backup GMail (or other IMAP) accounts to disk*
 
@@ -13,8 +12,7 @@ imap-backup [![Build Status](https://secure.travis-ci.org/joeyates/imap-backup.p
 [Rubygem]: http://rubygems.org/gems/imap-backup "Ruby gem at rubygems.org"
 [Continuous Integration]: http://travis-ci.org/joeyates/imap-backup "Build status by Travis-CI"
 
-Installation
-============
+# Installation
 
 Add this line to your application's Gemfile:
 
@@ -28,16 +26,14 @@ Or install it yourself as:
 
     gem install 'imap-backup'
 
-Basic Usage
-===========
+# Basic Usage
 
 * Create ~/.imap-backup
 * Run
 
     imap-backup
 
-Usage
-=====
+# Usage
 
 Check connection:
 
@@ -47,16 +43,14 @@ List IMAP folders:
 
     imap-backup --list
 
-Design Goals
-============
+# Design Goals
 
 * Secure - use a local file protected by permissions
 * Restartable - calculate start point based on alreadt downloaded messages
 * Standards compliant - save emails in a standard format
 * Standalone - does not rely on an email client or MTA
 
-Similar Software
-================
+# Similar Software
 
 * https://github.com/thefloweringash/gmail-imap-backup
 * https://github.com/mleonhard/imapbackup
