@@ -1,0 +1,21 @@
+#!/usr/bin/env ruby
+# -*- encoding: utf-8 -*-
+
+$:.unshift(File.expand_path('../../lib/', __FILE__))
+require 'imap/backup'
+
+settings = Imap::Backup::Settings.new
+
+if ARGV[0] == '--list'
+  settings.each_account do |account|
+    account.folders.each { |f| puts f.name }
+  end
+else
+  settings.each_account do |account|
+    account.backup_folders.each do |folder|
+      d = Imap::Backup::Downloader.new(account, folder['name'])
+      d.run
+    end
+  end
+end
+
