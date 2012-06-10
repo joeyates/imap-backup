@@ -1,21 +1,57 @@
 #!/usr/bin/env ruby
 # -*- encoding: utf-8 -*-
 
+require 'optparse'
+
 $:.unshift(File.expand_path('../../lib/', __FILE__))
 require 'imap/backup'
 
+options = {:command => 'backup'}
+opts = OptionParser.new do |opts|
+  opts.banner = "Usage: #{$0} [options] COMMAND"
+
+  opts.separator ''
+  opts.separator 'Commands:'
+  opts.separator "\tbackup (default)  Do the backup"
+  opts.separator "\thelp              Show usage"
+  opts.separator "\tlist              List folders for all (or selected) accounts"
+  opts.separator ''
+  opts.separator 'Common options:'
+
+  opts.on('-a', '--accounts ACCOUNT1[,ACCOUNT2,...]', Array) do |account|
+    options[:account] = account
+  end
+
+  opts.on_tail("-h", "--help", "Show usage") do
+    puts opts
+    exit
+  end
+
+end
+opts.parse!
+
+if ARGV.size > 0
+  options[:command] = ARGV.shift
+end
+
+raise "Unknown command '#{options[:command]}'" unless ['help', 'list', 'backup'].include?(options[:command])
+
 settings = Imap::Backup::Settings.new
 
-if ARGV[0] == '--list'
-  settings.each_account do |account|
-    account.folders.each { |f| puts f.name }
-  end
-else
-  settings.each_account do |account|
+case options[:command]
+when 'backup'
+  settings.each_account(options[:accounts]) do |account|
     account.backup_folders.each do |folder|
       d = Imap::Backup::Downloader.new(account, folder['name'])
       d.run
     end
+  end
+when 'help'
+  puts opts
+when 'list'
+  settings.each_account(options[:accounts]) do |account|
+    puts account.username
+    account.folders.each { |f| puts "\t" + f.name }
   end
 end
 
