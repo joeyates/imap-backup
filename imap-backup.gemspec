@@ -16,6 +16,11 @@ Gem::Specification.new do |gem|
   gem.require_paths = ['lib']
   gem.version       = Imap::Backup::VERSION
 
+  gem.add_runtime_dependency 'rake'
+  if RUBY_VERSION < '1.9'
+    gem.add_runtime_dependency 'json'
+  end
+
   gem.add_development_dependency 'pry'
   gem.add_development_dependency 'pry-doc'
   gem.add_development_dependency 'rspec',  '>= 2.3.0'
