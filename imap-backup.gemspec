@@ -6,7 +6,7 @@ Gem::Specification.new do |gem|
   gem.authors       = ['Joe Yates']
   gem.email         = ['joe.g.yates@gmail.com']
   gem.description   = %q{Backup GMail, or any other IMAP email service, to disk.}
-  gem.summary       = %q{Backup your GMail (or other IMAP) account}
+  gem.summary       = %q{Backup GMail (or other IMAP) accounts to disk}
   gem.homepage      = 'https://github.com/joeyates/imap-backup'
 
   gem.files         = `git ls-files`.split($\)

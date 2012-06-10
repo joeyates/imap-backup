@@ -1,6 +1,32 @@
-imap-backup
+imap-backup [![Build Status](https://secure.travis-ci.org/joeyates/imap-backup.png)][Continuous Integration]
 ===========
-Backup GMail (or other IMAP) accounts to disk
+
+*Backup GMail (or other IMAP) accounts to disk*
+
+  * [Source Code]
+  * [API documentation]
+  * [Rubygem]
+  * [Continuous Integration]
+
+[Source Code]: https://github.com/joeyates/imap-backup "Source code at GitHub"
+[API documentation]: http://rubydoc.info/gems/imap-backup/frames "RDoc API Documentation at Rubydoc.info"
+[Rubygem]: http://rubygems.org/gems/imap-backup "Ruby gem at rubygems.org"
+[Continuous Integration]: http://travis-ci.org/joeyates/imap-backup "Build status by Travis-CI"
+
+Installation
+============
+
+Add this line to your application's Gemfile:
+
+    gem 'imap/backup'
+
+And then execute:
+
+    $ bundle
+
+Or install it yourself as:
+
+    gem install 'imap-backup'
 
 Basic Usage
 ===========
