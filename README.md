@@ -19,6 +19,23 @@
 # Basic Usage
 
 * Create ~/.imap-backup
+
+    {
+      accounts:
+      [
+        {
+          username: "my.user@gmail.com",
+          password: "secret",
+          local_path: "/path/to/backup/root",
+          folders:
+            [
+              {name: "[Gmail]/All Mail"},
+              {name: "my_folder"}
+            ]
+        }
+      ]
+    }
+
 * Run
 
     imap-backup
