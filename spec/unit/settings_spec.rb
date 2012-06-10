@@ -47,6 +47,9 @@ describe Imap::Backup::Settings do
           @account1_settings
         ]
       }
+      File.stub!(:exist?).and_return(true)
+      stat = stub('File::Stat', :mode => 0600)
+      File.stub!(:stat).and_return(stat)
       File.stub!(:open)
       JSON.stub!(:load).and_return(settings)
       @account = stub('Imap::Backup::Settings', :disconnect => nil)
