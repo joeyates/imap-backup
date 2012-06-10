@@ -62,5 +62,10 @@ when 'list'
     puts account.username
     account.folders.each { |f| puts "\t" + f.name }
   end
+when 'status'
+  settings.each_account(options[:accounts]) do |account|
+    puts account.username
+    s = account.status
+  end
 end
 

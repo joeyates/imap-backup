@@ -24,6 +24,12 @@ module Imap
         @imap.list('/', '*')
       end
 
+      def uids(folder)
+        @imap.examine(folder)
+        fds = @imap.fetch(1 .. -1, 'UID')
+        fds.map{ |fd| fd[1]['UID'] }
+      end
+
       def each_uid(folder)
         @imap.examine(folder)
         @imap.uid_search(['ALL']).each do |uid|

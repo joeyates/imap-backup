@@ -39,6 +39,15 @@ describe Imap::Backup::Account do
       end
     end
 
+    context '#uids' do
+    end
+
+    context '#status' do
+
+      it 'should return status for each folder of each account'
+
+    end
+
     context '#each_uid' do
       it 'should examine the folder' do
         @imap.stub!(:uid_search => [])
