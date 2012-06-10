@@ -10,7 +10,7 @@ describe Imap::Backup::Account do
       Net::IMAP.should_receive(:new).with('imap.gmail.com', 993, true).and_return(imap)
       imap.should_receive('login').with('myuser', 'secret')
 
-      Imap::Backup::Account.new('username' => 'myuser', 'password' => 'secret')
+      Imap::Backup::Account.new(:username => 'myuser', :password => 'secret')
     end
 
   end

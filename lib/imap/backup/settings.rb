@@ -11,7 +11,7 @@ module Imap
         config_pathname = File.expand_path('~/.imap-backup/config.json')
         raise "Configuration file '#{config_pathname}' not found" if ! File.exist?(config_pathname)
         check_permissions(config_pathname, 0600)
-        @settings = JSON.load(File.open(config_pathname))
+        @settings = JSON.parse(File.read(config_pathname), :symbolize_names => true)
       end
 
       def each_account(accounts = nil)

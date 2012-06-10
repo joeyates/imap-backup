@@ -30,9 +30,9 @@ describe Imap::Backup::Settings do
       stat = stub('File::Stat', :mode => 0600)
       File.stub!(:stat).and_return(stat)
 
-      file = stub('file')
-      File.should_receive(:open).with(%r{/.imap-backup/config.json}).and_return(file)
-      JSON.should_receive(:load).with(file)
+      configuration = 'JSON string'
+      File.should_receive(:read).with(%r{/.imap-backup/config.json}).and_return(configuration)
+      JSON.should_receive(:parse).with(configuration, :symbolize_names => true)
 
       Imap::Backup::Settings.new
     end
@@ -50,8 +50,8 @@ describe Imap::Backup::Settings do
       File.stub!(:exist?).and_return(true)
       stat = stub('File::Stat', :mode => 0600)
       File.stub!(:stat).and_return(stat)
-      File.stub!(:open)
-      JSON.stub!(:load).and_return(@settings)
+      File.stub!(:read)
+      JSON.stub!(:parse).and_return(@settings)
       @account = stub('Imap::Backup::Settings', :disconnect => nil)
     end
 
