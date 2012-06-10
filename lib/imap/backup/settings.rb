@@ -14,8 +14,11 @@ module Imap
         @settings = JSON.load(File.open(config_pathname))
       end
 
-      def each_account
-        @settings['accounts'].each do |account|
+      def each_account(accounts = nil)
+        @settings[:accounts].each do |account|
+          if accounts
+            next unless accounts.include?(account[:username])
+          end
           a = Account.new(account)
           yield a
           a.disconnect

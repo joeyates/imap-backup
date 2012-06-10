@@ -41,25 +41,36 @@ describe Imap::Backup::Settings do
 
   context '#each_account' do
     before :each do
-      @account1_settings = stub('account1 settings')
-      settings = {
-        'accounts' => [
-          @account1_settings
+      @settings = {
+        :accounts => [
+          {:username => 'a1@example.com'},
+          {:username => 'a2@example.com'},
         ]
       }
       File.stub!(:exist?).and_return(true)
       stat = stub('File::Stat', :mode => 0600)
       File.stub!(:stat).and_return(stat)
       File.stub!(:open)
-      JSON.stub!(:load).and_return(settings)
+      JSON.stub!(:load).and_return(@settings)
       @account = stub('Imap::Backup::Settings', :disconnect => nil)
     end
 
     subject { Imap::Backup::Settings.new }
 
     it 'should create accounts' do
-      Imap::Backup::Account.should_receive(:new).with(@account1_settings).and_return(@account)
+      Imap::Backup::Account.should_receive(:new).with(@settings[:accounts][0]).and_return(@account)
+      Imap::Backup::Account.should_receive(:new).with(@settings[:accounts][1]).and_return(@account)
+
       subject.each_account {}
+    end
+
+    context 'with account parameter' do
+      it 'should only create requested accounts' do
+        Imap::Backup::Account.should_receive(:new).with(@settings[:accounts][0]).and_return(@account)
+        Imap::Backup::Account.should_not_receive(:new).with(@settings[:accounts][1]).and_return(@account)
+
+        subject.each_account(['a1@example.com']) {}
+      end
     end
 
     it 'should call the block' do
@@ -70,7 +81,7 @@ describe Imap::Backup::Settings do
         calls += 1
         a.should == @account
       end
-      calls.should == 1
+      calls.should == 2
     end
 
     it 'should disconnect the account' do

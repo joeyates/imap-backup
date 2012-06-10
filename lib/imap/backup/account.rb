@@ -6,13 +6,14 @@ module Imap
 
       REQUESTED_ATTRIBUTES = ['RFC822', 'FLAGS', 'INTERNALDATE']
 
+      attr_reader   :username
       attr_accessor :local_path
       attr_accessor :backup_folders
 
       def initialize(options)
-        @local_path, @backup_folders = options['local_path'], options['folders']
+        @username, @local_path, @backup_folders = options[:username], options[:local_path], options[:folders]
         @imap = Net::IMAP.new('imap.gmail.com', 993, true)
-        @imap.login(options['username'], options['password'])
+        @imap.login(@username, options[:password])
       end
 
       def disconnect
