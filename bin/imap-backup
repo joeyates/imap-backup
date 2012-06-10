@@ -6,19 +6,26 @@ require 'optparse'
 $:.unshift(File.expand_path('../../lib/', __FILE__))
 require 'imap/backup'
 
+KNOWN_COMMANDS = [
+  {:name => 'backup', :help => 'Do the backup (default)'},
+  {:name => 'list',   :help => 'List folders for all (or selected) accounts'},
+  {:name => 'status', :help => 'List backup status: downloaded, to download'},
+  {:name => 'help',   :help => 'Show usage'},
+]
+
 options = {:command => 'backup'}
 opts = OptionParser.new do |opts|
   opts.banner = "Usage: #{$0} [options] COMMAND"
 
   opts.separator ''
   opts.separator 'Commands:'
-  opts.separator "\tbackup (default)  Do the backup"
-  opts.separator "\thelp              Show usage"
-  opts.separator "\tlist              List folders for all (or selected) accounts"
+  KNOWN_COMMANDS.each do |command|
+    opts.separator "\t%- 20s %s" % [command[:name], command[:help]]
+  end
   opts.separator ''
   opts.separator 'Common options:'
 
-  opts.on('-a', '--accounts ACCOUNT1[,ACCOUNT2,...]', Array) do |account|
+  opts.on('-a', '--accounts ACCOUNT1[,ACCOUNT2,...]', Array, 'only these accounts') do |account|
     options[:account] = account
   end
 
@@ -34,7 +41,9 @@ if ARGV.size > 0
   options[:command] = ARGV.shift
 end
 
-raise "Unknown command '#{options[:command]}'" unless ['help', 'list', 'backup'].include?(options[:command])
+if KNOWN_COMMANDS.find{|c| c[:name] == options[:command] }.nil?
+  raise "Unknown command '#{options[:command]}'"
+end
 
 settings = Imap::Backup::Settings.new
 
