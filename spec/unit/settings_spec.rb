@@ -3,6 +3,27 @@ load File.expand_path( '../spec_helper.rb', File.dirname(__FILE__) )
 
 describe Imap::Backup::Settings do
 
+  before :each do
+    @settings = {
+      :accounts => [
+        {
+          :username => 'a1@example.com',
+          :local_path => '/base/path',
+          :folders => [{:name => 'my_folder'}]
+        },
+        {
+          :username => 'a2@example.com',
+          :folders => []
+        },
+      ]
+    }
+    File.stub!(:exist?).and_return(true)
+    stat = stub('File::Stat', :mode => 0600)
+    File.stub!(:stat).and_return(stat)
+    File.stub!(:read)
+    JSON.stub!(:parse).and_return(@settings)
+  end
+
   context '#initialize' do
 
     it 'should fail if the config file is missing' do
@@ -37,59 +58,103 @@ describe Imap::Backup::Settings do
       Imap::Backup::Settings.new
     end
 
+    context 'with account parameter' do
+      it 'should only create requested accounts' do
+        settings = Imap::Backup::Settings.new(['a2@example.com'])
+
+        settings.accounts.should == @settings[:accounts][1..1]
+      end
+    end
+
   end
 
-  context '#each_account' do
+  context 'instance methods' do
+
     before :each do
-      @settings = {
-        :accounts => [
-          {:username => 'a1@example.com'},
-          {:username => 'a2@example.com'},
-        ]
-      }
-      File.stub!(:exist?).and_return(true)
-      stat = stub('File::Stat', :mode => 0600)
-      File.stub!(:stat).and_return(stat)
-      File.stub!(:read)
-      JSON.stub!(:parse).and_return(@settings)
-      @account = stub('Imap::Backup::Settings', :disconnect => nil)
+      @connection = stub('Imap::Backup::Account::Connection', :disconnect => nil)
     end
 
     subject { Imap::Backup::Settings.new }
 
-    it 'should create accounts' do
-      Imap::Backup::Account.should_receive(:new).with(@settings[:accounts][0]).and_return(@account)
-      Imap::Backup::Account.should_receive(:new).with(@settings[:accounts][1]).and_return(@account)
+    context '#each_connection' do
 
-      subject.each_account {}
-    end
+      it 'should instantiate connections' do
+        Imap::Backup::Account::Connection.should_receive(:new).with(@settings[:accounts][0]).and_return(@connection)
+        Imap::Backup::Account::Connection.should_receive(:new).with(@settings[:accounts][1]).and_return(@connection)
 
-    context 'with account parameter' do
-      it 'should only create requested accounts' do
-        Imap::Backup::Account.should_receive(:new).with(@settings[:accounts][0]).and_return(@account)
-        Imap::Backup::Account.should_not_receive(:new).with(@settings[:accounts][1]).and_return(@account)
-
-        subject.each_account(['a1@example.com']) {}
+        subject.each_connection{}
       end
-    end
 
-    it 'should call the block' do
-      Imap::Backup::Account.stub!(:new).and_return(@account)
-      calls = 0
+      it 'should call the block' do
+        Imap::Backup::Account::Connection.stub!(:new).and_return(@connection)
+        calls = 0
 
-      subject.each_account do |a|
-        calls += 1
-        a.should == @account
+        subject.each_connection do |a|
+          calls += 1
+          a.should == @connection
+        end
+        calls.should == 2
       end
-      calls.should == 2
+
+      it 'should disconnect connections' do
+        Imap::Backup::Account::Connection.stub!(:new).and_return(@connection)
+
+        @connection.should_receive(:disconnect)
+
+        subject.each_connection {}
+      end
+
     end
 
-    it 'should disconnect the account' do
-      Imap::Backup::Account.stub!(:new).and_return(@account)
+    context '#run_backup' do
 
-      @account.should_receive(:disconnect)
+      before :each do
+        Imap::Backup::Account::Connection.stub!(:new).and_return(@connection)
+        @folder = stub('Imap::Backup::Account::Folder', :uids => [])
+        Imap::Backup::Account::Folder.stub!(:new).with(@connection, 'my_folder').and_return(@folder)
+        @serializer = stub('Imap::Backup::Serializer')
+        Imap::Backup::Serializer::Directory.stub!(:new).with('/base/path', 'my_folder').and_return(@serializer)
+        @downloader = stub('Imap::Backup::Downloader', :run => nil)
+        Imap::Backup::Downloader.stub!(:new).with(@folder, @serializer).and_return(@downloader)
+      end
 
-      subject.each_account {}
+      it 'should instantiate connections' do
+        Imap::Backup::Account::Connection.should_receive(:new).with(@settings[:accounts][0]).and_return(@connection)
+        Imap::Backup::Account::Connection.should_receive(:new).with(@settings[:accounts][1]).and_return(@connection)
+
+        subject.run_backup
+      end
+
+      it 'should instantiate folders' do
+        Imap::Backup::Account::Folder.should_receive(:new).with(@connection, 'my_folder').and_return(@folder)
+
+        subject.run_backup
+      end
+
+      it 'should instantiate serializers' do
+        Imap::Backup::Serializer::Directory.should_receive(:new).with('/base/path', 'my_folder').and_return(@serializer)
+
+        subject.run_backup
+      end
+
+      it 'should instantiate downloaders' do
+        Imap::Backup::Downloader.should_receive(:new).with(@folder, @serializer).and_return(@downloader)
+
+        subject.run_backup
+      end
+
+      it 'should run downloaders' do
+        @downloader.should_receive(:run)
+
+        subject.run_backup
+      end
+
+      it 'should disconnect' do
+        @connection.should_receive(:disconnect).twice
+
+        subject.run_backup
+      end
+
     end
 
   end

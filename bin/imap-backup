@@ -45,27 +45,22 @@ if KNOWN_COMMANDS.find{|c| c[:name] == options[:command] }.nil?
   raise "Unknown command '#{options[:command]}'"
 end
 
-settings = Imap::Backup::Settings.new
+settings = Imap::Backup::Settings.new(options[:accounts])
 
 case options[:command]
 when 'backup'
-  settings.each_account(options[:accounts]) do |account|
-    account.backup_folders.each do |folder|
-      d = Imap::Backup::Downloader.new(account, folder['name'])
-      d.run
-    end
-  end
+  settings.run_backup
 when 'help'
   puts opts
 when 'list'
-  settings.each_account(options[:accounts]) do |account|
-    puts account.username
-    account.folders.each { |f| puts "\t" + f.name }
+  settings.each_connection do |connection|
+    puts connection.username
+    connection.folders.each { |f| puts "\t" + f.name }
   end
 when 'status'
-  settings.each_account(options[:accounts]) do |account|
-    puts account.username
-    s = account.status
+  settings.each_connection do |connection|
+    puts connection.username
+    s = connection.status
   end
 end
 

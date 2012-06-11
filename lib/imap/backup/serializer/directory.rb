@@ -9,7 +9,8 @@ module Imap
 
         def initialize(path, folder)
           @path, @folder = path, folder
-          check_permissions(path, 0700)
+          check_permissions(@path, 0700)
+          make_folder(@path, @folder, 'g-wrx,o-wrx')
         end
 
         def uids
@@ -21,10 +22,25 @@ module Imap
           end.compact
         end
 
+        def exist?(uid)
+          message_filename = filename(uid)
+          File.exist?(message_filename)
+        end
+
+        def save(uid, message)
+          message_filename = filename(uid)
+          File.open(message_filename, 'w') { |f| f.write message.to_json }
+          FileUtils.chmod 0600, message_filename
+        end
+
         private
 
         def directory
           File.join(@path, @folder)
+        end
+
+        def filename(uid)
+          "#{directory}/%012u.json" % uid.to_i
         end
 
       end
