@@ -42,22 +42,21 @@
 
     imap-backup
 
-# Usage
-
-Check connection:
-
-    imap-backup --check
+# Other Usage
 
 List IMAP folders:
 
-    imap-backup --list
+    imap-backup folders
+
+Get statistics of emails to download per folder:
+
+    imap-backup status
 
 # Design Goals
 
 * Secure - use a local file protected by permissions
-* Restartable - calculate start point based on alreadt downloaded messages
-* Standards compliant - save emails in a standard format
-* Standalone - does not rely on an email client or MTA
+* Restartable - calculate start point based on already downloaded messages
+* Standalone - do not rely on an email client or MTA
 
 # Similar Software
 
