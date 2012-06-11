@@ -29,19 +29,6 @@ module Imap
         end
       end
 
-      def run_backup
-        @accounts.each do |account|
-          connection = Imap::Backup::Account::Connection.new(account)
-          account[:folders].each do |folder|
-            f = Imap::Backup::Account::Folder.new(connection, folder[:name])
-            s = Imap::Backup::Serializer::Directory.new(account[:local_path], folder[:name])
-            d = Imap::Backup::Downloader.new(f, s)
-            d.run
-          end
-          connection.disconnect
-        end
-      end
-
     end
   end
 end

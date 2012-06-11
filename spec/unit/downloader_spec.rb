@@ -23,29 +23,6 @@ describe Imap::Backup::Downloader do
 
     subject { Imap::Backup::Downloader.new(@folder, @serializer) }
 
-    context '#status' do
-
-      context 'local' do
-
-        before :each do
-          @folder.stub!(:uids).and_return([])
-        end
-      end
-
-      context 'remote' do
-
-        it 'should retrieve the available uids' do
-          File.stub!(:exist?).and_return(false)
-
-          @folder.should_receive(:uids).and_return(['234'])
-
-          subject.status[:remote].should == ['234']
-        end
-
-      end
-
-    end
-
     context '#run' do
 
       context 'with folder' do

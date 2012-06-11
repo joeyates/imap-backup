@@ -17,9 +17,10 @@ module Imap
           return [] if ! File.exist?(directory)
 
           d = Dir.open(directory)
-          d.map do |file|
+          as_strings = d.map do |file|
             file[/^0*(\d+).json$/, 1]
           end.compact
+          as_strings.map(&:to_i).sort
         end
 
         def exist?(uid)

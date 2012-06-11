@@ -17,9 +17,9 @@ describe Imap::Backup::Account::Folder do
 
       it 'should list available messages' do
         @imap.should_receive(:examine).with('my_folder')
-        @imap.should_receive(:uid_search).with(['ALL']).and_return(['123'])
+        @imap.should_receive(:uid_search).with(['ALL']).and_return([5678, 123])
 
-        subject.uids.should == ['123']
+        subject.uids.should == [123, 5678]
       end
 
     end
@@ -36,10 +36,10 @@ describe Imap::Backup::Account::Folder do
       it 'should request the message, the flags and the date' do
         @imap.should_receive(:examine).with('my_folder')
         @imap.should_receive(:uid_fetch).
-              with(['123'], ['RFC822', 'FLAGS', 'INTERNALDATE']).
+              with([123], ['RFC822', 'FLAGS', 'INTERNALDATE']).
               and_return([[nil, @message]])
 
-        subject.fetch('123')
+        subject.fetch(123)
       end
 
       if RUBY_VERSION > '1.9'
@@ -48,7 +48,7 @@ describe Imap::Backup::Account::Folder do
 
           @message_body.should_receive(:force_encoding).with('utf-8')
 
-          subject.fetch('123')
+          subject.fetch(123)
         end
       end
 

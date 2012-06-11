@@ -5,12 +5,12 @@ module Imap
     module Account
       class Connection
 
-        attr_reader   :username
-        attr_reader   :imap
-        attr_accessor :backup_folders
+        attr_reader :username
+        attr_reader :imap
 
         def initialize(options)
-          @username, @backup_folders = options[:username], options[:folders]
+          @username = options[:username]
+          @local_path, @backup_folders = options[:local_path], options[:folders]
           @imap = Net::IMAP.new('imap.gmail.com', 993, true)
           @imap.login(@username, options[:password])
         end
@@ -21,6 +21,23 @@ module Imap
 
         def folders
           @imap.list('/', '*')
+        end
+
+        def status
+          @backup_folders.map do |folder|
+            f = Imap::Backup::Account::Folder.new(self, folder[:name])
+            s = Imap::Backup::Serializer::Directory.new(@local_path, folder[:name])
+            {:name => folder[:name], :local => s.uids, :remote => f.uids}
+          end
+        end
+
+        def run_backup
+          @backup_folders.each do |folder|
+            f = Imap::Backup::Account::Folder.new(self, folder[:name])
+            s = Imap::Backup::Serializer::Directory.new(@local_path, folder[:name])
+            d = Imap::Backup::Downloader.new(f, s)
+            d.run
+          end
         end
 
       end

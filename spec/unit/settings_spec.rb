@@ -7,13 +7,10 @@ describe Imap::Backup::Settings do
     @settings = {
       :accounts => [
         {
-          :username => 'a1@example.com',
-          :local_path => '/base/path',
-          :folders => [{:name => 'my_folder'}]
+          :username => 'a1@example.com'
         },
         {
           :username => 'a2@example.com',
-          :folders => []
         },
       ]
     }
@@ -102,57 +99,6 @@ describe Imap::Backup::Settings do
         @connection.should_receive(:disconnect)
 
         subject.each_connection {}
-      end
-
-    end
-
-    context '#run_backup' do
-
-      before :each do
-        Imap::Backup::Account::Connection.stub!(:new).and_return(@connection)
-        @folder = stub('Imap::Backup::Account::Folder', :uids => [])
-        Imap::Backup::Account::Folder.stub!(:new).with(@connection, 'my_folder').and_return(@folder)
-        @serializer = stub('Imap::Backup::Serializer')
-        Imap::Backup::Serializer::Directory.stub!(:new).with('/base/path', 'my_folder').and_return(@serializer)
-        @downloader = stub('Imap::Backup::Downloader', :run => nil)
-        Imap::Backup::Downloader.stub!(:new).with(@folder, @serializer).and_return(@downloader)
-      end
-
-      it 'should instantiate connections' do
-        Imap::Backup::Account::Connection.should_receive(:new).with(@settings[:accounts][0]).and_return(@connection)
-        Imap::Backup::Account::Connection.should_receive(:new).with(@settings[:accounts][1]).and_return(@connection)
-
-        subject.run_backup
-      end
-
-      it 'should instantiate folders' do
-        Imap::Backup::Account::Folder.should_receive(:new).with(@connection, 'my_folder').and_return(@folder)
-
-        subject.run_backup
-      end
-
-      it 'should instantiate serializers' do
-        Imap::Backup::Serializer::Directory.should_receive(:new).with('/base/path', 'my_folder').and_return(@serializer)
-
-        subject.run_backup
-      end
-
-      it 'should instantiate downloaders' do
-        Imap::Backup::Downloader.should_receive(:new).with(@folder, @serializer).and_return(@downloader)
-
-        subject.run_backup
-      end
-
-      it 'should run downloaders' do
-        @downloader.should_receive(:run)
-
-        subject.run_backup
-      end
-
-      it 'should disconnect' do
-        @connection.should_receive(:disconnect).twice
-
-        subject.run_backup
       end
 
     end

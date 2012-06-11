@@ -8,16 +8,10 @@ module Imap
         @folder, @serializer = folder, serializer
       end
 
-      def status
-        {:local => @serializer.uids, :remote => @folder.uids}
-      end
-
       def run
-        @folder.uids.each do |uid|
-          next if @serializer.exist?(uid)
-
+        uids = @folder.uids - @serializer.uids
+        uids.each do |uid|
           message = @folder.fetch(uid)
-
           @serializer.save(uid, message)
         end
       end

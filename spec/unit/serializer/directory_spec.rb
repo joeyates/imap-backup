@@ -31,12 +31,12 @@ describe Imap::Backup::Serializer::Directory do
     context '#uids' do
 
       it 'should return the backed-up uids' do
-        files = ['00000123.json']
+        files = ['00000123.json', '000001.json']
 
         File.should_receive(:exist?).with('/base/path/my_folder').and_return(true)
         Dir.should_receive(:open).with('/base/path/my_folder').and_return(files)
 
-        subject.uids.should == ['123']
+        subject.uids.should == [1, 123]
       end
 
       it 'should return an empty Array if the directory does not exist' do
@@ -52,7 +52,7 @@ describe Imap::Backup::Serializer::Directory do
       it 'should check if the file exists' do
         File.should_receive(:exist?).with(%r{/base/path/my_folder/0+123.json}).and_return(true)
 
-        subject.exist?('123').should be_true
+        subject.exist?(123).should be_true
       end
 
     end
@@ -90,7 +90,7 @@ describe Imap::Backup::Serializer::Directory do
       it 'should set file permissions' do
         FileUtils.should_receive(:chmod).with(0600, /0+1234.json$/)
 
-        subject.save('1234', @message)
+        subject.save(1234, @message)
       end
     end
 

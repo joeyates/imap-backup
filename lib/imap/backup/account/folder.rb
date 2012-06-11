@@ -13,12 +13,12 @@ module Imap
 
         def uids
           @connection.imap.examine(@folder)
-          @connection.imap.uid_search(['ALL'])
+          @connection.imap.uid_search(['ALL']).sort
         end
 
         def fetch(uid)
           @connection.imap.examine(@folder)
-          message = @connection.imap.uid_fetch([uid], REQUESTED_ATTRIBUTES)[0][1]
+          message = @connection.imap.uid_fetch([uid.to_i], REQUESTED_ATTRIBUTES)[0][1]
           message['RFC822'].force_encoding('utf-8') if RUBY_VERSION > '1.9'
           message
         end

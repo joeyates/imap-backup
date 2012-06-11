@@ -7,10 +7,10 @@ $:.unshift(File.expand_path('../../lib/', __FILE__))
 require 'imap/backup'
 
 KNOWN_COMMANDS = [
-  {:name => 'backup', :help => 'Do the backup (default)'},
-  {:name => 'list',   :help => 'List folders for all (or selected) accounts'},
-  {:name => 'status', :help => 'List backup status: downloaded, to download'},
-  {:name => 'help',   :help => 'Show usage'},
+  {:name => 'backup',  :help => 'Do the backup (default)'},
+  {:name => 'folders', :help => 'List folders for all (or selected) accounts'},
+  {:name => 'status',  :help => 'List count of non backed-up emails per folder'},
+  {:name => 'help',    :help => 'Show usage'},
 ]
 
 options = {:command => 'backup'}
@@ -49,10 +49,12 @@ settings = Imap::Backup::Settings.new(options[:accounts])
 
 case options[:command]
 when 'backup'
-  settings.run_backup
+  settings.each_connection do |connection|
+    connection.run_backup
+  end
 when 'help'
   puts opts
-when 'list'
+when 'folders'
   settings.each_connection do |connection|
     puts connection.username
     connection.folders.each { |f| puts "\t" + f.name }
@@ -60,7 +62,11 @@ when 'list'
 when 'status'
   settings.each_connection do |connection|
     puts connection.username
-    s = connection.status
+    folders = connection.status
+    folders.each do |f|
+      missing_locally = f[:remote] - f[:local]
+      puts "#{f[:name]}: #{missing_locally.size}"
+    end
   end
 end
 
