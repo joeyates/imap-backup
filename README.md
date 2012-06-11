@@ -20,6 +20,7 @@
 
 * Create ~/.imap-backup
 
+```
     {
       accounts:
       [
@@ -35,6 +36,7 @@
         }
       ]
     }
+```
 
 * Run
 
