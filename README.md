@@ -20,7 +20,7 @@
 
 * Create ~/.imap-backup directory and configuration file
 
-```
+```shell
     $ cd
     $ mkdir .imap-backup
     $ chmod 0700 .imap-backup
