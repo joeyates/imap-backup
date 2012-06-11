@@ -21,30 +21,30 @@
 * Create ~/.imap-backup directory and configuration file
 
 ```shell
-    $ cd
-    $ mkdir .imap-backup
-    $ chmod 0700 .imap-backup
-    $ cd .imap-backup
-    $ touch config.json
-    $ chmod 0600 config.json
+$ cd
+$ mkdir .imap-backup
+$ chmod 0700 .imap-backup
+$ cd .imap-backup
+$ touch config.json
+$ chmod 0600 config.json
 ```
 
 ```
+{
+  accounts:
+  [
     {
-      accounts:
-      [
-        {
-          username: "my.user@gmail.com",
-          password: "secret",
-          local_path: "/path/to/backup/root",
-          folders:
-            [
-              {name: "[Gmail]/All Mail"},
-              {name: "my_folder"}
-            ]
-        }
-      ]
+      username: "my.user@gmail.com",
+      password: "secret",
+      local_path: "/path/to/backup/root",
+      folders:
+        [
+          {name: "[Gmail]/All Mail"},
+          {name: "my_folder"}
+        ]
     }
+  ]
+}
 ```
 
 * Run
