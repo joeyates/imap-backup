@@ -20,12 +20,14 @@
 
 * Create ~/.imap-backup directory and configuration file
 
+```
     $ cd
     $ mkdir .imap-backup
     $ chmod 0700 .imap-backup
     $ cd .imap-backup
     $ touch config.json
     $ chmod 0600 config.json
+```
 
 ```
     {
