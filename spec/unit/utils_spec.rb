@@ -52,7 +52,7 @@ describe Imap::Backup::Utils do
     end
 
     it 'should create the path' do
-      FileUtils.stub!(:chmod_R)
+      FileUtils.stub!(:chmod)
 
       FileUtils.should_receive(:mkdir_p).with('/base/path/new/folder')
 
@@ -62,7 +62,7 @@ describe Imap::Backup::Utils do
     it 'should set permissions on the path' do
       FileUtils.stub!(:mkdir_p)
 
-      FileUtils.should_receive(:chmod_R).with(0222, '/base/path/new')
+      FileUtils.should_receive(:chmod).with(0222, '/base/path/new')
 
       make_folder('/base/path', 'new/folder', 0222)
     end

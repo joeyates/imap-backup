@@ -1,3 +1,4 @@
+# encoding: utf-8
 require 'fileutils'
 
 module Imap
@@ -17,9 +18,9 @@ module Imap
         parts = path.split('/')
         return if parts.size == 0
         full_path = File.join(base_path, path)
-        FileUtils.mkdir_p(full_path)
+        FileUtils.mkdir_p full_path
         first_directory = File.join(base_path, parts[0])
-        FileUtils.chmod_R(permissions, first_directory)
+        FileUtils.chmod permissions, first_directory
       end
 
       private

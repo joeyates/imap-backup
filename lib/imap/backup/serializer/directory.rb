@@ -1,4 +1,5 @@
 # encoding: utf-8
+require 'fileutils'
 
 module Imap
   module Backup
@@ -9,8 +10,9 @@ module Imap
 
         def initialize(path, folder)
           @path, @folder = path, folder
-          check_permissions(@path, 0700)
-          make_folder(@path, @folder, 'g-wrx,o-wrx')
+          permissions = 0700
+          check_permissions(@path, permissions)
+          make_folder(@path, @folder, permissions)
         end
 
         def uids

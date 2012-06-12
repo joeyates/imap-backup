@@ -23,7 +23,7 @@ describe Imap::Backup::Serializer::Directory do
       stat = stub('File::Stat', :mode => 0700)
       File.stub!(:stat).with('/base/path').and_return(stat)
       FileUtils.stub!(:mkdir_p).with('/base/path/my_folder')
-      FileUtils.stub!(:chmod_R).with('g-wrx,o-wrx', '/base/path/my_folder')
+      FileUtils.stub!(:chmod).with(0700, '/base/path/my_folder')
     end
 
     subject { Imap::Backup::Serializer::Directory.new('/base/path', 'my_folder') }
