@@ -4,8 +4,7 @@ require 'json'
 
 module Imap
   module Backup
-
-    class Settings
+    class Configuration
 
       include Imap::Backup::Utils
 
@@ -15,11 +14,11 @@ module Imap
         config_pathname = File.expand_path('~/.imap-backup/config.json')
         raise "Configuration file '#{config_pathname}' not found" if ! File.exist?(config_pathname)
         check_permissions(config_pathname, 0600)
-        @settings = JSON.parse(File.read(config_pathname), :symbolize_names => true)
+        @configuration_data = JSON.parse(File.read(config_pathname), :symbolize_names => true)
         if accounts.nil?
-          @accounts = @settings[:accounts]
+          @accounts = @configuration_data[:accounts]
         else
-          @accounts = @settings[:accounts].select{ |account| accounts.include?(account[:username]) }
+          @accounts = @configuration_data[:accounts].select{ |account| accounts.include?(account[:username]) }
         end
       end
 

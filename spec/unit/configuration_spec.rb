@@ -1,10 +1,10 @@
 # encoding: utf-8
 load File.expand_path( '../spec_helper.rb', File.dirname(__FILE__) )
 
-describe Imap::Backup::Settings do
+describe Imap::Backup::Configuration do
 
   before :each do
-    @settings = {
+    @configuration_data = {
       :accounts => [
         {
           :username => 'a1@example.com'
@@ -18,7 +18,7 @@ describe Imap::Backup::Settings do
     stat = stub('File::Stat', :mode => 0600)
     File.stub!(:stat).and_return(stat)
     File.stub!(:read)
-    JSON.stub!(:parse).and_return(@settings)
+    JSON.stub!(:parse).and_return(@configuration_data)
   end
 
   context '#initialize' do
@@ -27,7 +27,7 @@ describe Imap::Backup::Settings do
       File.should_receive(:exist?).and_return(false)
 
       expect do
-        Imap::Backup::Settings.new
+        Imap::Backup::Configuration.new
       end.to raise_error(RuntimeError, /not found/)
     end
 
@@ -38,7 +38,7 @@ describe Imap::Backup::Settings do
       File.should_receive(:stat).and_return(stat)
 
       expect do
-        Imap::Backup::Settings.new
+        Imap::Backup::Configuration.new
       end.to raise_error(RuntimeError, /Permissions.*?should be 0600/)
     end
 
@@ -52,14 +52,14 @@ describe Imap::Backup::Settings do
       File.should_receive(:read).with(%r{/.imap-backup/config.json}).and_return(configuration)
       JSON.should_receive(:parse).with(configuration, :symbolize_names => true)
 
-      Imap::Backup::Settings.new
+      Imap::Backup::Configuration.new
     end
 
     context 'with account parameter' do
       it 'should only create requested accounts' do
-        settings = Imap::Backup::Settings.new(['a2@example.com'])
+        configuration = Imap::Backup::Configuration.new(['a2@example.com'])
 
-        settings.accounts.should == @settings[:accounts][1..1]
+        configuration.accounts.should == @configuration_data[:accounts][1..1]
       end
     end
 
@@ -71,13 +71,13 @@ describe Imap::Backup::Settings do
       @connection = stub('Imap::Backup::Account::Connection', :disconnect => nil)
     end
 
-    subject { Imap::Backup::Settings.new }
+    subject { Imap::Backup::Configuration.new }
 
     context '#each_connection' do
 
       it 'should instantiate connections' do
-        Imap::Backup::Account::Connection.should_receive(:new).with(@settings[:accounts][0]).and_return(@connection)
-        Imap::Backup::Account::Connection.should_receive(:new).with(@settings[:accounts][1]).and_return(@connection)
+        Imap::Backup::Account::Connection.should_receive(:new).with(@configuration_data[:accounts][0]).and_return(@connection)
+        Imap::Backup::Account::Connection.should_receive(:new).with(@configuration_data[:accounts][1]).and_return(@connection)
 
         subject.each_connection{}
       end
