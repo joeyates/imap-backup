@@ -6,3 +6,9 @@ require 'imap/backup/downloader'
 require 'imap/backup/serializer/directory'
 require 'imap/backup/version'
 
+module Imap
+  module Backup
+    class ConfigurationNotFound < StandardError; end
+  end
+end
+
