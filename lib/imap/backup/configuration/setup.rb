@@ -22,7 +22,7 @@ module Imap
               menu.header = 'Choose an action'
               @config.data[:accounts].each do |account|
                 menu.choice("#{account[:username]}") do
-                  Account.new(@config, account[:username]).run
+                  edit_account account[:username]
                 end
               end
               menu.choice('add account') do
@@ -58,7 +58,7 @@ module Imap
           if account.nil?
             account = add_account(username)
           end
-          Account.new @config, account[:username]
+          Account.new(@config, account).run
         end
 
       end

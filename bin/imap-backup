@@ -54,7 +54,7 @@ end
 begin
   configuration = Imap::Backup::Configuration::List.new(options[:accounts])
 rescue Imap::Backup::ConfigurationNotFound
-  Imap::Backup::Configuration::Setup.new
+  Imap::Backup::Configuration::Setup.new.run
   exit
 end
 
@@ -69,7 +69,7 @@ when 'folders'
     connection.folders.each { |f| puts "\t" + f.name }
   end
 when 'setup'
-  Imap::Backup::Configuration::Setup.new
+  Imap::Backup::Configuration::Setup.new.run
 when 'status'
   configuration.each_connection do |connection|
     puts connection.username
