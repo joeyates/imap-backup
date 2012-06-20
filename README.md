@@ -14,20 +14,17 @@
 
 # Installation
 
-    gem install 'imap-backup'
+    $ gem install 'imap-backup'
 
-# Basic Usage
+# Setup
 
-* Create ~/.imap-backup directory and configuration file
+Run:
 
-```shell
-$ cd
-$ mkdir .imap-backup
-$ chmod 0700 .imap-backup
-$ cd .imap-backup
-$ touch config.json
-$ chmod 0600 config.json
-```
+    $ imap-backup setup
+
+The setup system is a menu-driven command line application.
+
+It creates ~/.imap-backup directory and configuration file. E.g.:
 
 ```
 {
@@ -47,9 +44,22 @@ $ chmod 0600 config.json
 }
 ```
 
-* Run
+# Security
 
-    imap-backup
+Note that email usernames and passwords are held in plain text
+in the configuration file.
+
+The directory ~/.imap-backup, the configuration file and all backup
+directories have their access permissions set to only allow access
+by your user.
+
+# Run Backup
+
+Manually, from the command line:
+
+    $ imap-backup
+
+Altertatively, add it to your crontab.
 
 # Other Usage
 
