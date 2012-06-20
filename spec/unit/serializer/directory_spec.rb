@@ -7,6 +7,7 @@ describe Imap::Backup::Serializer::Directory do
   context '#initialize' do
 
     it 'should fail if download path file permissions are to lax' do
+      File.stub!(:exist?).with('/base/path').and_return(true)
       stat = stub('File::Stat', :mode => 0345)
       File.should_receive(:stat).with('/base/path').and_return(stat)
 
@@ -24,6 +25,7 @@ describe Imap::Backup::Serializer::Directory do
       File.stub!(:stat).with('/base/path').and_return(stat)
       FileUtils.stub!(:mkdir_p).with('/base/path/my_folder')
       FileUtils.stub!(:chmod).with(0700, '/base/path/my_folder')
+      File.stub!(:exist?).with('/base/path').and_return(true)
     end
 
     subject { Imap::Backup::Serializer::Directory.new('/base/path', 'my_folder') }

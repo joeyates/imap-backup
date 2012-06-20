@@ -6,13 +6,11 @@ module Imap
     module Serializer
       class Directory
 
-        include Imap::Backup::Utils
-
         def initialize(path, folder)
           @path, @folder = path, folder
           permissions = 0700
-          check_permissions(@path, permissions)
-          make_folder(@path, @folder, permissions)
+          Imap::Backup::Utils.check_permissions(@path, permissions)
+          Imap::Backup::Utils.make_folder(@path, @folder, permissions)
         end
 
         def uids

@@ -5,16 +5,22 @@ module Imap
   module Backup
     module Utils
 
-      def check_permissions(filename, limit)
-        stat   = File.stat(filename)
-        actual = stat.mode & 0777
+      def self.check_permissions(filename, limit)
+        actual = stat(filename)
         mask   = ~limit & 0777
         if actual & mask != 0
           raise "Permissions on '#{filename}' should be #{oct(limit)}, not #{oct(actual)}" 
         end
       end
 
-      def make_folder(base_path, path, permissions)
+      def self.stat(filename)
+        return nil unless File.exist?(filename)
+
+        stat   = File.stat(filename)
+        stat.mode & 0777
+      end
+
+      def self.make_folder(base_path, path, permissions)
         parts = path.split('/')
         return if parts.size == 0
         full_path = File.join(base_path, path)
@@ -25,7 +31,7 @@ module Imap
 
       private
 
-      def oct(permissions)
+      def self.oct(permissions)
         "0%o" % permissions
       end
 

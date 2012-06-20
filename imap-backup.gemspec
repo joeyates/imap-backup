@@ -17,6 +17,7 @@ Gem::Specification.new do |gem|
   gem.version       = Imap::Backup::VERSION
 
   gem.add_runtime_dependency 'rake'
+  gem.add_runtime_dependency 'highline'
   if RUBY_VERSION < '1.9'
     gem.add_runtime_dependency 'json'
   end
