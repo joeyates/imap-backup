@@ -5,8 +5,8 @@ require 'highline'
 module Imap
   module Backup
     module Configuration
-
       class Setup
+
         class << self
           attr_accessor :highline
         end

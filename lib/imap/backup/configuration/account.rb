@@ -3,7 +3,6 @@
 module Imap
   module Backup
     module Configuration
-
       class Account
 
         def initialize(store, account)
