@@ -15,6 +15,7 @@ describe Imap::Backup::Configuration::List do
     }
     @store = stub('Imap::Backup::Configuration::Store', :data => @configuration_data)
     Imap::Backup::Configuration::Store.stub!(:new => @store)
+    Imap::Backup::Configuration::Store.stub!(:exist? => true)
   end
 
   context '#initialize' do
