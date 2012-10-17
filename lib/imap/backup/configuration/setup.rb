@@ -6,7 +6,6 @@ module Imap
   module Backup
     module Configuration
       class Setup
-
         class << self
           attr_accessor :highline
         end
@@ -60,7 +59,6 @@ module Imap
           end
           Account.new(@config, account).run
         end
-
       end
     end
   end

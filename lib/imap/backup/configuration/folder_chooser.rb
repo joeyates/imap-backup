@@ -4,7 +4,6 @@ module Imap
   module Backup
     module Configuration
       class FolderChooser
-
         def initialize(account)
           @account = account
         end
@@ -48,7 +47,6 @@ module Imap
             end
           end
         end
-
       end
     end
   end

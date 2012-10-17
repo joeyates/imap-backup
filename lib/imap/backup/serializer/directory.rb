@@ -5,7 +5,6 @@ module Imap
   module Backup
     module Serializer
       class Directory
-
         def initialize(path, folder)
           @path, @folder = path, folder
           permissions = 0700
@@ -43,7 +42,6 @@ module Imap
         def filename(uid)
           "#{directory}/%012u.json" % uid.to_i
         end
-
       end
     end
   end

@@ -4,7 +4,6 @@ module Imap
   module Backup
     module Configuration
       class Account
-
         def initialize(store, account)
           @store, @account = store, account
         end
@@ -77,7 +76,6 @@ EOT
             end
           end
         end
-
       end
     end
   end

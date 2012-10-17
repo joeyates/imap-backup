@@ -6,7 +6,6 @@ module Imap
   module Backup
     module Configuration
       class Store
-
         CONFIGURATION_DIRECTORY = File.expand_path('~/.imap-backup')
 
         attr_reader :data
@@ -56,7 +55,6 @@ module Imap
             FileUtils.chmod 0700, path
           end
         end
-
       end
     end
   end

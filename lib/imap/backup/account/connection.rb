@@ -4,7 +4,6 @@ module Imap
   module Backup
     module Account
       class Connection
-
         attr_reader :username
         attr_reader :imap
 
@@ -39,7 +38,6 @@ module Imap
             d.run
           end
         end
-
       end
     end
   end

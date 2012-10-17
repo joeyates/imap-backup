@@ -5,7 +5,6 @@ require 'json'
 module Imap
   module Backup
     class Downloader
-
       def initialize(folder, serializer)
         @folder, @serializer = folder, serializer
       end
@@ -17,7 +16,6 @@ module Imap
           @serializer.save(uid, message)
         end
       end
-
     end
   end
 end

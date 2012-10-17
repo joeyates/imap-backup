@@ -4,7 +4,6 @@ module Imap
   module Backup
     module Account
       class Folder
-
         REQUESTED_ATTRIBUTES = ['RFC822', 'FLAGS', 'INTERNALDATE']
 
         def initialize(connection, folder)
@@ -22,7 +21,6 @@ module Imap
           message['RFC822'].force_encoding('utf-8') if RUBY_VERSION > '1.9'
           message
         end
-
       end
     end
   end

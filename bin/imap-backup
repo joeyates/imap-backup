@@ -34,7 +34,6 @@ opts = OptionParser.new do |opts|
     puts opts
     exit
   end
-
 end
 opts.parse!
 

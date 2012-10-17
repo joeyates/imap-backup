@@ -4,7 +4,6 @@ module Imap
   module Backup
     module Configuration
       module Asker
-
         EMAIL_MATCHER = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i
 
         def self.email(default = '')
@@ -34,7 +33,6 @@ module Imap
             q.responses[:not_valid] = 'Choose a different directory '
           end
         end
-
       end
     end
   end
