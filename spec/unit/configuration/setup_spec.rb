@@ -8,7 +8,7 @@ describe Imap::Backup::Configuration::Setup do
   context '#initialize' do
 
     it 'should not require the config file to exist' do
-      Imap::Backup::Configuration::Store.should_receive(:new).with(false)
+      Imap::Backup::Configuration::Store.should_receive(:new)
 
       Imap::Backup::Configuration::Setup.new
     end
@@ -26,7 +26,7 @@ describe Imap::Backup::Configuration::Setup do
       @account1 = { :username => 'account@example.com' }
       @data     = { :accounts => [ @account1 ] }
       @store    = stub('Imap::Backup::Configuration::Store', :data => @data, :path => '/base/path')
-      Imap::Backup::Configuration::Store.stub!(:new).with(false).and_return(@store)
+      Imap::Backup::Configuration::Store.stub!(:new).and_return(@store)
     end
 
     subject { Imap::Backup::Configuration::Setup.new }
