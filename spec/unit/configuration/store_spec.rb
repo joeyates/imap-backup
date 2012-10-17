@@ -2,7 +2,6 @@
 load File.expand_path( '../../spec_helper.rb', File.dirname(__FILE__) )
 
 describe Imap::Backup::Configuration::Store do
-
   before :all do
     @configuration_directory = Imap::Backup::Configuration::Store::CONFIGURATION_DIRECTORY
     Imap::Backup::Configuration::Store.instance_eval { remove_const :'CONFIGURATION_DIRECTORY' }
@@ -15,7 +14,6 @@ describe Imap::Backup::Configuration::Store do
   end
 
   context '#initialize' do
-
     before :each do
       Imap::Backup::Utils.stub!(:check_permissions => nil)
     end
@@ -48,11 +46,9 @@ describe Imap::Backup::Configuration::Store do
 
       Imap::Backup::Configuration::Store.new
     end
-
   end
 
   context '#save' do
-
     before :each do
       # initialize
       File.stub!(:directory?).with('/base/path').and_return(false)
@@ -91,7 +87,6 @@ describe Imap::Backup::Configuration::Store do
     end
 
     context 'saving accounts' do
-
       before :each do
         # initialize
         File.stub!(:exist?).with('/base/path/config.json').and_return(true)
@@ -155,10 +150,7 @@ describe Imap::Backup::Configuration::Store do
 
         subject.save
       end
-
     end
-
   end
-
 end
 
