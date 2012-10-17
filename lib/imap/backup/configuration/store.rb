@@ -40,10 +40,10 @@ module Imap
             mkdir_private account[:local_path]
             account[:folders].each do |f|
               parts = f[:name].split('/')
-              path  = account[:local_path].clone
+              p     = account[:local_path].clone
               parts.each do |part|
-                path = File.join(path, part)
-                mkdir_private path
+                p    = File.join(p, part)
+                mkdir_private p
               end
             end
           end
