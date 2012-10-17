@@ -18,6 +18,13 @@ describe Imap::Backup::Configuration::List do
   end
 
   context '#initialize' do
+    it 'fails if the configuration file is missing' do
+      Imap::Backup::Configuration::Store.should_receive(:exist?).and_return(false)
+
+      expect {
+        Imap::Backup::Configuration::List.new
+      }.to raise_error(Imap::Backup::ConfigurationNotFound, /not found/)
+    end
 
     context 'with account parameter' do
       it 'should only create requested accounts' do

@@ -12,7 +12,7 @@ module Imap
         self.highline = HighLine.new
 
         def initialize
-          @config = Imap::Backup::Configuration::Store.new(false)
+          @config = Imap::Backup::Configuration::Store.new
         end
 
         def run

@@ -11,25 +11,29 @@ module Imap
         attr_reader :data
         attr_reader :path
 
-        def initialize(fail_if_missing = true)
-          @path     = CONFIGURATION_DIRECTORY
-          @pathname = File.join(@path, 'config.json')
-          if File.directory?(@path)
-            Imap::Backup::Utils.check_permissions @path, 0700
+        def self.default_pathname
+          File.join(CONFIGURATION_DIRECTORY, 'config.json')
+        end
+
+        def self.exist?(pathname = default_pathname)
+          File.exist?(pathname)
+        end
+
+        def initialize(pathname = self.class.default_pathname)
+          @pathname = pathname
+          if File.directory?(path)
+            Imap::Backup::Utils.check_permissions path, 0700
           end
           if File.exist?(@pathname)
             Imap::Backup::Utils.check_permissions @pathname, 0600
             @data = JSON.parse(File.read(@pathname), :symbolize_names => true)
           else
-            if fail_if_missing
-              raise ConfigurationNotFound.new("Configuration file '#{@pathname}' not found")
-            end
             @data = {:accounts => []}
           end
         end
 
         def save
-          mkdir_private @path
+          mkdir_private path
           File.open(@pathname, 'w') { |f| f.write(JSON.pretty_generate(@data)) }
           FileUtils.chmod 0600, @pathname
           @data[:accounts].each do |account|
@@ -54,6 +58,10 @@ module Imap
           if Imap::Backup::Utils::stat(path) != 0700
             FileUtils.chmod 0700, path
           end
+        end
+
+        def path
+          File.dirname(@pathname)
         end
       end
     end

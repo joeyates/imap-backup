@@ -7,6 +7,9 @@ module Imap
         attr_reader :accounts
 
         def initialize(accounts = nil)
+          if not Imap::Backup::Configuration::Store.exist?
+            raise ConfigurationNotFound.new("Configuration file '#{Imap::Backup::Configuration::Store.default_pathname}' not found")
+          end
           @config = Imap::Backup::Configuration::Store.new
 
           if accounts.nil?

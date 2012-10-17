@@ -20,21 +20,12 @@ describe Imap::Backup::Configuration::Store do
       Imap::Backup::Utils.stub!(:check_permissions => nil)
     end
 
-    it 'by default, should fail if the config file is missing' do
+    it 'should not fail if the configuration file is missing' do
       File.should_receive(:directory?).with('/base/path').and_return(true)
       File.should_receive(:exist?).with('/base/path/config.json').and_return(false)
 
       expect do
         Imap::Backup::Configuration::Store.new
-      end.to raise_error(Imap::Backup::ConfigurationNotFound, /not found/)
-    end
-
-    it 'should not fail if fail_if_missing is false' do
-      File.should_receive(:directory?).with('/base/path').and_return(true)
-      File.should_receive(:exist?).with('/base/path/config.json').and_return(false)
-
-      expect do
-        Imap::Backup::Configuration::Store.new(false)
       end.to_not raise_error
     end
 
@@ -78,7 +69,7 @@ describe Imap::Backup::Configuration::Store do
       FileUtils.stub!(:chmod).with(0600, '/base/path/config.json')
     end
 
-    subject { Imap::Backup::Configuration::Store.new(false) }
+    subject { Imap::Backup::Configuration::Store.new }
 
     it 'should create the config directory' do
       File.should_receive(:directory?).with('/base/path').and_return(false)
