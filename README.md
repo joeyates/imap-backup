@@ -44,6 +44,28 @@ It creates ~/.imap-backup directory and configuration file. E.g.:
 }
 ```
 
+It connects to GMail by default, but you can also specify a server:
+
+```
+{  
+  "accounts":
+  [
+    {
+      "username": "my.user@gmail.com",
+      "password": "secret",
+      "server": "my.imap.example.com",
+      "local_path": "/path/to/backup/root",
+      "folders":
+        [
+          {"name": "[Gmail]/All Mail"},
+          {"name": "my_folder"}
+        ]
+    }
+  ]  
+}    
+```
+
+
 # Security
 
 Note that email usernames and passwords are held in plain text
