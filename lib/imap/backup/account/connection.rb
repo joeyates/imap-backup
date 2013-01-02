@@ -10,7 +10,7 @@ module Imap
         def initialize(options)
           @username = options[:username]
           @local_path, @backup_folders = options[:local_path], options[:folders]
-          @imap = Net::IMAP.new('imap.gmail.com', 993, true)
+          @imap = Net::IMAP.new(options[:server] || 'imap.gmail.com', 993, true)
           @imap.login(@username, options[:password])
         end
 

@@ -13,6 +13,15 @@ describe Imap::Backup::Account::Connection do
       Imap::Backup::Account::Connection.new(:username => 'myuser', :password => 'secret')
     end
 
+    context "with specific server" do
+      it 'should login to the imap server' do
+        imap = stub('Net::IMAP')
+        Net::IMAP.should_receive(:new).with('my.imap.example.com', 993, true).and_return(imap)
+        imap.should_receive('login').with('myuser', 'secret')
+
+        Imap::Backup::Account::Connection.new(:username => 'myuser', :password => 'secret', :server => 'my.imap.example.com')
+      end
+    end
   end
 
   context 'instance methods' do
