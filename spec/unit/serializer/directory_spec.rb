@@ -3,8 +3,10 @@
 load File.expand_path('../../spec_helper.rb', File.dirname(__FILE__))
 
 describe Imap::Backup::Serializer::Directory do
-  before :each do
-    stat = stub('File::Stat', :mode => 0700)
+  let(:stat) { stub('File::Stat', :mode => 0700) }
+  let(:files) { ['00000123.json', '000001.json'] }
+
+  before do
     File.stub!(:stat).with('/base/path').and_return(stat)
     FileUtils.stub!(:mkdir_p).with('/base/path/my_folder')
     FileUtils.stub!(:chmod).with(0700, '/base/path/my_folder')
@@ -15,8 +17,6 @@ describe Imap::Backup::Serializer::Directory do
 
   context '#uids' do
     it 'should return the backed-up uids' do
-      files = ['00000123.json', '000001.json']
-
       File.should_receive(:exist?).with('/base/path/my_folder').and_return(true)
       Dir.should_receive(:open).with('/base/path/my_folder').and_return(files)
 
@@ -39,38 +39,41 @@ describe Imap::Backup::Serializer::Directory do
   end
 
   context '#save' do
-    before :each do
-      File.stub!(:exist?).with(%r{/base/path/my_folder/0+1234.json}).and_return(true)
-      FileUtils.stub!(:chmod).with(0600, /0+1234.json$/)
-      @message = {
+    let(:message) do
+      {
         'RFC822' => 'the body',
         'other'  => 'xxx'
       }
-      @file = stub('File', :write => nil)
+    end
+    let(:file) { stub('File', :write => nil) }
+
+    before do
+      File.stub!(:exist?).with(%r{/base/path/my_folder/0+1234.json}).and_return(true)
+      FileUtils.stub!(:chmod).with(0600, /0+1234.json$/)
       File.stub!(:open) do |&block|
-        block.call @file
+        block.call file
       end
     end
 
     it 'should save messages' do
       File.should_receive(:open) do |&block|
-        block.call @file
+        block.call file
       end
-      @file.should_receive(:write).with(/the body/)
+      file.should_receive(:write).with(/the body/)
 
-      subject.save('1234', @message)
+      subject.save('1234', message)
     end
 
     it 'should JSON encode messages' do
-      @message.should_receive(:to_json)
+      message.should_receive(:to_json)
 
-      subject.save('1234', @message)
+      subject.save('1234', message)
     end
 
     it 'should set file permissions' do
       FileUtils.should_receive(:chmod).with(0600, /0+1234.json$/)
 
-      subject.save(1234, @message)
+      subject.save(1234, message)
     end
   end
 end
