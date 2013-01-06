@@ -11,6 +11,7 @@ require 'imap/backup/configuration/store'
 require 'imap/backup/downloader'
 require 'imap/backup/serializer/base'
 require 'imap/backup/serializer/directory'
+require 'imap/backup/serializer/mbox'
 require 'imap/backup/version'
 
 module Imap
