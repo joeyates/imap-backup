@@ -18,6 +18,7 @@ Gem::Specification.new do |gem|
 
   gem.add_runtime_dependency 'rake'
   gem.add_runtime_dependency 'highline'
+  gem.add_runtime_dependency 'mail'
   if RUBY_VERSION < '1.9'
     gem.add_runtime_dependency 'json'
   end
