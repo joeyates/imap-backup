@@ -2,8 +2,8 @@
 load File.expand_path('../../spec_helper.rb', File.dirname(__FILE__))
 
 describe Imap::Backup::Configuration::List do
-  before :each do
-    @configuration_data = {
+  let(:configuration_data) do
+    {
       :accounts => [
         {
           :username => 'a1@example.com'
@@ -13,8 +13,11 @@ describe Imap::Backup::Configuration::List do
         },
       ]
     }
-    @store = stub('Imap::Backup::Configuration::Store', :data => @configuration_data)
-    Imap::Backup::Configuration::Store.stub!(:new => @store)
+  end
+  let(:store) { stub('Imap::Backup::Configuration::Store', :data => configuration_data) }
+
+  before do
+    Imap::Backup::Configuration::Store.stub!(:new => store)
     Imap::Backup::Configuration::Store.stub!(:exist? => true)
   end
 
@@ -31,44 +34,41 @@ describe Imap::Backup::Configuration::List do
       it 'should only create requested accounts' do
         configuration = Imap::Backup::Configuration::List.new(['a2@example.com'])
 
-        configuration.accounts.should == @configuration_data[:accounts][1..1]
+        configuration.accounts.should == configuration_data[:accounts][1..1]
       end
     end
 
   end
 
   context 'instance methods' do
-
-    before :each do
-      @connection = stub('Imap::Backup::Account::Connection', :disconnect => nil)
-    end
+    let(:connection) { stub('Imap::Backup::Account::Connection', :disconnect => nil) }
 
     subject { Imap::Backup::Configuration::List.new }
 
     context '#each_connection' do
 
       it 'should instantiate connections' do
-        Imap::Backup::Account::Connection.should_receive(:new).with(@configuration_data[:accounts][0]).and_return(@connection)
-        Imap::Backup::Account::Connection.should_receive(:new).with(@configuration_data[:accounts][1]).and_return(@connection)
+        Imap::Backup::Account::Connection.should_receive(:new).with(configuration_data[:accounts][0]).and_return(connection)
+        Imap::Backup::Account::Connection.should_receive(:new).with(configuration_data[:accounts][1]).and_return(connection)
 
         subject.each_connection{}
       end
 
       it 'should call the block' do
-        Imap::Backup::Account::Connection.stub!(:new).and_return(@connection)
+        Imap::Backup::Account::Connection.stub!(:new).and_return(connection)
         calls = 0
 
         subject.each_connection do |a|
           calls += 1
-          a.should == @connection
+          a.should == connection
         end
         calls.should == 2
       end
 
       it 'should disconnect connections' do
-        Imap::Backup::Account::Connection.stub!(:new).and_return(@connection)
+        Imap::Backup::Account::Connection.stub!(:new).and_return(connection)
 
-        @connection.should_receive(:disconnect)
+        connection.should_receive(:disconnect)
 
         subject.each_connection {}
       end
