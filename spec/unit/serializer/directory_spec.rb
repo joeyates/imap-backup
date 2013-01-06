@@ -3,9 +3,7 @@
 load File.expand_path('../../spec_helper.rb', File.dirname(__FILE__))
 
 describe Imap::Backup::Serializer::Directory do
-
   context '#initialize' do
-
     it 'should fail if download path file permissions are to lax' do
       File.stub!(:exist?).with('/base/path').and_return(true)
       stat = stub('File::Stat', :mode => 0345)
@@ -15,11 +13,9 @@ describe Imap::Backup::Serializer::Directory do
         Imap::Backup::Serializer::Directory.new('/base/path', 'my_folder')
       end.to raise_error(RuntimeError, "Permissions on '/base/path' should be 0700, not 0345")
     end
-
   end
 
   context 'with object' do
-
     before :each do
       stat = stub('File::Stat', :mode => 0700)
       File.stub!(:stat).with('/base/path').and_return(stat)
@@ -31,7 +27,6 @@ describe Imap::Backup::Serializer::Directory do
     subject { Imap::Backup::Serializer::Directory.new('/base/path', 'my_folder') }
 
     context '#uids' do
-
       it 'should return the backed-up uids' do
         files = ['00000123.json', '000001.json']
 
@@ -46,21 +41,17 @@ describe Imap::Backup::Serializer::Directory do
 
         subject.uids.should == []
       end
-
     end
 
     context '#exist?' do
-
       it 'should check if the file exists' do
         File.should_receive(:exist?).with(%r{/base/path/my_folder/0+123.json}).and_return(true)
 
         subject.exist?(123).should be_true
       end
-
     end
 
     context '#save' do
-
       before :each do
         File.stub!(:exist?).with(%r{/base/path/my_folder/0+1234.json}).and_return(true)
         FileUtils.stub!(:chmod).with(0600, /0+1234.json$/)
@@ -95,8 +86,6 @@ describe Imap::Backup::Serializer::Directory do
         subject.save(1234, @message)
       end
     end
-
   end
-
 end
 
