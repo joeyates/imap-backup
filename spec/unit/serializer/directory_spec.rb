@@ -3,18 +3,6 @@
 load File.expand_path('../../spec_helper.rb', File.dirname(__FILE__))
 
 describe Imap::Backup::Serializer::Directory do
-  context '#initialize' do
-    it 'should fail if download path file permissions are to lax' do
-      File.stub!(:exist?).with('/base/path').and_return(true)
-      stat = stub('File::Stat', :mode => 0345)
-      File.should_receive(:stat).with('/base/path').and_return(stat)
-
-      expect do
-        Imap::Backup::Serializer::Directory.new('/base/path', 'my_folder')
-      end.to raise_error(RuntimeError, "Permissions on '/base/path' should be 0700, not 0345")
-    end
-  end
-
   context 'with object' do
     before :each do
       stat = stub('File::Stat', :mode => 0700)
