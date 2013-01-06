@@ -1,5 +1,5 @@
 # encoding: utf-8
-load File.expand_path( '../../spec_helper.rb', File.dirname(__FILE__) )
+load File.expand_path('../../spec_helper.rb', File.dirname(__FILE__))
 
 describe Imap::Backup::Configuration::List do
   before :each do
