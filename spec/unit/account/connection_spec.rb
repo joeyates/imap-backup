@@ -2,9 +2,7 @@
 load File.expand_path( '../../spec_helper.rb', File.dirname(__FILE__) )
 
 describe Imap::Backup::Account::Connection do
-
   context '#initialize' do
-
     it 'should login to the imap server' do
       imap = stub('Net::IMAP')
       Net::IMAP.should_receive(:new).with('imap.gmail.com', 993, true).and_return(imap)
@@ -25,7 +23,6 @@ describe Imap::Backup::Account::Connection do
   end
 
   context 'instance methods' do
-
     before :each do
       @imap = stub('Net::IMAP', :login => nil)
       Net::IMAP.stub!(:new).and_return(@imap)
@@ -57,7 +54,6 @@ describe Imap::Backup::Account::Connection do
 
 
     context '#status' do
-
       before :each do
         @folder = stub('Imap::Backup::Account::Folder', :uids => [])
         Imap::Backup::Account::Folder.stub!(:new).with(subject, 'my_folder').and_return(@folder)
@@ -80,11 +76,9 @@ describe Imap::Backup::Account::Connection do
 
         subject.status[0][:remote].should == [101, 234]
       end
-
     end
 
     context '#run_backup' do
-
       before :each do
         @folder = stub('Imap::Backup::Account::Folder', :uids => [])
         Imap::Backup::Account::Folder.stub!(:new).with(subject, 'my_folder').and_return(@folder)
@@ -117,10 +111,7 @@ describe Imap::Backup::Account::Connection do
 
         subject.run_backup
       end
-
     end
-
   end
-
 end
 

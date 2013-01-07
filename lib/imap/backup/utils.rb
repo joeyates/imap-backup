@@ -16,7 +16,7 @@ module Imap
       def self.stat(filename)
         return nil unless File.exist?(filename)
 
-        stat   = File.stat(filename)
+        stat = File.stat(filename)
         stat.mode & 0777
       end
 
