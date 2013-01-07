@@ -13,6 +13,14 @@ describe Imap::Backup::Configuration::Store do
     Imap::Backup::Configuration::Store::CONFIGURATION_DIRECTORY = @configuration_directory
   end
 
+  context '.exist?' do
+    it 'checks if the file exists' do
+      File.should_receive(:exist?).with('/base/path/config.json').and_return(true)
+
+      Imap::Backup::Configuration::Store.exist?
+    end
+  end
+
   context '#initialize' do
     before :each do
       Imap::Backup::Utils.stub!(:check_permissions => nil)
