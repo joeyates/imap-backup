@@ -30,7 +30,7 @@ The setup system is a menu-driven command line application.
 
 It creates ~/.imap-backup directory and configuration file. E.g.:
 
-```
+```json
 {
   "accounts":
   [
@@ -50,7 +50,7 @@ It creates ~/.imap-backup directory and configuration file. E.g.:
 
 It connects to GMail by default, but you can also specify a server:
 
-```
+```json
 {  
   "accounts":
   [
@@ -99,13 +99,13 @@ a full restore.
 List IMAP folders:
 
 ```shell
-imap-backup folders
+$ imap-backup folders
 ```
 
 Get statistics of emails to download per folder:
 
 ```shell
-imap-backup status
+$ imap-backup status
 ```
 
 # Design Goals
