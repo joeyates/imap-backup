@@ -33,7 +33,7 @@ module Imap
         def run_backup
           @backup_folders.each do |folder|
             f = Imap::Backup::Account::Folder.new(self, folder[:name])
-            s = Imap::Backup::Serializer::Directory.new(@local_path, folder[:name])
+            s = Imap::Backup::Serializer::Mbox.new(@local_path, folder[:name])
             d = Imap::Backup::Downloader.new(f, s)
             d.run
           end

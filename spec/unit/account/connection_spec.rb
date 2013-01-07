@@ -83,7 +83,7 @@ describe Imap::Backup::Account::Connection do
         @folder = stub('Imap::Backup::Account::Folder', :uids => [])
         Imap::Backup::Account::Folder.stub!(:new).with(subject, 'my_folder').and_return(@folder)
         @serializer = stub('Imap::Backup::Serializer')
-        Imap::Backup::Serializer::Directory.stub!(:new).with('/base/path', 'my_folder').and_return(@serializer)
+        Imap::Backup::Serializer::Mbox.stub!(:new).with('/base/path', 'my_folder').and_return(@serializer)
         @downloader = stub('Imap::Backup::Downloader', :run => nil)
         Imap::Backup::Downloader.stub!(:new).with(@folder, @serializer).and_return(@downloader)
       end
@@ -95,7 +95,7 @@ describe Imap::Backup::Account::Connection do
       end
 
       it 'should instantiate serializers' do
-        Imap::Backup::Serializer::Directory.should_receive(:new).with('/base/path', 'my_folder').and_return(@serializer)
+        Imap::Backup::Serializer::Mbox.should_receive(:new).with('/base/path', 'my_folder').and_return(@serializer)
 
         subject.run_backup
       end
