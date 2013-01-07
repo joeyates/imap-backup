@@ -33,9 +33,9 @@ module Imap
           message = Email::Mboxrd::Message.new(message['RFC822'])
           mbox = imap = nil
           begin
-            mbox = File.open(mbox_pathname, 'w+')
-            imap = File.open(imap_pathname, 'w+')
-            mbox.write message.to_mbox
+            mbox = File.open(mbox_pathname, 'ab')
+            imap = File.open(imap_pathname, 'ab')
+            mbox.write message.to_s
             imap.write uid + "\n"
           ensure
             mbox.close if mbox
