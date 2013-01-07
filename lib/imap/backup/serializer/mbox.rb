@@ -30,7 +30,7 @@ module Imap
         def save(uid, message)
           uid = uid.to_s
           return if uids.include?(uid)
-          message = Email::Mbox::Message.new(message)
+          message = Email::Mboxrd::Message.new(message['RFC822'])
           mbox = imap = nil
           begin
             mbox = File.open(mbox_pathname, 'w+')
