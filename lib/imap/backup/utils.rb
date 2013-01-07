@@ -25,8 +25,11 @@ module Imap
         return if parts.size == 0
         full_path = File.join(base_path, path)
         FileUtils.mkdir_p full_path
-        first_directory = File.join(base_path, parts[0])
-        FileUtils.chmod permissions, first_directory
+        path = base_path
+        parts.each do |part|
+          path = File.join(path, part)
+          FileUtils.chmod permissions, path
+        end
       end
 
       private

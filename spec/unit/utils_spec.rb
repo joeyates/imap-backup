@@ -2,9 +2,7 @@
 load File.expand_path( '../spec_helper.rb', File.dirname(__FILE__) )
 
 describe Imap::Backup::Utils do
-
   context '#check_permissions' do
-
     before :each do
       File.stub!(:exist?).and_return(true)
     end
@@ -42,11 +40,9 @@ describe Imap::Backup::Utils do
         Imap::Backup::Utils.check_permissions('foobar', 0345)
       end.to raise_error(RuntimeError, "Permissions on 'foobar' should be 0345, not 0777")
     end
-
   end
 
   context '#make_folder' do
-
     it 'should do nothing if an empty path is supplied' do
       FileUtils.should_not_receive(:mkdir_p)
 
@@ -64,12 +60,10 @@ describe Imap::Backup::Utils do
     it 'should set permissions on the path' do
       FileUtils.stub!(:mkdir_p)
 
-      FileUtils.should_receive(:chmod).with(0222, '/base/path/new')
+      FileUtils.should_receive(:chmod).with(0222, '/base/path/new/folder')
 
-      Imap::Backup::Utils.make_folder('/base/path', 'new/folder', 0222)
+      Imap::Backup::Utils.make_folder('/base/path/new', 'folder', 0222)
     end
-
   end
-
 end
 
