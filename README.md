@@ -14,13 +14,17 @@
 
 # Installation
 
-    $ gem install 'imap-backup'
+```shell
+$ gem install 'imap-backup'
+```
 
 # Setup
 
 Run:
 
-    $ imap-backup setup
+```shell
+$ imap-backup setup
+```
 
 The setup system is a menu-driven command line application.
 
@@ -61,10 +65,9 @@ It connects to GMail by default, but you can also specify a server:
           {"name": "my_folder"}
         ]
     }
-  ]  
-}    
+  ]
+}  
 ```
-
 
 # Security
 
@@ -79,7 +82,9 @@ by your user.
 
 Manually, from the command line:
 
-    $ imap-backup
+```shell
+$ imap-backup
+```
 
 Altertatively, add it to your crontab.
 
@@ -93,11 +98,15 @@ a full restore.
 
 List IMAP folders:
 
-    imap-backup folders
+```shell
+imap-backup folders
+```
 
 Get statistics of emails to download per folder:
 
-    imap-backup status
+```shell
+imap-backup status
+```
 
 # Design Goals
 
