@@ -18,7 +18,15 @@ describe Email::Mboxrd::Message do
 
     before do
       Mail.stub(:new).with(message_body).and_return(mail)
-      mail.stub_chain(:envelope, :from).and_return(from)
+    end
+
+    it 'does not modify the message' do
+      message_body2 = message_body.clone
+
+      message_body.should_receive(:clone).and_return(message_body2)
+      message_body.should_not_receive(:force_encoding).with('binary')
+
+      subject.to_s
     end
 
     it 'parses the message' do
