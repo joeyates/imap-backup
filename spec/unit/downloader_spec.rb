@@ -2,9 +2,7 @@
 require 'spec_helper'
 
 describe Imap::Backup::Downloader do
-
   context 'with account and downloader' do
-
     before :each do
       local_path = '/base/path'
       stat       = stub('File::Stat', :mode => 0700)
@@ -24,9 +22,7 @@ describe Imap::Backup::Downloader do
     subject { Imap::Backup::Downloader.new(@folder, @serializer) }
 
     context '#run' do
-
       context 'with folder' do
-
         it 'should list messages' do
           @folder.should_receive(:uids).and_return([])
 
@@ -70,16 +66,10 @@ describe Imap::Backup::Downloader do
 
               subject.run
             end
-
           end
-
         end
-
       end
-
     end
-
   end
-
 end
 

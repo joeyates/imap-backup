@@ -2,9 +2,7 @@
 require 'spec_helper'
 
 describe Imap::Backup::Account::Folder do
-
   context 'with instance' do
-
     before :each do
       @imap    = stub('Net::IMAP')
       @connection = stub('Imap::Backup::Account::Connection', :imap => @imap)
@@ -13,14 +11,12 @@ describe Imap::Backup::Account::Folder do
     subject { Imap::Backup::Account::Folder.new(@connection, 'my_folder') }
 
     context '#uids' do
-
       it 'should list available messages' do
         @imap.should_receive(:examine).with('my_folder')
         @imap.should_receive(:uid_search).with(['ALL']).and_return([5678, 123])
 
         subject.uids.should == [123, 5678]
       end
-
     end
 
     context '#fetch' do
@@ -50,10 +46,7 @@ describe Imap::Backup::Account::Folder do
           subject.fetch(123)
         end
       end
-
     end
-
   end
-
 end
 

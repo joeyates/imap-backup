@@ -2,9 +2,7 @@
 require 'spec_helper'
 
 describe Imap::Backup::Configuration::ConnectionTester do
-
   context '.test' do
-
     it 'should try to connect' do
       Imap::Backup::Account::Connection.should_receive(:new).with('foo')
 
@@ -40,8 +38,6 @@ describe Imap::Backup::Configuration::ConnectionTester do
 
       result.should =~ /unexpected error/i
     end
-
   end
-
 end
 

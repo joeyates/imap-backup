@@ -7,7 +7,6 @@ describe Imap::Backup::Configuration::FolderChooser do
   include InputOutputTestHelpers
 
   context '#run' do
-
     before :each do
       empty_account = {
         :folders => []
@@ -62,7 +61,6 @@ describe Imap::Backup::Configuration::FolderChooser do
     end
 
     context 'folder listing' do
-
       before :each do
         account = {
           :folders => [{:name => 'my_folder'}]
@@ -121,11 +119,7 @@ describe Imap::Backup::Configuration::FolderChooser do
         @output.string.should =~ /\d+\. \- my_folder/
         @account[:folders].should_not include( { :name => 'my_folder' } )
       end
-
-
     end
-
   end
-
 end
 

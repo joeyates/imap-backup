@@ -2,7 +2,6 @@
 require 'spec_helper'
 
 describe Imap::Backup::Configuration::Account do
-
   include HighLineTestHelpers
   include InputOutputTestHelpers
 
@@ -20,7 +19,6 @@ describe Imap::Backup::Configuration::Account do
   end
 
   context '#run' do
-
     before :each do
       @account1_path = '/backup/path'
       @account1 = {
@@ -45,7 +43,6 @@ describe Imap::Backup::Configuration::Account do
     subject { Imap::Backup::Configuration::Account.new(@store, @account1) }
 
     context 'menu' do
-
       it 'should show a menu' do
         subject.run
 
@@ -78,7 +75,6 @@ describe Imap::Backup::Configuration::Account do
     end
 
     context 'email' do
-
       it 'should modify the email address' do
         Imap::Backup::Configuration::Asker.should_receive(:email).once.and_return('new@example.com')
 
@@ -99,11 +95,9 @@ describe Imap::Backup::Configuration::Account do
           subject.run
         end.should =~ /there is already an account set up with that email address/i
       end
-
     end
 
     context 'password' do
-
       it 'should update the password' do
         Imap::Backup::Configuration::Asker.should_receive(:password).once.and_return('new_pwd')
 
@@ -123,11 +117,9 @@ describe Imap::Backup::Configuration::Account do
 
         @account1[:password].should == 'secret'
       end
-
     end
 
     context 'backup_path' do
-
       it 'should update the path' do
         Imap::Backup::Configuration::Asker.should_receive(:backup_path).once do |default, validator|
           validator.call('new/path')
@@ -153,7 +145,6 @@ describe Imap::Backup::Configuration::Account do
           subject.run
         end.should =~ %r{The path '/existing/path' is used to backup the account 'existing@example.com'}
       end
-
     end
 
     it 'should add/remove folders' do
@@ -177,7 +168,6 @@ describe Imap::Backup::Configuration::Account do
     end
 
     context 'deletion' do
-
       it 'should confirm deletion' do
         Imap::Backup::Configuration::Setup.highline.should_receive(:agree).with("Are you sure? (y/n) ").and_return(true)
 
@@ -205,20 +195,15 @@ describe Imap::Backup::Configuration::Account do
 
         @data[:accounts].should include(@account1)
       end
-
     end
 
     context 'return to main menu' do
-
       it 'should return' do
         @input.stub!(:gets).with().and_return("return\n")
 
         subject.run.should be_nil
       end
-
     end
-
   end
-
 end
 

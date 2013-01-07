@@ -2,9 +2,7 @@
 require 'spec_helper'
 
 describe Imap::Backup::Configuration::Asker do
-
   context '.email' do
-
     it 'should ask for an email' do
       Imap::Backup::Configuration::Setup.highline.should_receive(:ask).with(/email/)
 
@@ -29,11 +27,9 @@ describe Imap::Backup::Configuration::Asker do
 
       Imap::Backup::Configuration::Asker.email.should == 'new@example.com'
     end
-
   end
 
   context '.password' do
-
     before :each do
       Imap::Backup::Configuration::Setup.highline.stub!(:ask).with(/^password/).and_return('secret')
       Imap::Backup::Configuration::Setup.highline.stub!(:ask).with(/^repeat password/).and_return('secret')
@@ -92,11 +88,9 @@ describe Imap::Backup::Configuration::Asker do
 
       Imap::Backup::Configuration::Asker.password.should be_nil
     end
-
   end
 
   context '.backup_path' do
-
     it 'should ask for a directory' do
       validator = /validator/
       Imap::Backup::Configuration::Setup.highline.should_receive(:ask).with(/directory/) do |&block|
@@ -115,8 +109,6 @@ describe Imap::Backup::Configuration::Asker do
 
       Imap::Backup::Configuration::Asker.backup_path('default path', //).should == '/path'
     end
-
   end
-
 end
 

@@ -2,21 +2,17 @@
 require 'spec_helper'
 
 describe Imap::Backup::Configuration::Setup do
-
   include HighLineTestHelpers
 
   context '#initialize' do
-
     it 'should not require the config file to exist' do
       Imap::Backup::Configuration::Store.should_receive(:new)
 
       Imap::Backup::Configuration::Setup.new
     end
-
   end
 
   context '#run' do
-
     before :each do
       prepare_store
       @input, @output = prepare_highline
@@ -109,8 +105,6 @@ describe Imap::Backup::Configuration::Setup do
 
       subject.run
     end
-
   end
-
 end
 

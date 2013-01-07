@@ -37,7 +37,6 @@ describe Imap::Backup::Configuration::List do
         configuration.accounts.should == configuration_data[:accounts][1..1]
       end
     end
-
   end
 
   context 'instance methods' do
@@ -72,10 +71,7 @@ describe Imap::Backup::Configuration::List do
 
         subject.each_connection {}
       end
-
     end
-
   end
-
 end
 

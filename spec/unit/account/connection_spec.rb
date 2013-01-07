@@ -52,7 +52,6 @@ describe Imap::Backup::Account::Connection do
       end
     end
 
-
     context '#status' do
       before :each do
         @folder = stub('Imap::Backup::Account::Folder', :uids => [])
