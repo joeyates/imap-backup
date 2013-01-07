@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Email::Mbox::Message do
+describe Email::Mboxrd::Message do
   let(:from) { 'me@example.com' }
   let(:message_body) { "Foo\nBar\nFrom at the beginning of the line" }
   subject { Email::Mbox::Message.new(message_body) }

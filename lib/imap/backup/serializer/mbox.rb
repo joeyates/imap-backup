@@ -1,6 +1,6 @@
 # encoding: utf-8
 require 'csv'
-require 'email/mbox/message'
+require 'email/mboxrd/message'
 
 module Imap
   module Backup
