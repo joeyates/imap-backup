@@ -4,7 +4,8 @@ module Email
   module Mboxrd
     class Message
       def initialize(body)
-        @body = body
+        @body = body.clone
+        @body.force_encoding('binary') if RUBY_VERSION >= '1.9.0'
       end
 
       def to_s
