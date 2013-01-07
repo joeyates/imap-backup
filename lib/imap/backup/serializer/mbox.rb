@@ -8,8 +8,7 @@ module Imap
       class Mbox < Base
         def initialize(path, folder)
           super
-          container = File.dirname(mbox_pathname)
-          Imap::Backup::Utils.make_folder(container, DIRECTORY_PERMISSIONS)
+          create_containing_directory
           assert_files
         end
 
@@ -52,6 +51,12 @@ module Imap
           raise '.mbox file missing' if imap and not mbox
         end
 
+        def create_containing_directory
+          mbox_relative_path = File.dirname(mbox_relative_pathname)
+          return if mbox_relative_path == '.'
+          Imap::Backup::Utils.make_folder(@path, mbox_relative_path, DIRECTORY_PERMISSIONS)
+        end
+
         def exist?
           mbox_exist? and imap_exist?
         end
@@ -64,9 +69,12 @@ module Imap
           File.exist?(imap_pathname)
         end
 
+        def mbox_relative_pathname
+          @folder + '.mbox'
+        end
+
         def mbox_pathname
-          filename = @folder + '.mbox'
-          File.join(@path, filename)
+          File.join(@path, mbox_relative_pathname)
         end
 
         def imap_pathname

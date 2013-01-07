@@ -20,7 +20,7 @@ describe Imap::Backup::Serializer::Mbox do
     end
 
     it 'creates the containing directory' do
-      Imap::Backup::Utils.should_receive(:make_folder).with('/base/path/my', 0700)
+      Imap::Backup::Utils.should_receive(:make_folder).with('/base/path', 'my', 0700)
 
       Imap::Backup::Serializer::Mbox.new('/base/path', 'my/folder')
     end
@@ -84,14 +84,14 @@ describe Imap::Backup::Serializer::Mbox do
     context '#save' do
       let(:mbox_formatted_message) { 'message in mbox format' }
       let(:message_uid) { '999' }
-      let(:message) { stub('Email::Mbox::Message', to_mbox: mbox_formatted_message) }
+      let(:message) { stub('Email::Mboxrd::Message', to_s: mbox_formatted_message) }
       let(:mbox_file) { stub('File - mbox', close: nil) }
       let(:imap_file) { stub('File - imap', close: nil) }
 
       before do
-        Email::Mbox::Message.stub(new: message)
-        File.stub(:open).with(mbox_pathname, 'w+').and_return(mbox_file)
-        File.stub(:open).with(imap_pathname, 'w+').and_return(imap_file)
+        Email::Mboxrd::Message.stub(new: message)
+        File.stub(:open).with(mbox_pathname, 'ab').and_return(mbox_file)
+        File.stub(:open).with(imap_pathname, 'ab').and_return(imap_file)
         mbox_file.stub(:write).with(mbox_formatted_message)
         imap_file.stub(:write).with(message_uid + "\n")
       end
