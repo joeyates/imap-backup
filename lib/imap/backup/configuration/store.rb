@@ -49,6 +49,10 @@ module Imap
           end
         end
 
+        def path
+          File.dirname(@pathname)
+        end
+
         private
 
         def mkdir_private(path)
@@ -58,10 +62,6 @@ module Imap
           if Imap::Backup::Utils::stat(path) != 0700
             FileUtils.chmod 0700, path
           end
-        end
-
-        def path
-          File.dirname(@pathname)
         end
       end
     end
