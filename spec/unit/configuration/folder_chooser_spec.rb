@@ -7,68 +7,85 @@ describe Imap::Backup::Configuration::FolderChooser do
   include InputOutputTestHelpers
 
   context '#run' do
-    before :each do
-      empty_account = {
+    let(:connection) do
+      stub(
+        'Imap::Backup::Account::Connection'
+      )
+    end
+    let(:existing_account) do
+      {
+        :folders => [{:name => 'my_folder'}]
+      }
+    end
+    let(:empty_account) do
+      {
         :folders => []
       }
-      @connection = setup_account(empty_account, [])
+    end
+    let(:remote_folders) do
+      folder1 = stub('folder', :name => 'my_folder')       # this one is already backed up
+      folder2 = stub('folder', :name => 'another_folder')
+      [folder1, folder2]
+    end
+
+    before do
       @input, @output = prepare_highline
     end
 
-    def setup_account(account, remote_folders)
-      @account   = account
-      connection = stub('Imap::Backup::Account::Connection')
-      connection.stub!(:folders).and_return(remote_folders)
-      Imap::Backup::Account::Connection.stub!(:new).with(account).and_return(connection)
-      connection
-    end
+    context 'empty account' do
+      let(:account) { empty_account }
 
-    subject { Imap::Backup::Configuration::FolderChooser.new(@account) }
+      subject { Imap::Backup::Configuration::FolderChooser.new(account) }
 
-    it 'should connect to the account' do
-      Imap::Backup::Account::Connection.should_receive(:new).with(@account).and_return(@connection)
+      before do
+        connection.stub!(:folders).and_return([])
+        Imap::Backup::Account::Connection.stub!(:new).with(account).and_return(connection)
+      end
 
-      subject.run
-    end
+      it 'should connect to the account' do
+        Imap::Backup::Account::Connection.should_receive(:new).with(account).and_return(connection)
 
-    it 'should handle connection errors' do
-      Imap::Backup::Account::Connection.should_receive(:new).with(@account).and_raise('error')
-      Imap::Backup::Configuration::Setup.highline.should_receive(:ask).with('Press a key ')
-
-      capturing_output do
         subject.run
-      end.should =~ /connection failed/i
-    end
+      end
 
-    it 'should get a list of account folders' do
-      @connection.should_receive(:folders).and_return([])
+      it 'should handle connection errors' do
+        Imap::Backup::Account::Connection.should_receive(:new).with(account).and_raise('error')
+        Imap::Backup::Configuration::Setup.highline.should_receive(:ask).with('Press a key ')
 
-      subject.run
-    end
+        capturing_output do
+          subject.run
+        end.should =~ /connection failed/i
+      end
 
-    it 'should show the menu' do
-      subject.run
-      
-      @output.string.should =~ %r{Add/remove folders}
-    end
+      it 'should get a list of account folders' do
+        connection.should_receive(:folders).and_return([])
 
-    it 'should return to the account menu' do
-      @input.should_receive(:gets).and_return("return\n")
+        subject.run
+      end
 
-      subject.run
-      
-      @output.string.should =~ %r{return to the account menu}
+      it 'should show the menu' do
+        subject.run
+        
+        @output.string.should =~ %r{Add/remove folders}
+      end
+
+      it 'should return to the account menu' do
+        @input.should_receive(:gets).and_return("return\n")
+
+        subject.run
+        
+        @output.string.should =~ %r{return to the account menu}
+      end
     end
 
     context 'folder listing' do
-      before :each do
-        account = {
-          :folders => [{:name => 'my_folder'}]
-        }
-        folder1 = stub('folder', :name => 'my_folder')       # this one is already backed up
-        folder2 = stub('folder', :name => 'another_folder')
-        remote_folders = [folder1, folder2]
-        @connection = setup_account(account, remote_folders)
+      let(:account) { existing_account }
+
+      subject { Imap::Backup::Configuration::FolderChooser.new(account) }
+
+      before do
+        connection.stub!(:folders).and_return(remote_folders)
+        Imap::Backup::Account::Connection.stub!(:new).with(account).and_return(connection)
       end
 
       it 'should list folders' do
@@ -99,7 +116,7 @@ describe Imap::Backup::Configuration::FolderChooser do
         subject.run
 
         @output.string.should =~ /\d+\. \+ another_folder/
-        @account[:folders].should include( { :name => 'another_folder' } )
+        account[:folders].should include( { :name => 'another_folder' } )
       end
 
       it 'should remove folders' do
@@ -117,7 +134,7 @@ describe Imap::Backup::Configuration::FolderChooser do
         subject.run
 
         @output.string.should =~ /\d+\. \- my_folder/
-        @account[:folders].should_not include( { :name => 'my_folder' } )
+        account[:folders].should_not include( { :name => 'my_folder' } )
       end
     end
   end
