@@ -40,6 +40,7 @@ describe Imap::Backup::Configuration::FolderChooser do
       before do
         connection.stub!(:folders).and_return([])
         Imap::Backup::Account::Connection.stub!(:new).with(account).and_return(connection)
+        subject.stub(:system).with('clear')
       end
 
       it 'should connect to the account' do
@@ -59,6 +60,12 @@ describe Imap::Backup::Configuration::FolderChooser do
 
       it 'should get a list of account folders' do
         connection.should_receive(:folders).and_return([])
+
+        subject.run
+      end
+
+      it 'clears the screen' do
+        subject.should_receive(:system).with('clear')
 
         subject.run
       end
@@ -86,6 +93,7 @@ describe Imap::Backup::Configuration::FolderChooser do
       before do
         connection.stub!(:folders).and_return(remote_folders)
         Imap::Backup::Account::Connection.stub!(:new).with(account).and_return(connection)
+        subject.stub(:system).with('clear')
       end
 
       it 'should list folders' do

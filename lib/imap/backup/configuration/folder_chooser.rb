@@ -18,6 +18,7 @@ module Imap
           end
           @folders = @connection.folders
           loop do
+            system('clear')
             Setup.highline.choose do |menu|
               menu.header = 'Add/remove folders'
               menu.index = :number
