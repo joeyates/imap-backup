@@ -38,11 +38,18 @@ describe Imap::Backup::Configuration::Account do
       @store = stub('Imap::Backup::Configuration::Store')
       @store.stub!(:data => @data)
       @input, @output = prepare_highline
+      subject.stub(system: nil)
     end
 
     subject { Imap::Backup::Configuration::Account.new(@store, @account1) }
 
     context 'menu' do
+      it 'clears the screen' do
+        subject.should_receive(:system).with('clear')
+
+        subject.run
+      end
+
       it 'should show a menu' do
         subject.run
 

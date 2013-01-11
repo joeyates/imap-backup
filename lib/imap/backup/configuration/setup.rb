@@ -17,6 +17,7 @@ module Imap
 
         def run
           loop do
+            system('clear')
             self.class.highline.choose do |menu|
               menu.header = 'Choose an action'
               @config.data[:accounts].each do |account|

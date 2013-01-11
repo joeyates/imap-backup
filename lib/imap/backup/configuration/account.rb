@@ -10,6 +10,7 @@ module Imap
 
         def run
           loop do
+            system('clear')
             Setup.highline.choose do |menu|
               password =
                 if @account[:password] == ''

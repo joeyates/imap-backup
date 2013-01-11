@@ -16,6 +16,7 @@ describe Imap::Backup::Configuration::Setup do
     before :each do
       prepare_store
       @input, @output = prepare_highline
+      subject.stub(system: nil)
     end
 
     def prepare_store
@@ -37,6 +38,12 @@ describe Imap::Backup::Configuration::Setup do
       @output.string.should =~ /add account/
       @output.string.should =~ /save and exit/
       @output.string.should =~ /quit/
+    end
+
+    it 'clears the screen' do
+      subject.should_receive(:system).with('clear')
+
+      subject.run
     end
 
     it 'should list accounts' do
