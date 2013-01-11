@@ -38,7 +38,7 @@ describe Imap::Backup::Configuration::Account do
       @store = stub('Imap::Backup::Configuration::Store')
       @store.stub!(:data => @data)
       @input, @output = prepare_highline
-      subject.stub(system: nil)
+      subject.stub(:system => nil)
     end
 
     subject { Imap::Backup::Configuration::Account.new(@store, @account1) }

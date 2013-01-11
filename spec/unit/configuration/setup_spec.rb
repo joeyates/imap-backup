@@ -16,7 +16,7 @@ describe Imap::Backup::Configuration::Setup do
     before :each do
       prepare_store
       @input, @output = prepare_highline
-      subject.stub(system: nil)
+      subject.stub(:system => nil)
     end
 
     def prepare_store
