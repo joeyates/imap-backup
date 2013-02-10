@@ -21,8 +21,8 @@ describe Imap::Backup::Account::Folder do
       end
 
       it 'returns an empty array for missing mailboxes' do
-        data     = stub('Data', text: 'Unknown Mailbox: my_folder')
-        response = stub('Response', data: data)
+        data     = stub('Data', :text => 'Unknown Mailbox: my_folder')
+        response = stub('Response', :data => data)
         error    = Net::IMAP::NoResponseError.new(response)
         @imap.
           should_receive(:examine).
