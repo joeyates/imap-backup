@@ -42,6 +42,13 @@ describe Imap::Backup::Downloader do
             subject.run
           end
 
+          it 'skips failed fetches' do
+            @folder.should_receive(:fetch).with('999').and_return(nil)
+            @serializer.should_not_receive(:save).with('999', anything)
+
+            subject.run
+          end
+
           context 'to download' do
             before :each do
               @serializer.stub!(:exist?) do |uid|

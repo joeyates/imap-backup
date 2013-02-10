@@ -13,6 +13,7 @@ module Imap
         uids = @folder.uids - @serializer.uids
         uids.each do |uid|
           message = @folder.fetch(uid)
+          next if message.nil?
           @serializer.save(uid, message)
         end
       end
