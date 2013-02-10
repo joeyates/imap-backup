@@ -13,6 +13,9 @@ module Imap
         def uids
           @connection.imap.examine(@folder)
           @connection.imap.uid_search(['ALL']).sort
+        rescue Net::IMAP::NoResponseError => e
+          warn "Folder '#{@folder}' does not exist"
+          []
         end
 
         def fetch(uid)

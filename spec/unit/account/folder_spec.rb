@@ -2,6 +2,8 @@
 require 'spec_helper'
 
 describe Imap::Backup::Account::Folder do
+  include InputOutputTestHelpers
+
   context 'with instance' do
     before :each do
       @imap    = stub('Net::IMAP')
@@ -16,6 +18,20 @@ describe Imap::Backup::Account::Folder do
         @imap.should_receive(:uid_search).with(['ALL']).and_return([5678, 123])
 
         subject.uids.should == [123, 5678]
+      end
+
+      it 'returns an empty array for missing mailboxes' do
+        data     = stub('Data', text: 'Unknown Mailbox: my_folder')
+        response = stub('Response', data: data)
+        error    = Net::IMAP::NoResponseError.new(response)
+        @imap.
+          should_receive(:examine).
+          with('my_folder').
+          and_raise(error)
+
+        capturing_output do
+          expect(subject.uids).to eq([])
+        end
       end
     end
 
