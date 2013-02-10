@@ -4,6 +4,10 @@ require 'spec_helper'
 describe Imap::Backup::Account::Folder do
   include InputOutputTestHelpers
 
+  let(:missing_mailbox_data) { stub('Data', :text => 'Unknown Mailbox: my_folder') }
+  let(:missing_mailbox_response) { stub('Response', :data => missing_mailbox_data) }
+  let(:missing_mailbox_error) { Net::IMAP::NoResponseError.new(missing_mailbox_response) }
+
   context 'with instance' do
     before :each do
       @imap    = stub('Net::IMAP')
@@ -21,13 +25,10 @@ describe Imap::Backup::Account::Folder do
       end
 
       it 'returns an empty array for missing mailboxes' do
-        data     = stub('Data', :text => 'Unknown Mailbox: my_folder')
-        response = stub('Response', :data => data)
-        error    = Net::IMAP::NoResponseError.new(response)
         @imap.
           should_receive(:examine).
           with('my_folder').
-          and_raise(error)
+          and_raise(missing_mailbox_error)
 
         capturing_output do
           expect(subject.uids).to eq([])
@@ -51,6 +52,17 @@ describe Imap::Backup::Account::Folder do
               and_return([[nil, @message]])
 
         subject.fetch(123)
+      end
+
+      it "returns nil if the mailbox doesn't exist" do
+        @imap.
+          should_receive(:examine).
+          with('my_folder').
+          and_raise(missing_mailbox_error)
+
+        capturing_output do
+          expect(subject.fetch(123)).to be_nil
+        end
       end
 
       if RUBY_VERSION > '1.9'
