@@ -91,8 +91,8 @@ Altertatively, add it to your crontab.
 # Result
 
 Each folder is saved to an mbox file.
-Alongside each mbox is a file with extension '.imap' which lists the source IMAP UIDs
-to allow a full restore.
+Alongside each mbox is a file with extension '.imap', which lists the source IMAP
+UIDs to allow a full restore.
 
 # Other Usage
 
