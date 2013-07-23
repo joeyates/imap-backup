@@ -2,9 +2,10 @@
 require 'spec_helper'
 
 describe Imap::Backup::Account::Connection do
+  let(:imap) { double('Net::IMAP') }
+
   context '#initialize' do
     it 'should login to the imap server' do
-      imap = stub('Net::IMAP')
       Net::IMAP.should_receive(:new).with('imap.gmail.com', 993, true).and_return(imap)
       imap.should_receive('login').with('myuser', 'secret')
 
@@ -13,7 +14,6 @@ describe Imap::Backup::Account::Connection do
 
     context "with specific server" do
       it 'should login to the imap server' do
-        imap = stub('Net::IMAP')
         Net::IMAP.should_receive(:new).with('my.imap.example.com', 993, true).and_return(imap)
         imap.should_receive('login').with('myuser', 'secret')
 
@@ -24,8 +24,8 @@ describe Imap::Backup::Account::Connection do
 
   context 'instance methods' do
     before :each do
-      @imap = stub('Net::IMAP', :login => nil)
-      Net::IMAP.stub!(:new).and_return(@imap)
+      @imap = double('Net::IMAP', :login => nil)
+      Net::IMAP.stub(:new).and_return(@imap)
       @account = {
         :username   => 'myuser',
         :password   => 'secret',
@@ -54,10 +54,10 @@ describe Imap::Backup::Account::Connection do
 
     context '#status' do
       before :each do
-        @folder = stub('Imap::Backup::Account::Folder', :uids => [])
-        Imap::Backup::Account::Folder.stub!(:new).with(subject, 'my_folder').and_return(@folder)
-        @serializer = stub('Imap::Backup::Serializer', :uids => [])
-        Imap::Backup::Serializer::Directory.stub!(:new).with('/base/path', 'my_folder').and_return(@serializer)
+        @folder = double('Imap::Backup::Account::Folder', :uids => [])
+        Imap::Backup::Account::Folder.stub(:new).with(subject, 'my_folder').and_return(@folder)
+        @serializer = double('Imap::Backup::Serializer', :uids => [])
+        Imap::Backup::Serializer::Directory.stub(:new).with('/base/path', 'my_folder').and_return(@serializer)
       end
 
       it 'should return the names of folders' do
@@ -79,12 +79,12 @@ describe Imap::Backup::Account::Connection do
 
     context '#run_backup' do
       before :each do
-        @folder = stub('Imap::Backup::Account::Folder', :uids => [])
-        Imap::Backup::Account::Folder.stub!(:new).with(subject, 'my_folder').and_return(@folder)
-        @serializer = stub('Imap::Backup::Serializer')
-        Imap::Backup::Serializer::Mbox.stub!(:new).with('/base/path', 'my_folder').and_return(@serializer)
-        @downloader = stub('Imap::Backup::Downloader', :run => nil)
-        Imap::Backup::Downloader.stub!(:new).with(@folder, @serializer).and_return(@downloader)
+        @folder = double('Imap::Backup::Account::Folder', :uids => [])
+        Imap::Backup::Account::Folder.stub(:new).with(subject, 'my_folder').and_return(@folder)
+        @serializer = double('Imap::Backup::Serializer')
+        Imap::Backup::Serializer::Mbox.stub(:new).with('/base/path', 'my_folder').and_return(@serializer)
+        @downloader = double('Imap::Backup::Downloader', :run => nil)
+        Imap::Backup::Downloader.stub(:new).with(@folder, @serializer).and_return(@downloader)
       end
 
       it 'should instantiate folders' do
