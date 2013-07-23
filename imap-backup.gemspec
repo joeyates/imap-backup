@@ -25,7 +25,7 @@ Gem::Specification.new do |gem|
 
   gem.add_development_dependency 'pry'
   gem.add_development_dependency 'pry-doc'
-  gem.add_development_dependency 'rspec',  '>= 2.3.0'
+  gem.add_development_dependency 'rspec',  '>= 2.12.0'
   if RUBY_VERSION < '1.9'
     gem.add_development_dependency 'rcov'
   else
