@@ -2,23 +2,25 @@
 require 'spec_helper'
 
 describe Imap::Backup::Account::Connection do
-  let(:imap) { double('Net::IMAP', :login => nil) }
+  let(:imap) { double('Net::IMAP', :login => nil, :disconnect => nil, :list => []) }
   let(:folder) { double('Imap::Backup::Account::Folder', :uids => []) }
+
+  before do
+    Net::IMAP.stub(:new).with(anything, 993, true).and_return(imap)
+  end
 
   context '#initialize' do
     it 'should login to the imap server' do
-      Net::IMAP.should_receive(:new).with('imap.gmail.com', 993, true).and_return(imap)
-      imap.should_receive('login').with('myuser', 'secret')
-
       Imap::Backup::Account::Connection.new(:username => 'myuser', :password => 'secret')
+
+      expect(imap).to have_received(:login).with('myuser', 'secret')
     end
 
     context "with specific server" do
       it 'should login to the imap server' do
-        Net::IMAP.should_receive(:new).with('my.imap.example.com', 993, true).and_return(imap)
-        imap.should_receive('login').with('myuser', 'secret')
-
         Imap::Backup::Account::Connection.new(:username => 'myuser', :password => 'secret', :server => 'my.imap.example.com')
+
+        expect(Net::IMAP).to have_received(:new).with('my.imap.example.com', 993, true)
       end
     end
   end
@@ -34,25 +36,21 @@ describe Imap::Backup::Account::Connection do
       }
     end
 
-    before :each do
-      Net::IMAP.stub(:new).and_return(imap)
-    end
-
     subject { Imap::Backup::Account::Connection.new(account) }
 
     context '#disconnect' do
       it 'should disconnect from the server' do
-        imap.should_receive(:disconnect)
-
         subject.disconnect
+
+        expect(imap).to have_received(:disconnect).with()
       end
     end
 
     context '#folders' do
       it 'should list all folders' do
-        imap.should_receive(:list).with('/', '*')
-
         subject.folders
+
+        expect(imap).to have_received(:list).with('/', '*')
       end
     end
 
@@ -62,20 +60,27 @@ describe Imap::Backup::Account::Connection do
         Imap::Backup::Serializer::Directory.stub(:new).with('/base/path', 'my_folder').and_return(serializer)
       end
 
+      it 'requests uids' do
+        subject.status
+
+        expect(serializer).to have_received(:uids).with()
+      end
+
       it 'should return the names of folders' do
-        subject.status[0][:name].should == 'my_folder'
+        expect(subject.status[0][:name]).to eq('my_folder')
       end
 
       it 'should list local message uids' do
-        serializer.should_receive(:uids).and_return([321, 456])
+        serializer.stub(:uids).and_return([321, 456])
 
+        puts "subject.status: #{subject.status.inspect}"
         subject.status[0][:local].should == [321, 456]
       end
 
       it 'should retrieve the available uids' do
-        folder.should_receive(:uids).and_return([101, 234])
+        folder.stub(:uids).and_return([101, 234])
 
-        subject.status[0][:remote].should == [101, 234]
+        expect(subject.status[0][:remote]).to eq([101, 234])
       end
     end
 
