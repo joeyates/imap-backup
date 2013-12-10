@@ -17,6 +17,11 @@ module Imap
             return
           end
           @folders = @connection.folders
+          if @folders.nil?
+            puts 'Unable to get folder list'
+            Setup.highline.ask 'Press a key '
+            return
+          end
           loop do
             system('clear')
             Setup.highline.choose do |menu|
