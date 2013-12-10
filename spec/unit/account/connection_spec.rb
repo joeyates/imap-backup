@@ -23,7 +23,11 @@ describe Imap::Backup::Account::Connection do
 
   subject { Imap::Backup::Account::Connection.new(options) }
 
-  shared_examples 'connects to IMAP' do |username = 'username@gmail.com', server = 'imap.gmail.com'|
+  shared_examples 'connects to IMAP' do |options|
+    options ||= {}
+    username = options[:username] || 'username@gmail.com'
+    server = options[:server] || 'imap.gmail.com'
+
     it 'sets up the IMAP connection' do
       expect(Net::IMAP).to have_received(:new).with(server, {:port => 993, :ssl => true})
     end
@@ -53,7 +57,7 @@ describe Imap::Backup::Account::Connection do
       before { allow(imap).to receive(:disconnect) }
       before { subject.disconnect }
 
-      include_examples 'connects to IMAP', [email_username, server]
+      include_examples 'connects to IMAP', {:username => email_username, :server => server}
     end
   end
 
@@ -105,7 +109,7 @@ describe Imap::Backup::Account::Connection do
   context '#run_backup' do
     let(:folder) { double('folder') }
     let(:serializer) { double('serializer') }
-    let(:downloader) { double('downloader', run: nil) }
+    let(:downloader) { double('downloader', :run => nil) }
 
     before do
       allow(Imap::Backup::Account::Folder).to receive(:new).and_return(folder)
