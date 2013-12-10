@@ -2,120 +2,121 @@
 require 'spec_helper'
 
 describe Imap::Backup::Account::Connection do
-  let(:imap) { double('Net::IMAP', :login => nil, :disconnect => nil, :list => []) }
-  let(:folder) { double('Imap::Backup::Account::Folder', :uids => []) }
+  def self.folder_config
+    {:name => 'backup_folder'}
+  end
+
+  let(:imap) { double('Net::IMAP', :login => nil, :list => []) }
+  let(:options) do
+    {
+      :username => username,
+      :password => 'password',
+      :local_path => 'local_path',
+      :folders => [self.class.folder_config]
+    }
+  end
+  let(:username) { 'username@gmail.com' }
 
   before do
-    Net::IMAP.stub(:new).with(anything, 993, true).and_return(imap)
+    allow(Net::IMAP).to receive(:new).and_return(imap)
+  end
+
+  subject { Imap::Backup::Account::Connection.new(options) }
+
+  shared_examples 'connects to IMAP' do |username = 'username@gmail.com', server = 'imap.gmail.com'|
+    it 'sets up the IMAP connection' do
+      expect(Net::IMAP).to have_received(:new).with(server, {:port => 993, :ssl => true})
+    end
+
+    it 'logs in to the imap server' do
+      expect(imap).to have_received(:login).with(username, 'password')
+    end
   end
 
   context '#initialize' do
-    it 'should login to the imap server' do
-      Imap::Backup::Account::Connection.new(:username => 'myuser', :password => 'secret')
-
-      expect(imap).to have_received(:login).with('myuser', 'secret')
-    end
-
-    context "with specific server" do
-      it 'should login to the imap server' do
-        Imap::Backup::Account::Connection.new(:username => 'myuser', :password => 'secret', :server => 'my.imap.example.com')
-
-        expect(Net::IMAP).to have_received(:new).with('my.imap.example.com', 993, true)
-      end
+    [
+      [:username, 'username@gmail.com'],
+      [:local_path, 'local_path'],
+      [:backup_folders, [folder_config]]
+    ].each do |attr, expected|
+      its(attr) { should eq(expected) }
     end
   end
 
-  context 'instance methods' do
-    let(:serializer) { double('Imap::Backup::Serializer', :uids => []) }
-    let(:account) do
-      {
-        :username   => 'myuser',
-        :password   => 'secret',
-        :folders    => [{:name => 'my_folder'}],
-        :local_path => '/base/path',        
-      }
+  [
+    ['GMail', 'user@gmail.com', 'imap.gmail.com'],
+    ['Fastmail', 'user@fastmail.fm', 'mail.messagingengine.com'],
+  ].each do |service, email_username, server|
+    context service do
+      let(:username) { email_username }
+
+      before { allow(imap).to receive(:disconnect) }
+      before { subject.disconnect }
+
+      include_examples 'connects to IMAP', [email_username, server]
+    end
+  end
+
+  context '#folders' do
+    let(:folders) { 'folders' }
+
+    before { allow(imap).to receive(:list).and_return(folders) }
+
+    it 'returns the list of folders' do
+      expect(subject.folders).to eq(folders)
+    end
+  end
+
+  context '#status' do
+    let(:folder) { double('folder', :uids => [remote_uid]) }
+    let(:local_uid) { 'local_uid' }
+    let(:serializer) { double('serializer', :uids => [local_uid]) }
+    let(:remote_uid) { 'remote_uid' }
+
+    before do
+      allow(Imap::Backup::Account::Folder).to receive(:new).and_return(folder)
+      allow(Imap::Backup::Serializer::Directory).to receive(:new).and_return(serializer)
     end
 
-    subject { Imap::Backup::Account::Connection.new(account) }
-
-    context '#disconnect' do
-      it 'should disconnect from the server' do
-        subject.disconnect
-
-        expect(imap).to have_received(:disconnect).with()
-      end
+    it 'should return the names of folders' do
+      expect(subject.status[0][:name]).to eq('backup_folder')
     end
 
-    context '#folders' do
-      it 'should list all folders' do
-        subject.folders
-
-        expect(imap).to have_received(:list).with('/', '*')
-      end
+    it 'returns local message uids' do
+      expect(subject.status[0][:local]).to eq([local_uid])
     end
 
-    context '#status' do
-      before :each do
-        Imap::Backup::Account::Folder.stub(:new).with(subject, 'my_folder').and_return(folder)
-        Imap::Backup::Serializer::Directory.stub(:new).with('/base/path', 'my_folder').and_return(serializer)
-      end
+    it 'should retrieve the available uids' do
+      expect(subject.status[0][:remote]).to eq([remote_uid])
+    end
+  end
 
-      it 'requests uids' do
-        subject.status
+  context '#disconnect' do
+    before { allow(imap).to receive(:disconnect) }
+    before { subject.disconnect }
 
-        expect(serializer).to have_received(:uids).with()
-      end
-
-      it 'should return the names of folders' do
-        expect(subject.status[0][:name]).to eq('my_folder')
-      end
-
-      it 'should list local message uids' do
-        serializer.stub(:uids).and_return([321, 456])
-
-        puts "subject.status: #{subject.status.inspect}"
-        subject.status[0][:local].should == [321, 456]
-      end
-
-      it 'should retrieve the available uids' do
-        folder.stub(:uids).and_return([101, 234])
-
-        expect(subject.status[0][:remote]).to eq([101, 234])
-      end
+    it 'disconnects from the server' do
+      expect(imap).to have_received(:disconnect).with()
     end
 
-    context '#run_backup' do
-      let(:downloader) { double('Imap::Backup::Downloader', :run => nil) }
+    include_examples 'connects to IMAP'
+  end
 
-      before :each do
-        Imap::Backup::Account::Folder.stub(:new).with(subject, 'my_folder').and_return(folder)
-        Imap::Backup::Serializer::Mbox.stub(:new).with('/base/path', 'my_folder').and_return(serializer)
-        Imap::Backup::Downloader.stub(:new).with(folder, serializer).and_return(downloader)
-      end
+  context '#run_backup' do
+    let(:folder) { double('folder') }
+    let(:serializer) { double('serializer') }
+    let(:downloader) { double('downloader', run: nil) }
 
-      it 'should instantiate folders' do
-        Imap::Backup::Account::Folder.should_receive(:new).with(subject, 'my_folder').and_return(folder)
+    before do
+      allow(Imap::Backup::Account::Folder).to receive(:new).and_return(folder)
+      allow(Imap::Backup::Serializer::Mbox).to receive(:new).and_return(serializer)
+      allow(Imap::Backup::Downloader).to receive(:new).and_return(downloader)
+    end
 
-        subject.run_backup
-      end
+    before { subject.run_backup }
 
-      it 'should instantiate serializers' do
-        Imap::Backup::Serializer::Mbox.should_receive(:new).with('/base/path', 'my_folder').and_return(serializer)
-
-        subject.run_backup
-      end
-
-      it 'should instantiate downloaders' do
-        Imap::Backup::Downloader.should_receive(:new).with(folder, serializer).and_return(downloader)
-
-        subject.run_backup
-      end
-
-      it 'should run downloaders' do
-        downloader.should_receive(:run)
-
-        subject.run_backup
-      end
+    it 'runs downloaders' do
+      expect(downloader).to have_received(:run)
     end
   end
 end
