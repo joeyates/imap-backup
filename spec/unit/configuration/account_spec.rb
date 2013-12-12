@@ -248,7 +248,7 @@ describe Imap::Backup::Configuration::Account do
         allow(Imap::Backup::Configuration::ConnectionTester).to receive(:test).and_return('All fine')
         allow(highline).to receive(:ask)
         subject.run
-        menu.choices['test authentication'].call
+        menu.choices['test connection'].call
       end
 
       it 'tests the connection' do
