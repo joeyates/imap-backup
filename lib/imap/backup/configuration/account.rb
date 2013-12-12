@@ -32,8 +32,10 @@ EOT
                   if others.include?(username)
                     puts 'There is already an account set up with that email address'
                   else
-                    @account[:username] = username
-                    @account[:server] ||= default_server(username)
+                    account[:username] = username
+                    if account[:server].nil? or account[:server] == ''
+                      account[:server] = default_server(username)
+                    end
                   end
                 end
 

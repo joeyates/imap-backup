@@ -124,16 +124,29 @@ describe Imap::Backup::Configuration::Account do
         menu.choices['modify email'].call
       end
 
-      [
-        ['GMail', 'foo@gmail.com', 'imap.gmail.com'],
-        ['Fastmail', 'bar@fastmail.fm', 'mail.messagingengine.com'],
-      ].each do |service, email, expected|
-        context service do
-          let(:existing_server) { nil }
-          let(:new_email) { email }
+      context 'if the server is blank' do
+        [
+          ['GMail', 'foo@gmail.com', 'imap.gmail.com'],
+          ['Fastmail', 'bar@fastmail.fm', 'mail.messagingengine.com'],
+        ].each do |service, email, expected|
+          context service do
+            let(:new_email) { email }
 
-          it 'sets a default server' do
-            expect(account[:server]).to eq(expected)
+            context 'with nil' do
+              let(:existing_server) { nil }
+
+              it 'sets a default server' do
+                expect(account[:server]).to eq(expected)
+              end
+            end
+
+            context 'with an empty string' do
+              let(:existing_server) { '' }
+
+              it 'sets a default server' do
+                expect(account[:server]).to eq(expected)
+              end
+            end
           end
         end
       end
