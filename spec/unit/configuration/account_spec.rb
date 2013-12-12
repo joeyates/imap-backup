@@ -78,7 +78,7 @@ describe Imap::Backup::Configuration::Account do
         'modify server',
         'modify backup path',
         'choose backup folders',
-        'test authentication',
+        'test connection',
         'delete',
         'return to main menu',
         'quit', # TODO: quit is hidden

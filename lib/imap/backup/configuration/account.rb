@@ -6,83 +6,113 @@ module Imap::Backup::Configuration
       catch :done do
         loop do
           system('clear')
-          highline.choose do |menu|
-            menu.header = account_details
-
-            menu.choice('modify email') do
-              username = Asker.email(username)
-              puts "username: #{username}"
-              others   = store.data[:accounts].select { |a| a != account}.map { |a| a[:username] }
-              puts "others: #{others.inspect}"
-              if others.include?(username)
-                puts 'There is already an account set up with that email address'
-              else
-                account[:username] = username
-                if account[:server].nil? or account[:server] == ''
-                  account[:server] = default_server(username)
-                end
-              end
-            end
-
-            menu.choice('modify password') do
-              password = Asker.password
-              if ! password.nil?
-                account[:password] = password
-              end
-            end
-
-            menu.choice('modify server') do
-              server = highline.ask('server: ')
-              if ! server.nil?
-                account[:server] = server
-              end
-            end
-
-            menu.choice('modify backup path') do
-              validator = lambda do |p|
-                same = store.data[:accounts].find do |a|
-                  a[:username] != account[:username] && a[:local_path] == p
-                end
-                if same
-                  puts "The path '#{p}' is used to backup the account '#{same[:username]}'"
-                  false
-                else
-                  true
-                end
-              end
-              account[:local_path] = Asker.backup_path(account[:local_path], validator)
-            end
-
-            menu.choice('choose backup folders') do
-              FolderChooser.new(account).run
-            end
-
-            menu.choice 'test authentication' do
-              result = ConnectionTester.test(account)
-              puts result
-              highline.ask 'Press a key '
-            end
-
-            menu.choice 'delete' do
-              if highline.agree("Are you sure? (y/n) ")
-                store.data[:accounts].reject! { |a| a[:username] == account[:username] }
-                throw :done
-              end
-            end
-
-            menu.choice 'return to main menu' do
-              throw :done
-            end
-
-            menu.hidden('quit') do
-              throw :done
-            end
-          end
+          create_menu
         end
       end
     end
 
     private
+
+    def create_menu
+      highline.choose do |menu|
+        header menu
+        modify_email menu
+        modify_password menu
+        modify_server menu
+        modify_backup_path menu
+        choose_folders menu
+        test_connection menu
+        delete_account menu
+        menu.choice('return to main menu') { throw :done }
+        menu.hidden('quit') { throw :done }
+      end
+    end
+
+    def header(menu)
+      menu.header = <<-EOT
+Account:
+  email:    #{account[:username]}
+  server:   #{account[:server]}
+  path:     #{account[:local_path]}
+  folders:  #{folders.map { |f| f[:name] }.join(', ')}
+  password: #{masked_password}
+      EOT
+    end
+
+    def modify_email(menu)
+      menu.choice('modify email') do
+        username = Asker.email(username)
+        puts "username: #{username}"
+        others   = store.data[:accounts].select { |a| a != account}.map { |a| a[:username] }
+        puts "others: #{others.inspect}"
+        if others.include?(username)
+          puts 'There is already an account set up with that email address'
+        else
+          account[:username] = username
+          if account[:server].nil? or account[:server] == ''
+            account[:server] = default_server(username)
+          end
+        end
+      end
+    end
+
+    def modify_password(menu)
+      menu.choice('modify password') do
+        password = Asker.password
+        if ! password.nil?
+          account[:password] = password
+        end
+      end
+    end
+
+    def modify_server(menu)
+      menu.choice('modify server') do
+        server = highline.ask('server: ')
+        if ! server.nil?
+          account[:server] = server
+        end
+      end
+    end
+
+    def modify_backup_path(menu)
+      menu.choice('modify backup path') do
+        validator = lambda do |p|
+          same = store.data[:accounts].find do |a|
+            a[:username] != account[:username] && a[:local_path] == p
+          end
+          if same
+            puts "The path '#{p}' is used to backup the account '#{same[:username]}'"
+            false
+          else
+            true
+          end
+        end
+        account[:local_path] = Asker.backup_path(account[:local_path], validator)
+      end
+    end
+
+    def choose_folders(menu)
+      menu.choice('choose backup folders') do
+        FolderChooser.new(account).run
+      end
+    end
+
+    def test_connection(menu)
+      menu.choice('test connection') do
+        result = ConnectionTester.test(account)
+        puts result
+        highline.ask 'Press a key '
+      end
+    end
+
+    def delete_account(menu)
+      menu.choice('delete') do
+        if highline.agree("Are you sure? (y/n) ")
+          store.data[:accounts].reject! { |a| a[:username] == account[:username] }
+          throw :done
+        end
+      end
+    end
 
     def folders
       account[:folders] || []
@@ -103,17 +133,6 @@ module Imap::Backup::Configuration
       when /@fastmail\.fm/
         'mail.messagingengine.com'
       end
-    end
-
-    def account_details
-          <<-EOT
-Account:
-  email:    #{account[:username]}
-  server:   #{account[:server]}
-  path:     #{account[:local_path]}
-  folders:  #{folders.map { |f| f[:name] }.join(', ')}
-  password: #{masked_password}
-      EOT
     end
   end
 end
