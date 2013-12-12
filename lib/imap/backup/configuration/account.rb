@@ -15,14 +15,7 @@ module Imap
             loop do
               system('clear')
               highline.choose do |menu|
-                menu.header = <<EOT
-Account:
-  email:    #{account[:username]}
-  server:   #{account[:server]}
-  path:     #{account[:local_path]}
-  folders:  #{folders.map { |f| f[:name] }.join(', ')}
-  password: #{masked_password}
-EOT
+                menu.header = account_details
 
                 menu.choice('modify email') do
                   username = Asker.email(username)
@@ -118,6 +111,17 @@ EOT
           when /@fastmail\.fm/
             'mail.messagingengine.com'
           end
+        end
+
+        def account_details
+          <<-EOT
+Account:
+  email:    #{account[:username]}
+  server:   #{account[:server]}
+  path:     #{account[:local_path]}
+  folders:  #{folders.map { |f| f[:name] }.join(', ')}
+  password: #{masked_password}
+          EOT
         end
       end
     end
