@@ -4,11 +4,12 @@ module Imap
   module Backup
     module Account
       class Connection
-        attr_reader :username, :local_path, :backup_folders
+        attr_reader :username, :local_path, :backup_folders, :server
 
         def initialize(options)
           @username, @password = options[:username], options[:password]
           @local_path, @backup_folders = options[:local_path], options[:folders]
+          @server = options[:server] || host_for(username)
         end
 
         def folders
@@ -39,9 +40,8 @@ module Imap
 
         def imap
           return @imap unless @imap.nil?
-          host = host_for(username)
           options = options_for(username)
-          @imap = Net::IMAP.new(host, options)
+          @imap = Net::IMAP.new(server, options)
           @imap.login(username, @password)
           @imap
         end

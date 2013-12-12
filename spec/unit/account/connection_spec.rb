@@ -12,7 +12,7 @@ describe Imap::Backup::Account::Connection do
       :username => username,
       :password => 'password',
       :local_path => 'local_path',
-      :folders => [self.class.folder_config]
+      :folders => [self.class.folder_config],
     }
   end
   let(:username) { 'username@gmail.com' }
@@ -41,9 +41,27 @@ describe Imap::Backup::Account::Connection do
     [
       [:username, 'username@gmail.com'],
       [:local_path, 'local_path'],
-      [:backup_folders, [folder_config]]
+      [:backup_folders, [folder_config]],
     ].each do |attr, expected|
       its(attr) { should eq(expected) }
+    end
+
+    context 'server' do
+      context 'with a supplied value' do
+        before do
+          options.merge!(:server => 'imap.example.com')
+        end
+
+        it 'uses the supplied value' do
+          expect(subject.server).to eq('imap.example.com')
+        end
+      end
+
+      context 'without a supplied value' do
+        it 'uses the guesses the value' do
+          expect(subject.server).to eq('imap.gmail.com')
+        end
+      end
     end
   end
 
