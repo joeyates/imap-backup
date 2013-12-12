@@ -65,7 +65,7 @@ describe Imap::Backup::Configuration::Setup do
       end
 
       @account = stub('Imap::Backup::Configuration::Account')
-      Imap::Backup::Configuration::Account.should_receive(:new).with(@store, @account1).and_return(@account)
+      allow(Imap::Backup::Configuration::Account).to receive(:new).with(@store, @account1, anything).and_return(@account)
       @account.should_receive(:run).with()
 
       subject.run
@@ -86,7 +86,7 @@ describe Imap::Backup::Configuration::Setup do
       blank_account = {:username=>"new@example.com", :password=>"", :local_path=>"/base/path/new_example.com", :folders=>[]}
       Imap::Backup::Configuration::Asker.should_receive(:email).with().and_return('new@example.com')
       @account = stub('Imap::Backup::Configuration::Account')
-      Imap::Backup::Configuration::Account.should_receive(:new).with(@store, blank_account).and_return(@account)
+      allow(Imap::Backup::Configuration::Account).to receive(:new).with(@store, blank_account, anything).and_return(@account)
       @account.should_receive(:run).once
 
       subject.run

@@ -2,215 +2,273 @@
 require 'spec_helper'
 
 describe Imap::Backup::Configuration::Account do
-  include HighLineTestHelpers
-  include InputOutputTestHelpers
+  class MockHighlineMenu
+    attr_reader :choices
+    attr_accessor :header
 
-  def choose_menu_item(item)
-    @state = :initial
-    @input.should_receive(:gets) do
-      case @state
-      when :initial
-        @state = :done
-        "#{item}\n"
-      when :done
-        "quit\n"
-      end
+    def initialize
+      @choices = {}
+    end
+
+    def choice(name, &block)
+      choices[name] = block
+    end
+
+    def hidden(name, &block)
+      choices[name] = block
     end
   end
 
   context '#run' do
-    before :each do
-      @account1_path = '/backup/path'
-      @account1 = {
-        :username   => 'user@example.com',
-        :password   => 'secret',
-        :local_path => @account1_path,
-        :folders    => [ { :name => 'my_folder' }, { :name => 'another_folder' } ]
+    let(:highline) { double('Highline') }
+    let(:menu) { MockHighlineMenu.new }
+    let(:store) { double('Imap::Backup::Configuration::Store', :data => data) }
+    let(:data) { {:accounts => [account, account1]} }
+    let(:account) do
+      {
+        :username => existing_email,
+        :server => existing_server,
+        :local_path => '/backup/path',
+        :folders => [{:name => 'my_folder'}],
+        :password => existing_password,
       }
-      @other_account_path = '/existing/path'
-      @other_account = {
-        :username   => 'existing@example.com',
-        :password   => 'secret',
-        :local_path => @other_account_path,
-        :folders    => []
+    end
+    let(:account1) do
+      {
+        :username => other_email,
+        :local_path => other_existing_path,
       }
-      @data = {:accounts => [@account1, @other_account]}
-      @store = stub('Imap::Backup::Configuration::Store')
-      @store.stub!(:data => @data)
-      @input, @output = prepare_highline
-      subject.stub(:system => nil)
+    end
+    let(:existing_email) { 'user@example.com' }
+    let(:new_email) { 'foo@example.com' }
+    let(:existing_server) { 'imap.example.com' }
+    let(:existing_password) { 'password' }
+    let(:other_email) { 'other@example.com' }
+    let(:other_existing_path) { '/other/existing/path' }
+
+    before do
+      allow(subject).to receive(:system).and_return(nil)
+      allow(subject).to receive(:puts).and_return(nil)
+      allow(highline).to receive(:choose) do |&block|
+        block.call(menu)
+        throw :done
+      end
     end
 
-    subject { Imap::Backup::Configuration::Account.new(@store, @account1) }
+    subject { described_class.new(store, account, highline) }
+
+    context 'preparation' do
+      before { subject.run }
+
+      it 'clears the screen' do
+        expect(subject).to have_received(:system).with('clear')
+      end
+
+      context 'menu' do
+        it 'shows the menu' do
+          expect(highline).to have_received(:choose)
+        end
+      end
+    end
 
     context 'menu' do
-      it 'clears the screen' do
-        subject.should_receive(:system).with('clear')
+      [
+        'modify email',
+        'modify password',
+        'modify server',
+        'modify backup path',
+        'choose backup folders',
+        'test authentication',
+        'delete',
+        'return to main menu',
+        'quit', # TODO: quit is hidden
+      ].each do |item|
+        before { subject.run }
 
-        subject.run
+        it "has a '#{item}' item" do
+          expect(menu.choices).to include(item)
+        end
+      end
+    end
+
+    context 'account details' do
+      [
+        ['email', /email:\s+user@example.com/],
+        ['server', /server:\s+imap.example.com/],
+        ['password', /password:\s+x+/],
+        ['path', %r(path:\s+/backup/path)],
+        ['folders', /folders:\s+my_folder/],
+      ].each do |attribute, value|
+        before { subject.run }
+
+        it "shows the #{attribute}" do
+          expect(menu.header).to match(value)
+        end
       end
 
-      it 'should show a menu' do
-        subject.run
+      context 'with no password' do
+        let(:existing_password) { '' }
 
-        @output.string.should =~ /modify email/
-        @output.string.should =~ /modify password/
-        @output.string.should =~ /modify backup path/
-        @output.string.should =~ /choose backup folders/
-        @output.string.should =~ /test authentication/
-        @output.string.should =~ /delete/
-        @output.string.should =~ /return to main/
+        before { subject.run }
+
+        it 'indicates that a password is not set' do
+          expect(menu.header).to include('password: (unset)')
+        end
       end
-
-      it 'should show account details in the menu' do
-        subject.run
-
-        @output.string.should =~ /email:\s+user@example.com/
-        @output.string.should =~ /password:\s+x+/
-        @output.string.should =~ %r{path:\s+/backup/path}
-        @output.string.should =~ /folders:\s+my_folder, another_folder/
-      end
-
-      it 'should indicate that a password is not set' do
-        @account1[:password] = ''
-
-        subject.run
-
-        @output.string.should =~ /password:\s+\(unset\)/
-      end
-
     end
 
     context 'email' do
-      it 'should modify the email address' do
-        Imap::Backup::Configuration::Asker.should_receive(:email).once.and_return('new@example.com')
-
-        choose_menu_item 'modify email'
-
+      before do
+        allow(Imap::Backup::Configuration::Asker).to receive(:email).and_return(new_email)
         subject.run
-
-        @output.string.should =~ /email:\s+new@example.com/
-        @account1[:username].should == 'new@example.com'
+        menu.choices['modify email'].call
       end
 
-      it 'should do nothing if it creates a duplicate' do
-        Imap::Backup::Configuration::Asker.should_receive(:email).once.and_return('existing@example.com')
+      [
+        ['GMail', 'foo@gmail.com', 'imap.gmail.com'],
+        ['Fastmail', 'bar@fastmail.fm', 'mail.messagingengine.com'],
+      ].each do |service, email, expected|
+        context service do
+          let(:existing_server) { nil }
+          let(:new_email) { email }
 
-        choose_menu_item 'modify email'
+          it 'sets a default server' do
+            expect(account[:server]).to eq(expected)
+          end
+        end
+      end
 
-        capturing_output do
-          subject.run
-        end.should =~ /there is already an account set up with that email address/i
+      it 'modifies the email address' do
+        expect(account[:username]).to eq(new_email)
+      end
+
+      context 'the email already exists' do
+        let(:new_email) { other_email }
+
+        it 'indicates the error' do
+          expect(subject).to have_received(:puts).with('There is already an account set up with that email address')
+        end
+
+        it "doesn't set the email" do
+          expect(account[:username]).to eq(existing_email)
+        end
       end
     end
 
     context 'password' do
-      it 'should update the password' do
-        Imap::Backup::Configuration::Asker.should_receive(:password).once.and_return('new_pwd')
+      let(:new_password) { 'new_password' }
 
-        choose_menu_item 'modify password'
-
+      before do
+        allow(Imap::Backup::Configuration::Asker).to receive(:password).and_return(new_password)
         subject.run
-
-        @account1[:password].should == 'new_pwd'
+        menu.choices['modify password'].call
       end
 
-      it 'should do nothing if the user cancels' do
-        Imap::Backup::Configuration::Asker.should_receive(:password).once.and_return(nil)
+      it 'updates the password' do
+        expect(account[:password]).to eq(new_password)
+      end
 
-        choose_menu_item 'modify password'
+      context 'if the user cancels' do
+        let(:new_password) { nil }
 
+        it 'does nothing' do
+          expect(account[:password]).to eq(existing_password)
+        end
+      end
+    end
+
+    context 'server' do
+      let(:server) { 'server' }
+
+      before do
+        allow(highline).to receive(:ask).with('server: ').and_return(server)
+      end
+
+      before do
         subject.run
+        menu.choices['modify server'].call
+      end
 
-        @account1[:password].should == 'secret'
+      it 'updates the server' do
+        expect(account[:server]).to eq(server)
       end
     end
 
     context 'backup_path' do
-      it 'should update the path' do
-        Imap::Backup::Configuration::Asker.should_receive(:backup_path).once do |default, validator|
-          validator.call('new/path')
-          '/new/path'
+      let(:new_backup_path) { '/new/path' }
+
+      before do
+        @validator = nil
+        allow(Imap::Backup::Configuration::Asker).to receive(:backup_path) do |path, validator|
+          @validator = validator
+          new_backup_path
         end
-
-        choose_menu_item 'modify backup path'
-
         subject.run
-
-        @account1[:local_path].should == '/new/path'
+        menu.choices['modify backup path'].call
       end
 
-      it 'should validate that the path is not used by other backups' do
-        Imap::Backup::Configuration::Asker.should_receive(:backup_path) do |default, validator|
-          validator.call(@other_account_path)
-          '/path'
-        end
+      it 'updates the path' do
+        expect(account[:local_path]).to eq(new_backup_path)
+      end
 
-        choose_menu_item 'modify backup path'
-
-        capturing_output do
-          subject.run
-        end.should =~ %r{The path '/existing/path' is used to backup the account 'existing@example.com'}
+      it 'validates that the path is not used by other backups' do
+        expect(@validator.call(other_existing_path)).to be_false
       end
     end
 
-    it 'should add/remove folders' do
-      @chooser = stub('Imap::Backup::Configuration::FolderChooser')
-      Imap::Backup::Configuration::FolderChooser.should_receive(:new).with(@account1).and_return(@chooser)
-      @chooser.should_receive(:run).with().once
+    context 'folders' do
+      let(:chooser) { double(:run => nil) }
 
-      choose_menu_item 'choose backup folders'
+      before do
+        allow(Imap::Backup::Configuration::FolderChooser).to receive(:new).and_return(chooser)
+        subject.run
+        menu.choices['choose backup folders'].call
+      end
 
-      subject.run
+      it 'edits folders' do
+        expect(chooser).to have_received(:run)
+      end
     end
 
-    it 'should allow testing the connection' do
-      Imap::Backup::Configuration::ConnectionTester.should_receive(:test).with(@account1).and_return('All fine')
-
-      choose_menu_item 'test authentication'
-
-      capturing_output do
+    context 'connection test' do
+      before do
+        allow(Imap::Backup::Configuration::ConnectionTester).to receive(:test).and_return('All fine')
+        allow(highline).to receive(:ask)
         subject.run
-      end.should == "All fine\n"
+        menu.choices['test authentication'].call
+      end
+
+      it 'tests the connection' do
+        expect(Imap::Backup::Configuration::ConnectionTester).to have_received(:test).with(account)
+      end
     end
 
     context 'deletion' do
-      it 'should confirm deletion' do
-        Imap::Backup::Configuration::Setup.highline.should_receive(:agree).with("Are you sure? (y/n) ").and_return(true)
+      let(:confirmed) { true }
 
-        choose_menu_item 'delete'
-
+      before do
+        allow(highline).to receive(:agree).and_return(confirmed)
         subject.run
+        catch :done do
+          menu.choices['delete'].call
+        end
       end
 
-      it 'should delete the account' do
-        Imap::Backup::Configuration::Setup.highline.stub!(:agree).with("Are you sure? (y/n) ").and_return(true)
-
-        choose_menu_item 'delete'
-
-        subject.run
-
-        @data[:accounts].should_not include(@account1)
+      it 'asks for confirmation' do
+        expect(highline).to have_received(:agree)
       end
 
-      it 'should not delete if confirmation is not given' do
-        Imap::Backup::Configuration::Setup.highline.stub!(:agree).with("Are you sure? (y/n) ").and_return(false)
-
-        choose_menu_item 'delete'
-
-        subject.run
-
-        @data[:accounts].should include(@account1)
+      it 'deletes the account' do
+        expect(data[:accounts].find{|a| a[:username] == existing_email}).to be_nil
       end
-    end
 
-    context 'return to main menu' do
-      it 'should return' do
-        @input.stub!(:gets).with().and_return("return\n")
+      context 'without confirmation' do
+        let(:confirmed) { false }
 
-        subject.run.should be_nil
+        it 'does nothing' do
+          expect(data[:accounts].find{|a| a[:username] == existing_email}).to eq(account)
+        end
       end
     end
   end
 end
-

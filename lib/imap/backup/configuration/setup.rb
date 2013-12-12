@@ -58,7 +58,7 @@ module Imap
           if account.nil?
             account = add_account(username)
           end
-          Account.new(@config, account).run
+          Account.new(@config, account, Imap::Backup::Configuration::Setup.highline).run
         end
       end
     end
