@@ -66,4 +66,3 @@ describe Imap::Backup::Utils do
     end
   end
 end
-

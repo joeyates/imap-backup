@@ -74,4 +74,3 @@ describe Imap::Backup::Configuration::List do
     end
   end
 end
-

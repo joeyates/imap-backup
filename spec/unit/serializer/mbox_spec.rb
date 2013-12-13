@@ -110,4 +110,3 @@ describe Imap::Backup::Serializer::Mbox do
     end
   end
 end
-

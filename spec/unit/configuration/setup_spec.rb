@@ -20,8 +20,8 @@ describe Imap::Backup::Configuration::Setup do
     end
 
     def prepare_store
-      @account1 = { :username => 'account@example.com' }
-      @data     = { :accounts => [ @account1 ] }
+      @account1 = {:username => 'account@example.com'}
+      @data     = {:accounts => [@account1]}
       @store    = stub('Imap::Backup::Configuration::Store', :data => @data, :path => '/base/path')
       Imap::Backup::Configuration::Store.stub!(:new).and_return(@store)
     end
@@ -114,4 +114,3 @@ describe Imap::Backup::Configuration::Setup do
     end
   end
 end
-

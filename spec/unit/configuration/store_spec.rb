@@ -146,9 +146,7 @@ describe Imap::Backup::Configuration::Store do
       end
 
       it 'should create a path for folders with slashes' do
-        folders = [
-          { :name => 'folder/path' },
-        ]
+        folders = [{:name => 'folder/path'}]
         JSON.stub!(:parse).with('xxx', :symbolize_names => true).and_return(configuration(folders))
 
         File.should_receive(:directory?).with('/my/backup/path/folder').and_return(true)
@@ -161,4 +159,3 @@ describe Imap::Backup::Configuration::Store do
     end
   end
 end
-

@@ -8,9 +8,7 @@ describe Imap::Backup::Configuration::FolderChooser do
 
   context '#run' do
     let(:connection) do
-      stub(
-        'Imap::Backup::Account::Connection'
-      )
+      stub('Imap::Backup::Account::Connection')
     end
     let(:existing_account) do
       {
@@ -124,7 +122,7 @@ describe Imap::Backup::Configuration::FolderChooser do
         subject.run
 
         @output.string.should =~ /\d+\. \+ another_folder/
-        account[:folders].should include( { :name => 'another_folder' } )
+        account[:folders].should include({:name => 'another_folder'})
       end
 
       it 'should remove folders' do
@@ -142,9 +140,8 @@ describe Imap::Backup::Configuration::FolderChooser do
         subject.run
 
         @output.string.should =~ /\d+\. \- my_folder/
-        account[:folders].should_not include( { :name => 'my_folder' } )
+        account[:folders].should_not include({:name => 'my_folder'})
       end
     end
   end
 end
-

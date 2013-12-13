@@ -6,4 +6,3 @@ module Imap
     VERSION  = [MAJOR, MINOR, REVISION].map(&:to_s).join('.')
   end
 end
-

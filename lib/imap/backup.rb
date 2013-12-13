@@ -14,9 +14,6 @@ require 'imap/backup/serializer/directory'
 require 'imap/backup/serializer/mbox'
 require 'imap/backup/version'
 
-module Imap
-  module Backup
-    class ConfigurationNotFound < StandardError; end
-  end
+module Imap::Backup
+  class ConfigurationNotFound < StandardError; end
 end
-

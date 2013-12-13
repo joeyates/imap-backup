@@ -142,4 +142,3 @@ describe Imap::Backup::Account::Connection do
     end
   end
 end
-

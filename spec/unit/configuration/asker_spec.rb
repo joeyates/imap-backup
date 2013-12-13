@@ -111,4 +111,3 @@ describe Imap::Backup::Configuration::Asker do
     end
   end
 end
-

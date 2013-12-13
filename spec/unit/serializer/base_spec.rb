@@ -16,4 +16,3 @@ describe Imap::Backup::Serializer::Base do
     end
   end
 end
-

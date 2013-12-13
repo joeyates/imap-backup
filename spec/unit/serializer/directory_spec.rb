@@ -76,4 +76,3 @@ describe Imap::Backup::Serializer::Directory do
     end
   end
 end
-

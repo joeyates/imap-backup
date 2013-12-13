@@ -74,4 +74,3 @@ describe Imap::Backup::Account::Folder do
     end
   end
 end
-

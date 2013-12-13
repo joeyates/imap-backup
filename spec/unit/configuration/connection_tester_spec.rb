@@ -40,4 +40,3 @@ describe Imap::Backup::Configuration::ConnectionTester do
     end
   end
 end
-

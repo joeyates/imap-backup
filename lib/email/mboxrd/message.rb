@@ -1,37 +1,36 @@
 require 'mail'
 
-module Email
-  module Mboxrd
-    class Message
-      def initialize(body)
-        @body = body.clone
-        @body.force_encoding('binary') if RUBY_VERSION >= '1.9.0'
-      end
+module Email; end
 
-      def to_s
-        'From ' + from + "\n" + body + "\n"
-      end
+module Email::Mboxrd
+  class Message
+    def initialize(body)
+      @body = body.clone
+      @body.force_encoding('binary') if RUBY_VERSION >= '1.9.0'
+    end
 
-      private
+    def to_s
+      'From ' + from + "\n" + body + "\n"
+    end
 
-      def parsed
-        @parsed ||= Mail.new(@body)
-      end
+    private
 
-      def from
-        parsed.from[0] + ' ' + asctime
-      end
+    def parsed
+      @parsed ||= Mail.new(@body)
+    end
 
-      def body
-        mbox = @body.gsub(/\n(>*From)/, "\n>\\1")
-        mbox + "\n" unless mbox.end_with?("\n")
-        mbox
-      end
+    def from
+      parsed.from[0] + ' ' + asctime
+    end
 
-      def asctime
-        parsed.date.asctime
-      end
+    def body
+      mbox = @body.gsub(/\n(>*From)/, "\n>\\1")
+      mbox + "\n" unless mbox.end_with?("\n")
+      mbox
+    end
+
+    def asctime
+      parsed.date.asctime
     end
   end
 end
-

@@ -84,4 +84,3 @@ describe Imap::Backup::Downloader do
     end
   end
 end
-

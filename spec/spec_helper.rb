@@ -4,7 +4,7 @@ if RUBY_VERSION < '1.9'
   require 'rspec/autorun'
 else
   require 'simplecov'
-  if defined?( GATHER_RSPEC_COVERAGE )
+  if defined?(GATHER_RSPEC_COVERAGE)
     SimpleCov.start do
       add_filter "/spec/"
       add_filter "/vendor/"
@@ -12,10 +12,9 @@ else
   end
 end
 
-require File.expand_path( File.dirname(__FILE__) + '/../lib/imap/backup' )
+require File.expand_path(File.dirname(__FILE__) + '/../lib/imap/backup')
 
 module HighLineTestHelpers
-
   def prepare_highline
     @input  = stub('stdin', :eof? => false)
     # default gets stub
@@ -24,11 +23,9 @@ module HighLineTestHelpers
     Imap::Backup::Configuration::Setup.highline = HighLine.new(@input, @output)
     [@input, @output]
   end
-
 end
 
 module InputOutputTestHelpers
-
   def capturing_output
     output = StringIO.new
     $stdout = output
@@ -37,6 +34,4 @@ module InputOutputTestHelpers
   ensure
     $stdout = STDOUT
   end
-
 end
-

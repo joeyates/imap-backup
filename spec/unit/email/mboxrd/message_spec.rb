@@ -48,4 +48,3 @@ describe Email::Mboxrd::Message do
     end
   end
 end
-

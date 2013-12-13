@@ -4,7 +4,6 @@ require 'fileutils'
 module Imap
   module Backup
     module Utils
-
       def self.check_permissions(filename, limit)
         actual = stat(filename)
         mask   = ~limit & 0777
@@ -37,8 +36,6 @@ module Imap
       def self.oct(permissions)
         "0%o" % permissions
       end
-
     end
   end
 end
-
