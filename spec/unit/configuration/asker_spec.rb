@@ -1,113 +1,88 @@
 # encoding: utf-8
 require 'spec_helper'
 
-describe Imap::Backup::Configuration::Asker do
-  context '.email' do
-    it 'should ask for an email' do
-      Imap::Backup::Configuration::Setup.highline.should_receive(:ask).with(/email/)
+module Imap::Backup::Configuration
+  describe Asker do
+    let(:highline) { double }
 
-      Imap::Backup::Configuration::Asker.email
+    subject { Asker.new(highline) }
+
+    context '#initialize' do
+      its(:highline) { should eq(highline) }
     end
 
-    it 'should validate the address' do
-      Imap::Backup::Configuration::Setup.highline.should_receive(:ask).with(/email/) do |&block|
-        q = stub('HighLine::Question', :default=  => nil,
-                                       :readline= => nil,
-                                       :responses => {})
-        q.should_receive(:validate=).with(instance_of(Regexp))
+    context '#email' do
+      let(:email) { 'email@example.com' }
 
-        block.call q
+      before do
+        allow(highline).to receive(:ask).and_return(email)
+        @result = subject.email
       end
 
-      Imap::Backup::Configuration::Asker.email
+      it 'asks for an email'  do
+        expect(highline).to have_received(:ask).with(/email/)
+      end
+
+      it 'returns the address' do
+        expect(@result).to eq(email)
+      end
     end
 
-    it 'should return the address' do
-      Imap::Backup::Configuration::Setup.highline.stub!(:ask).with(/email/).and_return('new@example.com')
+    context '#password' do
+      let(:password1) { 'password' }
+      let(:password2) { 'password' }
+      let(:answers) { [answer1, answer2] }
+      let(:answer1) { true }
+      let(:answer2) { false }
 
-      Imap::Backup::Configuration::Asker.email.should == 'new@example.com'
-    end
-  end
+      before do
+        @i = 0
+        allow(highline).to receive(:ask).with('password: ').and_return(password1)
+        allow(highline).to receive(:ask).with('repeat password: ').and_return(password2)
+        allow(highline).to receive(:agree) do
+          answer = answers[@i]
+          @i += 1
+          answer
+        end
+        @result = subject.password
+      end
 
-  context '.password' do
-    before :each do
-      Imap::Backup::Configuration::Setup.highline.stub!(:ask).with(/^password/).and_return('secret')
-      Imap::Backup::Configuration::Setup.highline.stub!(:ask).with(/^repeat password/).and_return('secret')
-    end
+      it 'asks for a password' do
+        expect(highline).to have_received(:ask).with('password: ')
+      end
 
-    it 'should ask for a password and confirmation' do
-      Imap::Backup::Configuration::Setup.highline.should_receive(:ask).with(/^password/).and_return('secret')
-      Imap::Backup::Configuration::Setup.highline.should_receive(:ask).with(/^repeat password/).and_return('secret')
+      it 'asks for confirmation' do
+        expect(highline).to have_received(:ask).with('repeat password: ')
+      end
 
-      Imap::Backup::Configuration::Asker.password
-    end
+      it 'returns the password' do
+        expect(@result).to eq(password1)
+      end
 
-    it 'should return the password' do
-      Imap::Backup::Configuration::Asker.password.should == 'secret'
-    end
+      context 'different answers' do
+        let(:password2) { 'secret' }
 
-    it "should ask again if the passwords don't match" do
-      state = :password1
-      Imap::Backup::Configuration::Setup.highline.stub!(:ask) do
-        case state
-        when :password1
-          state = :confirmation1
-          'secret'
-        when :confirmation1
-          state = :retry?
-          'wrong!!!'
-        when :retry?
-          state = :password2
-          'y'
-        when :password2
-          state = :confirmation2
-          'secret'
-        when :confirmation2
-          'secret'
+        it 'asks to continue' do
+          expect(highline).to have_received(:agree).at_least(1).times.with(/Continue\?/)
         end
       end
-
-      Imap::Backup::Configuration::Asker.password
     end
 
-    it 'should return nil if the user cancels' do
-      state = :password1
-      Imap::Backup::Configuration::Setup.highline.stub!(:ask) do
-        case state
-        when :password1
-          state = :confirmation1
-          'secret'
-        when :confirmation1
-          state = :retry?
-          'wrong!!!'
-        when :retry?
-          state = :password2
-          'n'
-        end
+    context '#backup_path' do
+      let(:path) { '/path' }
+
+      before do
+        allow(highline).to receive(:ask).and_return(path)
+        @result = subject.backup_path('', //)
       end
 
-      Imap::Backup::Configuration::Asker.password.should be_nil
-    end
-  end
-
-  context '.backup_path' do
-    it 'should ask for a directory' do
-      validator = /validator/
-      Imap::Backup::Configuration::Setup.highline.should_receive(:ask).with(/directory/) do |&block|
-        q = stub('HighLine::Question', :responses => {}, :readline= => nil)
-        q.should_receive(:default=).with('default path')
-        q.should_receive(:validate=).with(validator)
-
-        block.call q
+      it 'asks for a directory' do
+        expect(highline).to have_received(:ask).with(/directory/)
       end
 
-      Imap::Backup::Configuration::Asker.backup_path('default path', validator)
-    end
-
-    it 'should return the choice' do
-      Imap::Backup::Configuration::Setup.highline.should_receive(:ask).with(/directory/).and_return('/path')
-
-      Imap::Backup::Configuration::Asker.backup_path('default path', //).should == '/path'
+      it 'returns the path' do
+        expect(@result).to eq(path)
+      end
     end
   end
 end
