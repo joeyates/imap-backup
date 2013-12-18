@@ -5,10 +5,10 @@ describe Imap::Backup::Configuration::Setup do
   include HighLineTestHelpers
 
   context '#initialize' do
-    it 'should not require the config file to exist' do
-      Imap::Backup::Configuration::Store.should_receive(:new)
-
-      Imap::Backup::Configuration::Setup.new
+    context 'without a config file' do
+      it 'works' do
+        Imap::Backup::Configuration::Setup.new
+      end
     end
   end
 

@@ -3,40 +3,51 @@ require 'spec_helper'
 
 describe Imap::Backup::Configuration::ConnectionTester do
   context '.test' do
-    it 'should try to connect' do
-      Imap::Backup::Account::Connection.should_receive(:new).with('foo')
+    let(:connection) { double('Imap::Backup::Account::Connection', :imap => nil) }
 
-      Imap::Backup::Configuration::ConnectionTester.test('foo')
+    before do
+      allow(Imap::Backup::Account::Connection).to receive(:new).and_return(connection)
     end
 
-    it 'should return success if the connection works' do
-      Imap::Backup::Account::Connection.stub!(:new).
-                                        with('foo')
+    context 'call' do
+      before { @result = subject.test('foo') }
 
-      result = Imap::Backup::Configuration::ConnectionTester.test('foo')
-
-      result.should =~ /successful/
+      it 'tries to connect' do
+        expect(connection).to have_received(:imap)
+      end
     end
 
-    it 'should handle no response' do
-      e = Net::IMAP::NoResponseError.new(stub('o', :data => stub('foo', :text => 'bar')))
-      Imap::Backup::Account::Connection.stub!(:new).
-                                        with('foo').
-                                        and_raise(e)
+    context 'success' do
+      before { @result = subject.test('foo') }
 
-      result = Imap::Backup::Configuration::ConnectionTester.test('foo')
-
-      result.should =~ /no response/i
+      it 'returns success' do
+        expect(@result).to match(/successful/)
+      end
     end
 
-    it 'should handle other errors' do
-      Imap::Backup::Account::Connection.stub!(:new).
-                                        with('foo').
-                                        and_raise('error')
+    context 'failure' do
+      before do
+        allow(connection).to receive(:imap).and_raise(error)
+        @result = subject.test('foo')
+      end
 
-      result = Imap::Backup::Configuration::ConnectionTester.test('foo')
+      context 'no connection' do
+        let(:error) do
+          data = double('foo', :text => 'bar')
+          Net::IMAP::NoResponseError.new(double('o', :data => data))
+        end
 
-      result.should =~ /unexpected error/i
+        it 'returns success' do
+          expect(@result).to match(/no response/i)
+        end
+      end
+
+      context 'other' do
+        let(:error) { 'Error' }
+        it 'returns success' do
+          expect(@result).to match(/unexpected error/i)
+        end
+      end
     end
   end
 end
