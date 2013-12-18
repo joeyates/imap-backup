@@ -39,12 +39,22 @@ module Imap::Backup::Account
     def imap
       return @imap unless @imap.nil?
       options = options_for(username)
+      Imap::Backup.logger.debug "Creating IMAP instance: #{server}, options: #{options.inspect}"
       @imap = Net::IMAP.new(server, options)
-      @imap.login(username, @password)
+      Imap::Backup.logger.debug "Logging in: #{username}/#{masked_password}"
+      @imap.login(username, password)
       @imap
     end
 
     private
+
+    def password
+      @password
+    end
+
+    def masked_password
+      password.gsub(/./, 'x')
+    end
 
     def host_for(username)
       case username
