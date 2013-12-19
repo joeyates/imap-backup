@@ -38,7 +38,7 @@ module Imap::Backup::Account
 
     def imap
       return @imap unless @imap.nil?
-      options = options_for(username)
+      options = options_for(server)
       Imap::Backup.logger.debug "Creating IMAP instance: #{server}, options: #{options.inspect}"
       @imap = Net::IMAP.new(server, options)
       Imap::Backup.logger.debug "Logging in: #{username}/#{masked_password}"
@@ -74,11 +74,13 @@ module Imap::Backup::Account
       end
     end
 
-    def options_for(username)
-      case username
-      when /@gmail\.com/
+    def options_for(server)
+      case server
+      when 'imap.gmail.com'
         {:port => 993, :ssl => true}
-      when /@fastmail\.fm/
+      when 'mail.messagingengine.com'
+        {:port => 993, :ssl => true}
+      else
         {:port => 993, :ssl => true}
       end
     end
