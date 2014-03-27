@@ -20,6 +20,8 @@ $ gem install 'imap-backup'
 
 # Setup
 
+In order to do backups, you need to add accounts and specify the folders to backup.
+
 Run:
 
 ```shell
@@ -68,6 +70,11 @@ It connects to GMail by default, but you can also specify a server:
   ]
 }  
 ```
+
+## Google Apps
+
+* Enable IMAP access to your account via the GMail interface (Settings/Forwarding and POP/IMAP),
+* In imap-backup setup, set the server to imap.gmail.com
 
 # Security
 

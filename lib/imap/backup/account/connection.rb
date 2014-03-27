@@ -71,6 +71,8 @@ module Imap::Backup::Account
         '/'
       when /@fastmail\.fm/
         'INBOX'
+      else
+        '/'
       end
     end
 
