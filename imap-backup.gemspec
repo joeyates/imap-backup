@@ -16,7 +16,11 @@ Gem::Specification.new do |gem|
   gem.require_paths = ['lib']
   gem.version       = Imap::Backup::VERSION
 
-  gem.add_runtime_dependency 'rake'
+  if RUBY_VERSION < '1.9'
+    gem.add_runtime_dependency 'rake', '< 10.2.0'
+  else
+    gem.add_runtime_dependency 'rake'
+  end
   gem.add_runtime_dependency 'highline'
   gem.add_runtime_dependency 'mail'
   if RUBY_VERSION < '1.9'
