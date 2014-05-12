@@ -2,74 +2,55 @@
 require 'spec_helper'
 
 describe Imap::Backup::Account::Folder do
-  include InputOutputTestHelpers
-
-  let(:imap) { stub('Net::IMAP') }
-  let(:connection) { stub('Imap::Backup::Account::Connection', :imap => imap) }
-  let(:missing_mailbox_data) { stub('Data', :text => 'Unknown Mailbox: my_folder') }
-  let(:missing_mailbox_response) { stub('Response', :data => missing_mailbox_data) }
+  let(:imap) { double('Net::IMAP', :examine => nil) }
+  let(:connection) { double('Imap::Backup::Account::Connection', :imap => imap) }
+  let(:missing_mailbox_data) { double('Data', :text => 'Unknown Mailbox: my_folder') }
+  let(:missing_mailbox_response) { double('Response', :data => missing_mailbox_data) }
   let(:missing_mailbox_error) { Net::IMAP::NoResponseError.new(missing_mailbox_response) }
 
-  context 'with instance' do
-    subject { Imap::Backup::Account::Folder.new(connection, 'my_folder') }
+  subject { described_class.new(connection, 'my_folder') }
 
-    context '#uids' do
-      it 'lists available messages' do
-        imap.should_receive(:examine).with('my_folder')
-        imap.should_receive(:uid_search).with(['ALL']).and_return([5678, 123])
+  context '#uids' do
+    let(:uids) { [5678, 123] }
 
-        subject.uids.should == [123, 5678]
+    before { allow(imap).to receive(:uid_search).and_return(uids) }
+
+    it 'lists available messages' do
+      expect(subject.uids).to eq(uids.reverse)
+    end
+
+    context 'with missing mailboxes' do
+      before { allow(imap).to receive(:examine).and_raise(missing_mailbox_error) }
+
+      it 'returns an empty array' do
+        expect(subject.uids).to eq([])
       end
+    end
+  end
 
-      it 'returns an empty array for missing mailboxes' do
-        imap.
-          should_receive(:examine).
-          with('my_folder').
-          and_raise(missing_mailbox_error)
+  context '#fetch' do
+    let(:message_body) { double('the body', :force_encoding => nil) }
+    let(:message) { {'RFC822' => message_body, 'other' => 'xxx'} }
 
-        capturing_output do
-          expect(subject.uids).to eq([])
-        end
+    before { allow(imap).to receive(:uid_fetch).and_return([[nil, message]]) }
+
+    it 'returns the message' do
+      expect(subject.fetch(123)).to eq(message)
+    end
+
+    context "if the mailbox doesn't exist" do
+      before { allow(imap).to receive(:examine).and_raise(missing_mailbox_error) }
+
+      it 'is nil' do
+        expect(subject.fetch(123)).to be_nil
       end
     end
 
-    context '#fetch' do
-      let(:message_body) { 'the body' }
-      let(:message) do
-        {
-          'RFC822' => message_body,
-          'other'  => 'xxx'
-        }
-      end
-
-      it 'requests the message, the flags and the date' do
-        imap.should_receive(:examine).with('my_folder')
-        imap.should_receive(:uid_fetch).
-              with([123], ['RFC822', 'FLAGS', 'INTERNALDATE']).
-              and_return([[nil, message]])
-
+    if RUBY_VERSION > '1.9'
+      it 'sets the encoding on the message' do
         subject.fetch(123)
-      end
 
-      it "returns nil if the mailbox doesn't exist" do
-        imap.
-          should_receive(:examine).
-          with('my_folder').
-          and_raise(missing_mailbox_error)
-
-        capturing_output do
-          expect(subject.fetch(123)).to be_nil
-        end
-      end
-
-      if RUBY_VERSION > '1.9'
-        it 'sets the encoding on the message' do
-          imap.stub!(:examine => nil, :uid_fetch => [[nil, message]])
-
-          message_body.should_receive(:force_encoding).with('utf-8')
-
-          subject.fetch(123)
-        end
+        expect(message_body).to have_received(:force_encoding).with('utf-8')
       end
     end
   end

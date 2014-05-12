@@ -3,109 +3,98 @@
 require 'spec_helper'
 
 describe Imap::Backup::Serializer::Mbox do
-  let(:stat) { stub('File::Stat', :mode => 0700) }
+  let(:stat) { double('File::Stat', :mode => 0700) }
+  let(:base_path) { '/base/path' }
   let(:mbox_pathname) { '/base/path/my/folder.mbox' }
+  let(:mbox_exists) { true }
   let(:imap_pathname) { '/base/path/my/folder.imap' }
+  let(:imap_exists) { true }
 
   before do
-    File.stub(:exist?).with('/base/path').and_return(true)
-    File.stub!(:stat).with('/base/path').and_return(stat)
-    Imap::Backup::Utils.stub(:make_folder)
+    allow(Imap::Backup::Utils).to receive(:make_folder)
+    allow(File).to receive(:exist?).with(base_path).and_return(true)
+    allow(File).to receive(:stat).with(base_path).and_return(stat)
+    allow(File).to receive(:exist?).with(mbox_pathname).and_return(mbox_exists)
+    allow(File).to receive(:exist?).with(imap_pathname).and_return(imap_exists)
   end
 
   context '#initialize' do
-    before do
-      File.stub(:exist?).with(mbox_pathname).and_return(true)
-      File.stub(:exist?).with(imap_pathname).and_return(true)
-    end
-
     it 'creates the containing directory' do
-      Imap::Backup::Utils.should_receive(:make_folder).with('/base/path', 'my', 0700)
+      described_class.new(base_path, 'my/folder')
 
-      Imap::Backup::Serializer::Mbox.new('/base/path', 'my/folder')
+      expect(Imap::Backup::Utils).to have_received(:make_folder).with(base_path, 'my', 0700)
     end
 
     context 'mbox and imap files' do
-      it 'checks if they exist' do
-        File.should_receive(:exist?).with(mbox_pathname).and_return(true)
-        File.should_receive(:exist?).with(imap_pathname).and_return(true)
+      context "if mbox exists and imap doesn't" do
+        let(:imap_exists) { false }
 
-        Imap::Backup::Serializer::Mbox.new('/base/path', 'my/folder')
+        it 'fails' do
+          expect {
+            described_class.new(base_path, 'my/folder')
+          }.to raise_error(RuntimeError, '.imap file missing')
+        end
       end
 
-      it "fails if mbox exists and imap doesn't" do
-        File.stub(:exist?).with(imap_pathname).and_return(false)
+      context "if imap exists and mbox doesn't" do
+        let(:mbox_exists) { false }
 
-        expect {
-          Imap::Backup::Serializer::Mbox.new('/base/path', 'my/folder')
-        }.to raise_error(RuntimeError, '.imap file missing')
-      end
-
-      it "fails if imap exists and mbox doesn't" do
-        File.stub(:exist?).with(mbox_pathname).and_return(false)
-
-        expect {
-          Imap::Backup::Serializer::Mbox.new('/base/path', 'my/folder')
-        }.to raise_error(RuntimeError, '.mbox file missing')
+        it 'fails' do
+          expect {
+            described_class.new(base_path, 'my/folder')
+          }.to raise_error(RuntimeError, '.mbox file missing')
+        end
       end
     end
   end
 
   context 'instance methods' do
+    let(:ids) { %w(1 123) }
+
     before do
-      File.stub(:exist?).with(mbox_pathname).and_return(true)
-      File.stub(:exist?).with(imap_pathname).and_return(true)
-      CSV.stub(:foreach) do |&block|
-        block.call ['1']
-        block.call ['123']
-      end
+      allow(CSV).to receive(:foreach) { |&b| ids.each { |id| b.call [id] } }
     end
 
-    subject { Imap::Backup::Serializer::Mbox.new('/base/path', 'my/folder') }
+    subject { described_class.new(base_path, 'my/folder') }
 
     context '#uids' do
       it 'returns the backed-up uids' do
-        File.should_receive(:exist?).with(mbox_pathname).and_return(true)
-        File.should_receive(:exist?).with(imap_pathname).and_return(true)
-
-        expect(subject.uids).to eq(['1', '123'])
+        expect(subject.uids).to eq(ids)
       end
 
-      it 'returns an empty Array if the mbox does not exist' do
-        File.stub(:exist?).with(mbox_pathname).and_return(false)
-        File.stub(:exist?).with(imap_pathname).and_return(false)
-        File.should_receive(:exist?).with(mbox_pathname).and_return(false)
-        File.should_receive(:exist?).with(imap_pathname).and_return(false)
+      context 'if the mbox does not exist' do
+        let(:mbox_exists) { false }
+        let(:imap_exists) { false }
 
-        expect(subject.uids).to eq([])
+        it 'returns an empty Array' do
+          expect(subject.uids).to eq([])
+        end
       end
     end
 
     context '#save' do
       let(:mbox_formatted_message) { 'message in mbox format' }
       let(:message_uid) { '999' }
-      let(:message) { stub('Email::Mboxrd::Message', :to_s => mbox_formatted_message) }
-      let(:mbox_file) { stub('File - mbox', :close => nil) }
-      let(:imap_file) { stub('File - imap', :close => nil) }
+      let(:message) { double('Email::Mboxrd::Message', :to_s => mbox_formatted_message) }
+      let(:mbox_file) { double('File - mbox', :write => nil, :close => nil) }
+      let(:imap_file) { double('File - imap', :write => nil, :close => nil) }
 
       before do
-        Email::Mboxrd::Message.stub(:new => message)
-        File.stub(:open).with(mbox_pathname, 'ab').and_return(mbox_file)
-        File.stub(:open).with(imap_pathname, 'ab').and_return(imap_file)
-        mbox_file.stub(:write).with(mbox_formatted_message)
-        imap_file.stub(:write).with(message_uid + "\n")
+        allow(Email::Mboxrd::Message).to receive(:new).and_return(message)
+        allow(File).to receive(:open).with(mbox_pathname, 'ab').and_return(mbox_file)
+        allow(File).to receive(:open).with(imap_pathname, 'ab').and_return(imap_file)
       end
 
       it 'saves the message to the mbox' do
-        mbox_file.should_receive(:write).with(mbox_formatted_message)
-
         subject.save(message_uid, "The\nemail\n")
+
+        expect(mbox_file).to have_received(:write).with(mbox_formatted_message)
       end
 
       it 'saves the uid to the imap file' do
-        imap_file.should_receive(:write).with(message_uid + "\n")
-
         subject.save(message_uid, "The\nemail\n")
+
+        expect(imap_file).to have_received(:write).with(message_uid + "\n")
       end
     end
   end

@@ -2,77 +2,69 @@
 require 'spec_helper'
 
 describe Imap::Backup::Serializer::Directory do
-  let(:stat) { stub('File::Stat', :mode => 0700) }
+  let(:stat) { double('File::Stat', :mode => 0700) }
   let(:files) { ['00000123.json', '000001.json'] }
+  let(:base) { '/base/path' }
+  let(:folder) { '/base/path/my_folder' }
+  let(:folder_exists) { true }
 
   before do
-    File.stub!(:stat).with('/base/path').and_return(stat)
-    FileUtils.stub!(:mkdir_p).with('/base/path/my_folder')
-    FileUtils.stub!(:chmod).with(0700, '/base/path/my_folder')
-    File.stub!(:exist?).with('/base/path').and_return(true)
+    allow(FileUtils).to receive(:mkdir_p)
+    allow(FileUtils).to receive(:chmod)
+    allow(File).to receive(:stat).with(base).and_return(stat)
+    allow(File).to receive(:exist?).with(base).and_return(true)
+    allow(File).to receive(:exist?).with(folder).and_return(folder_exists)
   end
 
-  subject { Imap::Backup::Serializer::Directory.new('/base/path', 'my_folder') }
+  subject { described_class.new(base, 'my_folder') }
 
   context '#uids' do
-    it 'should return the backed-up uids' do
-      File.should_receive(:exist?).with('/base/path/my_folder').and_return(true)
-      Dir.should_receive(:open).with('/base/path/my_folder').and_return(files)
+    before do
+      allow(Dir).to receive(:open).with(folder).and_return(files)
+    end
 
+    it 'returns the backed-up uids' do
       subject.uids.should == [1, 123]
     end
 
-    it 'should return an empty Array if the directory does not exist' do
-      File.should_receive(:exist?).with('/base/path/my_folder').and_return(false)
+    context 'if the directory does not exist' do
+      let(:folder_exists) { false }
 
-      subject.uids.should == []
+      it 'returns an empty array' do
+        subject.uids.should == []
+      end
     end
   end
 
   context '#exist?' do
-    it 'should check if the file exists' do
-      File.should_receive(:exist?).with(%r{/base/path/my_folder/0+123.json}).and_return(true)
+    it 'checks if the file exists' do
+      allow(File).to receive(:exist?).with(%r{/base/path/my_folder/0+123.json}).and_return(true)
 
       subject.exist?(123).should be_true
     end
   end
 
   context '#save' do
-    let(:message) do
-      {
-        'RFC822' => 'the body',
-        'other'  => 'xxx'
-      }
-    end
-    let(:file) { stub('File', :write => nil) }
+    let(:message) { {'RFC822' => 'the body', 'other'  => 'xxx'} }
+    let(:file) { double('File', :write => nil) }
 
     before do
-      File.stub!(:exist?).with(%r{/base/path/my_folder/0+1234.json}).and_return(true)
-      FileUtils.stub!(:chmod).with(0600, /0+1234.json$/)
-      File.stub!(:open) do |&block|
+      allow(File).to receive(:exist?).with(%r{/base/path/my_folder/0+1234.json}).and_return(true)
+      allow(File).to receive(:open) do |&block|
         block.call file
       end
     end
 
-    it 'should save messages' do
-      File.should_receive(:open) do |&block|
-        block.call file
-      end
-      file.should_receive(:write).with(/the body/)
-
+    it 'saves messages' do
       subject.save('1234', message)
+
+      expect(file).to have_received(:write).with(message.to_json)
     end
 
-    it 'should JSON encode messages' do
-      message.should_receive(:to_json)
-
-      subject.save('1234', message)
-    end
-
-    it 'should set file permissions' do
-      FileUtils.should_receive(:chmod).with(0600, /0+1234.json$/)
-
+    it 'sets file permissions' do
       subject.save(1234, message)
+
+      expect(FileUtils).to have_received(:chmod).with(0600, /0+1234.json$/)
     end
   end
 end

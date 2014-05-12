@@ -6,9 +6,10 @@ module Imap
     module Utils
       def self.check_permissions(filename, limit)
         actual = stat(filename)
-        mask   = ~limit & 0777
+        return nil if actual.nil?
+        mask = ~limit & 0777
         if actual & mask != 0
-          raise "Permissions on '#{filename}' should be #{oct(limit)}, not #{oct(actual)}" 
+          raise format("Permissions on '%s' should be 0%o, not 0%o", filename, limit, actual)
         end
       end
 
@@ -29,12 +30,6 @@ module Imap
           path = File.join(path, part)
           FileUtils.chmod permissions, path
         end
-      end
-
-      private
-
-      def self.oct(permissions)
-        "0%o" % permissions
       end
     end
   end

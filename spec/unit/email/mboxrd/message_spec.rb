@@ -5,34 +5,24 @@ require 'spec_helper'
 describe Email::Mboxrd::Message do
   let(:from) { 'me@example.com' }
   let(:date) { DateTime.new(2012, 12, 13, 18, 23, 45) }
-  let(:message_body) { "Foo\nBar\nFrom at the beginning of the line\n>>From quoted" }
-  subject { Email::Mboxrd::Message.new(message_body) }
+  let(:message_body) do
+    double('Body', :clone => cloned_message_body, :force_encoding => nil)
+  end
+  let(:cloned_message_body) { "Foo\nBar\nFrom at the beginning of the line\n>>From quoted" }
+
+  subject { described_class.new(message_body) }
 
   context '#to_s' do
-    let(:mail) do
-      mail = stub('Mail')
-      mail.stub(:from).and_return([from])
-      mail.stub(:date).and_return(date)
-      mail
-    end
+    let(:mail) { double('Mail', :from =>[from], :date => date) }
 
     before do
-      Mail.stub(:new).with(message_body).and_return(mail)
+      allow(Mail).to receive(:new).with(cloned_message_body).and_return(mail)
     end
 
     it 'does not modify the message' do
-      message_body2 = message_body.clone
-
-      message_body.should_receive(:clone).and_return(message_body2)
-      message_body.should_not_receive(:force_encoding).with('binary')
-
       subject.to_s
-    end
 
-    it 'parses the message' do
-      Mail.should_receive(:new).with(message_body).and_return(mail)
-
-      subject.to_s
+      expect(message_body).to_not have_received(:force_encoding).with('binary')
     end
 
     it "adds a 'From ' line at the start" do

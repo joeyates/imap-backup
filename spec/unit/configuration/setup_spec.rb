@@ -13,31 +13,35 @@ describe Imap::Backup::Configuration::Setup do
   end
 
   context '#run' do
-    before :each do
-      prepare_store
-      @input, @output = prepare_highline
-      subject.stub(:system => nil)
+    let(:account1) { {:username => 'account@example.com'} }
+    let(:account) { double('Imap::Backup::Configuration::Account', :run => nil) }
+    let(:data) { {:accounts => [account1]} }
+    let(:store) do
+      double(
+        'Imap::Backup::Configuration::Store',
+        :data => data,
+        :path => '/base/path',
+      )
     end
 
-    def prepare_store
-      @account1 = {:username => 'account@example.com'}
-      @data     = {:accounts => [@account1]}
-      @store    = stub('Imap::Backup::Configuration::Store', :data => @data, :path => '/base/path')
-      Imap::Backup::Configuration::Store.stub!(:new).and_return(@store)
+    before :each do
+      allow(Imap::Backup::Configuration::Store).to receive(:new).and_return(store)
+      @input, @output = prepare_highline
+      allow(@input).to receive(:eof?).and_return(false)
+      allow(@input).to receive(:gets).and_return("q\n")
+      allow(subject).to receive(:system)
     end
 
     subject { Imap::Backup::Configuration::Setup.new }
 
-    it 'should present a main menu' do
-      @input.should_receive(:eof?).and_return(false)
-      @input.should_receive(:gets).and_return("q\n")
+    context 'main menu' do
+      before { subject.run }
 
-      subject.run
-
-      @output.string.should =~ /Choose an action:/
-      @output.string.should =~ /add account/
-      @output.string.should =~ /save and exit/
-      @output.string.should =~ /quit/
+      %w(add\ account save\ and\ exit quit).each do |choice|
+        it "includes #{choice}" do
+          expect(@output.string).to include(choice)
+        end
+      end
     end
 
     it 'clears the screen' do
@@ -52,57 +56,32 @@ describe Imap::Backup::Configuration::Setup do
       @output.string.should =~ /account@example.com/
     end
 
-    it 'should edit accounts' do
-      state = :initial
-      @input.stub(:gets) do
-        case state
-        when :initial
-          state = :editing
-          "account@example.com\n"
-        else
-          "q\n"
-        end
+    context 'adding accounts' do
+      let(:blank_account) do
+        {
+          :username => "new@example.com",
+          :password => "",
+          :local_path => "/base/path/new_example.com",
+          :folders => []
+        }
       end
 
-      @account = stub('Imap::Backup::Configuration::Account')
-      allow(Imap::Backup::Configuration::Account).to receive(:new).with(@store, @account1, anything).and_return(@account)
-      @account.should_receive(:run).with()
+      before do
+        allow(@input).to receive(:gets).and_return("add\n", "q\n")
+        allow(Imap::Backup::Configuration::Asker).to receive(:email).with(no_args).and_return('new@example.com')
+        allow(Imap::Backup::Configuration::Account).to receive(:new).with(store, blank_account, anything).and_return(account)
 
-      subject.run
-    end
-
-    it 'should add accounts' do
-      state = :initial
-      @input.stub(:gets) do
-        case state
-        when :initial
-          state = :editing
-          "add\n"
-        else
-          "q\n"
-        end
+        subject.run
       end
 
-      blank_account = {:username=>"new@example.com", :password=>"", :local_path=>"/base/path/new_example.com", :folders=>[]}
-      Imap::Backup::Configuration::Asker.should_receive(:email).with().and_return('new@example.com')
-      @account = stub('Imap::Backup::Configuration::Account')
-      allow(Imap::Backup::Configuration::Account).to receive(:new).with(@store, blank_account, anything).and_return(@account)
-      @account.should_receive(:run).once
-
-      subject.run
-
-      @data[:accounts].size.should == 2
-      @data[:accounts][1].should == {
-        :username   => "new@example.com",
-        :password   => "",
-        :local_path => "/base/path/new_example.com",
-        :folders    => []
-      }
+      it 'adds account data' do
+        expect(data[:accounts][1]).to eq(blank_account)
+      end
     end
 
     it 'should save the configuration' do
       @input.should_receive(:gets).with().and_return("save\n")
-      @store.should_receive(:save).with()
+      store.should_receive(:save).with()
 
       subject.run
     end

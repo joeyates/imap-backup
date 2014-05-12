@@ -4,16 +4,16 @@ require 'spec_helper'
 describe Imap::Backup::Downloader do
   context 'with account and downloader' do
     let(:local_path) { '/base/path' }
-    let(:stat) { stub('File::Stat', :mode => 0700) }
+    let(:stat) { double('File::Stat', :mode => 0700) }
     let(:message) do
       {
         'RFC822' => 'the body',
         'other'  => 'xxx'
       }
     end
-    let(:folder) { stub('Imap::Backup::Account::Folder', :fetch => message) }
+    let(:folder) { double('Imap::Backup::Account::Folder', :fetch => message) }
     let(:serializer) do
-      stub(
+      double(
         'Imap::Backup::Serializer',
         :prepare => nil,
         :exist?  => true,
@@ -22,7 +22,7 @@ describe Imap::Backup::Downloader do
       )
     end
 
-    before { File.stub!(:stat).with(local_path).and_return(stat) }
+    before { allow(File).to receive(:stat).with(local_path).and_return(stat) }
 
     subject { Imap::Backup::Downloader.new(folder, serializer) }
 
@@ -36,11 +36,11 @@ describe Imap::Backup::Downloader do
 
         context 'with messages' do
           before :each do
-            folder.stub!(:uids).and_return(['123', '999', '1234'])
+            allow(folder).to receive(:uids).and_return(['123', '999', '1234'])
           end
 
           it 'should skip messages that are downloaded' do
-            File.stub!(:exist?).and_return(true)
+            allow(File).to receive(:exist?).and_return(true)
 
             serializer.should_not_receive(:fetch)
 
@@ -56,7 +56,7 @@ describe Imap::Backup::Downloader do
 
           context 'to download' do
             before :each do
-              serializer.stub!(:exist?) do |uid|
+              allow(serializer).to receive(:exist?) do |uid|
                 if uid == '123'
                   true
                 else

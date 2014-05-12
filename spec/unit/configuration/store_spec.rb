@@ -1,119 +1,111 @@
 # encoding: utf-8
 require 'spec_helper'
+require 'json'
 
 describe Imap::Backup::Configuration::Store do
-  before :all do
-    @configuration_directory = Imap::Backup::Configuration::Store::CONFIGURATION_DIRECTORY
-    Imap::Backup::Configuration::Store.instance_eval { remove_const :'CONFIGURATION_DIRECTORY' }
-    Imap::Backup::Configuration::Store::CONFIGURATION_DIRECTORY = '/base/path'
-  end
+  let(:file_path) { '/base/path/config.json' }
+  let(:file_exists) { true }
+  let(:directory) { '/base/path' }
+  let(:directory_exists) { true }
+  let(:data) { {:the => :config} }
+  let(:configuration) { data.to_json }
 
-  after :all do
-    Imap::Backup::Configuration::Store.instance_eval { remove_const :'CONFIGURATION_DIRECTORY' }
-    Imap::Backup::Configuration::Store::CONFIGURATION_DIRECTORY = @configuration_directory
+  before do
+    stub_const('Imap::Backup::Configuration::Store::CONFIGURATION_DIRECTORY', directory)
+    allow(File).to receive(:directory?).with(directory).and_return(directory_exists)
+    allow(File).to receive(:exist?).with(file_path).and_return(file_exists)
+    allow(File).to receive(:read).with(file_path).and_return(configuration)
+    allow(JSON).to receive(:parse).with(configuration, anything).and_return(data)
   end
 
   context '.exist?' do
-    it 'checks if the file exists' do
-      File.should_receive(:exist?).with('/base/path/config.json').and_return(true)
+    [true, false].each do |exists|
+      state = exists ? 'exists' : "doesn't exist"
+      context "when the file #{state}" do
+        let(:file_exists) { exists }
 
-      Imap::Backup::Configuration::Store.exist?
+        it "returns #{exists}" do
+          expect(described_class.exist?).to eq(file_exists)
+        end
+      end
     end
   end
 
   context '#initialize' do
     before :each do
-      Imap::Backup::Utils.stub!(:check_permissions => nil)
+      allow(Imap::Backup::Utils).to receive(:check_permissions).and_return(nil)
     end
 
-    it 'should not fail if the configuration file is missing' do
-      File.should_receive(:directory?).with('/base/path').and_return(true)
-      File.should_receive(:exist?).with('/base/path/config.json').and_return(false)
+    context 'loading' do
+      subject { described_class.new }
 
-      expect do
-        Imap::Backup::Configuration::Store.new
-      end.to_not raise_error
+      it 'sets data' do
+        expect(subject.data).to eq(data)
+      end
     end
 
-    it 'should fail if the config file permissions are too lax' do
-      File.stub!(:exist?).with('/base/path/config.json').and_return(true)
+    context 'if the configuration file is missing' do
+      let(:file_exists) { false }
 
-      Imap::Backup::Utils.should_receive(:check_permissions).with('/base/path/config.json', 0600).and_raise('Error')
-
-      expect do
-        Imap::Backup::Configuration::Store.new
-      end.to raise_error(RuntimeError, 'Error')
+      it "doesn't fail" do
+        expect do
+          described_class.new
+        end.to_not raise_error
+      end
     end
 
-    it 'should load the config file' do
-      File.stub!(:exist?).with('/base/path/config.json').and_return(true)
+    context 'if the config file permissions are too lax' do
+      let(:file_exists) { true }
 
-      configuration = 'JSON string'
-      File.should_receive(:read).with('/base/path/config.json').and_return(configuration)
-      JSON.should_receive(:parse).with(configuration, :symbolize_names => true)
+      before do
+        allow(Imap::Backup::Utils).to receive(:check_permissions).with(file_path, 0600).and_raise('Error')
+      end
 
-      Imap::Backup::Configuration::Store.new
+      it 'fails' do
+        expect do
+          described_class.new
+        end.to raise_error(RuntimeError, 'Error')
+      end
     end
   end
 
   context '#save' do
-    before :each do
-      # initialize
-      File.stub!(:directory?).with('/base/path').and_return(false)
-      File.stub!(:exist?).with('/base/path/config.json').and_return(false)
-      # save
-      @file = stub('File')
-      File.stub!(:directory?).with('/base/path').and_return(false)
-      FileUtils.stub!(:mkdir).with('/base/path')
-      Imap::Backup::Utils.stub!(:stat).with('/base/path').and_return(0700)
-      FileUtils.stub!(:chmod).with(0700, '/base/path')
-      File.stub!(:open).with('/base/path/config.json', 'w') { |&b| b.call @file }
-      JSON.stub!(:pretty_generate => 'JSON output')
-      @file.stub!(:write).with('JSON output')
-      FileUtils.stub!(:chmod).with(0600, '/base/path/config.json')
+    let(:directory_exists) { false }
+    let(:file_exists) { false }
+    let(:file) { double('File', :write => nil) }
+
+    before do
+      allow(FileUtils).to receive(:mkdir)
+      allow(FileUtils).to receive(:chmod)
+      allow(Imap::Backup::Utils).to receive(:stat).with(directory).and_return(0700)
+      allow(Imap::Backup::Utils).to receive(:stat).with(file_path).and_return(0600)
+      allow(File).to receive(:open).with(file_path, 'w') { |&b| b.call file }
+      allow(JSON).to receive(:pretty_generate).and_return('JSON output')
     end
 
-    subject { Imap::Backup::Configuration::Store.new }
+    subject { described_class.new }
 
-    it 'should create the config directory' do
-      File.should_receive(:directory?).with('/base/path').and_return(false)
-      FileUtils.should_receive(:mkdir).with('/base/path')
-
+    it 'creates the config directory' do
       subject.save
+
+      expect(FileUtils).to have_received(:mkdir).with(directory)
     end
 
-    it 'should save the config file' do
-      @file.should_receive(:write).with('JSON output')
-
+    it 'saves the configuration' do
       subject.save
+
+      expect(file).to have_received(:write).with('JSON output')
     end
 
-    it 'should set config perms to 0600' do
-      FileUtils.should_receive(:chmod).with(0600, '/base/path/config.json')
-
+    it 'sets config perms to 0600' do
       subject.save
+
+      expect(FileUtils).to have_received(:chmod).with(0600, file_path)
     end
 
     context 'saving accounts' do
-      before :each do
-        # initialize
-        File.stub!(:exist?).with('/base/path/config.json').and_return(true)
-        Imap::Backup::Utils.stub!(:check_permissions).with('/base/path/config.json', 0600)
-        folders = [
-          { :name => 'A folder' },
-        ]
-        File.stub!(:read).with('/base/path/config.json').and_return('xxx')
-        JSON.stub!(:parse).with('xxx', :symbolize_names => true).and_return(configuration(folders))
-        # save
-        File.stub!(:directory?).with('/my/backup/path').and_return(false)
-        FileUtils.stub!(:mkdir).with('/my/backup/path')
-        Imap::Backup::Utils.stub!(:stat).with('/my/backup/path').and_return(0700)
-        File.stub!(:directory?).with('/my/backup/path/A folder').and_return(false)
-        FileUtils.stub!(:mkdir).with('/my/backup/path/A folder')
-        Imap::Backup::Utils.stub!(:stat).with('/my/backup/path/A folder').and_return(0700)
-      end
-
-      def configuration(folders)
+      let(:folders) { [{ :name => 'A folder' }] }
+      let(:data) do
         {
           :accounts => [
             :local_path => '/my/backup/path',
@@ -121,40 +113,56 @@ describe Imap::Backup::Configuration::Store do
           ]
         }
       end
+      let(:file_exists) { true }
+      let(:a_folder_perms) { 0700 }
 
-      subject { Imap::Backup::Configuration::Store.new }
-
-      it 'should create account directories' do
-        File.should_receive(:directory?).with('/my/backup/path').and_return(false)
-        FileUtils.should_receive(:mkdir).with('/my/backup/path')
-
-        subject.save
+      before do
+        allow(Imap::Backup::Utils).to receive(:check_permissions)
+        allow(File).to receive(:directory?).with('/my/backup/path').and_return(false)
+        allow(Imap::Backup::Utils).to receive(:stat).with('/my/backup/path').and_return(0700)
+        allow(File).to receive(:directory?).with('/my/backup/path/A folder').and_return(false)
+        allow(Imap::Backup::Utils).to receive(:stat).with('/my/backup/path/A folder').and_return(a_folder_perms)
       end
 
-      it 'should create folder directories' do
-        File.should_receive(:directory?).with('/my/backup/path/A folder').and_return(false)
-        FileUtils.should_receive(:mkdir).with('/my/backup/path/A folder')
-
+      it 'creates account directories' do
         subject.save
+
+        expect(FileUtils).to have_received(:mkdir).with('/my/backup/path')
       end
 
-      it 'should set directory permissions, if necessary' do
-        Imap::Backup::Utils.stub!(:stat).with('/my/backup/path/A folder').and_return(0755)
-        FileUtils.should_receive(:chmod).with(0700, '/my/backup/path/A folder')
-
+      it 'creates folder directories' do
         subject.save
+
+        expect(FileUtils).to have_received(:mkdir).with('/my/backup/path/A folder')
       end
 
-      it 'should create a path for folders with slashes' do
-        folders = [{:name => 'folder/path'}]
-        JSON.stub!(:parse).with('xxx', :symbolize_names => true).and_return(configuration(folders))
+      context 'when directory permissions are too open' do
+        let(:a_folder_perms) { 0755 }
 
-        File.should_receive(:directory?).with('/my/backup/path/folder').and_return(true)
-        Imap::Backup::Utils.should_receive(:stat).with('/my/backup/path/folder').and_return(0700)
-        File.should_receive(:directory?).with('/my/backup/path/folder/path').and_return(true)
-        Imap::Backup::Utils.should_receive(:stat).with('/my/backup/path/folder/path').and_return(0700)
+        it 'sets premissions' do
+          subject.save
 
-        subject.save
+          expect(FileUtils).to have_received(:chmod).with(0700, '/my/backup/path/A folder')
+        end
+      end
+
+      context 'when folders have slashes' do
+        let(:directory_exists) { true }
+        let(:folders) { [{:name => 'folder/path'}] }
+
+        before do
+          allow(File).to receive(:directory?).with('/my/backup/path/folder').and_return(true)
+          allow(Imap::Backup::Utils).to receive(:stat).with('/my/backup/path/folder').and_return(0700)
+          allow(File).to receive(:directory?).with('/my/backup/path/folder/path').and_return(false)
+          allow(Imap::Backup::Utils).to receive(:stat).with('/my/backup/path/folder/path').and_return(0700)
+          allow(FileUtils).to receive(:mkdir)
+        end
+
+        it 'creates subdirectories' do
+          subject.save
+
+          expect(FileUtils).to have_received(:mkdir).with('/my/backup/path/folder/path')
+        end
       end
     end
   end

@@ -2,67 +2,93 @@
 require 'spec_helper'
 
 describe Imap::Backup::Utils do
-  context '#check_permissions' do
-    before :each do
-      File.stub!(:exist?).and_return(true)
+  let(:filename) { 'foobar' }
+  let(:stat) { double('File::Stat', :mode => mode) }
+  let(:mode) { 0777 }
+  let(:exists) { true }
+  
+  before do
+    allow(File).to receive(:stat).and_return(stat)
+    allow(File).to receive(:exist?).with(filename).and_return(exists)
+  end
+
+  context '.check_permissions' do
+    let(:requested) { 0345 }
+
+    context 'with existing files' do
+      [
+        [0100, 'less than the limit', true],
+        [0345, 'equal to the limit', true],
+        [0777, 'over the limit', false],
+      ].each do |mode, description, success|
+        context "when permissions are #{description}" do
+          let(:mode) { mode }
+
+          if success
+            it 'succeeds' do
+              described_class.check_permissions(filename, requested)
+            end
+          else
+            it 'fails' do
+              expect do
+                described_class.check_permissions(filename, requested)
+              end.to raise_error(RuntimeError, format("Permissions on '%s' should be 0%o, not 0%o", filename, requested, mode))
+            end
+          end
+        end
+      end
     end
 
-    it 'should stat the file' do
-      stat = stub('File::Stat', :mode => 0100)
-      File.should_receive(:stat).with('foobar').and_return(stat)
+    context 'with non-existent files' do
+      let(:exists) { false }
+      let(:mode) { 0111 }
 
-      Imap::Backup::Utils.check_permissions('foobar', 0345)
-    end
-
-    it 'should succeed if file permissions are less than limit' do
-      stat = stub('File::Stat', :mode => 0100)
-      File.stub!(:stat).and_return(stat)
-
-      expect do
-        Imap::Backup::Utils.check_permissions('foobar', 0345)
-      end.to_not raise_error
-    end
-
-    it 'should succeed if file permissions are equal to limit' do
-      stat = stub('File::Stat', :mode => 0345)
-      File.stub!(:stat).and_return(stat)
-
-      expect do
-        Imap::Backup::Utils.check_permissions('foobar', 0345)
-      end.to_not raise_error
-    end
-
-    it 'should fail if file permissions are over the limit' do
-      stat = stub('File::Stat', :mode => 0777)
-      File.stub!(:stat).and_return(stat)
-
-      expect do
-        Imap::Backup::Utils.check_permissions('foobar', 0345)
-      end.to raise_error(RuntimeError, "Permissions on 'foobar' should be 0345, not 0777")
+      it 'succeeds' do
+        described_class.check_permissions(filename, requested)
+      end
     end
   end
 
-  context '#make_folder' do
-    it 'should do nothing if an empty path is supplied' do
-      FileUtils.should_not_receive(:mkdir_p)
+  context '.stat' do
+    context 'with existing files' do
+      let(:mode) { 02345 }
 
-      Imap::Backup::Utils.make_folder('aaa', '', 0222)
+      it 'is the last 9 bits of the file mode' do
+        expect(described_class.stat(filename)).to eq(0345)
+      end
     end
 
-    it 'should create the path' do
-      FileUtils.stub!(:chmod)
+    context 'with non-existent files' do
+      let(:exists) { false }
 
-      FileUtils.should_receive(:mkdir_p).with('/base/path/new/folder')
+      it 'is nil' do
+        expect(described_class.stat(filename)).to be_nil
+      end
+    end
+  end
 
-      Imap::Backup::Utils.make_folder('/base/path', 'new/folder', 0222)
+  context '.make_folder' do
+    before do
+      allow(FileUtils).to receive(:mkdir_p)
+      allow(FileUtils).to receive(:chmod)
     end
 
-    it 'should set permissions on the path' do
-      FileUtils.stub!(:mkdir_p)
+    it 'does nothing if an empty path is supplied' do
+      described_class.make_folder('aaa', '', 0222)
 
-      FileUtils.should_receive(:chmod).with(0222, '/base/path/new/folder')
+      expect(FileUtils).to_not have_received(:mkdir_p)
+    end
 
-      Imap::Backup::Utils.make_folder('/base/path/new', 'folder', 0222)
+    it 'creates the path' do
+      described_class.make_folder('/base/path', 'new/folder', 0222)
+
+      expect(FileUtils).to have_received(:mkdir_p).with('/base/path/new/folder')
+    end
+
+    it 'sets permissions on the path' do
+      described_class.make_folder('/base/path/new', 'folder', 0222)
+
+      expect(FileUtils).to have_received(:chmod).with(0222, '/base/path/new/folder')
     end
   end
 end

@@ -2,74 +2,66 @@
 require 'spec_helper'
 
 describe Imap::Backup::Configuration::List do
-  let(:configuration_data) do
-    {
-      :accounts => [
-        {
-          :username => 'a1@example.com'
-        },
-        {
-          :username => 'a2@example.com',
-        },
-      ]
-    }
+  let(:accounts) do
+    [
+      {:username => 'a1@example.com'},
+      {:username => 'a2@example.com'},
+    ]
   end
-  let(:store) { stub('Imap::Backup::Configuration::Store', :data => configuration_data) }
+  let(:store) do
+    double('Imap::Backup::Configuration::Store', :data => {:accounts => accounts})
+  end
+  let(:exists) { true }
 
   before do
-    Imap::Backup::Configuration::Store.stub!(:new => store)
-    Imap::Backup::Configuration::Store.stub!(:exist? => true)
+    allow(Imap::Backup::Configuration::Store).to receive(:new).and_return(store)
+    allow(Imap::Backup::Configuration::Store).to receive(:exist?).and_return(exists)
   end
 
-  context '#initialize' do
-    it 'fails if the configuration file is missing' do
-      Imap::Backup::Configuration::Store.should_receive(:exist?).and_return(false)
+  subject { Imap::Backup::Configuration::List.new }
 
-      expect {
-        Imap::Backup::Configuration::List.new
-      }.to raise_error(Imap::Backup::ConfigurationNotFound, /not found/)
+  context '#initialize' do
+    context 'with account parameter' do
+      subject { Imap::Backup::Configuration::List.new(['a2@example.com']) }
+
+      it 'should only create requested accounts' do
+        expect(subject.accounts).to eq([accounts[1]])
+      end
     end
 
-    context 'with account parameter' do
-      it 'should only create requested accounts' do
-        configuration = Imap::Backup::Configuration::List.new(['a2@example.com'])
+    context 'without an account parameter' do
+      it 'selects all accounts' do
+        expect(subject.accounts).to eq(accounts)
+      end
+    end
 
-        configuration.accounts.should == configuration_data[:accounts][1..1]
+    context 'when the configuration file is missing' do
+      let(:exists) { false }
+
+      it 'fails' do
+        expect {
+          Imap::Backup::Configuration::List.new
+        }.to raise_error(Imap::Backup::ConfigurationNotFound, /not found/)
       end
     end
   end
 
   context 'instance methods' do
-    let(:connection) { stub('Imap::Backup::Account::Connection', :disconnect => nil) }
+    let(:connection1) { double('Imap::Backup::Account::Connection', :disconnect => nil) }
+    let(:connection2) { double('Imap::Backup::Account::Connection', :disconnect => nil) }
 
-    subject { Imap::Backup::Configuration::List.new }
+    before do
+      allow(Imap::Backup::Account::Connection).to receive(:new).with(accounts[0]).and_return(connection1)
+      allow(Imap::Backup::Account::Connection).to receive(:new).with(accounts[1]).and_return(connection2)
+    end
 
     context '#each_connection' do
+      specify "calls the block with each account's connection" do
+        connections = []
 
-      it 'should instantiate connections' do
-        Imap::Backup::Account::Connection.should_receive(:new).with(configuration_data[:accounts][0]).and_return(connection)
-        Imap::Backup::Account::Connection.should_receive(:new).with(configuration_data[:accounts][1]).and_return(connection)
+        subject.each_connection { |a| connections << a }
 
-        subject.each_connection{}
-      end
-
-      it 'should call the block' do
-        Imap::Backup::Account::Connection.stub!(:new).and_return(connection)
-        calls = 0
-
-        subject.each_connection do |a|
-          calls += 1
-          a.should == connection
-        end
-        calls.should == 2
-      end
-
-      it 'should disconnect connections' do
-        Imap::Backup::Account::Connection.stub!(:new).and_return(connection)
-
-        connection.should_receive(:disconnect)
-
-        subject.each_connection {}
+        expect(connections).to eq([connection1, connection2])
       end
     end
   end
