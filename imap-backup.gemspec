@@ -3,16 +3,16 @@ $LOAD_PATH.unshift(File.expand_path('../lib', __FILE__))
 require 'imap/backup/version'
 
 Gem::Specification.new do |gem|
-  gem.authors       = ['Joe Yates']
-  gem.email         = ['joe.g.yates@gmail.com']
+  gem.name          = 'imap-backup'
   gem.description   = %q{Backup GMail, or any other IMAP email service, to disk.}
   gem.summary       = %q{Backup GMail (or other IMAP) accounts to disk}
+  gem.authors       = ['Joe Yates']
+  gem.email         = ['joe.g.yates@gmail.com']
   gem.homepage      = 'https://github.com/joeyates/imap-backup'
 
   gem.files         = `git ls-files`.split($\)
   gem.executables   = gem.files.grep(%r{^bin/}).map { |f| File.basename(f) }
   gem.test_files    = gem.files.grep(%r{^spec/})
-  gem.name          = 'imap-backup'
   gem.require_paths = ['lib']
   gem.version       = Imap::Backup::VERSION
 
