@@ -16,9 +16,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../lib/imap/backup')
 
 module HighLineTestHelpers
   def prepare_highline
-    @input  = stub('stdin', :eof? => false)
-    # default gets stub
-    @input.stub!(:gets).with().and_return("q\n")
+    @input = double('stdin', :eof? => false, :gets => "q\n")
     @output = StringIO.new
     Imap::Backup::Configuration::Setup.highline = HighLine.new(@input, @output)
     [@input, @output]
