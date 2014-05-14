@@ -1,7 +1,9 @@
 # encoding: utf-8
 
-module Imap::Backup::Configuration
-  class Account < Struct.new(:store, :account, :highline)
+module Imap::Backup
+  module Configuration; end
+
+  class Configuration::Account < Struct.new(:store, :account, :highline)
     def run
       catch :done do
         loop do
@@ -41,7 +43,7 @@ Account:
 
     def modify_email(menu)
       menu.choice('modify email') do
-        username = Asker.email(username)
+        username = Configuration::Asker.email(username)
         puts "username: #{username}"
         others   = store.data[:accounts].select { |a| a != account}.map { |a| a[:username] }
         puts "others: #{others.inspect}"
@@ -58,7 +60,7 @@ Account:
 
     def modify_password(menu)
       menu.choice('modify password') do
-        password = Asker.password
+        password = Configuration::Asker.password
         if ! password.nil?
           account[:password] = password
         end
@@ -87,19 +89,19 @@ Account:
             true
           end
         end
-        account[:local_path] = Asker.backup_path(account[:local_path], validator)
+        account[:local_path] = Configuration::Asker.backup_path(account[:local_path], validator)
       end
     end
 
     def choose_folders(menu)
       menu.choice('choose backup folders') do
-        FolderChooser.new(account).run
+        Configuration::FolderChooser.new(account).run
       end
     end
 
     def test_connection(menu)
       menu.choice('test connection') do
-        result = ConnectionTester.test(account)
+        result = Configuration::ConnectionTester.test(account)
         puts result
         highline.ask 'Press a key '
       end

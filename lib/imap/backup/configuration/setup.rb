@@ -2,8 +2,10 @@
 require 'rubygems' if RUBY_VERSION < '1.9'
 require 'highline'
 
-module Imap::Backup::Configuration
-  class Setup
+module Imap::Backup
+  module Configuration; end
+
+  class Configuration::Setup
     class << self
       attr_accessor :highline
     end
@@ -21,7 +23,7 @@ module Imap::Backup::Configuration
             end
           end
           menu.choice('add account') do
-            username = Asker.email
+            username = Configuration::Asker.email
             edit_account username
           end
           menu.choice('save and exit') do
@@ -38,7 +40,7 @@ module Imap::Backup::Configuration
     private
 
     def config
-      @config ||= Imap::Backup::Configuration::Store.new
+      @config ||= Configuration::Store.new
     end
 
     def setup_logging
@@ -66,7 +68,7 @@ module Imap::Backup::Configuration
       if account.nil?
         account = add_account(username)
       end
-      Account.new(config, account, Imap::Backup::Configuration::Setup.highline).run
+      Configuration::Account.new(config, account, Configuration::Setup.highline).run
     end
   end
 end

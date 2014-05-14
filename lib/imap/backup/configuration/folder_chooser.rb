@@ -1,28 +1,30 @@
 # encoding: utf-8
 
-module Imap::Backup::Configuration
-  class FolderChooser
+module Imap::Backup
+  module Configuration; end
+
+  class Configuration::FolderChooser
     def initialize(account)
       @account = account
     end
 
     def run
       begin
-        @connection = Imap::Backup::Account::Connection.new(@account)
+        @connection = Account::Connection.new(@account)
       rescue => e
         puts 'Connection failed'
-        Setup.highline.ask 'Press a key '
+        Configuration::Setup.highline.ask 'Press a key '
         return
       end
       @folders = @connection.folders
       if @folders.nil?
         puts 'Unable to get folder list'
-        Setup.highline.ask 'Press a key '
+        Configuration::Setup.highline.ask 'Press a key '
         return
       end
       loop do
         system('clear')
-        Setup.highline.choose do |menu|
+        Configuration::Setup.highline.choose do |menu|
           menu.header = 'Add/remove folders'
           menu.index = :number
           @folders.each do |folder|

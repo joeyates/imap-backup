@@ -1,7 +1,9 @@
 # encoding: utf-8
 
-module Imap::Backup::Account
-  class Folder
+module Imap::Backup
+  module Account; end
+
+  class Account::Folder
     REQUESTED_ATTRIBUTES = ['RFC822', 'FLAGS', 'INTERNALDATE']
 
     def initialize(connection, folder)

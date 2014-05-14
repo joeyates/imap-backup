@@ -1,7 +1,9 @@
 require 'net/imap'
 
-module Imap::Backup::Account
-  class Connection
+module Imap::Backup
+  module Account; end
+
+  class Account::Connection
     attr_reader :username, :local_path, :backup_folders, :server
 
     def initialize(options)
@@ -17,17 +19,17 @@ module Imap::Backup::Account
 
     def status
       backup_folders.map do |folder|
-        f = Imap::Backup::Account::Folder.new(self, folder[:name])
-        s = Imap::Backup::Serializer::Directory.new(local_path, folder[:name])
+        f = Account::Folder.new(self, folder[:name])
+        s = Serializer::Directory.new(local_path, folder[:name])
         {:name => folder[:name], :local => s.uids, :remote => f.uids}
       end
     end
 
     def run_backup
       backup_folders.each do |folder|
-        f = Imap::Backup::Account::Folder.new(self, folder[:name])
-        s = Imap::Backup::Serializer::Mbox.new(local_path, folder[:name])
-        d = Imap::Backup::Downloader.new(f, s)
+        f = Account::Folder.new(self, folder[:name])
+        s = Serializer::Mbox.new(local_path, folder[:name])
+        d = Downloader.new(f, s)
         d.run
       end
     end

@@ -1,14 +1,16 @@
 # encoding: utf-8
 
-module Imap::Backup::Configuration
-  class List
+module Imap::Backup
+  module Configuration; end
+
+  class Configuration::List
     attr_reader :accounts
 
     def initialize(accounts = nil)
-      if not Imap::Backup::Configuration::Store.exist?
-        raise Imap::Backup::ConfigurationNotFound.new("Configuration file '#{Imap::Backup::Configuration::Store.default_pathname}' not found")
+      if not Configuration::Store.exist?
+        raise ConfigurationNotFound.new("Configuration file '#{Configuration::Store.default_pathname}' not found")
       end
-      @config = Imap::Backup::Configuration::Store.new
+      @config = Configuration::Store.new
 
       if accounts.nil?
         @accounts = @config.data[:accounts]
@@ -19,7 +21,7 @@ module Imap::Backup::Configuration
 
     def each_connection
       @accounts.each do |account|
-        connection = Imap::Backup::Account::Connection.new(account)
+        connection = Account::Connection.new(account)
         yield connection
         connection.disconnect
       end

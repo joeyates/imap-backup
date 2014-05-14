@@ -1,11 +1,13 @@
 # encoding: utf-8
 require 'fileutils'
 
-module Imap::Backup::Serializer
-  class Directory < Base
+module Imap::Backup
+  module Serializer; end
+
+  class Serializer::Directory < Serializer::Base
     def initialize(path, folder)
       super
-      Imap::Backup::Utils.make_folder(@path, @folder, DIRECTORY_PERMISSIONS)
+      Utils.make_folder(@path, @folder, Serializer::DIRECTORY_PERMISSIONS)
     end
 
     def uids

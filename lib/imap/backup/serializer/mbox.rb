@@ -2,8 +2,10 @@
 require 'csv'
 require 'email/mboxrd/message'
 
-module Imap::Backup::Serializer
-  class Mbox < Base
+module Imap::Backup
+  module Serializer; end
+
+  class Serializer::Mbox < Serializer::Base
     def initialize(path, folder)
       super
       create_containing_directory
@@ -52,7 +54,7 @@ module Imap::Backup::Serializer
     def create_containing_directory
       mbox_relative_path = File.dirname(mbox_relative_pathname)
       return if mbox_relative_path == '.'
-      Imap::Backup::Utils.make_folder(@path, mbox_relative_path, DIRECTORY_PERMISSIONS)
+      Utils.make_folder(@path, mbox_relative_path, Serializer::DIRECTORY_PERMISSIONS)
     end
 
     def exist?

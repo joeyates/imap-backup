@@ -1,9 +1,11 @@
 # encoding: utf-8
 
-module Imap::Backup::Configuration
-  module ConnectionTester
+module Imap::Backup
+  module Configuration; end
+
+  module Configuration::ConnectionTester
     def self.test(account)
-      Imap::Backup::Account::Connection.new(account).imap
+      Account::Connection.new(account).imap
       return 'Connection successful'
     rescue Net::IMAP::NoResponseError
       return 'No response'

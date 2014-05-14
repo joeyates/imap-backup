@@ -1,3 +1,5 @@
+module Imap; end
+
 require 'imap/backup/utils'
 require 'imap/backup/account/connection'
 require 'imap/backup/account/folder'
@@ -30,6 +32,6 @@ module Imap::Backup
   end
 
   def self.logger
-    Imap::Backup::Logger.instance.logger
+    Logger.instance.logger
   end
 end
