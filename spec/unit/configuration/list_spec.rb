@@ -18,11 +18,11 @@ describe Imap::Backup::Configuration::List do
     allow(Imap::Backup::Configuration::Store).to receive(:exist?).and_return(exists)
   end
 
-  subject { Imap::Backup::Configuration::List.new }
+  subject { described_class.new }
 
   context '#initialize' do
     context 'with account parameter' do
-      subject { Imap::Backup::Configuration::List.new(['a2@example.com']) }
+      subject { described_class.new(['a2@example.com']) }
 
       it 'should only create requested accounts' do
         expect(subject.accounts).to eq([accounts[1]])
@@ -40,7 +40,7 @@ describe Imap::Backup::Configuration::List do
 
       it 'fails' do
         expect {
-          Imap::Backup::Configuration::List.new
+          described_class.new
         }.to raise_error(Imap::Backup::ConfigurationNotFound, /not found/)
       end
     end

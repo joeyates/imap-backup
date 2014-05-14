@@ -10,7 +10,7 @@ describe Imap::Backup::Configuration::FolderChooser do
     let(:account) { {:folders => []} }
     let(:remote_folders) { [] }
 
-    subject { Imap::Backup::Configuration::FolderChooser.new(account) }
+    subject { described_class.new(account) }
 
     before do
       allow(Imap::Backup::Account::Connection).to receive(:new).with(account).and_return(connection)

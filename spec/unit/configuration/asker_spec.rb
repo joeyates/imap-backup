@@ -5,7 +5,7 @@ module Imap::Backup::Configuration
   describe Asker do
     let(:highline) { double }
 
-    subject { Asker.new(highline) }
+    subject { described_class.new(highline) }
 
     context '#initialize' do
       its(:highline) { should eq(highline) }

@@ -7,7 +7,7 @@ describe Imap::Backup::Configuration::Setup do
   context '#initialize' do
     context 'without a config file' do
       it 'works' do
-        Imap::Backup::Configuration::Setup.new
+        described_class.new
       end
     end
   end
@@ -32,7 +32,7 @@ describe Imap::Backup::Configuration::Setup do
       allow(subject).to receive(:system)
     end
 
-    subject { Imap::Backup::Configuration::Setup.new }
+    subject { described_class.new }
 
     context 'main menu' do
       before { subject.run }

@@ -21,7 +21,7 @@ describe Imap::Backup::Account::Connection do
     allow(Net::IMAP).to receive(:new).and_return(imap)
   end
 
-  subject { Imap::Backup::Account::Connection.new(options) }
+  subject { described_class.new(options) }
 
   shared_examples 'connects to IMAP' do |options|
     options ||= {}

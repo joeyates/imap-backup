@@ -24,7 +24,7 @@ describe Imap::Backup::Downloader do
 
     before { allow(File).to receive(:stat).with(local_path).and_return(stat) }
 
-    subject { Imap::Backup::Downloader.new(folder, serializer) }
+    subject { described_class.new(folder, serializer) }
 
     context '#run' do
       context 'with folder' do
