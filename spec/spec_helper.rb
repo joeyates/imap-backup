@@ -16,3 +16,5 @@ else
 end
 
 require 'imap/backup'
+
+silence_logging
