@@ -35,15 +35,15 @@ module Imap::Backup
     end
 
     def self.email(default = '')
-      new(Setup.highline).email(default)
+      new(Configuration::Setup.highline).email(default)
     end
 
     def self.password
-      new(Setup.highline).password
+      new(Configuration::Setup.highline).password
     end
 
     def self.backup_path(default, validator)
-      new(Setup.highline).backup_path(default, validator)
+      new(Configuration::Setup.highline).backup_path(default, validator)
     end
   end
 end
