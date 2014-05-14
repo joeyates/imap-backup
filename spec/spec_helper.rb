@@ -1,4 +1,9 @@
 require 'rspec'
+spec_path = File.dirname(__FILE__)
+$LOAD_PATH << File.expand_path('../lib', spec_path)
+
+support_glob = File.join(spec_path, 'support', '**', '*.rb')
+Dir[support_glob].each { |f| require f }
 
 if RUBY_VERSION < '1.9'
   require 'rspec/autorun'
@@ -12,24 +17,4 @@ else
   end
 end
 
-require File.expand_path(File.dirname(__FILE__) + '/../lib/imap/backup')
-
-module HighLineTestHelpers
-  def prepare_highline
-    @input = double('stdin', :eof? => false, :gets => "q\n")
-    @output = StringIO.new
-    Imap::Backup::Configuration::Setup.highline = HighLine.new(@input, @output)
-    [@input, @output]
-  end
-end
-
-module InputOutputTestHelpers
-  def capturing_output
-    output = StringIO.new
-    $stdout = output
-    yield
-    output.string
-  ensure
-    $stdout = STDOUT
-  end
-end
+require 'imap/backup'
