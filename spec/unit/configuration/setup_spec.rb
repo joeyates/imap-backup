@@ -20,7 +20,7 @@ describe Imap::Backup::Configuration::Setup do
       double(
         'Imap::Backup::Configuration::Store',
         :data => data,
-        :path => '/base/path',
+        :path => '/base/path'
       )
     end
 
