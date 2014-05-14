@@ -9,11 +9,9 @@ if RUBY_VERSION < '1.9'
   require 'rspec/autorun'
 else
   require 'simplecov'
-  if defined?(GATHER_RSPEC_COVERAGE)
-    SimpleCov.start do
-      add_filter "/spec/"
-      add_filter "/vendor/"
-    end
+  SimpleCov.start do
+    add_filter '/spec/'
+    add_filter '/vendor/'
   end
 end
 
