@@ -8,8 +8,7 @@ module Imap::Backup
   class Configuration::Store
     CONFIGURATION_DIRECTORY = File.expand_path('~/.imap-backup')
 
-    attr_reader :data
-    attr_reader :path
+    attr_reader :pathname
 
     def self.default_pathname
       File.join(CONFIGURATION_DIRECTORY, 'config.json')
@@ -21,21 +20,19 @@ module Imap::Backup
 
     def initialize(pathname = self.class.default_pathname)
       @pathname = pathname
-      if File.directory?(path)
-        Utils.check_permissions path, 0700
-      end
-      if File.exist?(@pathname)
-        Utils.check_permissions @pathname, 0600
-        @data = JSON.parse(File.read(@pathname), :symbolize_names => true)
-      else
-        @data = {:accounts => []}
-      end
+    end
+
+    def path
+      File.dirname(pathname)
     end
 
     def save
+      if File.directory?(path)
+        Utils.check_permissions path, 0700
+      end
       mkdir_private path
-      File.open(@pathname, 'w') { |f| f.write(JSON.pretty_generate(@data)) }
-      FileUtils.chmod 0600, @pathname
+      File.open(pathname, 'w') { |f| f.write(JSON.pretty_generate(data)) }
+      FileUtils.chmod 0600, pathname
       @data[:accounts].each do |account|
         mkdir_private account[:local_path]
         account[:folders].each do |f|
@@ -49,11 +46,17 @@ module Imap::Backup
       end
     end
 
-    def path
-      File.dirname(@pathname)
-    end
-
     private
+
+    def data
+      return @data if @data
+      if File.exist?(pathname)
+        Utils.check_permissions pathname, 0600
+        @data = JSON.parse(File.read(pathname), :symbolize_names => true)
+      else
+        @data = {:accounts => []}
+      end
+    end
 
     def mkdir_private(path)
       if ! File.directory?(path)

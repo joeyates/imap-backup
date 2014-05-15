@@ -3,9 +3,9 @@ require 'spec_helper'
 require 'json'
 
 describe Imap::Backup::Configuration::Store do
-  let(:file_path) { '/base/path/config.json' }
-  let(:file_exists) { true }
   let(:directory) { '/base/path' }
+  let(:file_path) { File.join(directory, '/config.json') }
+  let(:file_exists) { true }
   let(:directory_exists) { true }
   let(:data) { {:the => :config} }
   let(:configuration) { data.to_json }
@@ -31,41 +31,9 @@ describe Imap::Backup::Configuration::Store do
     end
   end
 
-  context '#initialize' do
-    before :each do
-      allow(Imap::Backup::Utils).to receive(:check_permissions).and_return(nil)
-    end
-
-    context 'loading' do
-      subject { described_class.new }
-
-      it 'sets data' do
-        expect(subject.data).to eq(data)
-      end
-    end
-
-    context 'if the configuration file is missing' do
-      let(:file_exists) { false }
-
-      it "doesn't fail" do
-        expect do
-          described_class.new
-        end.to_not raise_error
-      end
-    end
-
-    context 'if the config file permissions are too lax' do
-      let(:file_exists) { true }
-
-      before do
-        allow(Imap::Backup::Utils).to receive(:check_permissions).with(file_path, 0600).and_raise('Error')
-      end
-
-      it 'fails' do
-        expect do
-          described_class.new
-        end.to raise_error(RuntimeError, 'Error')
-      end
+  context '#path' do
+    it 'is the directory containing the configuration file' do
+      expect(subject.path).to eq(directory)
     end
   end
 
@@ -79,6 +47,7 @@ describe Imap::Backup::Configuration::Store do
       allow(FileUtils).to receive(:chmod)
       allow(Imap::Backup::Utils).to receive(:stat).with(directory).and_return(0700)
       allow(Imap::Backup::Utils).to receive(:stat).with(file_path).and_return(0600)
+      allow(Imap::Backup::Utils).to receive(:check_permissions).and_return(nil)
       allow(File).to receive(:open).with(file_path, 'w') { |&b| b.call file }
       allow(JSON).to receive(:pretty_generate).and_return('JSON output')
     end
@@ -101,6 +70,30 @@ describe Imap::Backup::Configuration::Store do
       subject.save
 
       expect(FileUtils).to have_received(:chmod).with(0600, file_path)
+    end
+
+    context 'if the configuration file is missing' do
+      let(:file_exists) { false }
+
+      it "doesn't fail" do
+        expect do
+          subject.save
+        end.to_not raise_error
+      end
+    end
+
+    context 'if the config file permissions are too lax' do
+      let(:file_exists) { true }
+
+      before do
+        allow(Imap::Backup::Utils).to receive(:check_permissions).with(file_path, 0600).and_raise('Error')
+      end
+
+      it 'fails' do
+        expect do
+          subject.save
+        end.to raise_error(RuntimeError, 'Error')
+      end
     end
 
     context 'saving accounts' do
