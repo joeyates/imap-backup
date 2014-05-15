@@ -12,26 +12,39 @@ describe Imap::Backup::Configuration::List do
     double('Imap::Backup::Configuration::Store', :data => {:accounts => accounts})
   end
   let(:exists) { true }
+  let(:connection1) { double('Imap::Backup::Account::Connection', :disconnect => nil) }
+  let(:connection2) { double('Imap::Backup::Account::Connection', :disconnect => nil) }
 
   before do
     allow(Imap::Backup::Configuration::Store).to receive(:new).and_return(store)
     allow(Imap::Backup::Configuration::Store).to receive(:exist?).and_return(exists)
+    allow(Imap::Backup::Account::Connection).to receive(:new).with(accounts[0]).and_return(connection1)
+    allow(Imap::Backup::Account::Connection).to receive(:new).with(accounts[1]).and_return(connection2)
   end
 
   subject { described_class.new }
 
   context '#initialize' do
+  end
+
+  context '#each_connection' do
+    specify "calls the block with each account's connection" do
+      connections = []
+
+      subject.each_connection { |a| connections << a }
+
+      expect(connections).to eq([connection1, connection2])
+    end
+
     context 'with account parameter' do
       subject { described_class.new(['a2@example.com']) }
 
       it 'should only create requested accounts' do
-        expect(subject.accounts).to eq([accounts[1]])
-      end
-    end
+        connections = []
 
-    context 'without an account parameter' do
-      it 'selects all accounts' do
-        expect(subject.accounts).to eq(accounts)
+        subject.each_connection { |a| connections << a }
+
+        expect(connections).to eq([connection2])
       end
     end
 
@@ -40,28 +53,8 @@ describe Imap::Backup::Configuration::List do
 
       it 'fails' do
         expect {
-          described_class.new
+          subject.each_connection {}
         }.to raise_error(Imap::Backup::ConfigurationNotFound, /not found/)
-      end
-    end
-  end
-
-  context 'instance methods' do
-    let(:connection1) { double('Imap::Backup::Account::Connection', :disconnect => nil) }
-    let(:connection2) { double('Imap::Backup::Account::Connection', :disconnect => nil) }
-
-    before do
-      allow(Imap::Backup::Account::Connection).to receive(:new).with(accounts[0]).and_return(connection1)
-      allow(Imap::Backup::Account::Connection).to receive(:new).with(accounts[1]).and_return(connection2)
-    end
-
-    context '#each_connection' do
-      specify "calls the block with each account's connection" do
-        connections = []
-
-        subject.each_connection { |a| connections << a }
-
-        expect(connections).to eq([connection1, connection2])
       end
     end
   end
