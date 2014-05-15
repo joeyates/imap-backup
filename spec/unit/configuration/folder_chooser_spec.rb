@@ -75,6 +75,19 @@ describe Imap::Backup::Configuration::FolderChooser do
       end
     end
 
+    context 'when folders are not available' do
+      let(:remote_folders) { nil }
+
+      before do
+        allow(Imap::Backup::Configuration::Setup.highline).to receive(:ask).and_return("q")
+        subject.run
+      end
+
+      it 'asks to press a key' do
+        expect(Imap::Backup::Configuration::Setup.highline).to have_received(:ask).with('Press a key ')
+      end
+    end
+
     context 'with connection errors' do
       before do
         allow(Imap::Backup::Account::Connection).to receive(:new).with(account).and_raise('error')
