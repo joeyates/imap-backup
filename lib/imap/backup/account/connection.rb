@@ -7,12 +7,11 @@ module Imap::Backup
     attr_reader :username
     attr_reader :local_path
     attr_reader :backup_folders
-    attr_reader :server
 
     def initialize(options)
       @username, @password = options[:username], options[:password]
       @local_path, @backup_folders = options[:local_path], options[:folders]
-      @server = options[:server] || host_for(username)
+      @server = options[:server]
     end
 
     def folders
@@ -39,6 +38,10 @@ module Imap::Backup
 
     def disconnect
       imap.disconnect
+    end
+
+    def server
+      @server ||= host_for(username)
     end
 
     def imap
