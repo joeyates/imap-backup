@@ -25,7 +25,7 @@ module Email::Mboxrd
 
     def body
       mbox = @body.gsub(/\n(>*From)/, "\n>\\1")
-      mbox + "\n" unless mbox.end_with?("\n")
+      mbox += "\n" unless mbox.end_with?("\n")
       mbox
     end
 
