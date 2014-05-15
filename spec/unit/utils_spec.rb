@@ -6,7 +6,7 @@ describe Imap::Backup::Utils do
   let(:stat) { double('File::Stat', :mode => mode) }
   let(:mode) { 0777 }
   let(:exists) { true }
-  
+
   before do
     allow(File).to receive(:stat).and_return(stat)
     allow(File).to receive(:exist?).with(filename).and_return(exists)
