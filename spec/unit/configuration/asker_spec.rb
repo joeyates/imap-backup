@@ -11,7 +11,7 @@ module Imap::Backup
         :readline= => nil,
         :validate= => nil,
         :responses => {},
-        :echo= => nil,
+        :echo= => nil
       )
     end
     let(:answer) { 'foo' }
