@@ -29,13 +29,16 @@ module Imap::Backup
     def save(uid, message)
       uid = uid.to_s
       return if uids.include?(uid)
-      message = Email::Mboxrd::Message.new(message['RFC822'])
+      body = message['RFC822']
+      mboxrd_message = Email::Mboxrd::Message.new(body)
       mbox = imap = nil
       begin
         mbox = File.open(mbox_pathname, 'ab')
         imap = File.open(imap_pathname, 'ab')
-        mbox.write message.to_s
+        mbox.write mboxrd_message.to_s
         imap.write uid + "\n"
+      rescue ArgumentError => e
+        Imap::Backup.logger.warn "Failed to save message #{uid}:\n#{body}. #{e}"
       ensure
         mbox.close if mbox
         imap.close if imap

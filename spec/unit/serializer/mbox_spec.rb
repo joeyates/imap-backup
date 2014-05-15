@@ -96,6 +96,23 @@ describe Imap::Backup::Serializer::Mbox do
 
         expect(imap_file).to have_received(:write).with(message_uid + "\n")
       end
+
+      context 'when the message causes parsing errors' do
+        before do
+          allow(message).to receive(:to_s).and_raise(ArgumentError)
+        end
+
+        it 'skips the message' do
+          subject.save(message_uid, "The\nemail\n")
+          expect(mbox_file).to_not have_received(:write)
+        end
+
+        it 'does not fail' do
+          expect do
+            subject.save(message_uid, "The\nemail\n")
+          end.to_not raise_error
+        end
+      end
     end
   end
 end
