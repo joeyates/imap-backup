@@ -4,7 +4,10 @@ module Imap::Backup
   module Account; end
 
   class Account::Connection
-    attr_reader :username, :local_path, :backup_folders, :server
+    attr_reader :username
+    attr_reader :local_path
+    attr_reader :backup_folders
+    attr_reader :server
 
     def initialize(options)
       @username, @password = options[:username], options[:password]
