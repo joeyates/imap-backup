@@ -3,7 +3,6 @@ require 'spec_helper'
 
 describe Imap::Backup::Configuration::FolderChooser do
   include HighLineTestHelpers
-  include InputOutputTestHelpers
 
   context '#run' do
     let(:connection) { double('Imap::Backup::Account::Connection', :folders => remote_folders) }
@@ -14,10 +13,10 @@ describe Imap::Backup::Configuration::FolderChooser do
 
     before do
       allow(Imap::Backup::Account::Connection).to receive(:new).with(account).and_return(connection)
+      @input, @output = prepare_highline
       allow(subject).to receive(:system)
+      allow(Imap::Backup.logger).to receive(:warn)
     end
-
-    before { @input, @output = prepare_highline }
 
     context 'display' do
       before { subject.run }
@@ -79,12 +78,12 @@ describe Imap::Backup::Configuration::FolderChooser do
     context 'with connection errors' do
       before do
         allow(Imap::Backup::Account::Connection).to receive(:new).with(account).and_raise('error')
-        allow(Imap::Backup::Configuration::Setup.highline).to receive(:ask)
-        @direct_output = capturing_output { subject.run }
+        allow(Imap::Backup::Configuration::Setup.highline).to receive(:ask).and_return("q")
+        subject.run
       end
 
       it 'prints an error message' do
-        expect(@direct_output).to include('Connection failed')
+        expect(Imap::Backup.logger).to have_received(:warn).with('Connection failed')
       end
 
       it 'asks to continue' do

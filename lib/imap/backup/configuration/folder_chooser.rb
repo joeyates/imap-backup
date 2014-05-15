@@ -12,13 +12,13 @@ module Imap::Backup
       begin
         @connection = Account::Connection.new(@account)
       rescue => e
-        puts 'Connection failed'
+        Imap::Backup.logger.warn 'Connection failed'
         Configuration::Setup.highline.ask 'Press a key '
         return
       end
       @folders = @connection.folders
       if @folders.nil?
-        puts 'Unable to get folder list'
+        Imap::Backup.logger.warn 'Unable to get folder list'
         Configuration::Setup.highline.ask 'Press a key '
         return
       end
