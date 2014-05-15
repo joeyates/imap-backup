@@ -13,31 +13,47 @@ module Imap::Backup
 
     def run
       setup_logging
-      loop do
-        system('clear')
-        self.class.highline.choose do |menu|
-          menu.header = 'Choose an action'
-          config.data[:accounts].each do |account|
-            menu.choice("#{account[:username]}") do
-              edit_account account[:username]
-            end
-          end
-          menu.choice('add account') do
-            username = Configuration::Asker.email
-            edit_account username
-          end
-          menu.choice('save and exit') do
-            config.save
-            return
-          end
-          menu.choice(:quit) do
-            return
-          end
+      catch :done do
+        loop do
+          system('clear')
+          show_menu
         end
       end
     end
 
     private
+
+    def show_menu
+      self.class.highline.choose do |menu|
+        menu.header = 'Choose an action'
+        account_items menu
+        add_account_item menu
+        menu.choice('add account') do
+          username = Configuration::Asker.email
+          edit_account username
+        end
+        menu.choice('save and exit') do
+          config.save
+          throw :done
+        end
+        menu.choice(:quit) { throw :done }
+      end
+    end
+
+    def account_items(menu)
+      config.data[:accounts].each do |account|
+        menu.choice("#{account[:username]}") do
+          edit_account account[:username]
+        end
+      end
+    end
+
+    def add_account_item(menu)
+      menu.choice('add account') do
+        username = Configuration::Asker.email
+        edit_account username
+      end
+    end
 
     def config
       @config ||= Configuration::Store.new
@@ -52,21 +68,20 @@ module Imap::Backup
         end
     end
 
-    def add_account(username)
+    def default_account_config(username)
       account = {
         :username   => username,
         :password   => '',
         :local_path => File.join(config.path, username.gsub('@', '_')),
         :folders    => []
       }
-      config.data[:accounts] << account
-      account
     end
 
     def edit_account(username)
       account = config.data[:accounts].find { |a| a[:username] == username }
       if account.nil?
-        account = add_account(username)
+        account = default_account_config(username)
+        config.data[:accounts] << account
       end
       Configuration::Account.new(config, account, Configuration::Setup.highline).run
     end
