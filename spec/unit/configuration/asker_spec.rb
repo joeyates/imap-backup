@@ -45,7 +45,15 @@ module Imap::Backup
     end
 
     context '#initialize' do
-      its(:highline) { should eq(highline) }
+      it 'requires 1 parameter' do
+        expect do
+          described_class.new
+        end.to raise_error(ArgumentError, /0 for 1/)
+      end
+
+      it 'expects a higline' do
+        expect(subject.highline).to eq(highline)
+      end
     end
 
     context '#email' do
@@ -56,7 +64,7 @@ module Imap::Backup
         @result = subject.email
       end
 
-      it 'asks for an email'  do
+      it 'asks for an email' do
         expect(highline).to have_received(:ask).with(/email/)
       end
 
