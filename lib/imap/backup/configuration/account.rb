@@ -4,6 +4,10 @@ module Imap::Backup
   module Configuration; end
 
   class Configuration::Account < Struct.new(:store, :account, :highline)
+    def initialize(store, account, highline)
+      super
+    end
+
     def run
       catch :done do
         loop do

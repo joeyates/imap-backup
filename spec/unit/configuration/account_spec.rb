@@ -19,6 +19,28 @@ describe Imap::Backup::Configuration::Account do
     end
   end
 
+  context '#initialize' do
+    it 'requires 3 parameters' do
+      expect do
+        described_class.new('foo')
+      end.to raise_error(ArgumentError, /1 for 3/)
+    end
+
+    [:store, :account, :highline].each do |param|
+      let(:store) { 'store' }
+      let(:account) { 'account' }
+      let(:highline) { 'highline' }
+
+      subject { described_class.new(store, account, highline) }
+
+      context param do
+        it 'is expected' do
+          expect(subject.send(param)).to eq(send(param))
+        end
+      end
+    end
+  end
+
   context '#run' do
     let(:highline) { double('Highline') }
     let(:menu) { MockHighlineMenu.new }
