@@ -37,7 +37,7 @@ module Imap::Backup
         imap = File.open(imap_pathname, 'ab')
         mbox.write mboxrd_message.to_s
         imap.write uid + "\n"
-      rescue ArgumentError => e
+      rescue => e
         Imap::Backup.logger.warn "Failed to save message #{uid}:\n#{body}. #{e}"
       ensure
         mbox.close if mbox
