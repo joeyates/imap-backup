@@ -26,7 +26,7 @@ describe Imap::Backup::Configuration::FolderChooser do
       end
 
       it 'should show the menu' do
-        @output.string.should =~ %r{Add/remove folders}
+        expect(@output.string).to match %r{Add/remove folders}
       end
     end
 

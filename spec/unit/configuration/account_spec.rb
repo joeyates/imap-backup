@@ -26,17 +26,15 @@ describe Imap::Backup::Configuration::Account do
       end.to raise_error(ArgumentError, /1 for 3/)
     end
 
+    let(:store) { 'store' }
+    let(:account) { 'account' }
+    let(:highline) { 'highline' }
+
+    subject { described_class.new(store, account, highline) }
+
     [:store, :account, :highline].each do |param|
-      let(:store) { 'store' }
-      let(:account) { 'account' }
-      let(:highline) { 'highline' }
-
-      subject { described_class.new(store, account, highline) }
-
-      context param do
-        it 'is expected' do
-          expect(subject.send(param)).to eq(send(param))
-        end
+      it "expects #{param}" do
+        expect(subject.send(param)).to eq(send(param))
       end
     end
   end
@@ -247,7 +245,7 @@ describe Imap::Backup::Configuration::Account do
       end
 
       it 'validates that the path is not used by other backups' do
-        expect(@validator.call(other_existing_path)).to be_false
+        expect(@validator.call(other_existing_path)).to be_falsey
       end
     end
 

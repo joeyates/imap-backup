@@ -43,7 +43,9 @@ describe Imap::Backup::Account::Connection do
       [:local_path, 'local_path'],
       [:backup_folders, [folder_config]],
     ].each do |attr, expected|
-      its(attr) { should eq(expected) }
+      it "expects #{attr}" do
+        expect(subject.send(attr)).to eq(expected)
+      end
     end
 
     context 'server' do
@@ -118,7 +120,7 @@ describe Imap::Backup::Account::Connection do
     before { subject.disconnect }
 
     it 'disconnects from the server' do
-      expect(imap).to have_received(:disconnect).with()
+      expect(imap).to have_received(:disconnect)
     end
 
     include_examples 'connects to IMAP'

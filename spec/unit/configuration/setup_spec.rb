@@ -20,7 +20,8 @@ describe Imap::Backup::Configuration::Setup do
       double(
         'Imap::Backup::Configuration::Store',
         :data => data,
-        :path => '/base/path'
+        :path => '/base/path',
+        :save => nil
       )
     end
 
@@ -45,15 +46,15 @@ describe Imap::Backup::Configuration::Setup do
     end
 
     it 'clears the screen' do
-      subject.should_receive(:system).with('clear')
-
       subject.run
+
+      expect(subject).to have_received(:system).with('clear')
     end
 
     it 'should list accounts' do
       subject.run
 
-      @output.string.should =~ /account@example.com/
+      expect(@output.string).to match /account@example.com/
     end
 
     context 'adding accounts' do
@@ -80,14 +81,15 @@ describe Imap::Backup::Configuration::Setup do
     end
 
     it 'should save the configuration' do
-      @input.should_receive(:gets).with().and_return("save\n")
-      store.should_receive(:save).with()
+      allow(@input).to receive(:gets).and_return("save\n")
 
       subject.run
+
+      expect(store).to have_received(:save)
     end
 
     it 'should exit' do
-      @input.should_receive(:gets).with().and_return("quit\n")
+      allow(@input).to receive(:gets).and_return("quit\n")
 
       subject.run
     end

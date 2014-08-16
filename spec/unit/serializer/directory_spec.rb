@@ -24,14 +24,14 @@ describe Imap::Backup::Serializer::Directory do
     end
 
     it 'returns the backed-up uids' do
-      subject.uids.should == [1, 123]
+      expect(subject.uids).to eq([1, 123])
     end
 
     context 'if the directory does not exist' do
       let(:folder_exists) { false }
 
       it 'returns an empty array' do
-        subject.uids.should == []
+        expect(subject.uids).to eq([])
       end
     end
   end
@@ -40,7 +40,7 @@ describe Imap::Backup::Serializer::Directory do
     it 'checks if the file exists' do
       allow(File).to receive(:exist?).with(%r{/base/path/my_folder/0+123.json}).and_return(true)
 
-      subject.exist?(123).should be_true
+      expect(subject.exist?(123)).to be_truthy
     end
   end
 
