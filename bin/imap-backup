@@ -60,6 +60,8 @@ end
 configuration.setup_logging
 
 case options[:command]
+when 'setup'
+  Imap::Backup::Configuration::Setup.new.run
 when 'backup'
   configuration.each_connection do |connection|
     connection.run_backup
@@ -74,8 +76,6 @@ when 'folders'
     end
     folders.each { |f| puts "\t" + f.name }
   end
-when 'setup'
-  Imap::Backup::Configuration::Setup.new.run
 when 'status'
   configuration.each_connection do |connection|
     puts connection.username
