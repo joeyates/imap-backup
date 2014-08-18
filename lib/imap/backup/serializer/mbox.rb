@@ -33,6 +33,10 @@ module Imap::Backup
         Imap::Backup.logger.debug "[#{folder}] message #{uid} already downloaded - skipping"
         return
       end
+
+      # invalidate cache
+      @uids = nil
+
       body = message['RFC822']
       mboxrd_message = Email::Mboxrd::Message.new(body)
       mbox = imap = nil
