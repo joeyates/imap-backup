@@ -27,7 +27,7 @@ opts = OptionParser.new do |opts|
   opts.separator 'Common options:'
 
   opts.on('-a', '--accounts ACCOUNT1[,ACCOUNT2,...]', Array, 'only these accounts') do |account|
-    options[:account] = account
+    options[:accounts] = account
   end
 
   opts.on_tail("-h", "--help", "Show usage") do
