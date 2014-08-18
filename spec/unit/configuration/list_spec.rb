@@ -9,7 +9,7 @@ describe Imap::Backup::Configuration::List do
     ]
   end
   let(:store) do
-    double('Imap::Backup::Configuration::Store', :data => {:accounts => accounts})
+    double('Imap::Backup::Configuration::Store', accounts: accounts)
   end
   let(:exists) { true }
   let(:connection1) { double('Imap::Backup::Account::Connection', :disconnect => nil) }
