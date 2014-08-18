@@ -10,7 +10,7 @@ describe Imap::Backup::Account::Connection do
     {:name => backup_folder}
   end
 
-  let(:imap) { double('Net::IMAP', :login => nil, :list => imap_folders) }
+  let(:imap) { double('Net::IMAP', :login => nil, :list => imap_folders, :disconnect => nil) }
   let(:imap_folders) { [] }
   let(:options) do
     {
@@ -30,17 +30,13 @@ describe Imap::Backup::Account::Connection do
 
   subject { described_class.new(options) }
 
-  shared_examples 'connects to IMAP' do |options|
-    options ||= {}
-    username = options[:username] || 'username@gmail.com'
-    server = options[:server] || 'imap.gmail.com'
-
+  shared_examples 'connects to IMAP' do
     it 'sets up the IMAP connection' do
-      expect(Net::IMAP).to have_received(:new).with(server, {:port => 993, :ssl => true})
+      expect(Net::IMAP).to have_received(:new)
     end
 
     it 'logs in to the imap server' do
-      expect(imap).to have_received(:login).with(username, 'password')
+      expect(imap).to have_received(:login)
     end
   end
 
@@ -54,38 +50,16 @@ describe Imap::Backup::Account::Connection do
         expect(subject.send(attr)).to eq(expected)
       end
     end
-
-    context 'server' do
-      context 'with a supplied value' do
-        before do
-          options.merge!(:server => 'imap.example.com')
-        end
-
-        it 'uses the supplied value' do
-          expect(subject.server).to eq('imap.example.com')
-        end
-      end
-
-      context 'without a supplied value' do
-        it 'uses the guesses the value' do
-          expect(subject.server).to eq('imap.gmail.com')
-        end
-      end
-    end
   end
 
-  [
-    ['GMail', 'user@gmail.com', 'imap.gmail.com'],
-    ['Fastmail', 'user@fastmail.fm', 'mail.messagingengine.com'],
-  ].each do |service, email_username, server|
-    context service do
-      let(:username) { email_username }
+  describe '#imap' do
+    before { @result = subject.imap }
 
-      before { allow(imap).to receive(:disconnect) }
-      before { subject.disconnect }
-
-      include_examples 'connects to IMAP', {:username => email_username, :server => server}
+    it 'returns the IMAP connection' do
+      expect(@result).to eq(imap)
     end
+
+    include_examples 'connects to IMAP'
   end
 
   context '#folders' do
@@ -188,7 +162,6 @@ describe Imap::Backup::Account::Connection do
   end
 
   context '#disconnect' do
-    before { allow(imap).to receive(:disconnect) }
     before { subject.disconnect }
 
     it 'disconnects from the server' do
