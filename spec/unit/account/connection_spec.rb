@@ -122,17 +122,6 @@ describe Imap::Backup::Account::Connection do
     end
   end
 
-  context '#disconnect' do
-    before { allow(imap).to receive(:disconnect) }
-    before { subject.disconnect }
-
-    it 'disconnects from the server' do
-      expect(imap).to have_received(:disconnect)
-    end
-
-    include_examples 'connects to IMAP'
-  end
-
   context '#run_backup' do
     let(:folder) { double('folder') }
     let(:serializer) { double('serializer') }
@@ -196,5 +185,16 @@ describe Imap::Backup::Account::Connection do
         end
       end
     end
+  end
+
+  context '#disconnect' do
+    before { allow(imap).to receive(:disconnect) }
+    before { subject.disconnect }
+
+    it 'disconnects from the server' do
+      expect(imap).to have_received(:disconnect)
+    end
+
+    include_examples 'connects to IMAP'
   end
 end
