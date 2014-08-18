@@ -15,6 +15,7 @@ require 'imap/backup/serializer/base'
 require 'imap/backup/serializer/directory'
 require 'imap/backup/serializer/mbox'
 require 'imap/backup/version'
+require 'email/provider'
 
 require 'logger'
 

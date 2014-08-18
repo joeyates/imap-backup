@@ -138,12 +138,12 @@ Account:
     end
 
     def default_server(username)
-      case username
-      when /@gmail\.com/
-        'imap.gmail.com'
-      when /@fastmail\.fm/
-        'mail.messagingengine.com'
+      provider = Email::Provider.for_address(username)
+      if provider.provider == :default
+        puts "Can't decide provider for email address '#{username}'"
+        return nil
       end
+      provider.host
     end
   end
 end

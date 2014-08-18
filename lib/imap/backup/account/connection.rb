@@ -17,7 +17,7 @@ module Imap::Backup
 
     def folders
       return @folders if @folders
-      root = root_for(username)
+      root = provider_root
       @folders = imap.list(root, '*')
       if @folders.nil?
         Imap::Backup.logger.warn "Unable to get folder list for account #{username}, (root '#{root}'"
@@ -51,12 +51,14 @@ module Imap::Backup
     end
 
     def server
-      @server ||= host_for(username)
+      return @server if @server
+      return nil if provider.nil?
+      @server = provider.host
     end
 
     def imap
       return @imap unless @imap.nil?
-      options = options_for(server)
+      options = provider_options
       Imap::Backup.logger.debug "Creating IMAP instance: #{server}, options: #{options.inspect}"
       @imap = Net::IMAP.new(server, options)
       Imap::Backup.logger.debug "Logging in: #{username}/#{masked_password}"
@@ -80,35 +82,16 @@ module Imap::Backup
       (folders || []).map { |f| {:name => f.name} }
     end
 
-    def host_for(username)
-      case username
-      when /@gmail\.com/
-        'imap.gmail.com'
-      when /@fastmail\.fm/
-        'mail.messagingengine.com'
-      end
+    def provider
+      @provider ||= Email::Provider.for_address(username)
     end
 
-    def root_for(username)
-      case username
-      when /@gmail\.com/
-        '/'
-      when /@fastmail\.fm/
-        'INBOX'
-      else
-        '/'
-      end
+    def provider_options
+      provider.options
     end
 
-    def options_for(server)
-      case server
-      when 'imap.gmail.com'
-        {:port => 993, :ssl => true}
-      when 'mail.messagingengine.com'
-        {:port => 993, :ssl => true}
-      else
-        {:port => 993, :ssl => true}
-      end
+    def provider_root
+      provider.root
     end
   end
 end
