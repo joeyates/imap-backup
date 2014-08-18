@@ -15,13 +15,14 @@ describe Imap::Backup::Configuration::Setup do
   context '#run' do
     let(:account1) { {:username => 'account@example.com'} }
     let(:account) { double('Imap::Backup::Configuration::Account', :run => nil) }
-    let(:data) { {:accounts => [account1]} }
+    let(:accounts) { [account1] }
     let(:store) do
       double(
         'Imap::Backup::Configuration::Store',
-        :data => data,
+        :accounts => accounts,
         :path => '/base/path',
-        :save => nil
+        :save => nil,
+        :debug? => false,
       )
     end
 
@@ -76,7 +77,7 @@ describe Imap::Backup::Configuration::Setup do
       end
 
       it 'adds account data' do
-        expect(data[:accounts][1]).to eq(blank_account)
+        expect(accounts[1]).to eq(blank_account)
       end
     end
 

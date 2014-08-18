@@ -33,7 +33,7 @@ module Imap::Backup
       mkdir_private path
       File.open(pathname, 'w') { |f| f.write(JSON.pretty_generate(data)) }
       FileUtils.chmod 0600, pathname
-      @data[:accounts].each do |account|
+      accounts.each do |account|
         mkdir_private account[:local_path]
         account[:folders].each do |f|
           parts = f[:name].split('/')
@@ -44,6 +44,14 @@ module Imap::Backup
           end
         end
       end
+    end
+
+    def accounts
+      data[:accounts]
+    end
+
+    def debug?
+      data.include?(:debug)
     end
 
     private

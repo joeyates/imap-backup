@@ -49,7 +49,7 @@ Account:
       menu.choice('modify email') do
         username = Configuration::Asker.email(username)
         puts "username: #{username}"
-        others   = store.data[:accounts].select { |a| a != account}.map { |a| a[:username] }
+        others   = store.accounts.select { |a| a != account}.map { |a| a[:username] }
         puts "others: #{others.inspect}"
         if others.include?(username)
           puts 'There is already an account set up with that email address'
@@ -83,7 +83,7 @@ Account:
     def modify_backup_path(menu)
       menu.choice('modify backup path') do
         validator = lambda do |p|
-          same = store.data[:accounts].find do |a|
+          same = store.accounts.find do |a|
             a[:username] != account[:username] && a[:local_path] == p
           end
           if same
@@ -114,7 +114,7 @@ Account:
     def delete_account(menu)
       menu.choice('delete') do
         if highline.agree("Are you sure? (y/n) ")
-          store.data[:accounts].reject! { |a| a[:username] == account[:username] }
+          store.accounts.reject! { |a| a[:username] == account[:username] }
           throw :done
         end
       end

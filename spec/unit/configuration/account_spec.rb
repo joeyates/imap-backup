@@ -42,8 +42,8 @@ describe Imap::Backup::Configuration::Account do
   context '#run' do
     let(:highline) { double('Highline') }
     let(:menu) { MockHighlineMenu.new }
-    let(:store) { double('Imap::Backup::Configuration::Store', :data => data) }
-    let(:data) { {:accounts => [account, account1]} }
+    let(:store) { double('Imap::Backup::Configuration::Store', :accounts => accounts) }
+    let(:accounts) { [account, account1] }
     let(:account) do
       {
         :username => existing_email,
@@ -292,14 +292,14 @@ describe Imap::Backup::Configuration::Account do
       end
 
       it 'deletes the account' do
-        expect(data[:accounts].find{|a| a[:username] == existing_email}).to be_nil
+        expect(accounts.find { |a| a[:username] == existing_email }).to be_nil
       end
 
       context 'without confirmation' do
         let(:confirmed) { false }
 
         it 'does nothing' do
-          expect(data[:accounts].find{|a| a[:username] == existing_email}).to eq(account)
+          expect(accounts.find{|a| a[:username] == existing_email}).to eq(account)
         end
       end
     end

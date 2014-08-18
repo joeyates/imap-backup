@@ -31,9 +31,9 @@ module Imap::Backup
     def accounts
       return @accounts if @accounts
       if required_accounts.nil?
-        @accounts = config.data[:accounts]
+        @accounts = config.accounts
       else
-        @accounts = config.data[:accounts].select{ |account| required_accounts.include?(account[:username]) }
+        @accounts = config.accounts.select{ |account| required_accounts.include?(account[:username]) }
       end
     end
   end

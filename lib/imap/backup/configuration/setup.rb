@@ -41,7 +41,7 @@ module Imap::Backup
     end
 
     def account_items(menu)
-      config.data[:accounts].each do |account|
+      config.accounts.each do |account|
         menu.choice("#{account[:username]}") do
           edit_account account[:username]
         end
@@ -61,7 +61,7 @@ module Imap::Backup
 
     def setup_logging
       Imap::Backup.logger.level =
-        if config.data[:debug]
+        if config.debug?
           ::Logger::Severity::DEBUG
         else
           ::Logger::Severity::ERROR
@@ -78,10 +78,10 @@ module Imap::Backup
     end
 
     def edit_account(username)
-      account = config.data[:accounts].find { |a| a[:username] == username }
+      account = config.accounts.find { |a| a[:username] == username }
       if account.nil?
         account = default_account_config(username)
-        config.data[:accounts] << account
+        config.accounts << account
       end
       Configuration::Account.new(config, account, Configuration::Setup.highline).run
     end
