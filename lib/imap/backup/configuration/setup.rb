@@ -28,10 +28,6 @@ module Imap::Backup
         menu.header = 'Choose an action'
         account_items menu
         add_account_item menu
-        menu.choice('add account') do
-          username = Configuration::Asker.email
-          edit_account username
-        end
         menu.choice('save and exit') do
           config.save
           throw :done
