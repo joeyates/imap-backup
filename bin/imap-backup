@@ -7,11 +7,11 @@ $:.unshift(File.expand_path('../../lib/', __FILE__))
 require 'imap/backup'
 
 KNOWN_COMMANDS = [
-  {:name => 'help',    :help => 'Show usage'},
   {:name => 'setup',   :help => 'Create/edit the configuration file'},
   {:name => 'backup',  :help => 'Do the backup (default)'},
   {:name => 'folders', :help => 'List folders for all (or selected) accounts'},
   {:name => 'status',  :help => 'List count of non backed-up emails per folder'},
+  {:name => 'help',    :help => 'Show usage'},
 ]
 
 options = {:command => 'backup'}
