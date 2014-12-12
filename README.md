@@ -93,7 +93,7 @@ Manually, from the command line:
 $ imap-backup
 ```
 
-Altertatively, add it to your crontab.
+Alternatively, add it to your crontab.
 
 # Result
 
