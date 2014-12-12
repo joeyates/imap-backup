@@ -6,11 +6,11 @@ module Imap::Backup
   class Account::Connection
     attr_reader :username
     attr_reader :local_path
-    attr_reader :backup_folders
 
     def initialize(options)
       @username, @password = options[:username], options[:password]
-      @local_path, @backup_folders = options[:local_path], options[:folders]
+      @local_path = options[:local_path]
+      @backup_folders = options[:folders]
       @server = options[:server]
     end
 
@@ -62,6 +62,11 @@ module Imap::Backup
 
     def masked_password
       password.gsub(/./, 'x')
+    end
+    
+    def backup_folders
+      return @backup_folders if @backup_folders and @backup_folders.size > 0
+      folders.map { |f| {:name => f} }
     end
 
     def host_for(username)

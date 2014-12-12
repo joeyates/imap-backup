@@ -2,19 +2,26 @@
 require 'spec_helper'
 
 describe Imap::Backup::Account::Connection do
-  def self.folder_config
-    {:name => 'backup_folder'}
+  def self.backup_folder
+    'backup_folder'
   end
 
-  let(:imap) { double('Net::IMAP', :login => nil, :list => []) }
+  def self.folder_config
+    {:name => backup_folder}
+  end
+
+  let(:imap) { double('Net::IMAP', :login => nil, :list => imap_folders) }
+  let(:imap_folders) { [] }
   let(:options) do
     {
       :username => username,
       :password => 'password',
-      :local_path => 'local_path',
-      :folders => [self.class.folder_config],
+      :local_path => local_path,
+      :folders => backup_folders,
     }
   end
+  let(:local_path) { 'local_path' }
+  let(:backup_folders) { [self.class.folder_config] }
   let(:username) { 'username@gmail.com' }
 
   before do
@@ -82,12 +89,12 @@ describe Imap::Backup::Account::Connection do
   end
 
   context '#folders' do
-    let(:folders) { 'folders' }
+    let(:imap_folders) { ['imap_folder'] }
 
-    before { allow(imap).to receive(:list).and_return(folders) }
+    before { allow(imap).to receive(:list).and_return(imap_folders) }
 
     it 'returns the list of folders' do
-      expect(subject.folders).to eq(folders)
+      expect(subject.folders).to eq(imap_folders)
     end
   end
 
@@ -103,7 +110,7 @@ describe Imap::Backup::Account::Connection do
     end
 
     it 'should return the names of folders' do
-      expect(subject.status[0][:name]).to eq('backup_folder')
+      expect(subject.status[0][:name]).to eq(self.class.backup_folder)
     end
 
     it 'returns local message uids' do
@@ -132,15 +139,53 @@ describe Imap::Backup::Account::Connection do
     let(:downloader) { double('downloader', :run => nil) }
 
     before do
-      allow(Imap::Backup::Account::Folder).to receive(:new).and_return(folder)
-      allow(Imap::Backup::Serializer::Mbox).to receive(:new).and_return(serializer)
       allow(Imap::Backup::Downloader).to receive(:new).and_return(downloader)
     end
 
-    before { subject.run_backup }
+    context 'with supplied backup_folders' do
+      before do
+        allow(Imap::Backup::Account::Folder).to receive(:new).
+          with(subject, self.class.backup_folder).and_return(folder)
+        allow(Imap::Backup::Serializer::Mbox).to receive(:new).
+          with(local_path, self.class.backup_folder).and_return(serializer)
+      end
 
-    it 'runs downloaders' do
-      expect(downloader).to have_received(:run)
+      before { subject.run_backup }
+
+      it 'runs the downloader' do
+        expect(downloader).to have_received(:run)
+      end
+    end
+
+    context 'without supplied backup_folders' do
+      let(:imap_folders) { ['foo'] }
+
+      before do
+        allow(Imap::Backup::Account::Folder).to receive(:new).
+          with(subject, 'foo').and_return(folder)
+        allow(Imap::Backup::Serializer::Mbox).to receive(:new).
+          with(local_path, 'foo').and_return(serializer)
+      end
+
+      context 'when supplied backup_folders is nil' do
+        let(:backup_folders) { nil }
+
+        before { subject.run_backup }
+
+        it 'runs the downloader' do
+          expect(downloader).to have_received(:run)
+        end
+      end
+
+      context 'when supplied backup_folders is an empty list' do
+        let(:backup_folders) { [] }
+
+        before { subject.run_backup }
+
+        it 'runs the downloader' do
+          expect(downloader).to have_received(:run)
+        end
+      end
     end
   end
 end
