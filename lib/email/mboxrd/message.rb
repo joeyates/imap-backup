@@ -33,7 +33,11 @@ module Email::Mboxrd
     end
 
     def asctime
-      parsed.date.asctime
+      date.asctime
+    end
+
+    def date
+      parsed.date
     end
   end
 end
