@@ -32,13 +32,19 @@ module Imap::Backup
           config.save
           throw :done
         end
-        menu.choice(:quit) { throw :done }
+        menu.choice(:quit) do
+          config.save if config.modified?
+          throw :done
+        end
       end
     end
 
     def account_items(menu)
       config.accounts.each do |account|
-        menu.choice("#{account[:username]}") do
+        next if account[:delete]
+        item = account[:username].clone
+        item << ' *' if account[:modified]
+        menu.choice(item) do
           edit_account account[:username]
         end
       end

@@ -20,12 +20,6 @@ describe Imap::Backup::Configuration::Account do
   end
 
   context '#initialize' do
-    it 'requires 3 parameters' do
-      expect do
-        described_class.new('foo')
-      end.to raise_error(ArgumentError, /1 for 3/)
-    end
-
     let(:store) { 'store' }
     let(:account) { 'account' }
     let(:highline) { 'highline' }
@@ -171,8 +165,12 @@ describe Imap::Backup::Configuration::Account do
         end
       end
 
-      it 'modifies the email address' do
-        expect(account[:username]).to eq(new_email)
+      context 'the email is new' do
+        it 'modifies the email address' do
+          expect(account[:username]).to eq(new_email)
+        end
+
+        include_examples 'it flags the account as modified'
       end
 
       context 'the email already exists' do
@@ -185,6 +183,8 @@ describe Imap::Backup::Configuration::Account do
         it "doesn't set the email" do
           expect(account[:username]).to eq(existing_email)
         end
+
+        include_examples "it doesn't flag the account as modified"
       end
     end
 
@@ -197,8 +197,12 @@ describe Imap::Backup::Configuration::Account do
         menu.choices['modify password'].call
       end
 
-      it 'updates the password' do
-        expect(account[:password]).to eq(new_password)
+      context 'if the user enters a password' do
+        it 'updates the password' do
+          expect(account[:password]).to eq(new_password)
+        end
+
+        include_examples 'it flags the account as modified'
       end
 
       context 'if the user cancels' do
@@ -207,6 +211,8 @@ describe Imap::Backup::Configuration::Account do
         it 'does nothing' do
           expect(account[:password]).to eq(existing_password)
         end
+
+        include_examples "it doesn't flag the account as modified"
       end
     end
 
@@ -225,6 +231,8 @@ describe Imap::Backup::Configuration::Account do
       it 'updates the server' do
         expect(account[:server]).to eq(server)
       end
+
+      include_examples 'it flags the account as modified'
     end
 
     context 'backup_path' do
@@ -247,6 +255,8 @@ describe Imap::Backup::Configuration::Account do
       it 'validates that the path is not used by other backups' do
         expect(@validator.call(other_existing_path)).to be_falsey
       end
+
+      include_examples 'it flags the account as modified'
     end
 
     context 'folders' do
@@ -291,16 +301,14 @@ describe Imap::Backup::Configuration::Account do
         expect(highline).to have_received(:agree)
       end
 
-      it 'deletes the account' do
-        expect(accounts.find { |a| a[:username] == existing_email }).to be_nil
+      context 'when the user confirms deletion' do
+        include_examples 'it flags the account to be deleted'
       end
 
       context 'without confirmation' do
         let(:confirmed) { false }
 
-        it 'does nothing' do
-          expect(accounts.find{|a| a[:username] == existing_email}).to eq(account)
-        end
+        include_examples "it doesn't flag the account to be deleted"
       end
     end
   end

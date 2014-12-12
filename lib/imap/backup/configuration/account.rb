@@ -58,6 +58,7 @@ Account:
           if account[:server].nil? or account[:server] == ''
             account[:server] = default_server(username)
           end
+          account[:modified] = true
         end
       end
     end
@@ -67,6 +68,7 @@ Account:
         password = Configuration::Asker.password
         if ! password.nil?
           account[:password] = password
+          account[:modified] = true
         end
       end
     end
@@ -76,6 +78,7 @@ Account:
         server = highline.ask('server: ')
         if ! server.nil?
           account[:server] = server
+          account[:modified] = true
         end
       end
     end
@@ -93,7 +96,9 @@ Account:
             true
           end
         end
+        existing = account[:local_path].clone
         account[:local_path] = Configuration::Asker.backup_path(account[:local_path], validator)
+        account[:modified] = true if existing != account[:local_path]
       end
     end
 
@@ -114,7 +119,7 @@ Account:
     def delete_account(menu)
       menu.choice('delete') do
         if highline.agree("Are you sure? (y/n) ")
-          store.accounts.reject! { |a| a[:username] == account[:username] }
+          account[:delete] = true
           throw :done
         end
       end

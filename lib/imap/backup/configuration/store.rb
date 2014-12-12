@@ -31,23 +31,18 @@ module Imap::Backup
         Utils.check_permissions path, 0700
       end
       mkdir_private path
+      remove_modified_flags
+      remove_deleted_accounts
       File.open(pathname, 'w') { |f| f.write(JSON.pretty_generate(data)) }
       FileUtils.chmod 0600, pathname
-      accounts.each do |account|
-        mkdir_private account[:local_path]
-        account[:folders].each do |f|
-          parts = f[:name].split('/')
-          p     = account[:local_path].clone
-          parts.each do |part|
-            p    = File.join(p, part)
-            mkdir_private p
-          end
-        end
-      end
     end
 
     def accounts
       data[:accounts]
+    end
+
+    def modified?
+      accounts.any? { |a| a[:modified] || a[:delete] }
     end
 
     def debug?
@@ -60,10 +55,19 @@ module Imap::Backup
       return @data if @data
       if File.exist?(pathname)
         Utils.check_permissions pathname, 0600
-        @data = JSON.parse(File.read(pathname), :symbolize_names => true)
+        contents = File.read(pathname)
+        @data = JSON.parse(contents, :symbolize_names => true)
       else
         @data = {:accounts => []}
       end
+    end
+
+    def remove_modified_flags
+      accounts.each { |a| a.delete(:modified) }
+    end
+
+    def remove_deleted_accounts
+      accounts.reject! { |a| a[:delete] }
     end
 
     def mkdir_private(path)

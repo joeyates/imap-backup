@@ -13,9 +13,8 @@ describe Imap::Backup::Configuration::Setup do
   end
 
   context '#run' do
-    let(:account1) { {:username => 'account@example.com'} }
-    let(:account) { double('Imap::Backup::Configuration::Account', :run => nil) }
-    let(:accounts) { [account1] }
+    let(:normal) { {:username => 'account@example.com'} }
+    let(:accounts) { [normal] }
     let(:store) do
       double(
         'Imap::Backup::Configuration::Store',
@@ -23,8 +22,10 @@ describe Imap::Backup::Configuration::Setup do
         :path => '/base/path',
         :save => nil,
         :debug? => false,
+        :modified? => modified,
       )
     end
+    let(:modified) { false }
 
     before :each do
       allow(Imap::Backup::Configuration::Store).to receive(:new).and_return(store)
@@ -52,10 +53,30 @@ describe Imap::Backup::Configuration::Setup do
       expect(subject).to have_received(:system).with('clear')
     end
 
-    it 'should list accounts' do
-      subject.run
+    context 'listing' do
+      let(:accounts) { [normal, modified, deleted] }
+      let(:modified) { {:username => 'modified@example.com', :modified => true} }
+      let(:deleted) { {:username => 'deleted@example.com', :delete => true} }
 
-      expect(@output.string).to match /account@example.com/
+      before { subject.run }
+
+      context 'normal accounts' do
+        it 'are listed' do
+          expect(@output.string).to match /account@example.com/
+        end
+      end
+
+      context 'modified accounts' do
+        it 'are flagged' do
+          expect(@output.string).to match /modified@example.com \*/
+        end
+      end
+
+      context 'deleted accounts' do
+        it 'are hidden' do
+          expect(@output.string).to_not match /delete@example.com/
+        end
+      end
     end
 
     context 'adding accounts' do
@@ -67,6 +88,7 @@ describe Imap::Backup::Configuration::Setup do
           :folders => []
         }
       end
+      let(:account) { double('Imap::Backup::Configuration::Account', :run => nil) }
 
       before do
         allow(@input).to receive(:gets).and_return("add\n", "q\n")
@@ -79,20 +101,51 @@ describe Imap::Backup::Configuration::Setup do
       it 'adds account data' do
         expect(accounts[1]).to eq(blank_account)
       end
+
+      it "doesn't flag the unedited account as modified" do
+        expect(accounts[1][:modified]).to be_nil
+      end
     end
 
-    it 'should save the configuration' do
-      allow(@input).to receive(:gets).and_return("save\n")
+    context "when 'save' is selected" do
+      before do
+        allow(@input).to receive(:gets).and_return("save\n")
+        subject.run
+      end
 
-      subject.run
+      it 'exits' do
+        # N.B. this will hang forever if save does not cause an exit
+      end
 
-      expect(store).to have_received(:save)
+      it 'saves the configuration' do
+        expect(store).to have_received(:save)
+      end
     end
 
-    it 'should exit' do
-      allow(@input).to receive(:gets).and_return("quit\n")
+    context "when 'quit' is selected" do
+      before do
+        allow(@input).to receive(:gets).and_return("quit\n")
 
-      subject.run
+        subject.run
+      end
+
+      it 'exits' do
+        # N.B. this will hang forever if quit does not cause an exit
+      end
+
+      context 'when the configuration is modified' do
+        let(:modified) { true }
+
+        it 'saves the configuration' do
+          expect(store).to have_received(:save)
+        end
+      end
+
+      context "when the configuration isn't modified" do
+        it "doesn't save the configuration" do
+          expect(store).to_not have_received(:save)
+        end
+      end
     end
   end
 end
