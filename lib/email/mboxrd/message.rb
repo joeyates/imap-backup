@@ -33,7 +33,7 @@ module Email::Mboxrd
     end
 
     def asctime
-      date.asctime
+      date ? date.asctime : ''
     end
 
     def date

@@ -36,5 +36,13 @@ describe Email::Mboxrd::Message do
     it "appends > before '>+From '" do
       expect(subject.to_s).to include("\n>>>From quoted")
     end
+
+    context 'when date is missing' do
+      let(:date) { nil }
+
+      it 'does no fail' do
+        expect { subject.to_s }.to_not raise_error
+      end
+    end
   end
 end
