@@ -13,6 +13,7 @@ module Imap::Backup
 
     def run
       uids = folder.uids - serializer.uids
+      Imap::Backup.logger.debug "New messages: #{uids.count}"
       uids.each do |uid|
         message = folder.fetch(uid)
         next if message.nil?
