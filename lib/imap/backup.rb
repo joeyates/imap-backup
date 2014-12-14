@@ -34,4 +34,13 @@ module Imap::Backup
   def self.logger
     Logger.instance.logger
   end
+
+  def self.setup_logging(config)
+    Imap::Backup.logger.level =
+      if config.debug?
+        ::Logger::Severity::DEBUG
+      else
+        ::Logger::Severity::ERROR
+      end
+  end
 end

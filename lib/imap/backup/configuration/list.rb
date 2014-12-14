@@ -10,6 +10,10 @@ module Imap::Backup
       @required_accounts = required_accounts
     end
 
+    def setup_logging
+      Imap::Backup.setup_logging config
+    end
+
     def each_connection
       accounts.each do |account|
         connection = Account::Connection.new(account)

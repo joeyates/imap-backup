@@ -12,7 +12,7 @@ module Imap::Backup
     self.highline = HighLine.new
 
     def run
-      setup_logging
+      Imap::Backup.setup_logging config
       catch :done do
         loop do
           system('clear')
@@ -58,15 +58,6 @@ module Imap::Backup
 
     def config
       @config ||= Configuration::Store.new
-    end
-
-    def setup_logging
-      Imap::Backup.logger.level =
-        if config.debug?
-          ::Logger::Severity::DEBUG
-        else
-          ::Logger::Severity::ERROR
-        end
     end
 
     def default_account_config(username)

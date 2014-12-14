@@ -57,6 +57,8 @@ rescue Imap::Backup::ConfigurationNotFound
   exit
 end
 
+configuration.setup_logging
+
 case options[:command]
 when 'backup'
   configuration.each_connection do |connection|
