@@ -49,7 +49,7 @@ describe Imap::Backup::Serializer::Mbox do
   end
 
   context 'instance methods' do
-    let(:ids) { %w(1 123) }
+    let(:ids) { %w(3 2 1) }
 
     before do
       allow(CSV).to receive(:foreach) { |&b| ids.each { |id| b.call [id] } }
@@ -58,8 +58,8 @@ describe Imap::Backup::Serializer::Mbox do
     subject { described_class.new(base_path, 'my/folder') }
 
     context '#uids' do
-      it 'returns the backed-up uids' do
-        expect(subject.uids).to eq(ids)
+      it 'returns the backed-up uids as sorted integers' do
+        expect(subject.uids).to eq(ids.map(&:to_i).sort)
       end
 
       context 'if the mbox does not exist' do

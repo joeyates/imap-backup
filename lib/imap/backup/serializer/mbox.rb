@@ -23,6 +23,7 @@ module Imap::Backup
       CSV.foreach(imap_pathname) do |row|
         @uids << row[0]
       end
+      @uids = @uids.map(&:to_i).sort
       @uids
     end
 
