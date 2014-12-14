@@ -32,8 +32,7 @@ module Imap::Backup
           config.save
           throw :done
         end
-        menu.choice(:quit) do
-          config.save if config.modified?
+        menu.choice('exit without saving changes') do
           throw :done
         end
       end

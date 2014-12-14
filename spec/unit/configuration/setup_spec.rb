@@ -31,7 +31,7 @@ describe Imap::Backup::Configuration::Setup do
       allow(Imap::Backup::Configuration::Store).to receive(:new).and_return(store)
       @input, @output = prepare_highline
       allow(@input).to receive(:eof?).and_return(false)
-      allow(@input).to receive(:gets).and_return("q\n")
+      allow(@input).to receive(:gets).and_return("exit\n")
       allow(subject).to receive(:system)
     end
 
@@ -40,7 +40,7 @@ describe Imap::Backup::Configuration::Setup do
     context 'main menu' do
       before { subject.run }
 
-      %w(add\ account save\ and\ exit quit).each do |choice|
+      %w(add\ account save\ and\ exit exit\ without\ saving).each do |choice|
         it "includes #{choice}" do
           expect(@output.string).to include(choice)
         end
@@ -91,7 +91,7 @@ describe Imap::Backup::Configuration::Setup do
       let(:account) { double('Imap::Backup::Configuration::Account', :run => nil) }
 
       before do
-        allow(@input).to receive(:gets).and_return("add\n", "q\n")
+        allow(@input).to receive(:gets).and_return("add\n", "exit\n")
         allow(Imap::Backup::Configuration::Asker).to receive(:email).with(no_args).and_return('new@example.com')
         allow(Imap::Backup::Configuration::Account).to receive(:new).with(store, blank_account, anything).and_return(account)
 
@@ -122,9 +122,9 @@ describe Imap::Backup::Configuration::Setup do
       end
     end
 
-    context "when 'quit' is selected" do
+    context "when 'exit without saving' is selected" do
       before do
-        allow(@input).to receive(:gets).and_return("quit\n")
+        allow(@input).to receive(:gets).and_return("exit\n")
 
         subject.run
       end
@@ -136,8 +136,8 @@ describe Imap::Backup::Configuration::Setup do
       context 'when the configuration is modified' do
         let(:modified) { true }
 
-        it 'saves the configuration' do
-          expect(store).to have_received(:save)
+        it "doesn't save the configuration" do
+          expect(store).to_not have_received(:save)
         end
       end
 
