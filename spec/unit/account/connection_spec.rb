@@ -186,6 +186,15 @@ describe Imap::Backup::Account::Connection do
           expect(downloader).to have_received(:run)
         end
       end
+
+      context "when the imap server doesn't return folders" do
+        let(:backup_folders) { nil }
+        let(:imap_folders) { nil }
+
+        it 'does not fail' do
+          expect { subject.run_backup }.to_not raise_error
+        end
+      end
     end
   end
 end

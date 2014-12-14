@@ -12,11 +12,17 @@ module Imap::Backup
       @local_path = options[:local_path]
       @backup_folders = options[:folders]
       @server = options[:server]
+      @folders = nil
     end
 
     def folders
+      return @folders if @folders
       root = root_for(username)
-      imap.list(root, '*')
+      @folders = imap.list(root, '*')
+      if @folders.nil?
+        Imap::Backup.logger.warn "Unable to get folder list for account #{username}, (root '#{root}'"
+      end
+      @folders
     end
 
     def status
@@ -66,7 +72,7 @@ module Imap::Backup
     
     def backup_folders
       return @backup_folders if @backup_folders and @backup_folders.size > 0
-      folders.map { |f| {:name => f} }
+      (folders || []).map { |f| {:name => f} }
     end
 
     def host_for(username)
