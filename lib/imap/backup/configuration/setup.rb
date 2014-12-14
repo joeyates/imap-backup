@@ -28,6 +28,7 @@ module Imap::Backup
         menu.header = 'Choose an action'
         account_items menu
         add_account_item menu
+        toggle_logging_item menu
         menu.choice('save and exit') do
           config.save
           throw :done
@@ -53,6 +54,15 @@ module Imap::Backup
       menu.choice('add account') do
         username = Configuration::Asker.email
         edit_account username
+      end
+    end
+
+    def toggle_logging_item(menu)
+      menu_item = config.debug? ? 'stop logging' : 'start logging'
+      new_setting = ! config.debug?
+      menu.choice(menu_item) do
+        config.debug = new_setting
+        Imap::Backup.setup_logging config
       end
     end
 

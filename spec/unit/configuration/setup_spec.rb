@@ -21,14 +21,17 @@ describe Imap::Backup::Configuration::Setup do
         :accounts => accounts,
         :path => '/base/path',
         :save => nil,
-        :debug? => false,
+        :debug? => debug,
+        :debug= => nil,
         :modified? => modified,
       )
     end
+    let(:debug) { false }
     let(:modified) { false }
 
     before :each do
       allow(Imap::Backup::Configuration::Store).to receive(:new).and_return(store)
+      allow(Imap::Backup).to receive(:setup_logging)
       @input, @output = prepare_highline
       allow(@input).to receive(:eof?).and_return(false)
       allow(@input).to receive(:gets).and_return("exit\n")
@@ -51,6 +54,12 @@ describe Imap::Backup::Configuration::Setup do
       subject.run
 
       expect(subject).to have_received(:system).with('clear')
+    end
+
+    it 'updates logging status' do
+      subject.run
+
+      expect(Imap::Backup).to have_received(:setup_logging)
     end
 
     context 'listing' do
@@ -104,6 +113,56 @@ describe Imap::Backup::Configuration::Setup do
 
       it "doesn't flag the unedited account as modified" do
         expect(accounts[1][:modified]).to be_nil
+      end
+    end
+
+    context 'logging' do
+      context 'when debug logging is disabled' do
+        before do
+          allow(@input).to receive(:gets).and_return("start\n", "exit\n")
+          subject.run
+        end
+
+        it 'shows a menu item' do
+          expect(@output.string).to include('start logging')
+        end
+
+        context 'when selected' do
+          it 'sets the debug flag' do
+            expect(store).to have_received(:debug=).with(true)
+          end
+
+          it 'updates logging status' do
+            expect(Imap::Backup).to have_received(:setup_logging).twice
+          end
+        end
+      end
+
+      context 'when debug logging is enabled' do
+        let(:debug) { true }
+
+        before do
+          allow(@input).to receive(:gets).and_return("stop\n", "exit\n")
+          subject.run
+        end
+
+        it 'shows a menu item' do
+          expect(@output.string).to include('stop logging')
+        end
+
+        context 'when selected' do
+          before do
+            allow(@input).to receive(:gets).and_return("stop\n", "exit\n")
+          end
+
+          it 'unsets the debug flag' do
+            expect(store).to have_received(:debug=).with(false)
+          end
+
+          it 'updates logging status' do
+            expect(Imap::Backup).to have_received(:setup_logging).twice
+          end
+        end
       end
     end
 

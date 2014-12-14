@@ -7,7 +7,8 @@ describe Imap::Backup::Configuration::Store do
   let(:file_path) { File.join(directory, '/config.json') }
   let(:file_exists) { true }
   let(:directory_exists) { true }
-  let(:data) { {:accounts => accounts} }
+  let(:data) { {:debug => debug, :accounts => accounts} }
+  let(:debug) { true }
   let(:accounts) { [] }
   let(:configuration) { data.to_json }
 
@@ -62,6 +63,64 @@ describe Imap::Backup::Configuration::Store do
 
       it 'is false' do
         expect(subject.modified?).to be_falsey
+      end
+    end
+  end
+
+  describe '#debug?' do
+    context 'when the debug flag is true' do
+      it 'is true' do
+        expect(subject.debug?).to be_truthy
+      end
+    end
+
+    context 'when the debug flag is false' do
+      let(:debug) { false }
+
+      it 'is false' do
+        expect(subject.debug?).to be_falsey
+      end
+    end
+
+    context 'when the debug flag is missing' do
+      let(:data) { {:accounts => accounts} }
+
+      it 'is false' do
+        expect(subject.debug?).to be_falsey
+      end
+    end
+
+    context 'when the debug flag is neither true nor false' do
+      let(:debug) { 'hi' }
+
+      it 'is false' do
+        expect(subject.debug?).to be_falsey
+      end
+    end
+  end
+
+  describe '#debug=' do
+    before { subject.debug = debug }
+
+    context 'when the supplied value is true' do
+      it 'sets the flag to true' do
+        expect(subject.debug?).to be_truthy
+      end
+    end
+
+    context 'when the supplied value is false' do
+      let(:debug) { false }
+
+      it 'sets the flag to false' do
+        expect(subject.debug?).to be_falsey
+      end
+    end
+
+    context 'when the supplied value is neither true nor false' do
+      let(:debug) { 'ciao' }
+
+      it 'sets the flag to false' do
+        expect(subject.debug?).to be_falsey
       end
     end
   end

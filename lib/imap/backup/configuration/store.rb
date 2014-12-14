@@ -46,7 +46,11 @@ module Imap::Backup
     end
 
     def debug?
-      data.include?(:debug)
+      data[:debug]
+    end
+
+    def debug=(value)
+      data[:debug] = [true, false].include?(value) ? value : false
     end
 
     private
@@ -60,6 +64,9 @@ module Imap::Backup
       else
         @data = {:accounts => []}
       end
+      @data[:debug] = false unless @data.include?(:debug)
+      @data[:debug] = false unless [true, false].include?(@data[:debug])
+      @data
     end
 
     def remove_modified_flags
