@@ -72,7 +72,7 @@ module Imap::Backup
     
     def backup_folders
       return @backup_folders if @backup_folders and @backup_folders.size > 0
-      (folders || []).map { |f| {:name => f} }
+      (folders || []).map { |f| {:name => f.name} }
     end
 
     def host_for(username)

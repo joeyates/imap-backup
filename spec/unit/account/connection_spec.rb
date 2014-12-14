@@ -158,7 +158,7 @@ describe Imap::Backup::Account::Connection do
     end
 
     context 'without supplied backup_folders' do
-      let(:imap_folders) { ['foo'] }
+      let(:imap_folders) { [double(:name => 'foo')] }
 
       before do
         allow(Imap::Backup::Account::Folder).to receive(:new).
