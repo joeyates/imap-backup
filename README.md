@@ -101,6 +101,23 @@ Each folder is saved to an mbox file.
 Alongside each mbox is a file with extension '.imap', which lists the source IMAP
 UIDs to allow a full restore.
 
+# Troubleshooting
+
+If you have problems:
+
+1. ensure that you have the latest release,
+2. turn on debugging output:
+
+```json
+{
+  "accounts":
+  [
+    ...
+  ],
+  "debug": true
+}
+```
+
 # Other Usage
 
 List IMAP folders:
