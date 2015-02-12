@@ -53,7 +53,7 @@ It creates ~/.imap-backup directory and configuration file. E.g.:
 It connects to GMail by default, but you can also specify a server:
 
 ```json
-{  
+{
   "accounts":
   [
     {
@@ -68,7 +68,7 @@ It connects to GMail by default, but you can also specify a server:
         ]
     }
   ]
-}  
+}
 ```
 
 ## Google Apps
