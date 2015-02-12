@@ -126,6 +126,7 @@ $ imap-backup status
 * https://github.com/thefloweringash/gmail-imap-backup
 * https://github.com/mleonhard/imapbackup
 * https://github.com/rgrove/larch - copies between IMAP servers
+* https://github.com/OfflineIMAP/offlineimap
 
 ## Contributing
 
