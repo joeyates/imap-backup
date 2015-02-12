@@ -38,7 +38,7 @@ module Imap::Backup
       # start the connection so we get logging messages in the right order
       imap
       backup_folders.each do |folder|
-        Imap::Backup.logger.debug "Folder: #{folder[:name]}"
+        Imap::Backup.logger.debug "[#{folder[:name]}] running backup"
         f = Account::Folder.new(self, folder[:name])
         s = Serializer::Mbox.new(local_path, folder[:name])
         d = Downloader.new(f, s)
@@ -61,6 +61,7 @@ module Imap::Backup
       @imap = Net::IMAP.new(server, options)
       Imap::Backup.logger.debug "Logging in: #{username}/#{masked_password}"
       @imap.login(username, password)
+      Imap::Backup.logger.debug "Login complete"
       @imap
     end
 

@@ -29,7 +29,10 @@ module Imap::Backup
 
     def save(uid, message)
       uid = uid.to_s
-      return if uids.include?(uid)
+      if uids.include?(uid)
+        Imap::Backup.logger.debug "[#{folder}] message #{uid} already downloaded - skipping"
+        return
+      end
       body = message['RFC822']
       mboxrd_message = Email::Mboxrd::Message.new(body)
       mbox = imap = nil
@@ -39,7 +42,7 @@ module Imap::Backup
         mbox.write mboxrd_message.to_s
         imap.write uid + "\n"
       rescue => e
-        Imap::Backup.logger.warn "Failed to save message #{uid}:\n#{body}. #{e}"
+        Imap::Backup.logger.warn "[#{folder}] failed to save message #{uid}:\n#{body}. #{e}"
       ensure
         mbox.close if mbox
         imap.close if imap

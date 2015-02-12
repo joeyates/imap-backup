@@ -13,10 +13,14 @@ module Imap::Backup
 
     def run
       uids = folder.uids - serializer.uids
-      Imap::Backup.logger.debug "New messages: #{uids.count}"
+      Imap::Backup.logger.debug "[#{folder.name}] #{uids.count} new messages"
       uids.each do |uid|
         message = folder.fetch(uid)
-        next if message.nil?
+        if message.nil?
+          Imap::Backup.logger.debug "[#{folder.name}] #{uid} - not available - skipped"
+          next
+        end
+        Imap::Backup.logger.debug "[#{folder.name}] #{uid} - #{message["RFC822"].size} bytes"
         serializer.save(uid, message)
       end
     end

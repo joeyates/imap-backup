@@ -6,6 +6,9 @@ module Imap::Backup
     FILE_PERMISSIONS      = 0600
 
     class Base
+      attr_reader :path
+      attr_reader :folder
+
       def initialize(path, folder)
         @path, @folder = path, folder
         Utils.check_permissions(@path, DIRECTORY_PERMISSIONS)

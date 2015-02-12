@@ -3,7 +3,7 @@ require 'spec_helper'
 
 describe Imap::Backup::Downloader do
   describe '#run' do
-    let(:message) { 'message' }
+    let(:message) { {'RFC822' => 'blah'} }
     let(:folder) { double('Imap::Backup::Account::Folder', :fetch => message, :name => 'folder') }
     let(:folder_uids) { ['111', '222', '333'] }
     let(:serializer) { double('Imap::Backup::Serializer', :save => nil) }
