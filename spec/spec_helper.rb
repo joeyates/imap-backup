@@ -1,4 +1,8 @@
+require "codeclimate-test-reporter"
 require 'rspec'
+
+CodeClimate::TestReporter.start
+
 spec_path = File.dirname(__FILE__)
 $LOAD_PATH << File.expand_path('../lib', spec_path)
 
