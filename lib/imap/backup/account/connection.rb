@@ -38,7 +38,7 @@ module Imap::Backup
       # start the connection so we get logging messages in the right order
       imap
       each_folder do |folder, serializer|
-        Imap::Backup.logger.debug "[#{folder[:name]}] running backup"
+        Imap::Backup.logger.debug "[#{folder.name}] running backup"
         Downloader.new(folder, serializer).run
       end
     end

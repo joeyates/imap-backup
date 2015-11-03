@@ -97,7 +97,7 @@ describe Imap::Backup::Account::Connection do
   end
 
   context '#run_backup' do
-    let(:folder) { double('folder') }
+    let(:folder) { double('folder', name: 'folder') }
     let(:serializer) { double('serializer') }
     let(:downloader) { double('downloader', :run => nil) }
 
