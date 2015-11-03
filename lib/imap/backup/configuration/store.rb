@@ -27,9 +27,6 @@ module Imap::Backup
     end
 
     def save
-      if File.directory?(path)
-        Utils.check_permissions path, 0700
-      end
       mkdir_private path
       remove_modified_flags
       remove_deleted_accounts
