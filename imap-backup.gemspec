@@ -18,7 +18,12 @@ Gem::Specification.new do |gem|
 
   gem.add_runtime_dependency 'rake'
   gem.add_runtime_dependency 'highline'
-  gem.add_runtime_dependency 'mail'
+  if RUBY_VERSION > '2'
+    gem.add_runtime_dependency 'mail'
+  else
+    gem.add_runtime_dependency 'mime-types', '~> 2.6'
+    gem.add_runtime_dependency 'mail', '~> 2.6.3'
+  end
 
   gem.add_development_dependency 'codeclimate-test-reporter', '~> 0.4.8'
   gem.add_development_dependency 'rspec',  '>= 3.0.0'
