@@ -48,7 +48,7 @@ module Imap::Backup
       it 'requires 1 parameter' do
         expect do
           described_class.new
-        end.to raise_error(ArgumentError, /0 for 1/)
+        end.to raise_error(ArgumentError, /wrong number/)
       end
 
       it 'expects a higline' do
