@@ -26,6 +26,7 @@ describe Imap::Backup::Account::Connection do
 
   before do
     allow(Net::IMAP).to receive(:new).and_return(imap)
+    allow(Imap::Backup::Utils).to receive(:make_folder)
   end
 
   subject { described_class.new(options) }
@@ -49,6 +50,11 @@ describe Imap::Backup::Account::Connection do
       it "expects #{attr}" do
         expect(subject.send(attr)).to eq(expected)
       end
+    end
+
+    it 'creates the path' do
+      subject.username
+      expect(Imap::Backup::Utils).to have_received(:make_folder)
     end
   end
 

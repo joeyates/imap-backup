@@ -13,6 +13,7 @@ module Imap::Backup
       @backup_folders = options[:folders]
       @server = options[:server]
       @folders = nil
+      create_account_folder
     end
 
     def folders
@@ -66,6 +67,14 @@ module Imap::Backup
         serializer = Serializer::Mbox.new(local_path, folder_info[:name])
         yield folder, serializer
       end
+    end
+
+    def create_account_folder
+      Utils.make_folder(
+        Configuration::Store::CONFIGURATION_DIRECTORY,
+        File.basename(local_path),
+        Serializer::DIRECTORY_PERMISSIONS
+      )
     end
 
     def password
