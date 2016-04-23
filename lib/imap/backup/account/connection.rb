@@ -6,12 +6,14 @@ module Imap::Backup
   class Account::Connection
     attr_reader :username
     attr_reader :local_path
+    attr_reader :connection_options
 
     def initialize(options)
       @username, @password = options[:username], options[:password]
       @local_path = options[:local_path]
       @backup_folders = options[:folders]
       @server = options[:server]
+      @connection_options = options[:connection_options] || {}
       @folders = nil
       create_account_folder
     end
@@ -101,7 +103,7 @@ module Imap::Backup
     end
 
     def provider_options
-      provider.options
+      provider.options.merge(connection_options)
     end
 
     def provider_root

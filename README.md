@@ -75,6 +75,35 @@ It connects to GMail by default, but you can also specify a server:
 }
 ```
 
+## Connection options
+
+You can override the parameters passed to `Net::IMAP` with `connection_options`.
+
+Specifically, if you are using a self-signed certificate and get SSL errors, e.g.
+`certificate verify failed`, you can choose to not verify the TLS connection:
+
+```json
+{
+  "accounts":
+  [
+    {
+      "username": "my.user@gmail.com",
+      "password": "secret",
+      "server": "my.imap.example.com",
+      "local_path": "/path/to/backup/root",
+      "folders": [
+        {"name": "[Gmail]/All Mail"},
+        {"name": "my_folder"}
+      ],
+      "connection_options": {
+        "ssl": {"verify_mode": 0},
+        "port": 993
+      }
+    }
+  ]
+}
+```
+
 ## Google Apps
 
 * Enable IMAP access to your account via the GMail interface (Settings/Forwarding and POP/IMAP),
