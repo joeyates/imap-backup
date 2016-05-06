@@ -20,10 +20,9 @@ module Imap::Backup
 
     def folders
       return @folders if @folders
-      root = provider_root
-      @folders = imap.list(root, '*')
+      @folders = imap.list('', '*')
       if @folders.nil?
-        Imap::Backup.logger.warn "Unable to get folder list for account #{username}, (root '#{root}'"
+        Imap::Backup.logger.warn "Unable to get folder list for account #{username}"
       end
       @folders
     end
@@ -104,10 +103,6 @@ module Imap::Backup
 
     def provider_options
       provider.options.merge(connection_options)
-    end
-
-    def provider_root
-      provider.root
     end
   end
 end

@@ -37,15 +37,4 @@ class Email::Provider
       'mail.messagingengine.com'
     end
   end
-
-  def root
-    case provider
-    when /@gmail\.com/
-      '/'
-    when /@fastmail\.fm/
-      'INBOX'
-    else
-      '/'
-    end
-  end
 end

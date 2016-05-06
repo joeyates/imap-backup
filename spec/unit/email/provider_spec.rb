@@ -31,10 +31,4 @@ describe Email::Provider do
       expect(subject.host).to eq('imap.gmail.com')
     end
   end
-
-  describe '#root' do
-    it 'returns root' do
-      expect(subject.root).to eq('/')
-    end
-  end
 end
