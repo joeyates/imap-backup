@@ -65,7 +65,7 @@ module Imap::Backup
     def create_containing_directory
       mbox_relative_path = File.dirname(mbox_relative_pathname)
       return if mbox_relative_path == '.'
-      Utils.make_folder(@path, mbox_relative_path, Serializer::DIRECTORY_PERMISSIONS)
+      Utils.make_folder(path, mbox_relative_path, Serializer::DIRECTORY_PERMISSIONS)
     end
 
     def exist?
@@ -81,16 +81,16 @@ module Imap::Backup
     end
 
     def mbox_relative_pathname
-      @folder + '.mbox'
+      folder + '.mbox'
     end
 
     def mbox_pathname
-      File.join(@path, mbox_relative_pathname)
+      File.join(path, mbox_relative_pathname)
     end
 
     def imap_pathname
-      filename = @folder + '.imap'
-      File.join(@path, filename)
+      filename = folder + '.imap'
+      File.join(path, filename)
     end
 
     def lock
