@@ -104,9 +104,11 @@ Specifically, if you are using a self-signed certificate and get SSL errors, e.g
 }
 ```
 
-## Google Apps
+## GMail
 
 * Enable IMAP access to your account via the GMail interface (Settings/Forwarding and POP/IMAP),
+* Under 'Sign-in & security', 'Signing in to Google', 'App passwords', generate a password
+  for imap-backup,
 * In imap-backup setup, set the server to imap.gmail.com
 
 # Security
