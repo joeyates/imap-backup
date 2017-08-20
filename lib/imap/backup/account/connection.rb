@@ -72,7 +72,7 @@ module Imap::Backup
 
     def create_account_folder
       Utils.make_folder(
-        Configuration::Store::CONFIGURATION_DIRECTORY,
+        File.dirname(local_path),
         File.basename(local_path),
         Serializer::DIRECTORY_PERMISSIONS
       )
