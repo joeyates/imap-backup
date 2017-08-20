@@ -1,10 +1,10 @@
 language: ruby
 rvm:
-  - 1.9.3
   - 2.0.0
   - 2.1.5
   - 2.2.4
   - 2.3.0
+  - 2.4.1
 branches:
   only:
     - master
