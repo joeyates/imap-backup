@@ -105,10 +105,11 @@ describe Imap::Backup::Account::Connection do
   context '#run_backup' do
     let(:folder) { double('folder', name: 'folder') }
     let(:serializer) { double('serializer') }
-    let(:downloader) { double('downloader', :run => nil) }
+    let(:downloader) { double(Imap::Backup::Downloader, :run => nil) }
 
     before do
-      allow(Imap::Backup::Downloader).to receive(:new).and_return(downloader)
+      allow(Imap::Backup::Downloader).
+        to receive(:new).with(folder, serializer) { downloader }
     end
 
     context 'with supplied backup_folders' do
@@ -141,8 +142,8 @@ describe Imap::Backup::Account::Connection do
 
         before { subject.run_backup }
 
-        it 'runs the downloader' do
-          expect(downloader).to have_received(:run)
+        it 'runs the downloader for each folder' do
+          expect(downloader).to have_received(:run).exactly(:once)
         end
       end
 
@@ -151,8 +152,8 @@ describe Imap::Backup::Account::Connection do
 
         before { subject.run_backup }
 
-        it 'runs the downloader' do
-          expect(downloader).to have_received(:run)
+        it 'runs the downloader for each folder' do
+          expect(downloader).to have_received(:run).exactly(:once)
         end
       end
 

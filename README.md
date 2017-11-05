@@ -24,7 +24,8 @@ $ gem install 'imap-backup'
 
 # Setup
 
-In order to do backups, you need to add accounts and specify the folders to backup.
+In order to do backups, you need to add accounts via a menu-driven command
+line program:
 
 Run:
 
@@ -32,9 +33,14 @@ Run:
 $ imap-backup setup
 ```
 
-The setup system is a menu-driven command line application.
+## Folders
 
-It creates ~/.imap-backup directory and configuration file. E.g.:
+By default, all folders are backed-up. You can override this by choosing
+specific folders.
+
+## Configuration file
+
+`setup` creates ~/.imap-backup directory and configuration file. E.g.:
 
 ```json
 {
