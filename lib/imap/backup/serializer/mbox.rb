@@ -46,7 +46,7 @@ module Imap::Backup
         mbox.write mboxrd_message.to_s
         imap.write uid + "\n"
       rescue => e
-        Imap::Backup.logger.warn "[#{folder}] failed to save message #{uid}:\n#{body}. #{e}"
+        Imap::Backup.logger.warn "[#{folder}] failed to save message #{uid}:\n#{body}. #{e}:\n#{e.backtrace.join("\n")}"
       ensure
         mbox.close if mbox
         imap.close if imap
