@@ -34,6 +34,11 @@ opts = OptionParser.new do |opts|
     puts opts
     exit
   end
+
+  opts.on_tail("--version", "Show version" ) do
+    puts Imap::Backup::VERSION
+    exit
+  end
 end
 opts.parse!
 
