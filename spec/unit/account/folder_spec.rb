@@ -38,6 +38,14 @@ describe Imap::Backup::Account::Folder do
       expect(subject.fetch(123)).to eq(message)
     end
 
+    context "if the server responds with nothing" do
+      before { allow(imap).to receive(:uid_fetch) { nil } }
+
+      it 'is nil' do
+        expect(subject.fetch(123)).to be_nil
+      end
+    end
+
     context "if the mailbox doesn't exist" do
       before { allow(imap).to receive(:examine).and_raise(missing_mailbox_error) }
 

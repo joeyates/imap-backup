@@ -33,7 +33,9 @@ module Imap::Backup
 
     def fetch(uid)
       imap.examine(name)
-      message = imap.uid_fetch([uid.to_i], REQUESTED_ATTRIBUTES)[0][1]
+      fetch_data_items = imap.uid_fetch([uid.to_i], REQUESTED_ATTRIBUTES)
+      return nil if fetch_data_items.nil?
+      message = fetch_data_items[0][1]
       message['RFC822'].force_encoding('utf-8')
       message
     rescue Net::IMAP::NoResponseError => e
