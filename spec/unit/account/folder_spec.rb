@@ -46,12 +46,10 @@ describe Imap::Backup::Account::Folder do
       end
     end
 
-    if RUBY_VERSION > '1.9'
-      it 'sets the encoding on the message' do
-        subject.fetch(123)
+    it 'sets the encoding on the message' do
+      subject.fetch(123)
 
-        expect(message_body).to have_received(:force_encoding).with('utf-8')
-      end
+      expect(message_body).to have_received(:force_encoding).with('utf-8')
     end
   end
 end
