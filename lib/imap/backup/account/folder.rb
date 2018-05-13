@@ -35,9 +35,10 @@ module Imap::Backup
       imap.examine(name)
       fetch_data_items = imap.uid_fetch([uid.to_i], REQUESTED_ATTRIBUTES)
       return nil if fetch_data_items.nil?
-      message = fetch_data_items[0][1]
-      message['RFC822'].force_encoding('utf-8')
-      message
+      fetch_data_item = fetch_data_items[0]
+      attributes = fetch_data_item.attr
+      attributes['RFC822'].force_encoding('utf-8')
+      attributes
     rescue Net::IMAP::NoResponseError => e
       Imap::Backup.logger.warn "Folder '#{name}' does not exist"
       nil

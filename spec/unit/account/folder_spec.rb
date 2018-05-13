@@ -30,12 +30,15 @@ describe Imap::Backup::Account::Folder do
 
   context '#fetch' do
     let(:message_body) { double('the body', :force_encoding => nil) }
-    let(:message) { {'RFC822' => message_body, 'other' => 'xxx'} }
+    let(:attributes) { {'RFC822' => message_body, 'other' => 'xxx'} }
+    let(:fetch_data_item) do
+      instance_double(Net::IMAP::FetchData, attr: attributes)
+    end
 
-    before { allow(imap).to receive(:uid_fetch).and_return([[nil, message]]) }
+    before { allow(imap).to receive(:uid_fetch) { [fetch_data_item] } }
 
     it 'returns the message' do
-      expect(subject.fetch(123)).to eq(message)
+      expect(subject.fetch(123)).to eq(attributes)
     end
 
     context "if the server responds with nothing" do
