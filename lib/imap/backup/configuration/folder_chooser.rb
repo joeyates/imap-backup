@@ -1,5 +1,3 @@
-# encoding: utf-8
-
 module Imap::Backup
   module Configuration; end
 
@@ -12,20 +10,20 @@ module Imap::Backup
 
     def run
       if connection.nil?
-        Imap::Backup.logger.warn 'Connection failed'
-        highline.ask 'Press a key '
+        Imap::Backup.logger.warn "Connection failed"
+        highline.ask "Press a key "
         return
       end
 
       if folders.nil?
-        Imap::Backup.logger.warn 'Unable to get folder list'
-        highline.ask 'Press a key '
+        Imap::Backup.logger.warn "Unable to get folder list"
+        highline.ask "Press a key "
         return
       end
 
       catch :done do
         loop do
-          system('clear')
+          system("clear")
           show_menu
         end
       end
@@ -35,18 +33,18 @@ module Imap::Backup
 
     def show_menu
       highline.choose do |menu|
-        menu.header = 'Add/remove folders'
+        menu.header = "Add/remove folders"
         menu.index = :number
         add_folders menu
-        menu.choice('return to the account menu') { throw :done }
-        menu.hidden('quit') { throw :done }
+        menu.choice("return to the account menu") { throw :done }
+        menu.hidden("quit") { throw :done }
       end
     end
 
     def add_folders(menu)
       folders.each do |folder|
         name = folder.name
-        mark = is_selected?(name) ? '+' : '-'
+        mark = is_selected?(name) ? "+" : "-"
         menu.choice("#{mark} #{name}") do
           toggle_selection name
         end
@@ -62,7 +60,7 @@ module Imap::Backup
         changed = account[:folders].reject! { |f| f[:name] == folder_name }
         account[:modified] = true if changed
       else
-        account[:folders] << { :name => folder_name }
+        account[:folders] << {name: folder_name}
         account[:modified] = true
       end
     end

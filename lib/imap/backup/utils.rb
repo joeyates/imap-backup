@@ -1,5 +1,4 @@
-# encoding: utf-8
-require 'fileutils'
+require "fileutils"
 
 module Imap::Backup
   module Utils
@@ -20,7 +19,7 @@ module Imap::Backup
     end
 
     def self.make_folder(base_path, path, permissions)
-      parts = path.split('/')
+      parts = path.split("/")
       return if parts.size == 0
       full_path = File.join(base_path, path)
       FileUtils.mkdir_p full_path

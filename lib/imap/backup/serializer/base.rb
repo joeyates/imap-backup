@@ -1,5 +1,3 @@
-# encoding: utf-8
-
 module Imap::Backup
   module Serializer
     DIRECTORY_PERMISSIONS = 0700

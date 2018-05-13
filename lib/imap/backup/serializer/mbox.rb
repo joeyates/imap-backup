@@ -1,6 +1,5 @@
-# encoding: utf-8
-require 'csv'
-require 'email/mboxrd/message'
+require "csv"
+require "email/mboxrd/message"
 
 module Imap::Backup
   module Serializer; end
@@ -37,12 +36,12 @@ module Imap::Backup
       # invalidate cache
       @uids = nil
 
-      body = message['RFC822']
+      body = message["RFC822"]
       mboxrd_message = Email::Mboxrd::Message.new(body)
       mbox = imap = nil
       begin
-        mbox = File.open(mbox_pathname, 'ab')
-        imap = File.open(imap_pathname, 'ab')
+        mbox = File.open(mbox_pathname, "ab")
+        imap = File.open(imap_pathname, "ab")
         mbox.write mboxrd_message.to_s
         imap.write uid + "\n"
       rescue => e
@@ -58,18 +57,18 @@ module Imap::Backup
     def assert_files
       mbox = mbox_exist?
       imap = imap_exist?
-      raise '.imap file missing' if mbox and not imap
-      raise '.mbox file missing' if imap and not mbox
+      raise ".imap file missing" if mbox && (not imap)
+      raise ".mbox file missing" if imap && (not mbox)
     end
 
     def create_containing_directory
       mbox_relative_path = File.dirname(mbox_relative_pathname)
-      return if mbox_relative_path == '.'
+      return if mbox_relative_path == "."
       Utils.make_folder(path, mbox_relative_path, Serializer::DIRECTORY_PERMISSIONS)
     end
 
     def exist?
-      mbox_exist? and imap_exist?
+      mbox_exist? && imap_exist?
     end
 
     def mbox_exist?
@@ -81,7 +80,7 @@ module Imap::Backup
     end
 
     def mbox_relative_pathname
-      folder + '.mbox'
+      folder + ".mbox"
     end
 
     def mbox_pathname
@@ -89,7 +88,7 @@ module Imap::Backup
     end
 
     def imap_pathname
-      filename = folder + '.imap'
+      filename = folder + ".imap"
       File.join(path, filename)
     end
 

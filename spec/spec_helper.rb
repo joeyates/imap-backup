@@ -1,19 +1,19 @@
 require "codeclimate-test-reporter"
-require 'rspec'
+require "rspec"
 
 CodeClimate::TestReporter.start
 
 spec_path = File.dirname(__FILE__)
-$LOAD_PATH << File.expand_path('../lib', spec_path)
+$LOAD_PATH << File.expand_path("../lib", spec_path)
 
-support_glob = File.join(spec_path, 'support', '**', '*.rb')
+support_glob = File.join(spec_path, "support", "**", "*.rb")
 Dir[support_glob].each { |f| require f }
 
-require 'simplecov'
+require "simplecov"
 SimpleCov.start do
-  add_filter '/spec/'
+  add_filter "/spec/"
 end
 
-require 'imap/backup'
+require "imap/backup"
 
 silence_logging

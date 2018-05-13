@@ -1,4 +1,4 @@
-require 'net/imap'
+require "net/imap"
 
 module Imap::Backup
   module Account; end
@@ -20,7 +20,7 @@ module Imap::Backup
 
     def folders
       return @folders if @folders
-      @folders = imap.list('', '*')
+      @folders = imap.list("", "*")
       if @folders.nil?
         Imap::Backup.logger.warn "Unable to get folder list for account #{username}"
       end
@@ -31,7 +31,7 @@ module Imap::Backup
       backup_folders.map do |folder|
         f = Account::Folder.new(self, folder[:name])
         s = Serializer::Directory.new(local_path, folder[:name])
-        {:name => folder[:name], :local => s.uids, :remote => f.uids}
+        {name: folder[:name], local: s.uids, remote: f.uids}
       end
     end
 
@@ -83,12 +83,12 @@ module Imap::Backup
     end
 
     def masked_password
-      password.gsub(/./, 'x')
+      password.gsub(/./, "x")
     end
     
     def backup_folders
-      return @backup_folders if @backup_folders and @backup_folders.size > 0
-      (folders || []).map { |f| {:name => f.name} }
+      return @backup_folders if @backup_folders && (@backup_folders.size > 0)
+      (folders || []).map { |f| {name: f.name} }
     end
 
     def provider

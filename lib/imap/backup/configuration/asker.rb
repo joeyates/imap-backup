@@ -1,5 +1,3 @@
-# encoding: utf-8
-
 module Imap::Backup
   module Configuration; end
 
@@ -10,18 +8,18 @@ module Imap::Backup
       super
     end
 
-    def email(default = '')
-      highline.ask('email address: ') do |q|
+    def email(default = "")
+      highline.ask("email address: ") do |q|
         q.default               = default
         q.readline              = true
         q.validate              = EMAIL_MATCHER
-        q.responses[:not_valid] = 'Enter a valid email address '
+        q.responses[:not_valid] = "Enter a valid email address "
       end
     end
 
     def password
-      password     = highline.ask('password: ')        { |q| q.echo = false }
-      confirmation = highline.ask('repeat password: ') { |q| q.echo = false }
+      password     = highline.ask("password: ")        { |q| q.echo = false }
+      confirmation = highline.ask("repeat password: ") { |q| q.echo = false }
       if password != confirmation
         return nil unless highline.agree("the password and confirmation did not match.\nContinue? (y/n) ")
         return self.password
@@ -30,15 +28,15 @@ module Imap::Backup
     end
 
     def backup_path(default, validator)
-      highline.ask('backup directory: ') do |q|
+      highline.ask("backup directory: ") do |q|
         q.default  = default
         q.readline = true
         q.validate = validator
-        q.responses[:not_valid] = 'Choose a different directory '
+        q.responses[:not_valid] = "Choose a different directory "
       end
     end
 
-    def self.email(default = '')
+    def self.email(default = "")
       new(Configuration::Setup.highline).email(default)
     end
 

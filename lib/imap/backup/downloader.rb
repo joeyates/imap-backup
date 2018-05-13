@@ -1,5 +1,3 @@
-# encoding: utf-8
-
 module Imap::Backup
   class Downloader
     attr_reader :folder

@@ -1,19 +1,18 @@
-# encoding: utf-8
-require 'spec_helper'
+require "spec_helper"
 
 describe Imap::Backup::Configuration::List do
   let(:accounts) do
     [
-      {:username => 'a1@example.com'},
-      {:username => 'a2@example.com'},
+      {username: "a1@example.com"},
+      {username: "a2@example.com"}
     ]
   end
   let(:store) do
-    double('Imap::Backup::Configuration::Store', accounts: accounts)
+    double("Imap::Backup::Configuration::Store", accounts: accounts)
   end
   let(:exists) { true }
-  let(:connection1) { double('Imap::Backup::Account::Connection', :disconnect => nil) }
-  let(:connection2) { double('Imap::Backup::Account::Connection', :disconnect => nil) }
+  let(:connection1) { double("Imap::Backup::Account::Connection", disconnect: nil) }
+  let(:connection2) { double("Imap::Backup::Account::Connection", disconnect: nil) }
 
   before do
     allow(Imap::Backup::Configuration::Store).to receive(:new).and_return(store)
@@ -24,10 +23,10 @@ describe Imap::Backup::Configuration::List do
 
   subject { described_class.new }
 
-  context '#initialize' do
+  context "#initialize" do
   end
 
-  context '#each_connection' do
+  context "#each_connection" do
     specify "calls the block with each account's connection" do
       connections = []
 
@@ -36,10 +35,10 @@ describe Imap::Backup::Configuration::List do
       expect(connections).to eq([connection1, connection2])
     end
 
-    context 'with account parameter' do
-      subject { described_class.new(['a2@example.com']) }
+    context "with account parameter" do
+      subject { described_class.new(["a2@example.com"]) }
 
-      it 'should only create requested accounts' do
+      it "should only create requested accounts" do
         connections = []
 
         subject.each_connection { |a| connections << a }
@@ -48,10 +47,10 @@ describe Imap::Backup::Configuration::List do
       end
     end
 
-    context 'when the configuration file is missing' do
+    context "when the configuration file is missing" do
       let(:exists) { false }
 
-      it 'fails' do
+      it "fails" do
         expect {
           subject.each_connection {}
         }.to raise_error(Imap::Backup::ConfigurationNotFound, /not found/)

@@ -1,5 +1,4 @@
-# encoding: utf-8
-require 'fileutils'
+require "fileutils"
 
 module Imap::Backup
   module Serializer; end
@@ -11,7 +10,7 @@ module Imap::Backup
     end
 
     def uids
-      return [] if ! File.exist?(directory)
+      return [] if !File.exist?(directory)
 
       d = Dir.open(directory)
       as_strings = d.map do |file|
@@ -27,7 +26,7 @@ module Imap::Backup
 
     def save(uid, message)
       message_filename = filename(uid)
-      File.open(message_filename, 'w') { |f| f.write message.to_json }
+      File.open(message_filename, "w") { |f| f.write message.to_json }
       FileUtils.chmod 0600, message_filename
     end
 

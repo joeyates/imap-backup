@@ -1,4 +1,4 @@
-require 'mail'
+require "mail"
 
 module Email; end
 
@@ -8,11 +8,11 @@ module Email::Mboxrd
 
     def initialize(supplied_body)
       @supplied_body = supplied_body.clone
-      @supplied_body.force_encoding('binary')
+      @supplied_body.force_encoding("binary")
     end
 
     def to_s
-      'From ' + from + "\n" + mboxrd_body + "\n"
+      "From " + from + "\n" + mboxrd_body + "\n"
     end
 
     private
@@ -22,7 +22,7 @@ module Email::Mboxrd
     end
 
     def from
-      parsed.from[0] + ' ' + asctime
+      parsed.from[0] + " " + asctime
     end
 
     def mboxrd_body
@@ -33,7 +33,7 @@ module Email::Mboxrd
     end
 
     def asctime
-      date ? date.asctime : ''
+      date ? date.asctime : ""
     end
 
     def date

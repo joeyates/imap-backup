@@ -1,5 +1,3 @@
-# encoding: utf-8
-
 module Imap::Backup
   module Configuration; end
 
@@ -42,7 +40,7 @@ module Imap::Backup
       if required_accounts.nil?
         @accounts = config.accounts
       else
-        @accounts = config.accounts.select{ |account| required_accounts.include?(account[:username]) }
+        @accounts = config.accounts.select { |account| required_accounts.include?(account[:username]) }
       end
     end
   end

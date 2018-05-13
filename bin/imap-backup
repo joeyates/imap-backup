@@ -1,32 +1,30 @@
 #!/usr/bin/env ruby
-# -*- encoding: utf-8 -*-
+require "optparse"
 
-require 'optparse'
-
-$:.unshift(File.expand_path('../../lib/', __FILE__))
-require 'imap/backup'
+$LOAD_PATH.unshift(File.expand_path("../../lib/", __FILE__))
+require "imap/backup"
 
 KNOWN_COMMANDS = [
-  {:name => 'setup',   :help => 'Create/edit the configuration file'},
-  {:name => 'backup',  :help => 'Do the backup (default)'},
-  {:name => 'folders', :help => 'List folders for all (or selected) accounts'},
-  {:name => 'status',  :help => 'List count of non backed-up emails per folder'},
-  {:name => 'help',    :help => 'Show usage'},
+  {name: "setup",   help: "Create/edit the configuration file"},
+  {name: "backup",  help: "Do the backup (default)"},
+  {name: "folders", help: "List folders for all (or selected) accounts"},
+  {name: "status",  help: "List count of non backed-up emails per folder"},
+  {name: "help",    help: "Show usage"}
 ]
 
-options = {:command => 'backup'}
+options = {command: "backup"}
 opts = OptionParser.new do |opts|
-  opts.banner = "Usage: #{$0} [options] COMMAND"
+  opts.banner = "Usage: #{$PROGRAM_NAME} [options] COMMAND"
 
-  opts.separator ''
-  opts.separator 'Commands:'
+  opts.separator ""
+  opts.separator "Commands:"
   KNOWN_COMMANDS.each do |command|
     opts.separator "\t%- 20s %s" % [command[:name], command[:help]]
   end
-  opts.separator ''
-  opts.separator 'Common options:'
+  opts.separator ""
+  opts.separator "Common options:"
 
-  opts.on('-a', '--accounts ACCOUNT1[,ACCOUNT2,...]', Array, 'only these accounts') do |account|
+  opts.on("-a", "--accounts ACCOUNT1[,ACCOUNT2,...]", Array, "only these accounts") do |account|
     options[:accounts] = account
   end
 
@@ -35,7 +33,7 @@ opts = OptionParser.new do |opts|
     exit
   end
 
-  opts.on_tail("--version", "Show version" ) do
+  opts.on_tail("--version", "Show version") do
     puts Imap::Backup::VERSION
     exit
   end
@@ -46,11 +44,11 @@ if ARGV.size > 0
   options[:command] = ARGV.shift
 end
 
-if KNOWN_COMMANDS.find{ |c| c[:name] == options[:command] }.nil?
+if KNOWN_COMMANDS.find { |c| c[:name] == options[:command] }.nil?
   raise "Unknown command '#{options[:command]}'"
 end
 
-if options[:command] == 'help'
+if options[:command] == "help"
   puts opts
   exit
 end
@@ -65,23 +63,23 @@ end
 configuration.setup_logging
 
 case options[:command]
-when 'setup'
+when "setup"
   Imap::Backup::Configuration::Setup.new.run
-when 'backup'
+when "backup"
   configuration.each_connection do |connection|
     connection.run_backup
   end
-when 'folders'
+when "folders"
   configuration.each_connection do |connection|
     puts connection.username
     folders = connection.folders
     if folders.nil?
-      warn 'Unable to list account folders'
+      warn "Unable to list account folders"
       exit 1
     end
     folders.each { |f| puts "\t" + f.name }
   end
-when 'status'
+when "status"
   configuration.each_connection do |connection|
     puts connection.username
     folders = connection.status

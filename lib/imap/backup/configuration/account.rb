@@ -1,5 +1,3 @@
-# encoding: utf-8
-
 module Imap::Backup
   module Configuration; end
 
@@ -11,7 +9,7 @@ module Imap::Backup
     def run
       catch :done do
         loop do
-          system('clear')
+          system("clear")
           create_menu
         end
       end
@@ -29,8 +27,8 @@ module Imap::Backup
         choose_folders menu
         test_connection menu
         delete_account menu
-        menu.choice('return to main menu') { throw :done }
-        menu.hidden('quit') { throw :done }
+        menu.choice("return to main menu") { throw :done }
+        menu.hidden("quit") { throw :done }
       end
     end
 
@@ -46,16 +44,16 @@ Account:
     end
 
     def modify_email(menu)
-      menu.choice('modify email') do
+      menu.choice("modify email") do
         username = Configuration::Asker.email(username)
         puts "username: #{username}"
-        others   = store.accounts.select { |a| a != account}.map { |a| a[:username] }
+        others = store.accounts.select { |a| a != account }.map { |a| a[:username] }
         puts "others: #{others.inspect}"
         if others.include?(username)
-          puts 'There is already an account set up with that email address'
+          puts "There is already an account set up with that email address"
         else
           account[:username] = username
-          if account[:server].nil? or account[:server] == ''
+          if account[:server].nil? || (account[:server] == "")
             account[:server] = default_server(username)
           end
           account[:modified] = true
@@ -64,9 +62,9 @@ Account:
     end
 
     def modify_password(menu)
-      menu.choice('modify password') do
+      menu.choice("modify password") do
         password = Configuration::Asker.password
-        if ! password.nil?
+        if !password.nil?
           account[:password] = password
           account[:modified] = true
         end
@@ -74,9 +72,9 @@ Account:
     end
 
     def modify_server(menu)
-      menu.choice('modify server') do
-        server = highline.ask('server: ')
-        if ! server.nil?
+      menu.choice("modify server") do
+        server = highline.ask("server: ")
+        if !server.nil?
           account[:server] = server
           account[:modified] = true
         end
@@ -84,7 +82,7 @@ Account:
     end
 
     def modify_backup_path(menu)
-      menu.choice('modify backup path') do
+      menu.choice("modify backup path") do
         validator = lambda do |p|
           same = store.accounts.find do |a|
             a[:username] != account[:username] && a[:local_path] == p
@@ -103,21 +101,21 @@ Account:
     end
 
     def choose_folders(menu)
-      menu.choice('choose backup folders') do
+      menu.choice("choose backup folders") do
         Configuration::FolderChooser.new(account).run
       end
     end
 
     def test_connection(menu)
-      menu.choice('test connection') do
+      menu.choice("test connection") do
         result = Configuration::ConnectionTester.test(account)
         puts result
-        highline.ask 'Press a key '
+        highline.ask "Press a key "
       end
     end
 
     def delete_account(menu)
-      menu.choice('delete') do
+      menu.choice("delete") do
         if highline.agree("Are you sure? (y/n) ")
           account[:delete] = true
           throw :done
@@ -130,10 +128,10 @@ Account:
     end
 
     def masked_password
-      if account[:password] == '' or account[:password].nil?
-        '(unset)'
+      if (account[:password] == "") || account[:password].nil?
+        "(unset)"
       else
-        account[:password].gsub(/./, 'x')
+        account[:password].gsub(/./, "x")
       end
     end
 

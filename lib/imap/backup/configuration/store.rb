@@ -1,16 +1,15 @@
-# encoding: utf-8
-require 'json'
+require "json"
 
 module Imap::Backup
   module Configuration; end
 
   class Configuration::Store
-    CONFIGURATION_DIRECTORY = File.expand_path('~/.imap-backup')
+    CONFIGURATION_DIRECTORY = File.expand_path("~/.imap-backup")
 
     attr_reader :pathname
 
     def self.default_pathname
-      File.join(CONFIGURATION_DIRECTORY, 'config.json')
+      File.join(CONFIGURATION_DIRECTORY, "config.json")
     end
 
     def self.exist?(pathname = default_pathname)
@@ -29,7 +28,7 @@ module Imap::Backup
       mkdir_private path
       remove_modified_flags
       remove_deleted_accounts
-      File.open(pathname, 'w') { |f| f.write(JSON.pretty_generate(data)) }
+      File.open(pathname, "w") { |f| f.write(JSON.pretty_generate(data)) }
       FileUtils.chmod 0600, pathname
     end
 
@@ -56,9 +55,9 @@ module Imap::Backup
       if File.exist?(pathname)
         Utils.check_permissions pathname, 0600
         contents = File.read(pathname)
-        @data = JSON.parse(contents, :symbolize_names => true)
+        @data = JSON.parse(contents, symbolize_names: true)
       else
-        @data = {:accounts => []}
+        @data = {accounts: []}
       end
       @data[:debug] = false unless @data.include?(:debug)
       @data[:debug] = false unless [true, false].include?(@data[:debug])
@@ -74,7 +73,7 @@ module Imap::Backup
     end
 
     def mkdir_private(path)
-      if ! File.directory?(path)
+      if !File.directory?(path)
         FileUtils.mkdir path
       end
       if Utils::stat(path) != 0700

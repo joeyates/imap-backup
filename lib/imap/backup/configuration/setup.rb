@@ -1,5 +1,4 @@
-# encoding: utf-8
-require 'highline'
+require "highline"
 
 module Imap::Backup
   module Configuration; end
@@ -14,7 +13,7 @@ module Imap::Backup
       Imap::Backup.setup_logging config
       catch :done do
         loop do
-          system('clear')
+          system("clear")
           show_menu
         end
       end
@@ -24,15 +23,15 @@ module Imap::Backup
 
     def show_menu
       self.class.highline.choose do |menu|
-        menu.header = 'Choose an action'
+        menu.header = "Choose an action"
         account_items menu
         add_account_item menu
         toggle_logging_item menu
-        menu.choice('save and exit') do
+        menu.choice("save and exit") do
           config.save
           throw :done
         end
-        menu.choice('exit without saving changes') do
+        menu.choice("exit without saving changes") do
           throw :done
         end
       end
@@ -42,7 +41,7 @@ module Imap::Backup
       config.accounts.each do |account|
         next if account[:delete]
         item = account[:username].clone
-        item << ' *' if account[:modified]
+        item << " *" if account[:modified]
         menu.choice(item) do
           edit_account account[:username]
         end
@@ -50,15 +49,15 @@ module Imap::Backup
     end
 
     def add_account_item(menu)
-      menu.choice('add account') do
+      menu.choice("add account") do
         username = Configuration::Asker.email
         edit_account username
       end
     end
 
     def toggle_logging_item(menu)
-      menu_item = config.debug? ? 'stop logging' : 'start logging'
-      new_setting = ! config.debug?
+      menu_item = config.debug? ? "stop logging" : "start logging"
+      new_setting = !config.debug?
       menu.choice(menu_item) do
         config.debug = new_setting
         Imap::Backup.setup_logging config
@@ -71,10 +70,10 @@ module Imap::Backup
 
     def default_account_config(username)
       account = {
-        :username   => username,
-        :password   => '',
-        :local_path => File.join(config.path, username.gsub('@', '_')),
-        :folders    => []
+        username: username,
+        password: "",
+        local_path: File.join(config.path, username.gsub("@", "_")),
+        folders: []
       }
     end
 
