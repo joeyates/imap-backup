@@ -1,15 +1,21 @@
 require "spec_helper"
 
-msg_no_from = %Q|Delivered-To: me@example.com
+msg_no_from = %Q|Delivered-To: you@example.com
 From: example <www.example.com>
-To: FirstName LastName <me@example.com>
+To: FirstName LastName <you@example.com>
 Subject: Re: no subject|
 
-msg_bad_from = %Q|Delivered-To: me@example.com
+msg_bad_from = %Q|Delivered-To: you@example.com
 from: "FirstName LastName (TEXT)" <"TEXT*" <no-reply@example.com>>
-To: FirstName LastName <me@example.com>
+To: FirstName LastName <you@example.com>
 Subject: Re: no subject
 Sender: FistName LastName <"TEXT*"no-reply=example.com@example.com>|
+
+msg_no_from_but_return_path = %Q|Delivered-To: you@example.com
+From: example <www.example.com>
+To: FirstName LastName <you@example.com>
+Return-Path: <me@example.com>
+Subject: Re: no subject|
 
 describe Email::Mboxrd::Message do
   let(:from) { "me@example.com" }
@@ -62,17 +68,24 @@ describe Email::Mboxrd::Message do
       allow(Mail).to receive(:new).and_call_original
     end
 
-    context 'when from is nil' do
+    context "when original message 'from' is nil" do
       let(:message_body) { msg_no_from }
-      it 'does not fail' do
-        expect { subject.to_s }.to_not raise_error
+      it "'from' is empty string" do
+        expect(subject.to_s).to start_with("From  \n")
       end
     end
 
-    context 'when from is string' do
+    context "when original message 'from' is a string but not an address" do
       let(:message_body) { msg_bad_from }
-      it 'does not fail' do
-        expect { subject.to_s }.to_not raise_error
+      it "'from' is empty string" do
+        expect(subject.to_s).to start_with("From  \n")
+      end
+    end
+
+    context "when original message 'from' is nil and 'envelope from' is nil and 'return path' is available" do
+      let(:message_body) { msg_no_from_but_return_path }
+      it "'return path' is used as 'from'" do
+        expect(subject.to_s).to start_with("From " + from + " \n")
       end
     end
   end
