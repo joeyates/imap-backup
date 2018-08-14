@@ -8,14 +8,18 @@ Subject: Re: no subject|
 msg_bad_from = %Q|Delivered-To: you@example.com
 from: "FirstName LastName (TEXT)" <"TEXT*" <no-reply@example.com>>
 To: FirstName LastName <you@example.com>
-Subject: Re: no subject
-Sender: FistName LastName <"TEXT*"no-reply=example.com@example.com>|
+Subject: Re: no subject|
 
 msg_no_from_but_return_path = %Q|Delivered-To: you@example.com
 From: example <www.example.com>
 To: FirstName LastName <you@example.com>
 Return-Path: <me@example.com>
 Subject: Re: no subject|
+
+msg_no_from_but_sender = %Q|Delivered-To: you@example.com
+To: FirstName LastName <you@example.com>
+Subject: Re: no subject
+Sender: FistName LastName <me@example.com>|
 
 describe Email::Mboxrd::Message do
   let(:from) { "me@example.com" }
@@ -77,6 +81,7 @@ describe Email::Mboxrd::Message do
 
     context "when original message 'from' is a string but not an address" do
       let(:message_body) { msg_bad_from }
+
       it "'from' is empty string" do
         expect(subject.to_s).to start_with("From  \n")
       end
@@ -84,7 +89,16 @@ describe Email::Mboxrd::Message do
 
     context "when original message 'from' is nil and 'envelope from' is nil and 'return path' is available" do
       let(:message_body) { msg_no_from_but_return_path }
+
       it "'return path' is used as 'from'" do
+        expect(subject.to_s).to start_with("From " + from + " \n")
+      end
+    end
+
+    context "with no from and a 'Sender'" do
+      let(:message_body) { msg_no_from_but_sender }
+
+      it "Sender is used as 'from'" do
         expect(subject.to_s).to start_with("From " + from + " \n")
       end
     end

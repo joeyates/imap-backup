@@ -28,6 +28,7 @@ module Email::Mboxrd
         end
       end
 
+      return parsed.sender if parsed.sender
       return parsed.envelope_from if parsed.envelope_from
       return parsed.return_path if parsed.return_path
 
