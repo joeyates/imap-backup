@@ -40,10 +40,12 @@ module Email::Mboxrd
     end
 
     def mboxrd_body
-      return @mboxrd_body if @mboxrd_body
-      @mboxrd_body = supplied_body.gsub(/\n(>*From)/, "\n>\\1")
-      @mboxrd_body += "\n" unless @mboxrd_body.end_with?("\n")
-      @mboxrd_body
+      @mboxrd_body ||=
+        begin
+          @mboxrd_body = supplied_body.gsub(/\n(>*From)/, "\n>\\1")
+          @mboxrd_body += "\n" if !@mboxrd_body.end_with?("\n")
+          @mboxrd_body
+        end
     end
 
     def asctime
