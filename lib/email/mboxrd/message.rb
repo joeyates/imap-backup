@@ -21,8 +21,26 @@ module Email::Mboxrd
       @parsed ||= Mail.new(supplied_body)
     end
 
+    def best_from
+      if parsed.from.is_a? Enumerable
+        parsed.from.each do |addr|
+          if addr
+            return addr
+          end
+        end
+      end
+      if parsed.envelope_from
+        return parsed.envelope_from
+      end
+      if parsed.return_path
+        return parsed.return_path
+      end
+
+      return ''
+    end
+
     def from
-      parsed.from[0] + " " + asctime
+      best_from + " " + asctime
     end
 
     def mboxrd_body
