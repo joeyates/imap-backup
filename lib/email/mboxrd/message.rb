@@ -22,21 +22,16 @@ module Email::Mboxrd
     end
 
     def best_from
-      if parsed.from.is_a? Enumerable
+      if parsed.from.is_a?(Enumerable)
         parsed.from.each do |addr|
-          if addr
-            return addr
-          end
+          return addr if addr
         end
       end
-      if parsed.envelope_from
-        return parsed.envelope_from
-      end
-      if parsed.return_path
-        return parsed.return_path
-      end
 
-      return ''
+      return parsed.envelope_from if parsed.envelope_from
+      return parsed.return_path if parsed.return_path
+
+      return ""
     end
 
     def from
