@@ -26,7 +26,10 @@ module Imap::Backup
     def config
       return @config if @config
       if not config_exists?
-        raise ConfigurationNotFound.new("Configuration file '#{Configuration::Store.default_pathname}' not found")
+        path = Configuration::Store.default_pathname
+        raise ConfigurationNotFound.new(
+          "Configuration file '#{path}' not found"
+        )
       end
       @config = Configuration::Store.new
     end
@@ -36,12 +39,14 @@ module Imap::Backup
     end
 
     def accounts
-      return @accounts if @accounts
-      if required_accounts.nil?
-        @accounts = config.accounts
-      else
-        @accounts = config.accounts.select { |account| required_accounts.include?(account[:username]) }
-      end
+      @accounts ||=
+        if required_accounts.nil?
+          config.accounts
+        else
+          config.accounts.select do |account|
+            required_accounts.include?(account[:username])
+          end
+        end
     end
   end
 end

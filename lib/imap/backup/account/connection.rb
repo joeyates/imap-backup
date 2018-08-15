@@ -22,7 +22,9 @@ module Imap::Backup
       return @folders if @folders
       @folders = imap.list("", "*")
       if @folders.nil?
-        Imap::Backup.logger.warn "Unable to get folder list for account #{username}"
+        Imap::Backup.logger.warn(
+          "Unable to get folder list for account #{username}"
+        )
       end
       @folders
     end
@@ -52,7 +54,9 @@ module Imap::Backup
     def imap
       return @imap unless @imap.nil?
       options = provider_options
-      Imap::Backup.logger.debug "Creating IMAP instance: #{server}, options: #{options.inspect}"
+      Imap::Backup.logger.debug(
+        "Creating IMAP instance: #{server}, options: #{options.inspect}"
+      )
       @imap = Net::IMAP.new(server, options)
       Imap::Backup.logger.debug "Logging in: #{username}/#{masked_password}"
       @imap.login(username, password)

@@ -20,7 +20,8 @@ describe Imap::Backup::Serializer::Mbox do
     it "creates the containing directory" do
       described_class.new(base_path, "my/folder")
 
-      expect(Imap::Backup::Utils).to have_received(:make_folder).with(base_path, "my", 0700)
+      expect(Imap::Backup::Utils).
+        to have_received(:make_folder).with(base_path, "my", 0700)
     end
 
     context "mbox and imap files" do
@@ -73,14 +74,16 @@ describe Imap::Backup::Serializer::Mbox do
     context "#save" do
       let(:mbox_formatted_message) { "message in mbox format" }
       let(:message_uid) { "999" }
-      let(:message) { double("Email::Mboxrd::Message", to_s: mbox_formatted_message) }
+      let(:message) do
+        double("Email::Mboxrd::Message", to_s: mbox_formatted_message)
+      end
       let(:mbox_file) { double("File - mbox", write: nil, close: nil) }
       let(:imap_file) { double("File - imap", write: nil, close: nil) }
 
       before do
         allow(Email::Mboxrd::Message).to receive(:new).and_return(message)
-        allow(File).to receive(:open).with(mbox_pathname, "ab").and_return(mbox_file)
-        allow(File).to receive(:open).with(imap_pathname, "ab").and_return(imap_file)
+        allow(File).to receive(:open).with(mbox_pathname, "ab") { mbox_file }
+        allow(File).to receive(:open).with(imap_pathname, "ab") { imap_file }
       end
 
       it "saves the message to the mbox" do

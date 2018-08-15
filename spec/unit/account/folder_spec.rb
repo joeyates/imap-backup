@@ -3,9 +3,15 @@ require "spec_helper"
 describe Imap::Backup::Account::Folder do
   let(:imap) { double("Net::IMAP", examine: nil) }
   let(:connection) { double("Imap::Backup::Account::Connection", imap: imap) }
-  let(:missing_mailbox_data) { double("Data", text: "Unknown Mailbox: my_folder") }
-  let(:missing_mailbox_response) { double("Response", data: missing_mailbox_data) }
-  let(:missing_mailbox_error) { Net::IMAP::NoResponseError.new(missing_mailbox_response) }
+  let(:missing_mailbox_data) do
+    double("Data", text: "Unknown Mailbox: my_folder")
+  end
+  let(:missing_mailbox_response) do
+    double("Response", data: missing_mailbox_data)
+  end
+  let(:missing_mailbox_error) do
+    Net::IMAP::NoResponseError.new(missing_mailbox_response)
+  end
 
   subject { described_class.new(connection, "my_folder") }
 
@@ -19,7 +25,9 @@ describe Imap::Backup::Account::Folder do
     end
 
     context "with missing mailboxes" do
-      before { allow(imap).to receive(:examine).and_raise(missing_mailbox_error) }
+      before do
+        allow(imap).to receive(:examine).and_raise(missing_mailbox_error)
+      end
 
       it "returns an empty array" do
         expect(subject.uids).to eq([])
@@ -49,7 +57,9 @@ describe Imap::Backup::Account::Folder do
     end
 
     context "if the mailbox doesn't exist" do
-      before { allow(imap).to receive(:examine).and_raise(missing_mailbox_error) }
+      before do
+        allow(imap).to receive(:examine).and_raise(missing_mailbox_error)
+      end
 
       it "is nil" do
         expect(subject.fetch(123)).to be_nil

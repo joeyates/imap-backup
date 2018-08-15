@@ -47,7 +47,8 @@ Account:
       menu.choice("modify email") do
         username = Configuration::Asker.email(username)
         puts "username: #{username}"
-        others = store.accounts.select { |a| a != account }.map { |a| a[:username] }
+        other_accounts = store.accounts.select { |a| a != account }
+        others = other_accounts.map { |a| a[:username] }
         puts "others: #{others.inspect}"
         if others.include?(username)
           puts "There is already an account set up with that email address"
@@ -88,14 +89,16 @@ Account:
             a[:username] != account[:username] && a[:local_path] == p
           end
           if same
-            puts "The path '#{p}' is used to backup the account '#{same[:username]}'"
+            puts "The path '#{p}' is used to backup " +
+              "the account '#{same[:username]}'"
             false
           else
             true
           end
         end
         existing = account[:local_path].clone
-        account[:local_path] = Configuration::Asker.backup_path(account[:local_path], validator)
+        account[:local_path] =
+          Configuration::Asker.backup_path(account[:local_path], validator)
         account[:modified] = true if existing != account[:local_path]
       end
     end

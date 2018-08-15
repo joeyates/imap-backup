@@ -12,11 +12,15 @@ describe Imap::Backup::Configuration::Store do
   let(:configuration) { data.to_json }
 
   before do
-    stub_const("Imap::Backup::Configuration::Store::CONFIGURATION_DIRECTORY", directory)
-    allow(File).to receive(:directory?).with(directory).and_return(directory_exists)
-    allow(File).to receive(:exist?).with(file_path).and_return(file_exists)
-    allow(Imap::Backup::Utils).to receive(:stat).with(directory).and_return(0700)
-    allow(Imap::Backup::Utils).to receive(:stat).with(file_path).and_return(0600)
+    stub_const(
+      "Imap::Backup::Configuration::Store::CONFIGURATION_DIRECTORY", directory
+    )
+    allow(File).to receive(:directory?).with(directory) { directory_exists }
+    allow(File).to receive(:exist?).with(file_path) { file_exists }
+    allow(Imap::Backup::Utils).
+      to receive(:stat).with(directory).and_return(0700)
+    allow(Imap::Backup::Utils).
+      to receive(:stat).with(file_path).and_return(0600)
     allow(Imap::Backup::Utils).to receive(:check_permissions).and_return(nil)
     allow(File).to receive(:read).with(file_path).and_return(configuration)
   end
@@ -202,7 +206,8 @@ describe Imap::Backup::Configuration::Store do
       let(:file_exists) { true }
 
       before do
-        allow(Imap::Backup::Utils).to receive(:check_permissions).with(file_path, 0600).and_raise("Error")
+        allow(Imap::Backup::Utils).to receive(:check_permissions).
+          with(file_path, 0600).and_raise("Error")
       end
 
       it "fails" do

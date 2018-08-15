@@ -1,4 +1,4 @@
-inherit_from: https://gist.githubusercontent.com/joeyates/4763b79425cf903fc70df3bc8fccda36/raw/356fa04037feedb212735d4e7002cbd8778a33e8/.rubocop.yaml
+inherit_from: https://gitlab.com/snippets/1744945/raw
 
 AllCops:
   Exclude:

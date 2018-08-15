@@ -21,7 +21,9 @@ module Imap::Backup
       password     = highline.ask("password: ")        { |q| q.echo = false }
       confirmation = highline.ask("repeat password: ") { |q| q.echo = false }
       if password != confirmation
-        return nil unless highline.agree("the password and confirmation did not match.\nContinue? (y/n) ")
+        return nil if !highline.agree(
+          "the password and confirmation did not match.\nContinue? (y/n) "
+        )
         return self.password
       end
       password

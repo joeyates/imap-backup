@@ -37,7 +37,8 @@ describe Imap::Backup::Serializer::Directory do
 
   context "#exist?" do
     it "checks if the file exists" do
-      allow(File).to receive(:exist?).with(%r{/base/path/my_folder/0+123.json}).and_return(true)
+      allow(File).
+        to receive(:exist?).with(%r{/base/path/my_folder/0+123.json}) { true }
 
       expect(subject.exist?(123)).to be_truthy
     end
@@ -48,7 +49,8 @@ describe Imap::Backup::Serializer::Directory do
     let(:file) { double("File", write: nil) }
 
     before do
-      allow(File).to receive(:exist?).with(%r{/base/path/my_folder/0+1234.json}).and_return(true)
+      allow(File).
+        to receive(:exist?).with(%r{/base/path/my_folder/0+1234.json}) { true }
       allow(File).to receive(:open) do |&block|
         block.call file
       end

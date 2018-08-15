@@ -3,7 +3,10 @@ require "spec_helper"
 describe Email::Provider do
   describe ".for_address" do
     context "known providers" do
-      [["gmail.com", :gmail], ["fastmail.fm", :fastmail]].each do |domain, provider|
+      [
+        ["gmail.com", :gmail],
+        ["fastmail.fm", :fastmail]
+      ].each do |domain, provider|
         it "recognizes #{provider}" do
           address = "foo@#{domain}"
           expect(described_class.for_address(address).provider).to eq(provider)
@@ -13,7 +16,8 @@ describe Email::Provider do
 
     context "with unknown providers" do
       it "returns a default provider" do
-        expect(described_class.for_address("foo@unknown.com").provider).to eq(:default)
+        result = described_class.for_address("foo@unknown.com").provider 
+        expect(result).to eq(:default)
       end
     end
   end

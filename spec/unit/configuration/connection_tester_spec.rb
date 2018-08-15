@@ -5,7 +5,7 @@ describe Imap::Backup::Configuration::ConnectionTester do
     let(:connection) { double("Imap::Backup::Account::Connection", imap: nil) }
 
     before do
-      allow(Imap::Backup::Account::Connection).to receive(:new).and_return(connection)
+      allow(Imap::Backup::Account::Connection).to receive(:new) { connection }
     end
 
     context "call" do

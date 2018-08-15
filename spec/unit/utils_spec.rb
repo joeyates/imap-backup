@@ -29,9 +29,13 @@ describe Imap::Backup::Utils do
             end
           else
             it "fails" do
+              message = format(
+                "Permissions on '%s' should be 0%o, not 0%o",
+                filename, requested, mode
+              )
               expect do
                 described_class.check_permissions(filename, requested)
-              end.to raise_error(RuntimeError, format("Permissions on '%s' should be 0%o, not 0%o", filename, requested, mode))
+              end.to raise_error(RuntimeError, message)
             end
           end
         end
@@ -87,7 +91,8 @@ describe Imap::Backup::Utils do
     it "sets permissions on the path" do
       described_class.make_folder("/base/path/new", "folder", 0222)
 
-      expect(FileUtils).to have_received(:chmod).with(0222, "/base/path/new/folder")
+      expect(FileUtils).
+        to have_received(:chmod).with(0222, "/base/path/new/folder")
     end
   end
 end

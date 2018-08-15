@@ -11,14 +11,21 @@ describe Imap::Backup::Configuration::List do
     double("Imap::Backup::Configuration::Store", accounts: accounts)
   end
   let(:exists) { true }
-  let(:connection1) { double("Imap::Backup::Account::Connection", disconnect: nil) }
-  let(:connection2) { double("Imap::Backup::Account::Connection", disconnect: nil) }
+  let(:connection1) do
+    double("Imap::Backup::Account::Connection", disconnect: nil)
+  end
+  let(:connection2) do
+    double("Imap::Backup::Account::Connection", disconnect: nil)
+  end
 
   before do
-    allow(Imap::Backup::Configuration::Store).to receive(:new).and_return(store)
-    allow(Imap::Backup::Configuration::Store).to receive(:exist?).and_return(exists)
-    allow(Imap::Backup::Account::Connection).to receive(:new).with(accounts[0]).and_return(connection1)
-    allow(Imap::Backup::Account::Connection).to receive(:new).with(accounts[1]).and_return(connection2)
+    allow(Imap::Backup::Configuration::Store).to receive(:new) { store }
+    allow(Imap::Backup::Configuration::Store).
+      to receive(:exist?) { exists }
+    allow(Imap::Backup::Account::Connection).
+      to receive(:new).with(accounts[0]) { connection1 }
+    allow(Imap::Backup::Account::Connection).
+      to receive(:new).with(accounts[1]) { connection2 }
   end
 
   subject { described_class.new }

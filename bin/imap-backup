@@ -24,7 +24,12 @@ opts = OptionParser.new do |opts|
   opts.separator ""
   opts.separator "Common options:"
 
-  opts.on("-a", "--accounts ACCOUNT1[,ACCOUNT2,...]", Array, "only these accounts") do |account|
+  opts.on(
+    "-a",
+    "--accounts ACCOUNT1[,ACCOUNT2,...]",
+    Array,
+    "only these accounts"
+  ) do |account|
     options[:accounts] = account
   end
 

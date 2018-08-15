@@ -29,7 +29,7 @@ describe Imap::Backup::Configuration::Setup do
     let(:modified) { false }
 
     before :each do
-      allow(Imap::Backup::Configuration::Store).to receive(:new).and_return(store)
+      allow(Imap::Backup::Configuration::Store).to receive(:new) { store }
       allow(Imap::Backup).to receive(:setup_logging)
       @input, @output = prepare_highline
       allow(@input).to receive(:eof?).and_return(false)
@@ -100,8 +100,10 @@ describe Imap::Backup::Configuration::Setup do
 
       before do
         allow(@input).to receive(:gets).and_return("add\n", "exit\n")
-        allow(Imap::Backup::Configuration::Asker).to receive(:email).with(no_args).and_return("new@example.com")
-        allow(Imap::Backup::Configuration::Account).to receive(:new).with(store, blank_account, anything).and_return(account)
+        allow(Imap::Backup::Configuration::Asker).to receive(:email).
+          with(no_args).and_return("new@example.com")
+        allow(Imap::Backup::Configuration::Account).to receive(:new).
+          with(store, blank_account, anything).and_return(account)
 
         subject.run
       end

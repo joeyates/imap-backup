@@ -35,7 +35,9 @@ describe Imap::Backup::Configuration::Account do
   context "#run" do
     let(:highline) { double("Highline") }
     let(:menu) { MockHighlineMenu.new }
-    let(:store) { double("Imap::Backup::Configuration::Store", accounts: accounts) }
+    let(:store) do
+      double("Imap::Backup::Configuration::Store", accounts: accounts)
+    end
     let(:accounts) { [account, account1] }
     let(:account) do
       {
@@ -132,7 +134,8 @@ describe Imap::Backup::Configuration::Account do
 
     context "email" do
       before do
-        allow(Imap::Backup::Configuration::Asker).to receive(:email).and_return(new_email)
+        allow(Imap::Backup::Configuration::Asker).
+          to receive(:email) { new_email }
         subject.run
         menu.choices["modify email"].call
       end
@@ -176,7 +179,8 @@ describe Imap::Backup::Configuration::Account do
         let(:new_email) { other_email }
 
         it "indicates the error" do
-          expect(subject).to have_received(:puts).with("There is already an account set up with that email address")
+          expect(subject).to have_received(:puts).
+            with("There is already an account set up with that email address")
         end
 
         it "doesn't set the email" do
@@ -191,7 +195,8 @@ describe Imap::Backup::Configuration::Account do
       let(:new_password) { "new_password" }
 
       before do
-        allow(Imap::Backup::Configuration::Asker).to receive(:password).and_return(new_password)
+        allow(Imap::Backup::Configuration::Asker).
+          to receive(:password) { new_password }
         subject.run
         menu.choices["modify password"].call
       end
@@ -239,7 +244,9 @@ describe Imap::Backup::Configuration::Account do
 
       before do
         @validator = nil
-        allow(Imap::Backup::Configuration::Asker).to receive(:backup_path) do |path, validator|
+        allow(
+          Imap::Backup::Configuration::Asker
+        ).to receive(:backup_path) do |path, validator|
           @validator = validator
           new_backup_path
         end
@@ -262,7 +269,8 @@ describe Imap::Backup::Configuration::Account do
       let(:chooser) { double(run: nil) }
 
       before do
-        allow(Imap::Backup::Configuration::FolderChooser).to receive(:new).and_return(chooser)
+        allow(Imap::Backup::Configuration::FolderChooser).
+          to receive(:new) { chooser }
         subject.run
         menu.choices["choose backup folders"].call
       end
@@ -274,14 +282,16 @@ describe Imap::Backup::Configuration::Account do
 
     context "connection test" do
       before do
-        allow(Imap::Backup::Configuration::ConnectionTester).to receive(:test).and_return("All fine")
+        allow(Imap::Backup::Configuration::ConnectionTester).
+          to receive(:test).and_return("All fine")
         allow(highline).to receive(:ask)
         subject.run
         menu.choices["test connection"].call
       end
 
       it "tests the connection" do
-        expect(Imap::Backup::Configuration::ConnectionTester).to have_received(:test).with(account)
+        expect(Imap::Backup::Configuration::ConnectionTester).
+          to have_received(:test).with(account)
       end
     end
 

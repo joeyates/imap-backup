@@ -27,7 +27,9 @@ describe Email::Mboxrd::Message do
   let(:message_body) do
     double("Body", clone: cloned_message_body, force_encoding: nil)
   end
-  let(:cloned_message_body) { "Foo\nBar\nFrom at the beginning of the line\n>>From quoted" }
+  let(:cloned_message_body) do
+    "Foo\nBar\nFrom at the beginning of the line\n>>From quoted"
+  end
 
   subject { described_class.new(message_body) }
 
@@ -45,7 +47,8 @@ describe Email::Mboxrd::Message do
     end
 
     it "adds a 'From ' line at the start" do
-      expect(subject.to_s).to start_with("From " + from + " " + date.asctime + "\n")
+      expect(subject.to_s).
+        to start_with("From " + from + " " + date.asctime + "\n")
     end
 
     it "replaces existing 'From ' with '>From '" do
@@ -87,7 +90,8 @@ describe Email::Mboxrd::Message do
       end
     end
 
-    context "when original message 'from' is nil and 'envelope from' is nil and 'return path' is available" do
+    context "when original message 'from' is nil and " \
+      "'envelope from' is nil and 'return path' is available" do
       let(:message_body) { msg_no_from_but_return_path }
 
       it "'return path' is used as 'from'" do

@@ -10,9 +10,10 @@ describe Imap::Backup::Serializer::Base do
     end
 
     it "should fail if file permissions are to lax" do
+      message = "Permissions on '/base/path' should be 0700, not 0345"
       expect do
         described_class.new("/base/path", "my_folder")
-      end.to raise_error(RuntimeError, "Permissions on '/base/path' should be 0700, not 0345")
+      end.to raise_error(RuntimeError, message)
     end
   end
 end

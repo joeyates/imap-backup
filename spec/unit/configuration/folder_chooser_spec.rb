@@ -4,14 +4,17 @@ describe Imap::Backup::Configuration::FolderChooser do
   include HighLineTestHelpers
 
   context "#run" do
-    let(:connection) { double("Imap::Backup::Account::Connection", folders: remote_folders) }
+    let(:connection) do
+      double("Imap::Backup::Account::Connection", folders: remote_folders)
+    end
     let(:account) { {folders: []} }
     let(:remote_folders) { [] }
 
     subject { described_class.new(account) }
 
     before do
-      allow(Imap::Backup::Account::Connection).to receive(:new).with(account).and_return(connection)
+      allow(Imap::Backup::Account::Connection).
+        to receive(:new).with(account) { connection }
       @input, @output = prepare_highline
       allow(subject).to receive(:system)
       allow(Imap::Backup.logger).to receive(:warn)
@@ -32,7 +35,8 @@ describe Imap::Backup::Configuration::FolderChooser do
     context "folder listing" do
       let(:account) { {folders: [{name: "my_folder"}]} }
       let(:remote_folders) do
-        folder1 = double("folder", name: "my_folder") # this one is already backed up
+        # this one is already backed up:
+        folder1 = double("folder", name: "my_folder")
         folder2 = double("folder", name: "another_folder")
         [folder1, folder2]
       end
@@ -82,28 +86,34 @@ describe Imap::Backup::Configuration::FolderChooser do
       let(:remote_folders) { nil }
 
       before do
-        allow(Imap::Backup::Configuration::Setup.highline).to receive(:ask).and_return("q")
+        allow(Imap::Backup::Configuration::Setup.highline).
+          to receive(:ask).and_return("q")
         subject.run
       end
 
       it "asks to press a key" do
-        expect(Imap::Backup::Configuration::Setup.highline).to have_received(:ask).with("Press a key ")
+        expect(Imap::Backup::Configuration::Setup.highline).
+          to have_received(:ask).with("Press a key ")
       end
     end
 
     context "with connection errors" do
       before do
-        allow(Imap::Backup::Account::Connection).to receive(:new).with(account).and_raise("error")
-        allow(Imap::Backup::Configuration::Setup.highline).to receive(:ask).and_return("q")
+        allow(Imap::Backup::Account::Connection).
+          to receive(:new).with(account).and_raise("error")
+        allow(Imap::Backup::Configuration::Setup.highline).
+          to receive(:ask).and_return("q")
         subject.run
       end
 
       it "prints an error message" do
-        expect(Imap::Backup.logger).to have_received(:warn).with("Connection failed")
+        expect(Imap::Backup.logger).
+          to have_received(:warn).with("Connection failed")
       end
 
       it "asks to continue" do
-        expect(Imap::Backup::Configuration::Setup.highline).to have_received(:ask).with("Press a key ")
+        expect(Imap::Backup::Configuration::Setup.highline).
+          to have_received(:ask).with("Press a key ")
       end
     end
   end

@@ -9,7 +9,9 @@ describe Imap::Backup::Account::Connection do
     {name: backup_folder}
   end
 
-  let(:imap) { double("Net::IMAP", login: nil, list: imap_folders, disconnect: nil) }
+  let(:imap) do
+    double("Net::IMAP", login: nil, list: imap_folders, disconnect: nil)
+  end
   let(:imap_folders) { [] }
   let(:options) do
     {
@@ -85,7 +87,7 @@ describe Imap::Backup::Account::Connection do
 
     before do
       allow(Imap::Backup::Account::Folder).to receive(:new).and_return(folder)
-      allow(Imap::Backup::Serializer::Directory).to receive(:new).and_return(serializer)
+      allow(Imap::Backup::Serializer::Directory).to receive(:new) { serializer }
     end
 
     it "should return the names of folders" do

@@ -29,7 +29,9 @@ module Imap::Backup
     def save(uid, message)
       uid = uid.to_s
       if uids.include?(uid)
-        Imap::Backup.logger.debug "[#{folder}] message #{uid} already downloaded - skipping"
+        Imap::Backup.logger.debug(
+          "[#{folder}] message #{uid} already downloaded - skipping"
+        )
         return
       end
 
@@ -45,7 +47,12 @@ module Imap::Backup
         mbox.write mboxrd_message.to_s
         imap.write uid + "\n"
       rescue => e
-        Imap::Backup.logger.warn "[#{folder}] failed to save message #{uid}:\n#{body}. #{e}:\n#{e.backtrace.join("\n")}"
+        message = <<-ERROR.gsub(/^\s*/m, "")
+          [#{folder}] failed to save message #{uid}:
+          #{body}. #{e}:
+          #{e.backtrace.join("\n")}"
+        ERROR
+        Imap::Backup.logger.warn message
       ensure
         mbox.close if mbox
         imap.close if imap
@@ -64,7 +71,9 @@ module Imap::Backup
     def create_containing_directory
       mbox_relative_path = File.dirname(mbox_relative_pathname)
       return if mbox_relative_path == "."
-      Utils.make_folder(path, mbox_relative_path, Serializer::DIRECTORY_PERMISSIONS)
+      Utils.make_folder(
+        path, mbox_relative_path, Serializer::DIRECTORY_PERMISSIONS
+      )
     end
 
     def exist?

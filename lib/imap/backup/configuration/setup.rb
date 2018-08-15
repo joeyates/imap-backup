@@ -83,7 +83,9 @@ module Imap::Backup
         account = default_account_config(username)
         config.accounts << account
       end
-      Configuration::Account.new(config, account, Configuration::Setup.highline).run
+      Configuration::Account.new(
+        config, account, Configuration::Setup.highline
+      ).run
     end
   end
 end

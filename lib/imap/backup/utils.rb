@@ -7,7 +7,10 @@ module Imap::Backup
       return nil if actual.nil?
       mask = ~limit & 0777
       if actual & mask != 0
-        raise format("Permissions on '%s' should be 0%o, not 0%o", filename, limit, actual)
+        message = format(
+          "Permissions on '%s' should be 0%o, not 0%o", filename, limit, actual
+        )
+        raise message
       end
     end
 

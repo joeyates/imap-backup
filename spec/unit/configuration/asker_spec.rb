@@ -81,8 +81,10 @@ module Imap::Backup
 
       before do
         @i = 0
-        allow(highline).to receive(:ask).with("password: ").and_return(password1)
-        allow(highline).to receive(:ask).with("repeat password: ").and_return(password2)
+        allow(highline).to receive(:ask).
+          with("password: ").and_return(password1)
+        allow(highline).to receive(:ask).
+          with("repeat password: ").and_return(password2)
         allow(highline).to receive(:agree) do
           answer = answers[@i]
           @i += 1
@@ -107,7 +109,8 @@ module Imap::Backup
         let(:password2) { "secret" }
 
         it "asks to continue" do
-          expect(highline).to have_received(:agree).at_least(1).times.with(/Continue\?/)
+          expect(highline).to have_received(:agree).
+            at_least(1).times.with(/Continue\?/)
         end
       end
     end
