@@ -29,7 +29,7 @@ module Imap::Backup
       remove_modified_flags
       remove_deleted_accounts
       File.open(pathname, "w") { |f| f.write(JSON.pretty_generate(data)) }
-      FileUtils.chmod 0600, pathname
+      FileUtils.chmod 0o600, pathname
     end
 
     def accounts
@@ -53,7 +53,7 @@ module Imap::Backup
     def data
       return @data if @data
       if File.exist?(pathname)
-        Utils.check_permissions pathname, 0600
+        Utils.check_permissions pathname, 0o600
         contents = File.read(pathname)
         @data = JSON.parse(contents, symbolize_names: true)
       else
@@ -76,8 +76,8 @@ module Imap::Backup
       if !File.directory?(path)
         FileUtils.mkdir path
       end
-      if Utils::stat(path) != 0700
-        FileUtils.chmod 0700, path
+      if Utils::stat(path) != 0o700
+        FileUtils.chmod 0o700, path
       end
     end
   end

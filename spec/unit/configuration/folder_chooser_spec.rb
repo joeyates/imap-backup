@@ -61,7 +61,7 @@ describe Imap::Backup::Configuration::FolderChooser do
         end
 
         specify "are added to the account" do
-          expect(account[:folders]).to include({name: "another_folder"})
+          expect(account[:folders]).to include(name: "another_folder")
         end
 
         include_examples "it flags the account as modified"
@@ -75,7 +75,7 @@ describe Imap::Backup::Configuration::FolderChooser do
         end
 
         specify "are removed from the account" do
-          expect(account[:folders]).to_not include({name: "my_folder"})
+          expect(account[:folders]).to_not include(name: "my_folder")
         end
 
         include_examples "it flags the account as modified"

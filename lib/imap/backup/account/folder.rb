@@ -6,7 +6,7 @@ module Imap::Backup
   class Account::Folder
     extend Forwardable
 
-    REQUESTED_ATTRIBUTES = ["RFC822", "FLAGS", "INTERNALDATE"]
+    REQUESTED_ATTRIBUTES = ["RFC822", "FLAGS", "INTERNALDATE"].freeze
 
     attr_reader :connection
     attr_reader :name
@@ -25,7 +25,7 @@ module Imap::Backup
     def uids
       imap.examine(name)
       imap.uid_search(["ALL"]).sort
-    rescue Net::IMAP::NoResponseError => e
+    rescue Net::IMAP::NoResponseError
       Imap::Backup.logger.warn "Folder '#{name}' does not exist"
       []
     end
@@ -38,7 +38,7 @@ module Imap::Backup
       attributes = fetch_data_item.attr
       attributes["RFC822"].force_encoding("utf-8")
       attributes
-    rescue Net::IMAP::NoResponseError => e
+    rescue Net::IMAP::NoResponseError
       Imap::Backup.logger.warn "Folder '#{name}' does not exist"
       nil
     end

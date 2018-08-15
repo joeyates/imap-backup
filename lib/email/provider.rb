@@ -2,7 +2,7 @@ module Email; end
 
 class Email::Provider
   def self.for_address(address)
-    case 
+    case
     when address.end_with?("@gmail.com")
       new(:gmail)
     when address.end_with?("@fastmail.fm")

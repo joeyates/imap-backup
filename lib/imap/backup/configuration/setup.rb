@@ -69,10 +69,10 @@ module Imap::Backup
     end
 
     def default_account_config(username)
-      account = {
+      {
         username: username,
         password: "",
-        local_path: File.join(config.path, username.gsub("@", "_")),
+        local_path: File.join(config.path, username.tr("@", "_")),
         folders: []
       }
     end

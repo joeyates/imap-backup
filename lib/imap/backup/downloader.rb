@@ -19,7 +19,7 @@ module Imap::Backup
           next
         end
         Imap::Backup.logger.debug(
-          "[#{folder.name}] #{uid} - #{message["RFC822"].size} bytes"
+          "[#{folder.name}] #{uid} - #{message['RFC822'].size} bytes"
         )
         serializer.save(uid, message)
       end

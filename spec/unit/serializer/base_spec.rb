@@ -2,7 +2,7 @@ require "spec_helper"
 
 describe Imap::Backup::Serializer::Base do
   context "#initialize" do
-    let(:stat) { double("File::Stat", mode: 0345) }
+    let(:stat) { double("File::Stat", mode: 0o345) }
 
     before do
       allow(File).to receive(:exist?).with("/base/path").and_return(true)

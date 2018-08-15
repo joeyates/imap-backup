@@ -67,7 +67,7 @@ module Imap::Backup
 
     def connection
       @connection ||= Account::Connection.new(account)
-    rescue => e
+    rescue
       nil
     end
 

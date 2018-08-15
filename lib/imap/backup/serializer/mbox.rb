@@ -17,7 +17,7 @@ module Imap::Backup
       return @uids if @uids
 
       @uids = []
-      return @uids if not exist?
+      return @uids if !exist?
 
       CSV.foreach(imap_pathname) do |row|
         @uids << row[0]
@@ -64,8 +64,8 @@ module Imap::Backup
     def assert_files
       mbox = mbox_exist?
       imap = imap_exist?
-      raise ".imap file missing" if mbox && (not imap)
-      raise ".mbox file missing" if imap && (not mbox)
+      raise ".imap file missing" if mbox && (!imap)
+      raise ".mbox file missing" if imap && (!mbox)
     end
 
     def create_containing_directory

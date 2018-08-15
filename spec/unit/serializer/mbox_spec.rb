@@ -1,7 +1,7 @@
 require "spec_helper"
 
 describe Imap::Backup::Serializer::Mbox do
-  let(:stat) { double("File::Stat", mode: 0700) }
+  let(:stat) { double("File::Stat", mode: 0o700) }
   let(:base_path) { "/base/path" }
   let(:mbox_pathname) { "/base/path/my/folder.mbox" }
   let(:mbox_exists) { true }
@@ -21,7 +21,7 @@ describe Imap::Backup::Serializer::Mbox do
       described_class.new(base_path, "my/folder")
 
       expect(Imap::Backup::Utils).
-        to have_received(:make_folder).with(base_path, "my", 0700)
+        to have_received(:make_folder).with(base_path, "my", 0o700)
     end
 
     context "mbox and imap files" do

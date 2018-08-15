@@ -1,7 +1,7 @@
 module Imap::Backup
   module Serializer
-    DIRECTORY_PERMISSIONS = 0700
-    FILE_PERMISSIONS      = 0600
+    DIRECTORY_PERMISSIONS = 0o700
+    FILE_PERMISSIONS      = 0o600
 
     class Base
       attr_reader :path

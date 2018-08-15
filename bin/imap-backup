@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 require "optparse"
 
-$LOAD_PATH.unshift(File.expand_path("../../lib/", __FILE__))
+$LOAD_PATH.unshift(File.expand_path("../lib/", __dir__))
 require "imap/backup"
 
 KNOWN_COMMANDS = [
@@ -10,16 +10,16 @@ KNOWN_COMMANDS = [
   {name: "folders", help: "List folders for all (or selected) accounts"},
   {name: "status",  help: "List count of non backed-up emails per folder"},
   {name: "help",    help: "Show usage"}
-]
+].freeze
 
 options = {command: "backup"}
-opts = OptionParser.new do |opts|
+parser = OptionParser.new do |opts|
   opts.banner = "Usage: #{$PROGRAM_NAME} [options] COMMAND"
 
   opts.separator ""
   opts.separator "Commands:"
   KNOWN_COMMANDS.each do |command|
-    opts.separator "\t%- 20s %s" % [command[:name], command[:help]]
+    opts.separator format("\t%- 20<name>s %<help>s", command)
   end
   opts.separator ""
   opts.separator "Common options:"
@@ -43,7 +43,7 @@ opts = OptionParser.new do |opts|
     exit
   end
 end
-opts.parse!
+parser.parse!
 
 if ARGV.size > 0
   options[:command] = ARGV.shift

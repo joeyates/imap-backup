@@ -33,21 +33,21 @@ module Imap::Backup
     end
 
     def header(menu)
-      menu.header = <<-EOT
-Account:
-  email:    #{account[:username]}
-  server:   #{account[:server]}
-  path:     #{account[:local_path]}
-  folders:  #{folders.map { |f| f[:name] }.join(', ')}
-  password: #{masked_password}
-      EOT
+      menu.header = <<-HEADER.gsub(/^\s{8}/m, "")
+        Account:
+          email:    #{account[:username]}
+          server:   #{account[:server]}
+          path:     #{account[:local_path]}
+          folders:  #{folders.map { |f| f[:name] }.join(', ')}
+          password: #{masked_password}
+      HEADER
     end
 
     def modify_email(menu)
       menu.choice("modify email") do
         username = Configuration::Asker.email(username)
         puts "username: #{username}"
-        other_accounts = store.accounts.select { |a| a != account }
+        other_accounts = store.accounts.reject { |a| a == account }
         others = other_accounts.map { |a| a[:username] }
         puts "others: #{others.inspect}"
         if others.include?(username)
@@ -84,12 +84,12 @@ Account:
 
     def modify_backup_path(menu)
       menu.choice("modify backup path") do
-        validator = lambda do |p|
+        validator = ->(p) do
           same = store.accounts.find do |a|
             a[:username] != account[:username] && a[:local_path] == p
           end
           if same
-            puts "The path '#{p}' is used to backup " +
+            puts "The path '#{p}' is used to backup " \
               "the account '#{same[:username]}'"
             false
           else

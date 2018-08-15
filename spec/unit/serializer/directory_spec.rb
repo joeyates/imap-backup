@@ -1,7 +1,7 @@
 require "spec_helper"
 
 describe Imap::Backup::Serializer::Directory do
-  let(:stat) { double("File::Stat", mode: 0700) }
+  let(:stat) { double("File::Stat", mode: 0o700) }
   let(:files) { ["00000123.json", "000001.json"] }
   let(:base) { "/base/path" }
   let(:folder) { "/base/path/my_folder" }
@@ -65,7 +65,7 @@ describe Imap::Backup::Serializer::Directory do
     it "sets file permissions" do
       subject.save(1234, message)
 
-      expect(FileUtils).to have_received(:chmod).with(0600, /0+1234.json$/)
+      expect(FileUtils).to have_received(:chmod).with(0o600, /0+1234.json$/)
     end
   end
 end

@@ -16,7 +16,7 @@ describe Email::Provider do
 
     context "with unknown providers" do
       it "returns a default provider" do
-        result = described_class.for_address("foo@unknown.com").provider 
+        result = described_class.for_address("foo@unknown.com").provider
         expect(result).to eq(:default)
       end
     end

@@ -27,7 +27,7 @@ module Imap::Backup
     def save(uid, message)
       message_filename = filename(uid)
       File.open(message_filename, "w") { |f| f.write message.to_json }
-      FileUtils.chmod 0600, message_filename
+      FileUtils.chmod 0o600, message_filename
     end
 
     private
@@ -37,7 +37,7 @@ module Imap::Backup
     end
 
     def filename(uid)
-      "#{directory}/%012u.json" % uid.to_i
+      format("#{directory}/%012<uid>u.json", uid: uid.to_i)
     end
   end
 end

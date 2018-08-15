@@ -18,9 +18,9 @@ describe Imap::Backup::Configuration::Store do
     allow(File).to receive(:directory?).with(directory) { directory_exists }
     allow(File).to receive(:exist?).with(file_path) { file_exists }
     allow(Imap::Backup::Utils).
-      to receive(:stat).with(directory).and_return(0700)
+      to receive(:stat).with(directory).and_return(0o700)
     allow(Imap::Backup::Utils).
-      to receive(:stat).with(file_path).and_return(0600)
+      to receive(:stat).with(file_path).and_return(0o600)
     allow(Imap::Backup::Utils).to receive(:check_permissions).and_return(nil)
     allow(File).to receive(:read).with(file_path).and_return(configuration)
   end
@@ -155,7 +155,7 @@ describe Imap::Backup::Configuration::Store do
 
     context "when accounts are modified" do
       let(:accounts) { [{name: "foo", modified: true}] }
-      
+
       before { subject.save }
 
       it "skips the 'modified' flag" do
@@ -188,7 +188,7 @@ describe Imap::Backup::Configuration::Store do
       before { subject.save }
 
       it "sets them to 0600" do
-        expect(FileUtils).to have_received(:chmod).with(0600, file_path)
+        expect(FileUtils).to have_received(:chmod).with(0o600, file_path)
       end
     end
 
@@ -207,7 +207,7 @@ describe Imap::Backup::Configuration::Store do
 
       before do
         allow(Imap::Backup::Utils).to receive(:check_permissions).
-          with(file_path, 0600).and_raise("Error")
+          with(file_path, 0o600).and_raise("Error")
       end
 
       it "fails" do
