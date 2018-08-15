@@ -42,10 +42,19 @@ module Email::Mboxrd
     def mboxrd_body
       @mboxrd_body ||=
         begin
-          @mboxrd_body = supplied_body.gsub(/\n(>*From)/, "\n>\\1")
+          @mboxrd_body = add_extra_quote(supplied_body)
           @mboxrd_body += "\n" if !@mboxrd_body.end_with?("\n")
           @mboxrd_body
         end
+    end
+
+    def add_extra_quote(body)
+      # The mboxrd format requires that lines starting with 'From'
+      # be prefixed with a '>' so that any remaining lines which start with
+      # 'From ' can be taken as the beginning of messages.
+      # http://www.digitalpreservation.gov/formats/fdd/fdd000385.shtml
+      # Here we add an extra '>' before any "From" or ">From".
+      body.gsub(/\n(>*From)/, "\n>\\1")
     end
 
     def asctime
