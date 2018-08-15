@@ -6,6 +6,16 @@ module Email::Mboxrd
   class Message
     attr_reader :supplied_body
 
+    def self.from_serialized(serialized)
+      cleaned = serialized.gsub(/^>(>*From)/, "\\1")
+      # Serialized messages in this format *should* start with a line
+      #   From xxx yy zz
+      if cleaned.start_with?("From ")
+        cleaned = cleaned.sub(/^From .*[\r\n]*/, "")
+      end
+      new(cleaned)
+    end
+
     def initialize(supplied_body)
       @supplied_body = supplied_body.clone
       @supplied_body.force_encoding("binary")

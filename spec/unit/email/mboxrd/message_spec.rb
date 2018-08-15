@@ -33,6 +33,21 @@ describe Email::Mboxrd::Message do
 
   subject { described_class.new(message_body) }
 
+  describe ".from_serialized" do
+    let(:serialized_message) { "From foo@a.com\n#{imap_message}" }
+    let(:imap_message) { "Delivered-To: me@example.com\nFrom Me\n" }
+
+    before { @result = described_class.from_serialized(serialized_message) }
+
+    it "returns the message" do
+      expect(@result).to be_a(described_class)
+    end
+
+    it "removes one level of > before From" do
+      expect(@result.supplied_body).to eq(imap_message)
+    end
+  end
+
   context "#to_serialized" do
     let(:mail) { double("Mail", from: [from], date: date) }
 
