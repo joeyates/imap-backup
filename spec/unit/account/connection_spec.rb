@@ -10,7 +10,7 @@ describe Imap::Backup::Account::Connection do
   end
 
   let(:imap) do
-    double("Net::IMAP", login: nil, list: imap_folders, disconnect: nil)
+    double("Net::IMAP", login: nil, disconnect: nil)
   end
   let(:imap_folders) { [] }
   let(:options) do
@@ -24,9 +24,15 @@ describe Imap::Backup::Account::Connection do
   let(:local_path) { "local_path" }
   let(:backup_folders) { [self.class.folder_config] }
   let(:username) { "username@gmail.com" }
+  let(:root_info) do
+    instance_double(Net::IMAP::MailboxList, name: root_name)
+  end
+  let(:root_name) { "foo" }
 
   before do
     allow(Net::IMAP).to receive(:new).and_return(imap)
+    allow(imap).to receive(:list).with("", "") { [root_info] }
+    allow(imap).to receive(:list).with(root_name, "*") { imap_folders }
     allow(Imap::Backup::Utils).to receive(:make_folder)
   end
 
