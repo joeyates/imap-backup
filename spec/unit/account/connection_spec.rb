@@ -70,9 +70,9 @@ describe Imap::Backup::Account::Connection do
   end
 
   context "#folders" do
-    let(:imap_folders) { ["imap_folder"] }
-
-    before { allow(imap).to receive(:list).and_return(imap_folders) }
+    let(:imap_folders) do
+      [instance_double(Net::IMAP::MailboxList)]
+    end
 
     it "returns the list of folders" do
       expect(subject.folders).to eq(imap_folders)
@@ -129,7 +129,9 @@ describe Imap::Backup::Account::Connection do
     end
 
     context "without supplied backup_folders" do
-      let(:imap_folders) { [double(name: "foo")] }
+      let(:imap_folders) do
+        [instance_double(Net::IMAP::MailboxList, name: "foo")]
+      end
 
       before do
         allow(Imap::Backup::Account::Folder).to receive(:new).
