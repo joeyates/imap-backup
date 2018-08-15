@@ -75,7 +75,7 @@ describe Imap::Backup::Serializer::Mbox do
       let(:mbox_formatted_message) { "message in mbox format" }
       let(:message_uid) { "999" }
       let(:message) do
-        double("Email::Mboxrd::Message", to_s: mbox_formatted_message)
+        double("Email::Mboxrd::Message", to_serialized: mbox_formatted_message)
       end
       let(:mbox_file) { double("File - mbox", write: nil, close: nil) }
       let(:imap_file) { double("File - imap", write: nil, close: nil) }
@@ -100,7 +100,7 @@ describe Imap::Backup::Serializer::Mbox do
 
       context "when the message causes parsing errors" do
         before do
-          allow(message).to receive(:to_s).and_raise(ArgumentError)
+          allow(message).to receive(:to_serialized).and_raise(ArgumentError)
         end
 
         it "skips the message" do

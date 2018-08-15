@@ -44,7 +44,7 @@ module Imap::Backup
       begin
         mbox = File.open(mbox_pathname, "ab")
         imap = File.open(imap_pathname, "ab")
-        mbox.write mboxrd_message.to_s
+        mbox.write mboxrd_message.to_serialized
         imap.write uid + "\n"
       rescue => e
         message = <<-ERROR.gsub(/^\s*/m, "")

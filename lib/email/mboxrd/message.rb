@@ -11,7 +11,7 @@ module Email::Mboxrd
       @supplied_body.force_encoding("binary")
     end
 
-    def to_s
+    def to_serialized
       "From " + from + "\n" + mboxrd_body + "\n"
     end
 
