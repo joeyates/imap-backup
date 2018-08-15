@@ -88,12 +88,14 @@ describe Imap::Backup::Account::Connection do
   context "#status" do
     let(:folder) { double("folder", uids: [remote_uid]) }
     let(:local_uid) { "local_uid" }
-    let(:serializer) { double("serializer", uids: [local_uid]) }
+    let(:serializer) do
+      instance_double(Imap::Backup::Serializer::Mbox, uids: [local_uid])
+    end
     let(:remote_uid) { "remote_uid" }
 
     before do
       allow(Imap::Backup::Account::Folder).to receive(:new).and_return(folder)
-      allow(Imap::Backup::Serializer::Directory).to receive(:new) { serializer }
+      allow(Imap::Backup::Serializer::Mbox).to receive(:new) { serializer }
     end
 
     it "should return the names of folders" do

@@ -36,7 +36,7 @@ module Imap::Backup
     def status
       backup_folders.map do |folder|
         f = Account::Folder.new(self, folder[:name])
-        s = Serializer::Directory.new(local_path, folder[:name])
+        s = Serializer::Mbox.new(local_path, folder[:name])
         {name: folder[:name], local: s.uids, remote: f.uids}
       end
     end
