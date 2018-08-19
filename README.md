@@ -186,6 +186,18 @@ $ imap-backup status
 * https://github.com/rgrove/larch - copies between IMAP servers
 * https://github.com/OfflineIMAP/offlineimap
 
+# Testing
+
+## Integration Tests
+
+Integration tests are run against a Docker image
+(antespi/docker-imap-devel:latest).
+
+Currently, the integration tests with Docker are excluded from the CI run.
+
+The image has a pre-existing user:
+`address@example.org` with password `pass`
+
 ## Contributing
 
 1. Fork it

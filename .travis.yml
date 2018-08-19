@@ -11,4 +11,4 @@ branches:
 before_install:
   - gem update --system
   - gem update bundler
-script: "bundle exec rake spec"
+script: "bundle exec rspec --tag ~docker"

@@ -1,0 +1,15 @@
+# This file adapted from github.com/antespi/docker-imap-devel
+version: "3"
+
+services:
+  imap:
+    image: antespi/docker-imap-devel:latest
+    container_name: imap
+    ports:
+    - "8025:25"
+    - "8143:143"
+    - "8993:993"
+    environment:
+    - MAILNAME=example.org
+    - MAIL_ADDRESS=address@example.org
+    - MAIL_PASS=pass

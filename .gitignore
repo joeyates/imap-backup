@@ -5,3 +5,4 @@ coverage
 pkg
 .rbenv-version
 vendor
+/tmp
