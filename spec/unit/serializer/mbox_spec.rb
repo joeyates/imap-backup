@@ -1,119 +1,82 @@
-require "spec_helper"
-
 describe Imap::Backup::Serializer::Mbox do
-  let(:stat) { double("File::Stat", mode: 0o700) }
   let(:base_path) { "/base/path" }
-  let(:mbox_pathname) { "/base/path/my/folder.mbox" }
-  let(:mbox_exists) { true }
-  let(:imap_pathname) { "/base/path/my/folder.imap" }
-  let(:imap_exists) { true }
+  let(:store) do
+    instance_double(
+      Imap::Backup::Serializer::MboxStore,
+      add: nil,
+      uids: nil
+    )
+  end
+  let(:imap_folder) { "folder" }
+  let(:permissions) { 0o700 }
+  let(:dir_exists) { true }
 
   before do
     allow(Imap::Backup::Utils).to receive(:make_folder)
-    allow(File).to receive(:exist?).with(base_path).and_return(true)
-    allow(File).to receive(:stat).with(base_path).and_return(stat)
-    allow(File).to receive(:exist?).with(mbox_pathname).and_return(mbox_exists)
-    allow(File).to receive(:exist?).with(imap_pathname).and_return(imap_exists)
+    allow(Imap::Backup::Utils).to receive(:mode) { permissions }
+    allow(Imap::Backup::Utils).to receive(:check_permissions) { true }
+    allow(File).to receive(:directory?) { dir_exists }
   end
 
-  context "#initialize" do
-    it "creates the containing directory" do
-      described_class.new(base_path, "my/folder")
+  subject { described_class.new(base_path, imap_folder) }
 
-      expect(Imap::Backup::Utils).
-        to have_received(:make_folder).with(base_path, "my", 0o700)
-    end
+  before do
+    allow(FileUtils).to receive(:chmod)
+    allow(Imap::Backup::Serializer::MboxStore).to receive(:new) { store }
+  end
 
-    context "mbox and imap files" do
-      context "if mbox exists and imap doesn't" do
-        let(:imap_exists) { false }
+  context "containing directory" do
+    before { subject.uids }
 
-        it "fails" do
-          expect {
-            described_class.new(base_path, "my/folder")
-          }.to raise_error(RuntimeError, ".imap file missing")
+    context "when the IMAP folder has multiple elements" do
+      let(:imap_folder) { "folder/path" }
+
+      context "when the containing directory is missing" do
+        let(:dir_exists) { false }
+
+        it "is created" do
+          expect(Imap::Backup::Utils).to have_received(:make_folder).
+            with(base_path, File.dirname(imap_folder), 0o700)
         end
       end
+    end
 
-      context "if imap exists and mbox doesn't" do
-        let(:mbox_exists) { false }
+    context "when the containing directory permissons are incorrect" do
+      let(:permissions) { 0o777 }
 
-        it "fails" do
-          expect {
-            described_class.new(base_path, "my/folder")
-          }.to raise_error(RuntimeError, ".mbox file missing")
-        end
+      it "corrects them" do
+        path = File.expand_path(File.join(base_path, File.dirname(imap_folder)))
+        expect(FileUtils).to have_received(:chmod).with(0o700, path)
+      end
+    end
+
+    context "when the containing directory permissons are correct" do
+      it "does nothing" do
+        expect(FileUtils).to_not have_received(:chmod)
+      end
+    end
+
+    context "when the containing directory exists" do
+      it "is not created" do
+        expect(Imap::Backup::Utils).to_not have_received(:make_folder).
+          with(base_path, File.dirname(imap_folder), 0o700)
       end
     end
   end
 
-  context "instance methods" do
-    let(:ids) { %w(3 2 1) }
+  context "#uids" do
+    it "calls the store" do
+      subject.uids
 
-    before do
-      allow(CSV).to receive(:foreach) { |&b| ids.each { |id| b.call [id] } }
+      expect(store).to have_received(:uids)
     end
+  end
 
-    subject { described_class.new(base_path, "my/folder") }
+  context "#save" do
+    it "calls the store" do
+      subject.save("foo", "bar")
 
-    context "#uids" do
-      it "returns the backed-up uids as sorted integers" do
-        expect(subject.uids).to eq(ids.map(&:to_i).sort)
-      end
-
-      context "if the mbox does not exist" do
-        let(:mbox_exists) { false }
-        let(:imap_exists) { false }
-
-        it "returns an empty Array" do
-          expect(subject.uids).to eq([])
-        end
-      end
-    end
-
-    context "#save" do
-      let(:mbox_formatted_message) { "message in mbox format" }
-      let(:message_uid) { "999" }
-      let(:message) do
-        double("Email::Mboxrd::Message", to_serialized: mbox_formatted_message)
-      end
-      let(:mbox_file) { double("File - mbox", write: nil, close: nil) }
-      let(:imap_file) { double("File - imap", write: nil, close: nil) }
-
-      before do
-        allow(Email::Mboxrd::Message).to receive(:new).and_return(message)
-        allow(File).to receive(:open).with(mbox_pathname, "ab") { mbox_file }
-        allow(File).to receive(:open).with(imap_pathname, "ab") { imap_file }
-      end
-
-      it "saves the message to the mbox" do
-        subject.save(message_uid, "The\nemail\n")
-
-        expect(mbox_file).to have_received(:write).with(mbox_formatted_message)
-      end
-
-      it "saves the uid to the imap file" do
-        subject.save(message_uid, "The\nemail\n")
-
-        expect(imap_file).to have_received(:write).with(message_uid + "\n")
-      end
-
-      context "when the message causes parsing errors" do
-        before do
-          allow(message).to receive(:to_serialized).and_raise(ArgumentError)
-        end
-
-        it "skips the message" do
-          subject.save(message_uid, "The\nemail\n")
-          expect(mbox_file).to_not have_received(:write)
-        end
-
-        it "does not fail" do
-          expect do
-            subject.save(message_uid, "The\nemail\n")
-          end.to_not raise_error
-        end
-      end
+      expect(store).to have_received(:add)
     end
   end
 end

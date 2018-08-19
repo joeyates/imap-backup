@@ -49,12 +49,12 @@ describe Imap::Backup::Utils do
     end
   end
 
-  context ".stat" do
+  context ".mode" do
     context "with existing files" do
       let(:mode) { 0o2345 }
 
       it "is the last 9 bits of the file mode" do
-        expect(described_class.stat(filename)).to eq(0o345)
+        expect(described_class.mode(filename)).to eq(0o345)
       end
     end
 
@@ -62,7 +62,7 @@ describe Imap::Backup::Utils do
       let(:exists) { false }
 
       it "is nil" do
-        expect(described_class.stat(filename)).to be_nil
+        expect(described_class.mode(filename)).to be_nil
       end
     end
   end

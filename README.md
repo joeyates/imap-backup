@@ -16,6 +16,12 @@
 [Rubygem]: http://rubygems.org/gems/imap-backup "Ruby gem at rubygems.org"
 [Continuous Integration]: http://travis-ci.org/joeyates/imap-backup "Build status by Travis-CI"
 
+## Version 2
+
+With versions above 2.x, this gems stores IMAP metadata in a
+backwardly-incompatible way. When upgrading, all old backups will be gradually
+deleted to allow for the new file format to be introduced.
+
 # Installation
 
 ```shell
