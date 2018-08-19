@@ -20,6 +20,10 @@ Subject: #{subject}
   def mbox_path(name)
     File.join(local_backup_path, name + ".mbox")
   end
+
+  def imap_content(name)
+    File.read(imap_path(name))
+  end
 end
 
 RSpec.configure do |config|

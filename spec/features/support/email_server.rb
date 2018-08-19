@@ -22,6 +22,15 @@ Subject: #{subject}
     imap.expunge
   end
 
+  def examine(folder)
+    imap.examine(folder)
+  end
+
+  def server_uids(folder)
+    examine(folder)
+    imap.uid_search(["ALL"]).sort
+  end
+
   def imap
     @imap ||=
       begin

@@ -24,4 +24,11 @@ RSpec.describe "backup", type: :feature, docker: true do
 
     expect(mbox_content(folder)).to eq(messages_as_mbox)
   end
+
+  it "records IMAP ids" do
+    connection.run_backup
+
+    expected_uids = server_uids(folder)
+    expect(imap_content(folder)).to eq(expected_uids.join("\n") + "\n")
+  end
 end
