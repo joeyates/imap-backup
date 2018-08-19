@@ -4,18 +4,40 @@ require "email/mboxrd/message"
 
 module Imap::Backup
   class Serializer::MboxStore
-    CURRENT_VERSION = 1
+    CURRENT_VERSION = 2
 
     attr_reader :folder
     attr_reader :path
+    attr_reader :loaded
 
     def initialize(path, folder)
       @path = path
       @folder = folder
+      @loaded = false
       @uids = nil
+      @uid_validity = nil
+    end
+
+    def uid_validity
+      do_load if !loaded
+      @uid_validity
+    end
+
+    def uid_validity=(value)
+      do_load if !loaded
+      @uid_validity = value
+      @uids ||= []
+      write_imap_file
+    end
+
+    def uids
+      do_load if !loaded
+      @uids || []
     end
 
     def add(uid, message)
+      do_load if !loaded
+      raise "Can't add messages without uid_validity" if !uid_validity
       uid = uid.to_i
       if uids.include?(uid)
         Imap::Backup.logger.debug(
@@ -45,6 +67,7 @@ module Imap::Backup
     end
 
     def load(uid)
+      do_load if !loaded
       message_index = uids.find_index(uid)
       return nil if message_index.nil?
       load_nth(message_index)
@@ -52,8 +75,9 @@ module Imap::Backup
 
     def reset
       @uids = nil
+      @uid_validity = nil
+      @loaded = false
       delete_files
-      write_imap_file
       write_blank_mbox_file
     end
 
@@ -61,25 +85,21 @@ module Imap::Backup
       File.dirname(folder)
     end
 
-    def uids
-      @uids ||=
-        begin
-          data = imap_data
-          if data
-            imap_data[:uids].map(&:to_i).sort
-          else
-            reset
-            []
-          end
-        end
-    end
-
     private
 
-    def imap_data
-      if !imap_ok?
-        return nil
+    def do_load
+      data = imap_data
+      if data
+        @uids = imap_data[:uids].map(&:to_i).sort
+        @uid_validity = imap_data[:uid_validity]
+        @loaded = true
+      else
+        reset
       end
+    end
+
+    def imap_data
+      return nil if !imap_ok?
 
       imap_data = nil
 
@@ -89,7 +109,6 @@ module Imap::Backup
         return nil
       end
 
-      return nil if imap_data[:version] != CURRENT_VERSION
       return nil if !imap_data.has_key?(:uids)
       return nil if !imap_data[:uids].is_a?(Array)
 
@@ -137,6 +156,7 @@ module Imap::Backup
     def write_imap_file
       imap_data = {
         version: CURRENT_VERSION,
+        uid_validity: @uid_validity,
         uids: @uids
       }
       content = imap_data.to_json

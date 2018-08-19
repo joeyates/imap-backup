@@ -12,6 +12,7 @@ describe Imap::Backup::Serializer::MboxStore do
   let(:imap_content) do
     {
       version: Imap::Backup::Serializer::MboxStore::CURRENT_VERSION,
+      uid_validity: 123,
       uids: uids.sort
     }.to_json
   end
@@ -65,11 +66,15 @@ describe Imap::Backup::Serializer::MboxStore do
     let(:mbox_formatted_message) { "message in mbox format" }
     let(:message_uid) { "999" }
     let(:message) do
-      double("Email::Mboxrd::Message", to_serialized: mbox_formatted_message)
+      instance_double(
+        Email::Mboxrd::Message,
+        to_serialized: mbox_formatted_message
+      )
     end
     let(:updated_imap_content) do
       {
         version: Imap::Backup::Serializer::MboxStore::CURRENT_VERSION,
+        uid_validity: 123,
         uids: (uids + [999]).sort
       }.to_json
     end
@@ -77,6 +82,7 @@ describe Imap::Backup::Serializer::MboxStore do
     before do
       allow(Email::Mboxrd::Message).to receive(:new).and_return(message)
       allow(File).to receive(:open).with(mbox_pathname, "ab") { mbox_file }
+      subject.uid_validity = 123
     end
 
     it "saves the message to the mbox" do

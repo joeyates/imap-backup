@@ -16,14 +16,24 @@ module Imap::Backup
     def initialize(connection, name)
       @connection = connection
       @name = name
+      @uid_validity = nil
     end
 
+    # Deprecated: use #name
     def folder
       name
     end
 
+    def uid_validity
+      @uid_validity ||=
+        begin
+          examine
+          imap.responses["UIDVALIDITY"][-1]
+        end
+    end
+
     def uids
-      imap.examine(name)
+      examine
       imap.uid_search(["ALL"]).sort
     rescue Net::IMAP::NoResponseError
       Imap::Backup.logger.warn "Folder '#{name}' does not exist"
@@ -31,7 +41,7 @@ module Imap::Backup
     end
 
     def fetch(uid)
-      imap.examine(name)
+      examine
       fetch_data_items = imap.uid_fetch([uid.to_i], REQUESTED_ATTRIBUTES)
       return nil if fetch_data_items.nil?
       fetch_data_item = fetch_data_items[0]
@@ -41,6 +51,12 @@ module Imap::Backup
     rescue Net::IMAP::NoResponseError
       Imap::Backup.logger.warn "Folder '#{name}' does not exist"
       nil
+    end
+
+    private
+
+    def examine
+      imap.examine(name)
     end
   end
 end

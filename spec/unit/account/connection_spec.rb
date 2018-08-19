@@ -10,7 +10,7 @@ describe Imap::Backup::Account::Connection do
   end
 
   let(:imap) do
-    double("Net::IMAP", login: nil, disconnect: nil)
+    instance_double(Net::IMAP, login: nil, disconnect: nil)
   end
   let(:imap_folders) { [] }
   let(:options) do
@@ -86,7 +86,9 @@ describe Imap::Backup::Account::Connection do
   end
 
   context "#status" do
-    let(:folder) { double("folder", uids: [remote_uid]) }
+    let(:folder) do
+      instance_double(Imap::Backup::Account::Folder, uids: [remote_uid])
+    end
     let(:local_uid) { "local_uid" }
     let(:serializer) do
       instance_double(Imap::Backup::Serializer::Mbox, uids: [local_uid])
@@ -112,9 +114,21 @@ describe Imap::Backup::Account::Connection do
   end
 
   context "#run_backup" do
-    let(:folder) { double("folder", name: "folder") }
-    let(:serializer) { double("serializer") }
-    let(:downloader) { double(Imap::Backup::Downloader, run: nil) }
+    let(:folder) do
+      instance_double(
+        Imap::Backup::Account::Folder,
+        name: "folder",
+        uid_validity: uid_validity
+      )
+    end
+    let(:uid_validity) { 123 }
+    let(:serializer) do
+      instance_double(
+        Imap::Backup::Serializer::Mbox,
+        set_uid_validity: nil
+      )
+    end
+    let(:downloader) { instance_double(Imap::Backup::Downloader, run: nil) }
 
     before do
       allow(Imap::Backup::Downloader).

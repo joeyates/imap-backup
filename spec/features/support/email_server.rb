@@ -31,6 +31,11 @@ Subject: #{subject}
     imap.uid_search(["ALL"]).sort
   end
 
+  def server_uid_validity(folder)
+    examine(folder)
+    imap.responses["UIDVALIDITY"][0]
+  end
+
   def imap
     @imap ||=
       begin

@@ -45,6 +45,12 @@ RSpec.describe "backup", type: :feature, docker: true do
       expect(imap_metadata[:uids]).to eq(folder_uids)
     end
 
+    it "records uid_validity" do
+      connection.run_backup
+
+      expect(imap_metadata[:uid_validity]).to eq(server_uid_validity(folder))
+    end
+
     context "when an unversioned .imap file is found" do
       let!(:unversioned) do
         File.open(imap_path(folder), "w") { |f| f.write "old format imap" }
