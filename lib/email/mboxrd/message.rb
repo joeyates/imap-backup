@@ -46,7 +46,12 @@ module Email::Mboxrd
     end
 
     def from
-      best_from + " " + asctime
+      @from ||=
+        begin
+          from = best_from
+          from << " " + asctime if asctime != ""
+          from
+        end
     end
 
     def mboxrd_body
@@ -68,7 +73,7 @@ module Email::Mboxrd
     end
 
     def asctime
-      date ? date.asctime : ""
+      @asctime ||= date ? date.asctime : ""
     end
 
     def date

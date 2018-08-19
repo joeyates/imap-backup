@@ -62,8 +62,8 @@ describe Email::Mboxrd::Message do
     end
 
     it "adds a 'From ' line at the start" do
-      expect(subject.to_serialized).
-        to start_with("From " + from + " " + date.asctime + "\n")
+      expected = "From #{from} #{date.asctime}\n"
+      expect(subject.to_serialized).to start_with(expected)
     end
 
     it "replaces existing 'From ' with '>From '" do
@@ -93,7 +93,7 @@ describe Email::Mboxrd::Message do
     context "when original message 'from' is nil" do
       let(:message_body) { msg_no_from }
       it "'from' is empty string" do
-        expect(subject.to_serialized).to start_with("From  \n")
+        expect(subject.to_serialized).to start_with("From \n")
       end
     end
 
@@ -101,7 +101,7 @@ describe Email::Mboxrd::Message do
       let(:message_body) { msg_bad_from }
 
       it "'from' is empty string" do
-        expect(subject.to_serialized).to start_with("From  \n")
+        expect(subject.to_serialized).to start_with("From \n")
       end
     end
 
@@ -110,7 +110,7 @@ describe Email::Mboxrd::Message do
       let(:message_body) { msg_no_from_but_return_path }
 
       it "'return path' is used as 'from'" do
-        expect(subject.to_serialized).to start_with("From " + from + " \n")
+        expect(subject.to_serialized).to start_with("From " + from + "\n")
       end
     end
 
@@ -118,7 +118,7 @@ describe Email::Mboxrd::Message do
       let(:message_body) { msg_no_from_but_sender }
 
       it "Sender is used as 'from'" do
-        expect(subject.to_serialized).to start_with("From " + from + " \n")
+        expect(subject.to_serialized).to start_with("From " + from + "\n")
       end
     end
   end
