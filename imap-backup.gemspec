@@ -15,6 +15,13 @@ Gem::Specification.new do |gem|
   gem.require_paths = ["lib"]
   gem.version       = Imap::Backup::VERSION
 
+  gem.post_install_message = <<-MESSAGE.gsub(/^\s{4}/m, "")
+    When upgrading #{gem.name} from version 1.x to 2.x not that the
+    metadata storage method has changed (from flat file to JSON).
+    As a result, on the first run after an upgrade, old backup folders will be
+    **deleted** and a full new backup created.
+  MESSAGE
+
   gem.add_runtime_dependency "rake"
   gem.add_runtime_dependency "highline"
   gem.add_runtime_dependency "mail"

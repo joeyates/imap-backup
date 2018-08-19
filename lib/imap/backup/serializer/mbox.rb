@@ -1,112 +1,48 @@
-require "csv"
-require "email/mboxrd/message"
+require "imap/backup/serializer/mbox_store"
 
 module Imap::Backup
-  module Serializer; end
+  class Serializer::Mbox
+    attr_reader :path
+    attr_reader :folder
 
-  class Serializer::Mbox < Serializer::Base
     def initialize(path, folder)
-      super
-      create_containing_directory
-      assert_files
+      @path = path
+      @folder = folder
     end
 
-    # TODO: cleanup locks, close file handles
-
     def uids
-      return @uids if @uids
-
-      @uids = []
-      return @uids if !exist?
-
-      CSV.foreach(imap_pathname) do |row|
-        @uids << row[0]
-      end
-      @uids = @uids.map(&:to_i).sort
-      @uids
+      store.uids
     end
 
     def save(uid, message)
-      uid = uid.to_s
-      if uids.include?(uid)
-        Imap::Backup.logger.debug(
-          "[#{folder}] message #{uid} already downloaded - skipping"
-        )
-        return
-      end
-
-      # invalidate cache
-      @uids = nil
-
-      body = message["RFC822"]
-      mboxrd_message = Email::Mboxrd::Message.new(body)
-      mbox = imap = nil
-      begin
-        mbox = File.open(mbox_pathname, "ab")
-        imap = File.open(imap_pathname, "ab")
-        mbox.write mboxrd_message.to_serialized
-        imap.write uid + "\n"
-      rescue => e
-        message = <<-ERROR.gsub(/^\s*/m, "")
-          [#{folder}] failed to save message #{uid}:
-          #{body}. #{e}:
-          #{e.backtrace.join("\n")}"
-        ERROR
-        Imap::Backup.logger.warn message
-      ensure
-        mbox.close if mbox
-        imap.close if imap
-      end
+      store.add(uid, message)
     end
 
     private
 
-    def assert_files
-      mbox = mbox_exist?
-      imap = imap_exist?
-      raise ".imap file missing" if mbox && (!imap)
-      raise ".mbox file missing" if imap && (!mbox)
+    def store
+      @store ||=
+        begin
+          create_containing_directory
+          Serializer::MboxStore.new(path, folder)
+        end
     end
 
     def create_containing_directory
-      mbox_relative_path = File.dirname(mbox_relative_pathname)
-      return if mbox_relative_path == "."
-      Utils.make_folder(
-        path, mbox_relative_path, Serializer::DIRECTORY_PERMISSIONS
-      )
-    end
+      relative_path = File.dirname(folder)
+      containing_directory = File.join(path, relative_path)
+      full_path = File.expand_path(containing_directory)
 
-    def exist?
-      mbox_exist? && imap_exist?
-    end
+      if !File.directory?(full_path)
+        Imap::Backup::Utils.make_folder(
+          path, relative_path, Serializer::DIRECTORY_PERMISSIONS
+        )
+      end
 
-    def mbox_exist?
-      File.exist?(mbox_pathname)
-    end
-
-    def imap_exist?
-      File.exist?(imap_pathname)
-    end
-
-    def mbox_relative_pathname
-      folder + ".mbox"
-    end
-
-    def mbox_pathname
-      File.join(path, mbox_relative_pathname)
-    end
-
-    def imap_pathname
-      filename = folder + ".imap"
-      File.join(path, filename)
-    end
-
-    def lock
-      # lock mbox and imap files
-      # create both empty if missing
-    end
-
-    def unlock
+      if Imap::Backup::Utils.mode(full_path) !=
+          Serializer::DIRECTORY_PERMISSIONS
+        FileUtils.chmod Serializer::DIRECTORY_PERMISSIONS, full_path
+      end
     end
   end
 end

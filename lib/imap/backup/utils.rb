@@ -3,7 +3,7 @@ require "fileutils"
 module Imap::Backup
   module Utils
     def self.check_permissions(filename, limit)
-      actual = stat(filename)
+      actual = mode(filename)
       return nil if actual.nil?
       mask = ~limit & 0o777
       if actual & mask != 0
@@ -16,8 +16,8 @@ module Imap::Backup
       end
     end
 
-    def self.stat(filename)
-      return nil unless File.exist?(filename)
+    def self.mode(filename)
+      return nil if !File.exist?(filename)
 
       stat = File.stat(filename)
       stat.mode & 0o777

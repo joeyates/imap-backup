@@ -21,8 +21,16 @@ Subject: #{subject}
     File.join(local_backup_path, name + ".mbox")
   end
 
+  def imap_path(name)
+    File.join(local_backup_path, name + ".imap")
+  end
+
   def imap_content(name)
     File.read(imap_path(name))
+  end
+
+  def imap_parsed(name)
+    JSON.parse(imap_content(name), symbolize_names: true)
   end
 end
 
