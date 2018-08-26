@@ -37,12 +37,29 @@ module Imap::Backup
       end
     end
 
+    def force_uid_validity(value)
+      store.uid_validity = value
+    end
+
     def uids
       store.uids
     end
 
+    def load(uid)
+      store.load(uid)
+    end
+
     def save(uid, message)
       store.add(uid, message)
+    end
+
+    def rename(new_name)
+      @folder = new_name
+      store.rename new_name
+    end
+
+    def update_uid(old, new)
+      store.update_uid old, new
     end
 
     private

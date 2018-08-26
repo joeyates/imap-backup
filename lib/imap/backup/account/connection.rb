@@ -52,6 +52,30 @@ module Imap::Backup
       end
     end
 
+    def restore
+      local_folders do |serializer, folder|
+        exists = folder.exist?
+        if exists
+          new_name = serializer.set_uid_validity(folder.uid_validity)
+          old_name = serializer.folder
+          if new_name
+            Imap::Backup.logger.debug "Backup '#{old_name}' renamed and restored to '#{new_name}'"
+            new_serializer = Serializer::Mbox.new(local_path, new_name)
+            new_folder = Account::Folder.new(self, new_name)
+            new_folder.create
+            new_serializer.force_uid_validity(new_folder.uid_validity)
+            Uploader.new(new_folder, new_serializer).run
+          else
+            Uploader.new(folder, serializer).run
+          end
+        else
+          folder.create
+          serializer.force_uid_validity(folder.uid_validity)
+          Uploader.new(folder, serializer).run
+        end
+      end
+    end
+
     def disconnect
       imap.disconnect
     end
@@ -99,6 +123,17 @@ module Imap::Backup
     def backup_folders
       return @backup_folders if @backup_folders && (@backup_folders.size > 0)
       (folders || []).map { |f| {name: f.name} }
+    end
+
+    def local_folders
+      glob = File.join(local_path, "**", "*.imap")
+      base = Pathname.new(local_path)
+      Pathname.glob(glob) do |path|
+        name = path.relative_path_from(base).to_s[0..-6]
+        serializer = Serializer::Mbox.new(local_path, name)
+        folder = Account::Folder.new(self, name)
+        yield serializer, folder
+      end
     end
 
     def provider

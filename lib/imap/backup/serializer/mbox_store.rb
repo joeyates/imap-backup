@@ -39,14 +39,6 @@ module Imap::Backup
       @uids || []
     end
 
-    def rename(new_name)
-      new_mbox_pathname = absolute_path(new_name + ".mbox")
-      new_imap_pathname = absolute_path(new_name + ".imap")
-      File.rename(mbox_pathname, new_mbox_pathname)
-      File.rename(imap_pathname, new_imap_pathname)
-      @folder = new_name
-    end
-
     def add(uid, message)
       do_load if !loaded
       raise "Can't add messages without uid_validity" if !uid_validity
@@ -85,12 +77,27 @@ module Imap::Backup
       load_nth(message_index)
     end
 
+    def update_uid(old, new)
+      index = uids.find_index(old.to_i)
+      return if index.nil?
+      uids[index] = new.to_i
+      write_imap_file
+    end
+
     def reset
       @uids = nil
       @uid_validity = nil
       @loaded = false
       delete_files
       write_blank_mbox_file
+    end
+
+    def rename(new_name)
+      new_mbox_pathname = absolute_path(new_name + ".mbox")
+      new_imap_pathname = absolute_path(new_name + ".imap")
+      File.rename(mbox_pathname, new_mbox_pathname)
+      File.rename(imap_pathname, new_imap_pathname)
+      @folder = new_name
     end
 
     def relative_path
@@ -148,13 +155,13 @@ module Imap::Backup
 
           while line = f.gets
             if line.start_with?("From ")
-              e.yield lines.join("\n") + "\n" if lines.count > 0
+              e.yield lines.join if lines.count > 0
               lines = [line]
             else
               lines << line
             end
           end
-          e.yield lines.join("\n") + "\n" if lines.count > 0
+          e.yield lines.join if lines.count > 0
         end
       end
     end

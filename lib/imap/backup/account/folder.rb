@@ -24,6 +24,18 @@ module Imap::Backup
       name
     end
 
+    def exist?
+      examine
+      true
+    rescue Net::IMAP::NoResponseError => e
+      false
+    end
+
+    def create
+      return if exist?
+      imap.create(name)
+    end
+
     def uid_validity
       @uid_validity ||=
         begin
@@ -53,10 +65,20 @@ module Imap::Backup
       nil
     end
 
+    def append(message)
+      response = imap.append(name, message.supplied_body, nil, message.date)
+      extract_uid(response)
+    end
+
     private
 
     def examine
       imap.examine(name)
+    end
+
+    def extract_uid(response)
+      @uid_validity, uid = response.data.code.data.split(" ").map(&:to_i)
+      uid
     end
   end
 end
