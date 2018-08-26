@@ -102,8 +102,8 @@ module Imap::Backup
     def do_load
       data = imap_data
       if data
-        @uids = imap_data[:uids].map(&:to_i).sort
-        @uid_validity = imap_data[:uid_validity]
+        @uids = data[:uids].map(&:to_i).sort
+        @uid_validity = data[:uid_validity]
         @loaded = true
       else
         reset
