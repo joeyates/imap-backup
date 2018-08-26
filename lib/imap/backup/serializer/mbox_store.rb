@@ -18,6 +18,10 @@ module Imap::Backup
       @uid_validity = nil
     end
 
+    def exist?
+      mbox_exist? && imap_exist?
+    end
+
     def uid_validity
       do_load if !loaded
       @uid_validity
@@ -33,6 +37,14 @@ module Imap::Backup
     def uids
       do_load if !loaded
       @uids || []
+    end
+
+    def rename(new_name)
+      new_mbox_pathname = absolute_path(new_name + ".mbox")
+      new_imap_pathname = absolute_path(new_name + ".imap")
+      File.rename(mbox_pathname, new_mbox_pathname)
+      File.rename(imap_pathname, new_imap_pathname)
+      @folder = new_name
     end
 
     def add(uid, message)
@@ -170,10 +182,6 @@ module Imap::Backup
     def delete_files
       File.unlink(imap_pathname) if imap_exist?
       File.unlink(mbox_pathname) if mbox_exist?
-    end
-
-    def exist?
-      mbox_exist? && imap_exist?
     end
 
     def mbox_exist?

@@ -33,7 +33,6 @@ module Imap::Backup
         store.rename new_name
         @store = nil
         store.uid_validity = value
-        store.reset
         new_name
       end
     end

@@ -36,6 +36,24 @@ Subject: #{subject}
     imap.responses["UIDVALIDITY"][0]
   end
 
+  def server_create_folder(folder)
+    imap.create(folder)
+    imap.disconnect
+    @imap = nil
+  end
+
+  def server_rename_folder(from, to)
+    imap.rename(from, to)
+    imap.disconnect
+    @imap = nil
+  end
+
+  def server_delete_folder(folder)
+    imap.delete folder
+    imap.disconnect
+    @imap = nil
+  end
+
   def imap
     @imap ||=
       begin

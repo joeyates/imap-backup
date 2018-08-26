@@ -56,6 +56,11 @@ module Imap::Backup
       imap.disconnect
     end
 
+    def reconnect
+      disconnect
+      @imap = nil
+    end
+
     def imap
       return @imap unless @imap.nil?
       options = provider_options
