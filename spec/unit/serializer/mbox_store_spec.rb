@@ -20,22 +20,22 @@ describe Imap::Backup::Serializer::MboxStore do
   subject { described_class.new(base_path, folder) }
 
   before do
+    allow(File).to receive(:exist?).and_call_original
     allow(File).to receive(:exist?).with(imap_pathname) { imap_exists }
     allow(File).to receive(:exist?).with(mbox_pathname) { mbox_exists }
-    #allow(File).to receive(:exist?).and_call_original
 
+    allow(File).to receive(:open).and_call_original
     allow(File).
       to receive(:open).with("/base/path/my/folder.imap") { imap_content }
     allow(File).to receive(:open).with(imap_pathname, "w").and_yield(imap_file)
     allow(File).to receive(:open).with(mbox_pathname, "w").and_yield(mbox_file)
-    #allow(File).to receive(:open).and_call_original
 
+    allow(File).to receive(:read).and_call_original
     allow(File).to receive(:read).with(imap_pathname) { imap_content }
-    #allow(File).to receive(:read).and_call_original
 
+    allow(File).to receive(:unlink).and_call_original
     allow(File).to receive(:unlink).with(imap_pathname)
     allow(File).to receive(:unlink).with(mbox_pathname)
-    #allow(File).to receive(:unlink).and_call_original
 
     allow(FileUtils).to receive(:chmod)
   end
