@@ -143,7 +143,8 @@ describe Imap::Backup::Configuration::Account do
       context "if the server is blank" do
         [
           ["GMail", "foo@gmail.com", "imap.gmail.com"],
-          ["Fastmail", "bar@fastmail.fm", "mail.messagingengine.com"]
+          ["Fastmail", "bar@fastmail.fm", "imap.fastmail.com"],
+          ["Fastmail", "bar@fastmail.com", "imap.fastmail.com"]
         ].each do |service, email, expected|
           context service do
             let(:new_email) { email }

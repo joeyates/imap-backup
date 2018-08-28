@@ -3,6 +3,8 @@ module Email; end
 class Email::Provider
   def self.for_address(address)
     case
+    when address.end_with?("@fastmail.com")
+      new(:fastmail)
     when address.end_with?("@gmail.com")
       new(:gmail)
     when address.end_with?("@fastmail.fm")
@@ -34,7 +36,7 @@ class Email::Provider
     when :gmail
       "imap.gmail.com"
     when :fastmail
-      "mail.messagingengine.com"
+      "imap.fastmail.com"
     end
   end
 end
