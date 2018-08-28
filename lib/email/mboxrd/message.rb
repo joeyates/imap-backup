@@ -29,6 +29,10 @@ module Email::Mboxrd
       parsed.date
     end
 
+    def imap_body
+      supplied_body.gsub(/(?<!\r)\n/, "\r\n")
+    end
+
     private
 
     def parsed
