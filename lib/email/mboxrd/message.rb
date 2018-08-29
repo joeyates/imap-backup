@@ -22,7 +22,15 @@ module Email::Mboxrd
     end
 
     def to_serialized
-      "From " + from + "\n" + mboxrd_body + "\n"
+      "From " + from + "\n" + mboxrd_body
+    end
+
+    def date
+      parsed.date
+    end
+
+    def imap_body
+      supplied_body.gsub(/(?<!\r)\n/, "\r\n")
     end
 
     private
@@ -57,9 +65,10 @@ module Email::Mboxrd
     def mboxrd_body
       @mboxrd_body ||=
         begin
-          @mboxrd_body = add_extra_quote(supplied_body)
-          @mboxrd_body += "\n" if !@mboxrd_body.end_with?("\n")
-          @mboxrd_body
+          mboxrd_body = add_extra_quote(supplied_body.gsub("\r\n", "\n"))
+          mboxrd_body += "\n" if !mboxrd_body.end_with?("\n")
+          mboxrd_body += "\n" if !mboxrd_body.end_with?("\n\n")
+          mboxrd_body
         end
     end
 
@@ -74,10 +83,6 @@ module Email::Mboxrd
 
     def asctime
       @asctime ||= date ? date.asctime : ""
-    end
-
-    def date
-      parsed.date
     end
   end
 end

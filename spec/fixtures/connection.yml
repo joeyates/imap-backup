@@ -2,6 +2,5 @@
 :username: 'address@example.org'
 :password: 'pass'
 :connection_options:
-  :port: 8993
-  :ssl:
-    :verify_mode: 0
+  :port: 8143
+  :ssl: false

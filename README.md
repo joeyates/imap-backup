@@ -164,6 +164,13 @@ If you have problems:
   "debug": true
 }
 ```
+# Restore
+
+All missing messages are pushed to the IMAP server.
+Existing messages are left unchanged.
+
+This functionality requires that the IMAP server supports the UIDPLUS
+extension to IMAP4.
 
 # Other Usage
 
@@ -196,13 +203,33 @@ $ imap-backup status
 
 ## Integration Tests
 
-Integration tests are run against a Docker image
+Integration tests (feature specs) are run against a Docker image
 (antespi/docker-imap-devel:latest).
+
+In one shell, run the Docker image:
+
+```
+docker run \
+  --env MAIL_ADDRESS=address@example.org \
+  --env MAIL_PASS=pass \
+  --env MAILNAME=example.org \
+  --publish 8993:993 \
+  antespi/docker-imap-devel:latest
+```
 
 Currently, the integration tests with Docker are excluded from the CI run.
 
-The image has a pre-existing user:
-`address@example.org` with password `pass`
+To run **just** the Docker-based tests:
+
+```
+rspec -t docker
+```
+
+To run **all** specs, including the integration tests, do the following:
+
+```
+rspec -O .rspec-all
+```
 
 ## Contributing
 

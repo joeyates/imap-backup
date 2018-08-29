@@ -12,6 +12,7 @@ describe Imap::Backup::Serializer::MboxStore do
   let(:imap_content) do
     {
       version: Imap::Backup::Serializer::MboxStore::CURRENT_VERSION,
+      uid_validity: 123,
       uids: uids.sort
     }.to_json
   end
@@ -19,22 +20,22 @@ describe Imap::Backup::Serializer::MboxStore do
   subject { described_class.new(base_path, folder) }
 
   before do
+    allow(File).to receive(:exist?).and_call_original
     allow(File).to receive(:exist?).with(imap_pathname) { imap_exists }
     allow(File).to receive(:exist?).with(mbox_pathname) { mbox_exists }
-    #allow(File).to receive(:exist?).and_call_original
 
+    allow(File).to receive(:open).and_call_original
     allow(File).
       to receive(:open).with("/base/path/my/folder.imap") { imap_content }
     allow(File).to receive(:open).with(imap_pathname, "w").and_yield(imap_file)
     allow(File).to receive(:open).with(mbox_pathname, "w").and_yield(mbox_file)
-    #allow(File).to receive(:open).and_call_original
 
+    allow(File).to receive(:read).and_call_original
     allow(File).to receive(:read).with(imap_pathname) { imap_content }
-    #allow(File).to receive(:read).and_call_original
 
+    allow(File).to receive(:unlink).and_call_original
     allow(File).to receive(:unlink).with(imap_pathname)
     allow(File).to receive(:unlink).with(mbox_pathname)
-    #allow(File).to receive(:unlink).and_call_original
 
     allow(FileUtils).to receive(:chmod)
   end
@@ -65,11 +66,15 @@ describe Imap::Backup::Serializer::MboxStore do
     let(:mbox_formatted_message) { "message in mbox format" }
     let(:message_uid) { "999" }
     let(:message) do
-      double("Email::Mboxrd::Message", to_serialized: mbox_formatted_message)
+      instance_double(
+        Email::Mboxrd::Message,
+        to_serialized: mbox_formatted_message
+      )
     end
     let(:updated_imap_content) do
       {
         version: Imap::Backup::Serializer::MboxStore::CURRENT_VERSION,
+        uid_validity: 123,
         uids: (uids + [999]).sort
       }.to_json
     end
@@ -77,6 +82,7 @@ describe Imap::Backup::Serializer::MboxStore do
     before do
       allow(Email::Mboxrd::Message).to receive(:new).and_return(message)
       allow(File).to receive(:open).with(mbox_pathname, "ab") { mbox_file }
+      subject.uid_validity = 123
     end
 
     it "saves the message to the mbox" do
