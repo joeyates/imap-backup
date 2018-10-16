@@ -76,7 +76,7 @@ module Imap::Backup
       if !File.directory?(path)
         FileUtils.mkdir path
       end
-      if Utils::stat(path) != 0o700
+      if Utils::mode(path) != 0o700
         FileUtils.chmod 0o700, path
       end
     end
