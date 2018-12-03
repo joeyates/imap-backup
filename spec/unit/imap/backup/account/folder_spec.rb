@@ -1,7 +1,15 @@
 require "spec_helper"
 
 describe Imap::Backup::Account::Folder do
-  let(:imap) { double("Net::IMAP", examine: nil) }
+  let(:imap) do
+    instance_double(
+      Net::IMAP,
+      append: append_response,
+      create: nil,
+      examine: nil,
+      responses: responses
+    )
+  end
   let(:connection) { double("Imap::Backup::Account::Connection", imap: imap) }
   let(:missing_mailbox_data) do
     double("Data", text: "Unknown Mailbox: my_folder")
@@ -12,6 +20,8 @@ describe Imap::Backup::Account::Folder do
   let(:missing_mailbox_error) do
     Net::IMAP::NoResponseError.new(missing_mailbox_response)
   end
+  let(:responses) { [] }
+  let(:append_response) { nil }
 
   subject { described_class.new(connection, "my_folder") }
 
@@ -70,6 +80,89 @@ describe Imap::Backup::Account::Folder do
       subject.fetch(123)
 
       expect(message_body).to have_received(:force_encoding).with("utf-8")
+    end
+  end
+
+  context "#folder"  do
+    it "is the name" do
+      expect(subject.folder).to eq("my_folder")
+    end
+  end
+
+  context "#exist?" do
+    context "when the folder exists" do
+      it "is true" do
+        expect(subject.exist?).to be_truthy
+      end
+    end
+
+    context "when the folder doesn't exist" do
+      before do
+        allow(imap).to receive(:examine).and_raise(missing_mailbox_error)
+      end
+
+      it "is false" do
+        expect(subject.exist?).to be_falsey
+      end
+    end
+  end
+
+  context "#create" do
+    context "when the folder exists" do
+      before { subject.create }
+
+      it "is does not create the folder" do
+        expect(imap).to_not have_received(:create)
+      end
+    end
+
+    context "when the folder doesn't exist" do
+      before do
+        allow(imap).to receive(:examine).and_raise(missing_mailbox_error)
+        subject.create
+      end
+
+      it "is does not create the folder" do
+        expect(imap).to have_received(:create)
+      end
+    end
+  end
+
+  context "#uid_validity" do
+    let(:responses) { {"UIDVALIDITY" => ["x", "uid validity"]} }
+
+    it "is returned" do
+      expect(subject.uid_validity).to eq("uid validity")
+    end
+  end
+
+  context "#append" do
+    let(:message) do
+      instance_double(
+        Email::Mboxrd::Message,
+        imap_body: "imap body",
+        date: Time.now
+      )
+    end
+    let(:append_response) { "response" }
+    let(:result) { subject.append(message) }
+
+    before do
+      allow(append_response).
+        to receive_message_chain("data.code.data") { "1 2" }
+      result
+    end
+
+    it "appends the message" do
+      expect(imap).to have_received(:append)
+    end
+
+    it "returns the new uid" do
+      expect(result).to eq(2)
+    end
+
+    it "set the new uid validity" do
+      expect(subject.uid_validity).to eq(1)
     end
   end
 end
