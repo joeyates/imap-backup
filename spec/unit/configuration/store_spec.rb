@@ -16,6 +16,7 @@ describe Imap::Backup::Configuration::Store do
       "Imap::Backup::Configuration::Store::CONFIGURATION_DIRECTORY", directory
     )
     allow(File).to receive(:directory?).with(directory) { directory_exists }
+    allow(File).to receive(:exist?).and_call_original
     allow(File).to receive(:exist?).with(file_path) { file_exists }
     allow(Imap::Backup::Utils).
       to receive(:stat).with(directory).and_return(0o700)
