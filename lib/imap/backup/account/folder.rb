@@ -67,7 +67,7 @@ module Imap::Backup
 
     def append(message)
       body = message.imap_body
-      date = message.date.to_time
+      date = message.date&.to_time
       response = imap.append(name, body, nil, date)
       extract_uid(response)
     end
