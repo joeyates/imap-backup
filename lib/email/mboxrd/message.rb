@@ -27,6 +27,8 @@ module Email::Mboxrd
 
     def date
       parsed.date
+    rescue
+      nil
     end
 
     def imap_body

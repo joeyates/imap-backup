@@ -30,6 +30,21 @@ describe Email::Mboxrd::Message do
   let(:cloned_message_body) do
     "Foo\nBar\nFrom at the beginning of the line\n>>From quoted"
   end
+  let(:msg_good) do
+    %Q|Delivered-To: you@example.com
+From: Foo <foo@example.com>
+To: FirstName LastName <you@example.com>
+Date: #{date.rfc822}
+Subject: Re: no subject|
+  end
+
+  let(:msg_bad_date) do
+    %Q|Delivered-To: you@example.com
+From: Foo <foo@example.com>
+To: FirstName LastName <you@example.com>
+Date: Mon,5 May 2014 08:97:99 GMT
+Subject: Re: no subject|
+  end
 
   subject { described_class.new(message_body) }
 
@@ -90,14 +105,15 @@ describe Email::Mboxrd::Message do
       allow(Mail).to receive(:new).and_call_original
     end
 
-    context "when original message 'from' is nil" do
+    context "when original message 'from' is missing" do
       let(:message_body) { msg_no_from }
+
       it "'from' is empty string" do
         expect(subject.to_serialized).to start_with("From \n")
       end
     end
 
-    context "when original message 'from' is a string but not an address" do
+    context "when original message 'from' is a string but not well-formed address" do
       let(:message_body) { msg_bad_from }
 
       it "'from' is empty string" do
@@ -119,6 +135,22 @@ describe Email::Mboxrd::Message do
 
       it "Sender is used as 'from'" do
         expect(subject.to_serialized).to start_with("From " + from + "\n")
+      end
+    end
+  end
+
+  context "#date" do
+    let(:message_body) { msg_good }
+
+    it "returns the date" do
+      expect(subject.date).to eq(date)
+    end
+
+    context "with incorrect minutes and seconds" do
+      let(:message_body) { msg_bad_date }
+
+      it "returns nil" do
+        expect(subject.date).to be_nil
       end
     end
   end
