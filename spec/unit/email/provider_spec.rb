@@ -26,7 +26,7 @@ describe Email::Provider do
 
   describe "#options" do
     it "returns options" do
-      expect(subject.options).to eq(port: 993, ssl: true)
+      expect(subject.options).to be_a(Hash)
     end
   end
 
