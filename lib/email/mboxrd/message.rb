@@ -78,6 +78,8 @@ module Email::Mboxrd
 
     def date
       parsed.date
+    rescue
+      nil
     end
   end
 end
