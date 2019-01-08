@@ -48,7 +48,7 @@ module Email::Mboxrd
     def from
       @from ||=
         begin
-          from = best_from
+          from = best_from.dup
           from << " " + asctime if asctime != ""
           from
         end
