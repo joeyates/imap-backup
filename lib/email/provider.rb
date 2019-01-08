@@ -23,7 +23,7 @@ class Email::Provider
   def options
     case provider
     when :gmail
-      {port: 993, ssl: true}
+      {port: 993, ssl: {ssl_version: :TLSv1_2}}
     when :fastmail
       {port: 993, ssl: true}
     else
