@@ -1,34 +1,34 @@
-require "spec_helper"
+# rubocop:disable Metrics/ModuleLength
 
 module Imap::Backup
   describe Configuration::Asker do
+    subject { described_class.new(highline) }
+
     let(:highline) { double }
     let(:query) do
-      double(
-        "Query",
-        :default= => nil,
-        :readline= => nil,
-        :validate= => nil,
-        :responses => {},
-        :echo= => nil
+      instance_double(
+        HighLine::Question,
+        "default=": nil,
+        "readline=": nil,
+        "validate=": nil,
+        "responses": {},
+        "echo=": nil
       )
     end
     let(:answer) { "foo" }
 
     before do
-      allow(Configuration::Setup).to receive(:highline).and_return(highline)
+      allow(Configuration::Setup).to receive(:highline) { highline }
       allow(highline).to receive(:ask) do |&b|
         b.call query
         answer
       end
     end
 
-    subject { described_class.new(highline) }
-
     [
       [:email, [], "email address"],
       [:password, [], "password"],
-      [:backup_path, ["x", "y"], "backup directory"]
+      [:backup_path, %w(x y), "backup directory"]
     ].each do |method, params, prompt|
       context ".#{method}" do
         it "asks for input" do
@@ -58,39 +58,35 @@ module Imap::Backup
     context "#email" do
       let(:email) { "email@example.com" }
       let(:answer) { email }
+      let(:result) { subject.email }
 
-      before do
-        @result = subject.email
-      end
+      before { result }
 
       it "asks for an email" do
         expect(highline).to have_received(:ask).with(/email/)
       end
 
       it "returns the address" do
-        expect(@result).to eq(email)
+        expect(result).to eq(email)
       end
     end
 
     context "#password" do
       let(:password1) { "password" }
       let(:password2) { "password" }
-      let(:answers) { [answer1, answer2] }
-      let(:answer1) { true }
-      let(:answer2) { false }
+      let(:answers) { [true, false] }
+      let(:result) { subject.password }
 
       before do
-        @i = 0
-        allow(highline).to receive(:ask).
-          with("password: ").and_return(password1)
-        allow(highline).to receive(:ask).
-          with("repeat password: ").and_return(password2)
+        i = 0
+        allow(highline).to receive(:ask).with("password: ") { password1 }
+        allow(highline).to receive(:ask).with("repeat password: ") { password2 }
         allow(highline).to receive(:agree) do
-          answer = answers[@i]
-          @i += 1
+          answer = answers[i]
+          i += 1
           answer
         end
-        @result = subject.password
+        result
       end
 
       it "asks for a password" do
@@ -102,7 +98,7 @@ module Imap::Backup
       end
 
       it "returns the password" do
-        expect(@result).to eq(password1)
+        expect(result).to eq(password1)
       end
 
       context "different answers" do
@@ -110,7 +106,7 @@ module Imap::Backup
 
         it "asks to continue" do
           expect(highline).to have_received(:agree).
-            at_least(1).times.with(/Continue\?/)
+            at_least(:once).with(/Continue\?/)
         end
       end
     end
@@ -118,13 +114,14 @@ module Imap::Backup
     context "#backup_path" do
       let(:path) { "/path" }
       let(:answer) { path }
+      let(:result) { subject.backup_path("", //) }
 
       before do
         allow(highline).to receive(:ask) do |&b|
           b.call query
           path
         end
-        @result = subject.backup_path("", //)
+        result
       end
 
       it "asks for a directory" do
@@ -132,8 +129,10 @@ module Imap::Backup
       end
 
       it "returns the path" do
-        expect(@result).to eq(path)
+        expect(result).to eq(path)
       end
     end
   end
 end
+
+# rubocop:enable Metrics/ModuleLength

@@ -1,16 +1,20 @@
-require "spec_helper"
-
 describe Imap::Backup::Downloader do
   describe "#run" do
+    subject { described_class.new(folder, serializer) }
+
     let(:message) { {"RFC822" => "blah"} }
     let(:folder) do
-      double("Imap::Backup::Account::Folder", fetch: message, name: "folder")
+      instance_double(
+        Imap::Backup::Account::Folder,
+        fetch: message,
+        name: "folder"
+      )
     end
-    let(:folder_uids) { ["111", "222", "333"] }
-    let(:serializer) { double("Imap::Backup::Serializer", save: nil) }
+    let(:folder_uids) { %w(111 222 333) }
+    let(:serializer) do
+      instance_double(Imap::Backup::Serializer::Mbox, save: nil)
+    end
     let(:serializer_uids) { ["222"] }
-
-    subject { described_class.new(folder, serializer) }
 
     before do
       allow(folder).to receive(:uids).and_return(folder_uids)

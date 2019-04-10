@@ -1,8 +1,6 @@
-require "spec_helper"
-
 describe Imap::Backup::Utils do
   let(:filename) { "foobar" }
-  let(:stat) { double("File::Stat", mode: mode) }
+  let(:stat) { instance_double(File::Stat, mode: mode) }
   let(:mode) { 0o777 }
   let(:exists) { true }
 

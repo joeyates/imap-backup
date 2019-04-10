@@ -9,7 +9,7 @@ module Imap::Backup
     def run
       catch :done do
         loop do
-          system("clear")
+          Kernel.system("clear")
           create_menu
         end
       end
@@ -46,12 +46,12 @@ module Imap::Backup
     def modify_email(menu)
       menu.choice("modify email") do
         username = Configuration::Asker.email(username)
-        puts "username: #{username}"
+        Kernel.puts "username: #{username}"
         other_accounts = store.accounts.reject { |a| a == account }
         others = other_accounts.map { |a| a[:username] }
-        puts "others: #{others.inspect}"
+        Kernel.puts "others: #{others.inspect}"
         if others.include?(username)
-          puts "There is already an account set up with that email address"
+          Kernel.puts "There is already an account set up with that email address"
         else
           account[:username] = username
           if account[:server].nil? || (account[:server] == "")
@@ -89,7 +89,7 @@ module Imap::Backup
             a[:username] != account[:username] && a[:local_path] == p
           end
           if same
-            puts "The path '#{p}' is used to backup " \
+            Kernel.puts "The path '#{p}' is used to backup " \
               "the account '#{same[:username]}'"
             false
           else
@@ -112,7 +112,7 @@ module Imap::Backup
     def test_connection(menu)
       menu.choice("test connection") do
         result = Configuration::ConnectionTester.test(account)
-        puts result
+        Kernel.puts result
         highline.ask "Press a key "
       end
     end
@@ -141,7 +141,7 @@ module Imap::Backup
     def default_server(username)
       provider = Email::Provider.for_address(username)
       if provider.provider == :default
-        puts "Can't decide provider for email address '#{username}'"
+        Kernel.puts "Can't decide provider for email address '#{username}'"
         return nil
       end
       provider.host

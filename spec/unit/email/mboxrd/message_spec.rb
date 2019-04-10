@@ -1,73 +1,82 @@
-require "spec_helper"
+msg_no_from = <<~NO_FROM
+  Delivered-To: you@example.com
+  From: example <www.example.com>
+  To: FirstName LastName <you@example.com>
+  Subject: Re: no subject
+NO_FROM
 
-msg_no_from = %Q|Delivered-To: you@example.com
-From: example <www.example.com>
-To: FirstName LastName <you@example.com>
-Subject: Re: no subject|
+msg_bad_from = <<~BAD_FROM
+  Delivered-To: you@example.com
+  from: "FirstName LastName (TEXT)" <"TEXT*" <no-reply@example.com>>
+  To: FirstName LastName <you@example.com>
+  Subject: Re: no subject
+BAD_FROM
 
-msg_bad_from = %Q|Delivered-To: you@example.com
-from: "FirstName LastName (TEXT)" <"TEXT*" <no-reply@example.com>>
-To: FirstName LastName <you@example.com>
-Subject: Re: no subject|
+msg_no_from_but_return_path = <<~RETURN_PATH
+  Delivered-To: you@example.com
+  From: example <www.example.com>
+  To: FirstName LastName <you@example.com>
+  Return-Path: <me@example.com>
+  Subject: Re: no subject
+RETURN_PATH
 
-msg_no_from_but_return_path = %Q|Delivered-To: you@example.com
-From: example <www.example.com>
-To: FirstName LastName <you@example.com>
-Return-Path: <me@example.com>
-Subject: Re: no subject|
-
-msg_no_from_but_sender = %Q|Delivered-To: you@example.com
-To: FirstName LastName <you@example.com>
-Subject: Re: no subject
-Sender: FistName LastName <me@example.com>|
+msg_no_from_but_sender = <<~NOT_SENDER
+  Delivered-To: you@example.com
+  To: FirstName LastName <you@example.com>
+  Subject: Re: no subject
+  Sender: FistName LastName <me@example.com>
+NOT_SENDER
 
 describe Email::Mboxrd::Message do
+  subject { described_class.new(message_body) }
+
   let(:from) { "me@example.com" }
   let(:date) { DateTime.new(2012, 12, 13, 18, 23, 45) }
   let(:message_body) do
-    double("Body", clone: cloned_message_body, force_encoding: nil)
+    instance_double(String, clone: cloned_message_body, force_encoding: nil)
   end
   let(:cloned_message_body) do
     "Foo\nBar\nFrom at the beginning of the line\n>>From quoted"
   end
   let(:msg_good) do
-    %Q|Delivered-To: you@example.com
-From: Foo <foo@example.com>
-To: FirstName LastName <you@example.com>
-Date: #{date.rfc822}
-Subject: Re: no subject|
+    <<~GOOD
+      Delivered-To: you@example.com
+      From: Foo <foo@example.com>
+      To: FirstName LastName <you@example.com>
+      Date: #{date.rfc822}
+      Subject: Re: no subject
+    GOOD
   end
 
   let(:msg_bad_date) do
-    %Q|Delivered-To: you@example.com
-From: Foo <foo@example.com>
-To: FirstName LastName <you@example.com>
-Date: Mon,5 May 2014 08:97:99 GMT
-Subject: Re: no subject|
+    <<~BAD
+      Delivered-To: you@example.com
+      From: Foo <foo@example.com>
+      To: FirstName LastName <you@example.com>
+      Date: Mon,5 May 2014 08:97:99 GMT
+      Subject: Re: no subject
+    BAD
   end
-
-  subject { described_class.new(message_body) }
 
   describe ".from_serialized" do
     let(:serialized_message) { "From foo@a.com\n#{imap_message}" }
     let(:imap_message) { "Delivered-To: me@example.com\nFrom Me\n" }
-
-    before { @result = described_class.from_serialized(serialized_message) }
+    let!(:result) { described_class.from_serialized(serialized_message) }
 
     it "returns the message" do
-      expect(@result).to be_a(described_class)
+      expect(result).to be_a(described_class)
     end
 
     it "removes one level of > before From" do
-      expect(@result.supplied_body).to eq(imap_message)
+      expect(result.supplied_body).to eq(imap_message)
     end
   end
 
   context "#to_serialized" do
-    let(:mail) { double("Mail", from: [from], date: date) }
+    let(:mail) { instance_double(Mail::Message, from: [from], date: date) }
 
     before do
-      allow(Mail).to receive(:new).with(cloned_message_body).and_return(mail)
+      allow(Mail).to receive(:new).with(cloned_message_body) { mail }
     end
 
     it "does not modify the message" do
@@ -113,7 +122,7 @@ Subject: Re: no subject|
       end
     end
 
-    context "when original message 'from' is a string but not well-formed address" do
+    context "when original message 'from' is not a well-formed address" do
       let(:message_body) { msg_bad_from }
 
       it "'from' is empty string" do

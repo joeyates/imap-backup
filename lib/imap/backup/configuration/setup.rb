@@ -13,7 +13,7 @@ module Imap::Backup
       Imap::Backup.setup_logging config
       catch :done do
         loop do
-          system("clear")
+          Kernel.system("clear")
           show_menu
         end
       end

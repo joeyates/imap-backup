@@ -1,5 +1,6 @@
-require "spec_helper"
 require "json"
+
+# rubocop:disable RSpec/PredicateMatcher
 
 describe Imap::Backup::Configuration::Store do
   let(:directory) { "/base/path" }
@@ -130,8 +131,10 @@ describe Imap::Backup::Configuration::Store do
   end
 
   describe "#save" do
+    subject { described_class.new }
+
     let(:directory_exists) { false }
-    let(:file) { double("File", write: nil) }
+    let(:file) { instance_double(File, write: nil) }
 
     before do
       allow(FileUtils).to receive(:mkdir)
@@ -139,8 +142,6 @@ describe Imap::Backup::Configuration::Store do
       allow(File).to receive(:open).with(file_path, "w") { |&b| b.call file }
       allow(JSON).to receive(:pretty_generate).and_return("JSON output")
     end
-
-    subject { described_class.new }
 
     it "creates the config directory" do
       subject.save
@@ -219,3 +220,5 @@ describe Imap::Backup::Configuration::Store do
     end
   end
 end
+
+# rubocop:enable RSpec/PredicateMatcher

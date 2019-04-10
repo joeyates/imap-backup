@@ -1,4 +1,6 @@
 describe Imap::Backup::Serializer::Mbox do
+  subject { described_class.new(base_path, imap_folder) }
+
   let(:base_path) { "/base/path" }
   let(:store) do
     instance_double(
@@ -20,11 +22,6 @@ describe Imap::Backup::Serializer::Mbox do
     allow(Imap::Backup::Utils).to receive(:mode) { permissions }
     allow(Imap::Backup::Utils).to receive(:check_permissions) { true }
     allow(File).to receive(:directory?) { dir_exists }
-  end
-
-  subject { described_class.new(base_path, imap_folder) }
-
-  before do
     allow(FileUtils).to receive(:chmod)
     allow(Imap::Backup::Serializer::MboxStore).to receive(:new) { store }
   end

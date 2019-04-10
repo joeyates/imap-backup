@@ -1,5 +1,3 @@
-require "spec_helper"
-
 describe Imap::Backup::Uploader do
   subject { described_class.new(folder, serializer) }
 

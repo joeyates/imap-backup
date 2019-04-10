@@ -1,6 +1,8 @@
-require "spec_helper"
+# rubocop:disable RSpec/PredicateMatcher
 
 describe Imap::Backup::Account::Folder do
+  subject { described_class.new(connection, "my_folder") }
+
   let(:imap) do
     instance_double(
       Net::IMAP,
@@ -10,20 +12,18 @@ describe Imap::Backup::Account::Folder do
       responses: responses
     )
   end
-  let(:connection) { double("Imap::Backup::Account::Connection", imap: imap) }
+  let(:connection) do
+    instance_double(Imap::Backup::Account::Connection, imap: imap)
+  end
   let(:missing_mailbox_data) do
-    double("Data", text: "Unknown Mailbox: my_folder")
+    OpenStruct.new(text: "Unknown Mailbox: my_folder")
   end
-  let(:missing_mailbox_response) do
-    double("Response", data: missing_mailbox_data)
-  end
+  let(:missing_mailbox_response) { OpenStruct.new(data: missing_mailbox_data) }
   let(:missing_mailbox_error) do
     Net::IMAP::NoResponseError.new(missing_mailbox_response)
   end
   let(:responses) { [] }
   let(:append_response) { nil }
-
-  subject { described_class.new(connection, "my_folder") }
 
   context "#uids" do
     let(:uids) { [5678, 123] }
@@ -46,7 +46,7 @@ describe Imap::Backup::Account::Folder do
   end
 
   context "#fetch" do
-    let(:message_body) { double("the body", force_encoding: nil) }
+    let(:message_body) { instance_double(String, force_encoding: nil) }
     let(:attributes) { {"RFC822" => message_body, "other" => "xxx"} }
     let(:fetch_data_item) do
       instance_double(Net::IMAP::FetchData, attr: attributes)
@@ -144,12 +144,12 @@ describe Imap::Backup::Account::Folder do
         date: Time.now
       )
     end
-    let(:append_response) { "response" }
+    let(:append_response) do
+      OpenStruct.new(data: OpenStruct.new(code: OpenStruct.new(data: "1 2")))
+    end
     let(:result) { subject.append(message) }
 
     before do
-      allow(append_response).
-        to receive_message_chain("data.code.data") { "1 2" }
       result
     end
 
@@ -166,3 +166,5 @@ describe Imap::Backup::Account::Folder do
     end
   end
 end
+
+# rubocop:enable RSpec/PredicateMatcher

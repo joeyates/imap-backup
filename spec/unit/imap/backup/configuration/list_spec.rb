@@ -1,6 +1,6 @@
-require "spec_helper"
-
 describe Imap::Backup::Configuration::List do
+  subject { described_class.new }
+
   let(:accounts) do
     [
       {username: "a1@example.com"},
@@ -8,14 +8,14 @@ describe Imap::Backup::Configuration::List do
     ]
   end
   let(:store) do
-    double("Imap::Backup::Configuration::Store", accounts: accounts)
+    instance_double(Imap::Backup::Configuration::Store, accounts: accounts)
   end
   let(:exists) { true }
   let(:connection1) do
-    double("Imap::Backup::Account::Connection", disconnect: nil)
+    instance_double(Imap::Backup::Account::Connection, disconnect: nil)
   end
   let(:connection2) do
-    double("Imap::Backup::Account::Connection", disconnect: nil)
+    instance_double(Imap::Backup::Account::Connection, disconnect: nil)
   end
 
   before do
@@ -26,11 +26,6 @@ describe Imap::Backup::Configuration::List do
       to receive(:new).with(accounts[0]) { connection1 }
     allow(Imap::Backup::Account::Connection).
       to receive(:new).with(accounts[1]) { connection2 }
-  end
-
-  subject { described_class.new }
-
-  context "#initialize" do
   end
 
   context "#each_connection" do
@@ -45,7 +40,7 @@ describe Imap::Backup::Configuration::List do
     context "with account parameter" do
       subject { described_class.new(["a2@example.com"]) }
 
-      it "should only create requested accounts" do
+      it "only creates requested accounts" do
         connections = []
 
         subject.each_connection { |a| connections << a }
@@ -58,9 +53,9 @@ describe Imap::Backup::Configuration::List do
       let(:exists) { false }
 
       it "fails" do
-        expect {
+        expect do
           subject.each_connection {}
-        }.to raise_error(Imap::Backup::ConfigurationNotFound, /not found/)
+        end.to raise_error(Imap::Backup::ConfigurationNotFound, /not found/)
       end
     end
   end

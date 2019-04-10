@@ -1,4 +1,4 @@
-require "spec_helper"
+# rubocop:disable RSpec/NestedGroups
 
 describe Imap::Backup::Configuration::Setup do
   include HighLineTestHelpers
@@ -12,39 +12,41 @@ describe Imap::Backup::Configuration::Setup do
   end
 
   context "#run" do
+    subject { described_class.new }
+
     let(:normal) { {username: "account@example.com"} }
     let(:accounts) { [normal] }
     let(:store) do
-      double(
-        "Imap::Backup::Configuration::Store",
-        :accounts => accounts,
-        :path => "/base/path",
-        :save => nil,
-        :debug? => debug,
-        :debug= => nil,
-        :modified? => modified,
+      instance_double(
+        Imap::Backup::Configuration::Store,
+        "accounts": accounts,
+        "path": "/base/path",
+        "save": nil,
+        "debug?": debug,
+        "debug=": nil,
+        "modified?": modified
       )
     end
     let(:debug) { false }
     let(:modified) { false }
+    let!(:highline_streams) { prepare_highline }
+    let(:input) { highline_streams[0] }
+    let(:output) { highline_streams[1] }
 
-    before :each do
+    before do
       allow(Imap::Backup::Configuration::Store).to receive(:new) { store }
       allow(Imap::Backup).to receive(:setup_logging)
-      @input, @output = prepare_highline
-      allow(@input).to receive(:eof?).and_return(false)
-      allow(@input).to receive(:gets).and_return("exit\n")
-      allow(subject).to receive(:system)
+      allow(input).to receive(:eof?) { false }
+      allow(input).to receive(:gets) { "exit\n" }
+      allow(Kernel).to receive(:system)
     end
-
-    subject { described_class.new }
 
     context "main menu" do
       before { subject.run }
 
       %w(add\ account save\ and\ exit exit\ without\ saving).each do |choice|
         it "includes #{choice}" do
-          expect(@output.string).to include(choice)
+          expect(output.string).to include(choice)
         end
       end
     end
@@ -52,7 +54,7 @@ describe Imap::Backup::Configuration::Setup do
     it "clears the screen" do
       subject.run
 
-      expect(subject).to have_received(:system).with("clear")
+      expect(Kernel).to have_received(:system).with("clear")
     end
 
     it "updates logging status" do
@@ -70,19 +72,19 @@ describe Imap::Backup::Configuration::Setup do
 
       context "normal accounts" do
         it "are listed" do
-          expect(@output.string).to match /account@example.com/
+          expect(output.string).to match(/account@example.com/)
         end
       end
 
       context "modified accounts" do
         it "are flagged" do
-          expect(@output.string).to match /modified@example.com \*/
+          expect(output.string).to match(/modified@example.com \*/)
         end
       end
 
       context "deleted accounts" do
         it "are hidden" do
-          expect(@output.string).to_not match /delete@example.com/
+          expect(output.string).to_not match(/delete@example.com/)
         end
       end
     end
@@ -96,10 +98,12 @@ describe Imap::Backup::Configuration::Setup do
           folders: []
         }
       end
-      let(:account) { double("Imap::Backup::Configuration::Account", run: nil) }
+      let(:account) do
+        instance_double(Imap::Backup::Configuration::Account, run: nil)
+      end
 
       before do
-        allow(@input).to receive(:gets).and_return("add\n", "exit\n")
+        allow(input).to receive(:gets).and_return("add\n", "exit\n")
         allow(Imap::Backup::Configuration::Asker).to receive(:email).
           with(no_args).and_return("new@example.com")
         allow(Imap::Backup::Configuration::Account).to receive(:new).
@@ -120,12 +124,12 @@ describe Imap::Backup::Configuration::Setup do
     context "logging" do
       context "when debug logging is disabled" do
         before do
-          allow(@input).to receive(:gets).and_return("start\n", "exit\n")
+          allow(input).to receive(:gets).and_return("start\n", "exit\n")
           subject.run
         end
 
         it "shows a menu item" do
-          expect(@output.string).to include("start logging")
+          expect(output.string).to include("start logging")
         end
 
         context "when selected" do
@@ -143,17 +147,17 @@ describe Imap::Backup::Configuration::Setup do
         let(:debug) { true }
 
         before do
-          allow(@input).to receive(:gets).and_return("stop\n", "exit\n")
+          allow(input).to receive(:gets).and_return("stop\n", "exit\n")
           subject.run
         end
 
         it "shows a menu item" do
-          expect(@output.string).to include("stop logging")
+          expect(output.string).to include("stop logging")
         end
 
         context "when selected" do
           before do
-            allow(@input).to receive(:gets).and_return("stop\n", "exit\n")
+            allow(input).to receive(:gets).and_return("stop\n", "exit\n")
           end
 
           it "unsets the debug flag" do
@@ -169,7 +173,7 @@ describe Imap::Backup::Configuration::Setup do
 
     context "when 'save' is selected" do
       before do
-        allow(@input).to receive(:gets).and_return("save\n")
+        allow(input).to receive(:gets).and_return("save\n")
         subject.run
       end
 
@@ -184,7 +188,7 @@ describe Imap::Backup::Configuration::Setup do
 
     context "when 'exit without saving' is selected" do
       before do
-        allow(@input).to receive(:gets).and_return("exit\n")
+        allow(input).to receive(:gets).and_return("exit\n")
 
         subject.run
       end
@@ -209,3 +213,5 @@ describe Imap::Backup::Configuration::Setup do
     end
   end
 end
+
+# rubocop:enable RSpec/NestedGroups

@@ -1,13 +1,15 @@
 describe Imap::Backup::Serializer::MboxStore do
+  subject { described_class.new(base_path, folder) }
+
   let(:base_path) { "/base/path" }
   let(:folder) { "the/folder" }
   let(:folder_path) { File.join(base_path, folder) }
   let(:imap_pathname) { folder_path + ".imap" }
   let(:imap_exists) { true }
-  let(:imap_file) { double("File - imap", write: nil, close: nil) }
+  let(:imap_file) { instance_double(File, write: nil, close: nil) }
   let(:mbox_pathname) { folder_path + ".mbox" }
   let(:mbox_exists) { true }
-  let(:mbox_file) { double("File - mbox", write: nil, close: nil) }
+  let(:mbox_file) { instance_double(File, write: nil, close: nil) }
   let(:uids) { [3, 2, 1] }
   let(:imap_content) do
     {
@@ -16,8 +18,6 @@ describe Imap::Backup::Serializer::MboxStore do
       uids: uids.sort
     }.to_json
   end
-
-  subject { described_class.new(base_path, folder) }
 
   before do
     allow(File).to receive(:exist?).and_call_original

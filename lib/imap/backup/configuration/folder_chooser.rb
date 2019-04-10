@@ -23,7 +23,7 @@ module Imap::Backup
 
       catch :done do
         loop do
-          system("clear")
+          Kernel.system("clear")
           show_menu
         end
       end

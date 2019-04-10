@@ -3,12 +3,12 @@ module BackupDirectoryHelpers
     from = fixture("connection")[:username]
     subject = options[:subject]
     body = options[:body]
-    body_and_headers = <<-EOT
-From: #{from}
-Subject: #{subject}
+    body_and_headers = <<~BODY
+      From: #{from}
+      Subject: #{subject}
 
-#{body}
-    EOT
+      #{body}
+    BODY
 
     "From #{from}\n#{body_and_headers}\n"
   end

@@ -1,5 +1,3 @@
-require "spec_helper"
-
 describe Imap::Backup::Account::Connection do
   def self.backup_folder
     "backup_folder"
@@ -8,6 +6,8 @@ describe Imap::Backup::Account::Connection do
   def self.folder_config
     {name: backup_folder}
   end
+
+  subject { described_class.new(options) }
 
   let(:imap) do
     instance_double(Net::IMAP, login: nil, disconnect: nil)
@@ -18,7 +18,7 @@ describe Imap::Backup::Account::Connection do
       username: username,
       password: "password",
       local_path: local_path,
-      folders: backup_folders,
+      folders: backup_folders
     }
   end
   let(:local_path) { "local_path" }
@@ -48,8 +48,6 @@ describe Imap::Backup::Account::Connection do
     allow(Imap::Backup::Utils).to receive(:make_folder)
   end
 
-  subject { described_class.new(options) }
-
   shared_examples "connects to IMAP" do
     it "sets up the IMAP connection" do
       expect(Net::IMAP).to have_received(:new)
@@ -78,10 +76,10 @@ describe Imap::Backup::Account::Connection do
   end
 
   describe "#imap" do
-    before { @result = subject.imap }
+    let!(:result) { subject.imap }
 
     it "returns the IMAP connection" do
-      expect(@result).to eq(imap)
+      expect(result).to eq(imap)
     end
 
     include_examples "connects to IMAP"
@@ -108,7 +106,7 @@ describe Imap::Backup::Account::Connection do
       allow(Imap::Backup::Serializer::Mbox).to receive(:new) { serializer }
     end
 
-    it "should return the names of folders" do
+    it "returns the names of folders" do
       expect(subject.status[0][:name]).to eq(self.class.backup_folder)
     end
 
@@ -116,7 +114,7 @@ describe Imap::Backup::Account::Connection do
       expect(subject.status[0][:local]).to eq([local_uid])
     end
 
-    it "should retrieve the available uids" do
+    it "retrieves the available uids" do
       expect(subject.status[0][:remote]).to eq([remote_uid])
     end
   end
@@ -143,9 +141,8 @@ describe Imap::Backup::Account::Connection do
           with(subject, self.class.backup_folder).and_return(folder)
         allow(Imap::Backup::Serializer::Mbox).to receive(:new).
           with(local_path, self.class.backup_folder).and_return(serializer)
+        subject.run_backup
       end
-
-      before { subject.run_backup }
 
       it "runs the downloader" do
         expect(downloader).to have_received(:run)

@@ -1,15 +1,16 @@
-require "spec_helper"
-
 describe Imap::Backup::Configuration::ConnectionTester do
   context ".test" do
-    let(:connection) { double("Imap::Backup::Account::Connection", imap: nil) }
+    let(:connection) do
+      instance_double(Imap::Backup::Account::Connection, imap: nil)
+    end
+    let(:result) { subject.test("foo") }
 
     before do
       allow(Imap::Backup::Account::Connection).to receive(:new) { connection }
     end
 
     context "call" do
-      before { @result = subject.test("foo") }
+      before { result }
 
       it "tries to connect" do
         expect(connection).to have_received(:imap)
@@ -17,34 +18,36 @@ describe Imap::Backup::Configuration::ConnectionTester do
     end
 
     context "success" do
-      before { @result = subject.test("foo") }
+      before { result }
 
       it "returns success" do
-        expect(@result).to match(/successful/)
+        expect(result).to match(/successful/)
       end
     end
 
     context "failure" do
       before do
         allow(connection).to receive(:imap).and_raise(error)
-        @result = subject.test("foo")
+        result
       end
 
       context "no connection" do
         let(:error) do
-          data = double("foo", text: "bar")
-          Net::IMAP::NoResponseError.new(double("o", data: data))
+          data = OpenStruct.new(text: "bar")
+          response = OpenStruct.new(data: data)
+          Net::IMAP::NoResponseError.new(response)
         end
 
-        it "returns success" do
-          expect(@result).to match(/no response/i)
+        it "returns error" do
+          expect(result).to match(/no response/i)
         end
       end
 
       context "other" do
         let(:error) { "Error" }
-        it "returns success" do
-          expect(@result).to match(/unexpected error/i)
+
+        it "returns error" do
+          expect(result).to match(/unexpected error/i)
         end
       end
     end

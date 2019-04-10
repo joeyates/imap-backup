@@ -1,8 +1,15 @@
 inherit_from: https://gitlab.com/snippets/1744945/raw
 
 AllCops:
-  TargetRubyVersion: 2.1
+  TargetRubyVersion: 2.3
   Exclude:
     - "bin/stubs/*"
   DisplayCopNames:
     Enabled: true
+
+RSpec/ContextWording:
+  Enabled: false
+RSpec/NestedGroups:
+  Max: 4
+RSpec/ReturnFromStub:
+  Enabled: false

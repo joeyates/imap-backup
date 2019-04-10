@@ -10,7 +10,7 @@ RSpec.describe "backup", type: :feature, docker: true do
   let(:folder) { "my-stuff" }
   let(:email1) { send_email folder, msg1 }
   let(:email2) { send_email folder, msg2 }
-  let!(:pre) { }
+  let!(:pre) {}
   let!(:setup) do
     server_create_folder folder
     email1
@@ -29,7 +29,7 @@ RSpec.describe "backup", type: :feature, docker: true do
     expect(mbox_content(folder)).to eq(messages_as_mbox)
   end
 
-  context "IMAP metadata" do
+  describe "IMAP metadata" do
     let(:imap_metadata) { imap_parsed(folder) }
     let(:folder_uids) { server_uids(folder) }
 
@@ -52,14 +52,15 @@ RSpec.describe "backup", type: :feature, docker: true do
     context "when uid_validity does not match" do
       let(:new_name) { "NEWNAME" }
       let(:email3) { send_email folder, msg3 }
+      let(:original_folder_uid_validity) { server_uid_validity(folder) }
       let!(:pre) do
         server_create_folder folder
         email3
-        @original_folder_uid_validity = server_uid_validity(folder)
+        original_folder_uid_validity
         connection.run_backup
         server_rename_folder folder, new_name
       end
-      let(:renamed_folder) { folder + "." + @original_folder_uid_validity.to_s }
+      let(:renamed_folder) { folder + "." + original_folder_uid_validity.to_s }
 
       after do
         server_delete_folder new_name
@@ -81,7 +82,7 @@ RSpec.describe "backup", type: :feature, docker: true do
         end
 
         it "moves the old backup to a uniquely named directory" do
-          renamed = folder + "." + @original_folder_uid_validity.to_s + ".1"
+          renamed = folder + "." + original_folder_uid_validity.to_s + ".1"
           expect(mbox_content(renamed)).to eq(message_as_mbox_entry(msg3))
         end
       end

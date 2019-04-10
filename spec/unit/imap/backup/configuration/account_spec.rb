@@ -1,4 +1,4 @@
-require "spec_helper"
+# rubocop:disable RSpec/NestedGroups
 
 describe Imap::Backup::Configuration::Account do
   class MockHighlineMenu
@@ -19,11 +19,11 @@ describe Imap::Backup::Configuration::Account do
   end
 
   context "#initialize" do
+    subject { described_class.new(store, account, highline) }
+
     let(:store) { "store" }
     let(:account) { "account" }
     let(:highline) { "highline" }
-
-    subject { described_class.new(store, account, highline) }
 
     [:store, :account, :highline].each do |param|
       it "expects #{param}" do
@@ -33,10 +33,12 @@ describe Imap::Backup::Configuration::Account do
   end
 
   context "#run" do
-    let(:highline) { double("Highline") }
+    subject { described_class.new(store, account, highline) }
+
+    let(:highline) { instance_double(HighLine) }
     let(:menu) { MockHighlineMenu.new }
     let(:store) do
-      double("Imap::Backup::Configuration::Store", accounts: accounts)
+      instance_double(Imap::Backup::Configuration::Store, accounts: accounts)
     end
     let(:accounts) { [account, account1] }
     let(:account) do
@@ -45,13 +47,13 @@ describe Imap::Backup::Configuration::Account do
         server: existing_server,
         local_path: "/backup/path",
         folders: [{name: "my_folder"}],
-        password: existing_password,
+        password: existing_password
       }
     end
     let(:account1) do
       {
         username: other_email,
-        local_path: other_existing_path,
+        local_path: other_existing_path
       }
     end
     let(:existing_email) { "user@example.com" }
@@ -62,21 +64,19 @@ describe Imap::Backup::Configuration::Account do
     let(:other_existing_path) { "/other/existing/path" }
 
     before do
-      allow(subject).to receive(:system).and_return(nil)
-      allow(subject).to receive(:puts).and_return(nil)
+      allow(Kernel).to receive(:system)
+      allow(Kernel).to receive(:puts)
       allow(highline).to receive(:choose) do |&block|
         block.call(menu)
         throw :done
       end
     end
 
-    subject { described_class.new(store, account, highline) }
-
     context "preparation" do
       before { subject.run }
 
       it "clears the screen" do
-        expect(subject).to have_received(:system).with("clear")
+        expect(Kernel).to have_received(:system).with("clear")
       end
 
       context "menu" do
@@ -96,7 +96,7 @@ describe Imap::Backup::Configuration::Account do
         "test connection",
         "delete",
         "return to main menu",
-        "quit", # TODO: quit is hidden
+        "quit" # TODO: quit is hidden
       ].each do |item|
         before { subject.run }
 
@@ -180,7 +180,7 @@ describe Imap::Backup::Configuration::Account do
         let(:new_email) { other_email }
 
         it "indicates the error" do
-          expect(subject).to have_received(:puts).
+          expect(Kernel).to have_received(:puts).
             with("There is already an account set up with that email address")
         end
 
@@ -226,9 +226,6 @@ describe Imap::Backup::Configuration::Account do
 
       before do
         allow(highline).to receive(:ask).with("server: ").and_return(server)
-      end
-
-      before do
         subject.run
         menu.choices["modify server"].call
       end
@@ -247,7 +244,7 @@ describe Imap::Backup::Configuration::Account do
         @validator = nil
         allow(
           Imap::Backup::Configuration::Asker
-        ).to receive(:backup_path) do |path, validator|
+        ).to receive(:backup_path) do |_path, validator|
           @validator = validator
           new_backup_path
         end
@@ -260,14 +257,18 @@ describe Imap::Backup::Configuration::Account do
       end
 
       it "validates that the path is not used by other backups" do
+        # rubocop:disable RSpec/InstanceVariable
         expect(@validator.call(other_existing_path)).to be_falsey
+        # rubocop:enable RSpec/InstanceVariable
       end
 
       include_examples "it flags the account as modified"
     end
 
     context "folders" do
-      let(:chooser) { double(run: nil) }
+      let(:chooser) do
+        instance_double(Imap::Backup::Configuration::FolderChooser, run: nil)
+      end
 
       before do
         allow(Imap::Backup::Configuration::FolderChooser).
@@ -323,3 +324,5 @@ describe Imap::Backup::Configuration::Account do
     end
   end
 end
+
+# rubocop:enable RSpec/NestedGroups

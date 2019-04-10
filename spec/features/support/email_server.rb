@@ -1,6 +1,6 @@
 module EmailServerHelpers
-  REQUESTED_ATTRIBUTES = ["RFC822", "FLAGS", "INTERNALDATE"]
-  DEFAULT_EMAIL = "address@example.org"
+  REQUESTED_ATTRIBUTES = %w(RFC822 FLAGS INTERNALDATE).freeze
+  DEFAULT_EMAIL = "address@example.org".freeze
 
   def send_email(folder, options)
     message = message_as_server_message(options)
@@ -11,13 +11,14 @@ module EmailServerHelpers
     from = options[:from] || DEFAULT_EMAIL
     subject = options[:subject]
     body = options[:body]
-    message = <<-EOT.gsub("\n", "\r\n")
-From: #{from}
-Subject: #{subject}
 
-#{body}
+    <<~MESSAGE.gsub("\n", "\r\n")
+      From: #{from}
+      Subject: #{subject}
 
-    EOT
+      #{body}
+
+    MESSAGE
   end
 
   def server_messages(folder)
@@ -32,8 +33,10 @@ Subject: #{subject}
 
   def server_fetch_email(folder, uid)
     examine folder
+
     fetch_data_items = imap.uid_fetch([uid.to_i], REQUESTED_ATTRIBUTES)
     return nil if fetch_data_items.nil?
+
     fetch_data_item = fetch_data_items[0]
     attributes = fetch_data_item.attr
     attributes["RFC822"].force_encoding("utf-8")
@@ -43,7 +46,7 @@ Subject: #{subject}
   def delete_emails(folder)
     imap.select(folder)
     uids = imap.uid_search(["ALL"]).sort
-    imap.store(1 .. uids.size, "+FLAGS", [:Deleted])
+    imap.store(1..uids.size, "+FLAGS", [:Deleted])
     imap.expunge
   end
 

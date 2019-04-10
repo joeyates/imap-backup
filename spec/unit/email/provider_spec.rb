@@ -1,5 +1,3 @@
-require "spec_helper"
-
 describe Email::Provider do
   describe ".for_address" do
     context "known providers" do

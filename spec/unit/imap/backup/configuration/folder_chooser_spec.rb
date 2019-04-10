@@ -1,22 +1,24 @@
-require "spec_helper"
-
 describe Imap::Backup::Configuration::FolderChooser do
   include HighLineTestHelpers
 
   context "#run" do
+    subject { described_class.new(account) }
+
     let(:connection) do
-      double("Imap::Backup::Account::Connection", folders: remote_folders)
+      instance_double(
+        Imap::Backup::Account::Connection, folders: remote_folders
+      )
     end
     let(:account) { {folders: []} }
     let(:remote_folders) { [] }
-
-    subject { described_class.new(account) }
+    let!(:highline_streams) { prepare_highline }
+    let(:input) { highline_streams[0] }
+    let(:output) { highline_streams[1] }
 
     before do
       allow(Imap::Backup::Account::Connection).
         to receive(:new).with(account) { connection }
-      @input, @output = prepare_highline
-      allow(subject).to receive(:system)
+      allow(Kernel).to receive(:system)
       allow(Imap::Backup.logger).to receive(:warn)
     end
 
@@ -24,11 +26,11 @@ describe Imap::Backup::Configuration::FolderChooser do
       before { subject.run }
 
       it "clears the screen" do
-        expect(subject).to have_received(:system).with("clear")
+        expect(Kernel).to have_received(:system).with("clear")
       end
 
-      it "should show the menu" do
-        expect(@output.string).to match %r{Add/remove folders}
+      it "shows the menu" do
+        expect(output.string).to match %r{Add/remove folders}
       end
     end
 
@@ -36,8 +38,12 @@ describe Imap::Backup::Configuration::FolderChooser do
       let(:account) { {folders: [{name: "my_folder"}]} }
       let(:remote_folders) do
         # this one is already backed up:
-        folder1 = double("folder", name: "my_folder")
-        folder2 = double("folder", name: "another_folder")
+        folder1 = instance_double(
+          Imap::Backup::Account::Folder, name: "my_folder"
+        )
+        folder2 = instance_double(
+          Imap::Backup::Account::Folder, name: "another_folder"
+        )
         [folder1, folder2]
       end
 
@@ -45,17 +51,17 @@ describe Imap::Backup::Configuration::FolderChooser do
         before { subject.run }
 
         it "shows folders which are being backed up" do
-          expect(@output.string).to include("+ my_folder")
+          expect(output.string).to include("+ my_folder")
         end
 
         it "shows folders which are not being backed up" do
-          expect(@output.string).to include("- another_folder")
+          expect(output.string).to include("- another_folder")
         end
       end
 
       context "adding folders" do
         before do
-          allow(@input).to receive(:gets).and_return("2\n", "q\n")
+          allow(input).to receive(:gets).and_return("2\n", "q\n")
 
           subject.run
         end
@@ -69,7 +75,7 @@ describe Imap::Backup::Configuration::FolderChooser do
 
       context "removing folders" do
         before do
-          allow(@input).to receive(:gets).and_return("1\n", "q\n")
+          allow(input).to receive(:gets).and_return("1\n", "q\n")
 
           subject.run
         end
