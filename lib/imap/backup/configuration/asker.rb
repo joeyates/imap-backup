@@ -2,7 +2,7 @@ module Imap::Backup
   module Configuration; end
 
   class Configuration::Asker < Struct.new(:highline)
-    EMAIL_MATCHER = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]+$/i
+    EMAIL_MATCHER = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]+$/i.freeze
 
     def initialize(highline)
       super
@@ -24,6 +24,7 @@ module Imap::Backup
         return nil if !highline.agree(
           "the password and confirmation did not match.\nContinue? (y/n) "
         )
+
         return self.password
       end
       password

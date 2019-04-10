@@ -4,7 +4,8 @@ module Imap::Backup
     attr_reader :serializer
 
     def initialize(folder, serializer)
-      @folder, @serializer = folder, serializer
+      @folder = folder
+      @serializer = serializer
     end
 
     def run

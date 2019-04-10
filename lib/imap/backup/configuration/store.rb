@@ -52,6 +52,7 @@ module Imap::Backup
 
     def data
       return @data if @data
+
       if File.exist?(pathname)
         Utils.check_permissions pathname, 0o600
         contents = File.read(pathname)
@@ -73,12 +74,8 @@ module Imap::Backup
     end
 
     def mkdir_private(path)
-      if !File.directory?(path)
-        FileUtils.mkdir path
-      end
-      if Utils::mode(path) != 0o700
-        FileUtils.chmod 0o700, path
-      end
+      FileUtils.mkdir(path) if !File.directory?(path)
+      FileUtils.chmod(0o700, path) if Utils.mode(path) != 0o700
     end
   end
 end

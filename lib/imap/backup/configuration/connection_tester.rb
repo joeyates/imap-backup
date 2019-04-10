@@ -7,7 +7,7 @@ module Imap::Backup
       "Connection successful"
     rescue Net::IMAP::NoResponseError
       "No response"
-    rescue Exception => e
+    rescue StandardError => e
       "Unexpected error: #{e}"
     end
   end

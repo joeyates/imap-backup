@@ -42,6 +42,7 @@ module Imap::Backup
     def add(uid, message)
       do_load if !loaded
       raise "Can't add messages without uid_validity" if !uid_validity
+
       uid = uid.to_i
       if uids.include?(uid)
         Imap::Backup.logger.debug(
@@ -58,7 +59,7 @@ module Imap::Backup
         mbox.write mboxrd_message.to_serialized
         @uids << uid
         write_imap_file
-      rescue => e
+      rescue StandardError => e
         message = <<-ERROR.gsub(/^\s*/m, "")
           [#{folder}] failed to save message #{uid}:
           #{body}. #{e}:
@@ -66,7 +67,7 @@ module Imap::Backup
         ERROR
         Imap::Backup.logger.warn message
       ensure
-        mbox.close if mbox
+        mbox&.close
       end
     end
 
@@ -74,12 +75,14 @@ module Imap::Backup
       do_load if !loaded
       message_index = uids.find_index(uid)
       return nil if message_index.nil?
+
       load_nth(message_index)
     end
 
     def update_uid(old, new)
       index = uids.find_index(old.to_i)
       return if index.nil?
+
       uids[index] = new.to_i
       write_imap_file
     end
@@ -128,7 +131,7 @@ module Imap::Backup
         return nil
       end
 
-      return nil if !imap_data.has_key?(:uids)
+      return nil if !imap_data.key?(:uids)
       return nil if !imap_data[:uids].is_a?(Array)
 
       imap_data
@@ -137,12 +140,14 @@ module Imap::Backup
     def imap_ok?
       return false if !exist?
       return false if !imap_looks_like_json?
+
       true
     end
 
     def load_nth(index)
       each_mbox_message.with_index do |raw, i|
         next unless i == index
+
         return Email::Mboxrd::Message.from_serialized(raw)
       end
       nil
@@ -153,21 +158,24 @@ module Imap::Backup
         File.open(mbox_pathname) do |f|
           lines = []
 
-          while line = f.gets
+          loop do
+            line = f.gets
+            breask if !line
             if line.start_with?("From ")
-              e.yield lines.join if lines.count > 0
+              e.yield lines.join if lines.count.positive?
               lines = [line]
             else
               lines << line
             end
           end
-          e.yield lines.join if lines.count > 0
+          e.yield lines.join if lines.count.positive?
         end
       end
     end
 
     def imap_looks_like_json?
       return false unless imap_exist?
+
       content = File.read(imap_pathname)
       content.start_with?("{")
     end

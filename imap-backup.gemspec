@@ -1,4 +1,4 @@
-$LOAD_PATH.unshift(File.expand_path("../lib", __FILE__))
+$LOAD_PATH.unshift(File.expand_path("lib", __dir__))
 require "imap/backup/version"
 
 Gem::Specification.new do |gem|
@@ -9,12 +9,12 @@ Gem::Specification.new do |gem|
   gem.email         = ["joe.g.yates@gmail.com"]
   gem.homepage      = "https://github.com/joeyates/imap-backup"
 
-  gem.files         = `git ls-files`.split($\)
+  gem.files         = `git ls-files`.split($OUTPUT_RECORD_SEPARATOR)
   gem.executables   = gem.files.grep(%r{^bin/}).map { |f| File.basename(f) }
   gem.test_files    = gem.files.grep(%r{^spec/})
   gem.require_paths = ["lib"]
-  gem.required_ruby_version = [">= 2.2.0"]
-  gem.version       = Imap::Backup::VERSION
+  gem.required_ruby_version = [">= 2.3.0"]
+  gem.version = Imap::Backup::VERSION
 
   gem.post_install_message = <<-MESSAGE.gsub(/^\s{4}/m, "")
     Note that, when upgrading #{gem.name} from version 1.x to 2.x,
@@ -24,9 +24,9 @@ Gem::Specification.new do |gem|
     **deleted** and a full new backup created.
   MESSAGE
 
-  gem.add_runtime_dependency "rake"
   gem.add_runtime_dependency "highline"
   gem.add_runtime_dependency "mail"
+  gem.add_runtime_dependency "rake"
 
   gem.add_development_dependency "codeclimate-test-reporter", "~> 0.4.8"
   gem.add_development_dependency "pry-byebug"

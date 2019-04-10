@@ -27,7 +27,7 @@ module Email::Mboxrd
 
     def date
       parsed.date
-    rescue
+    rescue StandardError
       nil
     end
 
@@ -52,7 +52,7 @@ module Email::Mboxrd
       return parsed.envelope_from if parsed.envelope_from
       return parsed.return_path if parsed.return_path
 
-      return ""
+      ""
     end
 
     def from

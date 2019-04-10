@@ -44,21 +44,22 @@ module Imap::Backup
     def add_folders(menu)
       folders.each do |folder|
         name = folder.name
-        mark = is_selected?(name) ? "+" : "-"
+        mark = selected?(name) ? "+" : "-"
         menu.choice("#{mark} #{name}") do
           toggle_selection name
         end
       end
     end
 
-    def is_selected?(folder_name)
+    def selected?(folder_name)
       backup_folders = account[:folders]
       return false if backup_folders.nil?
+
       backup_folders.find { |f| f[:name] == folder_name }
     end
 
     def toggle_selection(folder_name)
-      if is_selected?(folder_name)
+      if selected?(folder_name)
         changed = account[:folders].reject! { |f| f[:name] == folder_name }
         account[:modified] = true if changed
       else
@@ -70,7 +71,7 @@ module Imap::Backup
 
     def connection
       @connection ||= Account::Connection.new(account)
-    rescue
+    rescue StandardError
       nil
     end
 

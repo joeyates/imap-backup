@@ -12,6 +12,7 @@ module Imap::Backup
       missing_uids.each do |uid|
         message = serializer.load(uid)
         next if message.nil?
+
         new_uid = folder.append(message)
         serializer.update_uid(uid, new_uid)
       end

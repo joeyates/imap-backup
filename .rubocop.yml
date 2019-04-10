@@ -13,3 +13,5 @@ RSpec/NestedGroups:
   Max: 4
 RSpec/ReturnFromStub:
   Enabled: false
+Style/EmptyCaseCondition:
+  Enabled: false

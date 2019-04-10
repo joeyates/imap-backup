@@ -27,6 +27,7 @@ module Imap::Backup
           new_name = "#{folder}.#{existing_uid_validity}#{extra}"
           test_store = Serializer::MboxStore.new(path, new_name)
           break if !test_store.exist?
+
           digit ||= 0
           digit += 1
         end
@@ -84,7 +85,7 @@ module Imap::Backup
       end
 
       if Imap::Backup::Utils.mode(full_path) !=
-          Serializer::DIRECTORY_PERMISSIONS
+         Serializer::DIRECTORY_PERMISSIONS
         FileUtils.chmod Serializer::DIRECTORY_PERMISSIONS, full_path
       end
     end

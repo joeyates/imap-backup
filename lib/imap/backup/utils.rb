@@ -5,15 +5,16 @@ module Imap::Backup
     def self.check_permissions(filename, limit)
       actual = mode(filename)
       return nil if actual.nil?
+
       mask = ~limit & 0o777
-      if actual & mask != 0
-        message = format(
-          "Permissions on '%<filename>s' " \
-            "should be 0%<limit>o, not 0%<actual>o",
-          filename: filename, limit: limit, actual: actual
-        )
-        raise message
-      end
+      return if (actual & mask).zero?
+
+      message = format(
+        "Permissions on '%<filename>s' " \
+          "should be 0%<limit>o, not 0%<actual>o",
+        filename: filename, limit: limit, actual: actual
+      )
+      raise message
     end
 
     def self.mode(filename)
@@ -25,7 +26,8 @@ module Imap::Backup
 
     def self.make_folder(base_path, path, permissions)
       parts = path.split("/")
-      return if parts.size == 0
+      return if parts.empty?
+
       full_path = File.join(base_path, path)
       FileUtils.mkdir_p full_path
       path = base_path

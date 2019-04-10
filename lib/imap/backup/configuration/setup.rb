@@ -40,6 +40,7 @@ module Imap::Backup
     def account_items(menu)
       config.accounts.each do |account|
         next if account[:delete]
+
         item = account[:username].clone
         item << " *" if account[:modified]
         menu.choice(item) do

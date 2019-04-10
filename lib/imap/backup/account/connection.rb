@@ -10,7 +10,8 @@ module Imap::Backup
     attr_reader :username
 
     def initialize(options)
-      @username, @password = options[:username], options[:password]
+      @username = options[:username]
+      @password = options[:password]
       @local_path = options[:local_path]
       @backup_folders = options[:folders]
       @server = options[:server]
@@ -59,7 +60,9 @@ module Imap::Backup
           new_name = serializer.set_uid_validity(folder.uid_validity)
           old_name = serializer.folder
           if new_name
-            Imap::Backup.logger.debug "Backup '#{old_name}' renamed and restored to '#{new_name}'"
+            Imap::Backup.logger.debug(
+              "Backup '#{old_name}' renamed and restored to '#{new_name}'"
+            )
             new_serializer = Serializer::Mbox.new(local_path, new_name)
             new_folder = Account::Folder.new(self, new_name)
             new_folder.create
@@ -87,6 +90,7 @@ module Imap::Backup
 
     def imap
       return @imap unless @imap.nil?
+
       options = provider_options
       Imap::Backup.logger.debug(
         "Creating IMAP instance: #{server}, options: #{options.inspect}"
@@ -121,7 +125,8 @@ module Imap::Backup
     end
 
     def backup_folders
-      return @backup_folders if @backup_folders && (@backup_folders.size > 0)
+      return @backup_folders if @backup_folders && !@backup_folders.empty?
+
       (folders || []).map { |f| {name: f.name} }
     end
 
@@ -143,6 +148,7 @@ module Imap::Backup
     def server
       return @server if @server
       return nil if provider.nil?
+
       @server = provider.host
     end
 
@@ -156,6 +162,7 @@ module Imap::Backup
     # in the reference.
     def provider_root
       return @provider_root if @provider_root
+
       root_info = imap.list("", "")[0]
       @provider_root = root_info.name
     end

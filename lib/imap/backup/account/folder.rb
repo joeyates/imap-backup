@@ -6,7 +6,7 @@ module Imap::Backup
   class Account::Folder
     extend Forwardable
 
-    REQUESTED_ATTRIBUTES = ["RFC822", "FLAGS", "INTERNALDATE"].freeze
+    REQUESTED_ATTRIBUTES = %w[RFC822 FLAGS INTERNALDATE].freeze
 
     attr_reader :connection
     attr_reader :name
@@ -27,12 +27,13 @@ module Imap::Backup
     def exist?
       examine
       true
-    rescue Net::IMAP::NoResponseError => e
+    rescue Net::IMAP::NoResponseError
       false
     end
 
     def create
       return if exist?
+
       imap.create(name)
     end
 
@@ -56,6 +57,7 @@ module Imap::Backup
       examine
       fetch_data_items = imap.uid_fetch([uid.to_i], REQUESTED_ATTRIBUTES)
       return nil if fetch_data_items.nil?
+
       fetch_data_item = fetch_data_items[0]
       attributes = fetch_data_item.attr
       attributes["RFC822"].force_encoding("utf-8")

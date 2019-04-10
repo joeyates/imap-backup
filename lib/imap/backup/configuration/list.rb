@@ -10,6 +10,7 @@ module Imap::Backup
 
     def setup_logging
       return if !config_exists?
+
       Imap::Backup.setup_logging config
     end
 
@@ -25,6 +26,7 @@ module Imap::Backup
 
     def config
       return @config if @config
+
       if !config_exists?
         path = Configuration::Store.default_pathname
         raise ConfigurationNotFound, "Configuration file '#{path}' not found"
