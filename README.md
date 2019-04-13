@@ -1,4 +1,4 @@
-[![Build Status](https://secure.travis-ci.org/joeyates/imap-backup.png)][Continuous Integration]
+[![Build Status](https://secure.travis-ci.org/joeyates/imap-backup.svg)][Continuous Integration]
 [![Source Analysis](https://codeclimate.com/github/joeyates/imap-backup/badges/gpa.svg)](https://codeclimate.com/github/joeyates/imap-backup)
 [![Test Coverage](https://codeclimate.com/github/joeyates/imap-backup/badges/coverage.svg)](https://codeclimate.com/github/joeyates/imap-backup/coverage)
 
