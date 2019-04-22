@@ -21,6 +21,8 @@ module Imap::Backup
         return
       end
 
+      remove_missing
+
       catch :done do
         loop do
           Kernel.system("clear")
@@ -56,6 +58,30 @@ module Imap::Backup
       return false if backup_folders.nil?
 
       backup_folders.find { |f| f[:name] == folder_name }
+    end
+
+    def remove_missing
+      removed = []
+      backup_folders = []
+      account[:folders].each do |f|
+        found = folders.find { |folder| folder.name == f[:name] }
+        if found
+          backup_folders << f
+        else
+          removed << f[:name]
+        end
+      end
+
+      return if removed.empty?
+
+      account[:folders] = backup_folders
+      account[:modified] = true
+
+      Kernel.puts <<~MESSAGE
+        The following folders have been removed: #{removed.join(', ')}
+      MESSAGE
+
+      highline.ask "Press a key "
     end
 
     def toggle_selection(folder_name)

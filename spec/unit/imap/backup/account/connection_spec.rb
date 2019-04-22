@@ -124,9 +124,11 @@ describe Imap::Backup::Account::Connection do
       instance_double(
         Imap::Backup::Account::Folder,
         name: "folder",
+        exist?: exists,
         uid_validity: uid_validity
       )
     end
+    let(:exists) { true }
     let(:uid_validity) { 123 }
     let(:downloader) { instance_double(Imap::Backup::Downloader, run: nil) }
 
@@ -146,6 +148,14 @@ describe Imap::Backup::Account::Connection do
 
       it "runs the downloader" do
         expect(downloader).to have_received(:run)
+      end
+
+      context "when a folder does not exist" do
+        let(:exists) { false }
+
+        it "does not run the downloader" do
+          expect(downloader).to_not have_received(:run)
+        end
       end
     end
 

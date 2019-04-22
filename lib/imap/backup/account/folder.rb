@@ -3,6 +3,8 @@ require "forwardable"
 module Imap::Backup
   module Account; end
 
+  class FolderNotFound < StandardError; end
+
   class Account::Folder
     extend Forwardable
 
@@ -27,7 +29,7 @@ module Imap::Backup
     def exist?
       examine
       true
-    rescue Net::IMAP::NoResponseError
+    rescue FolderNotFound
       false
     end
 
@@ -48,8 +50,7 @@ module Imap::Backup
     def uids
       examine
       imap.uid_search(["ALL"]).sort
-    rescue Net::IMAP::NoResponseError
-      Imap::Backup.logger.warn "Folder '#{name}' does not exist"
+    rescue FolderNotFound
       []
     end
 
@@ -62,8 +63,7 @@ module Imap::Backup
       attributes = fetch_data_item.attr
       attributes["RFC822"].force_encoding("utf-8")
       attributes
-    rescue Net::IMAP::NoResponseError
-      Imap::Backup.logger.warn "Folder '#{name}' does not exist"
+    rescue FolderNotFound
       nil
     end
 
@@ -78,6 +78,9 @@ module Imap::Backup
 
     def examine
       imap.examine(name)
+    rescue Net::IMAP::NoResponseError
+      Imap::Backup.logger.warn "Folder '#{name}' does not exist"
+      raise FolderNotFound, "Folder '#{name}' does not exist"
     end
 
     def extract_uid(response)

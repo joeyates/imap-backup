@@ -16,8 +16,7 @@ describe Imap::Backup::Configuration::FolderChooser do
     let(:output) { highline_streams[1] }
 
     before do
-      allow(Imap::Backup::Account::Connection).
-        to receive(:new).with(account) { connection }
+      allow(Imap::Backup::Account::Connection).to receive(:new) { connection }
       allow(Kernel).to receive(:system)
       allow(Imap::Backup.logger).to receive(:warn)
     end
@@ -86,6 +85,28 @@ describe Imap::Backup::Configuration::FolderChooser do
 
         include_examples "it flags the account as modified"
       end
+    end
+
+    context "with missing remote folders" do
+      let(:account) do
+        {folders: [{name: "on_server"}, {name: "not_on_server"}]}
+      end
+      let(:remote_folders) do
+        [
+          instance_double(Imap::Backup::Account::Folder, name: "on_server")
+        ]
+      end
+
+      before do
+        allow(Kernel).to receive(:puts)
+        subject.run
+      end
+
+      specify "are removed from the account" do
+        expect(account[:folders]).to_not include(name: "not_on_server")
+      end
+
+      include_examples "it flags the account as modified"
     end
 
     context "when folders are not available" do
