@@ -134,6 +134,18 @@ describe Imap::Backup::Account::Folder do
     it "is returned" do
       expect(subject.uid_validity).to eq("uid validity")
     end
+
+    context "when the folder doesn't exist" do
+      before do
+        allow(imap).to receive(:examine).and_raise(missing_mailbox_error)
+      end
+
+      it "raises an error" do
+        expect do
+          subject.uid_validity
+        end.to raise_error(Imap::Backup::FolderNotFound)
+      end
+    end
   end
 
   context "#append" do

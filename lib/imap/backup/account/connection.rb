@@ -47,6 +47,7 @@ module Imap::Backup
       # start the connection so we get logging messages in the right order
       imap
       each_folder do |folder, serializer|
+        next if !folder.exist?
         Imap::Backup.logger.debug "[#{folder.name}] running backup"
         serializer.set_uid_validity(folder.uid_validity)
         Downloader.new(folder, serializer).run
