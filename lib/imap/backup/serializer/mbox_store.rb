@@ -160,7 +160,7 @@ module Imap::Backup
 
           loop do
             line = f.gets
-            breask if !line
+            break if !line
             if line.start_with?("From ")
               e.yield lines.join if lines.count.positive?
               lines = [line]
