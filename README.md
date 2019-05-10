@@ -52,8 +52,7 @@ E.g.:
 
 ```json
 {
-  "accounts":
-  [
+  "accounts": [
     {
       "username": "my.user@gmail.com",
       "password": "secret",
@@ -72,8 +71,7 @@ It connects to GMail by default, but you can also specify a server:
 
 ```json
 {
-  "accounts":
-  [
+  "accounts": [
     {
       "username": "my.user@gmail.com",
       "password": "secret",
@@ -98,8 +96,7 @@ Specifically, if you are using a self-signed certificate and get SSL errors, e.g
 
 ```json
 {
-  "accounts":
-  [
+  "accounts": [
     {
       "username": "my.user@gmail.com",
       "password": "secret",
