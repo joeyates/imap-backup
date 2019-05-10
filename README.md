@@ -46,7 +46,9 @@ specific folders.
 
 ## Configuration file
 
-`setup` creates ~/.imap-backup directory and configuration file. E.g.:
+`setup` creates the file `~/.imap-backup/config.json`
+
+E.g.:
 
 ```json
 {
