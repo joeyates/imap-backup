@@ -153,9 +153,10 @@ describe Imap::Backup::Account::Folder do
       instance_double(
         Email::Mboxrd::Message,
         imap_body: "imap body",
-        date: Time.now
+        date: message_date
       )
     end
+    let(:message_date) { Time.new(2010, 10, 10, 9, 15, 22, 0) }
     let(:append_response) do
       OpenStruct.new(data: OpenStruct.new(code: OpenStruct.new(data: "1 2")))
     end
@@ -167,6 +168,11 @@ describe Imap::Backup::Account::Folder do
 
     it "appends the message" do
       expect(imap).to have_received(:append)
+    end
+
+    it "sets the date and time" do
+      expect(imap).to have_received(:append).
+        with(anything, anything, anything, message_date)
     end
 
     it "returns the new uid" do
