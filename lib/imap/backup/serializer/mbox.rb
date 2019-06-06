@@ -10,7 +10,7 @@ module Imap::Backup
       @folder = folder
     end
 
-    def set_uid_validity(value)
+    def apply_uid_validity(value)
       existing_uid_validity = store.uid_validity
       case
       when existing_uid_validity.nil?

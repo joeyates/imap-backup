@@ -33,7 +33,7 @@ describe Imap::Backup::Account::Connection do
       Imap::Backup::Serializer::Mbox,
       folder: serialized_folder,
       force_uid_validity: nil,
-      set_uid_validity: new_uid_validity,
+      apply_uid_validity: new_uid_validity,
       uids: [local_uid]
     )
   end
@@ -253,7 +253,8 @@ describe Imap::Backup::Account::Connection do
     end
 
     it "sets local uid validity" do
-      expect(serializer).to have_received(:set_uid_validity).with(uid_validity)
+      expect(serializer).
+        to have_received(:apply_uid_validity).with(uid_validity)
     end
 
     context "when folders exist" do

@@ -83,7 +83,7 @@ describe Imap::Backup::Account::Folder do
     end
   end
 
-  describe "#folder"  do
+  describe "#folder" do
     it "is the name" do
       expect(subject.folder).to eq("my_folder")
     end

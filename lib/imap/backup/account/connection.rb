@@ -48,8 +48,9 @@ module Imap::Backup
       imap
       each_folder do |folder, serializer|
         next if !folder.exist?
+
         Imap::Backup.logger.debug "[#{folder.name}] running backup"
-        serializer.set_uid_validity(folder.uid_validity)
+        serializer.apply_uid_validity(folder.uid_validity)
         Downloader.new(folder, serializer).run
       end
     end
@@ -58,7 +59,7 @@ module Imap::Backup
       local_folders do |serializer, folder|
         exists = folder.exist?
         if exists
-          new_name = serializer.set_uid_validity(folder.uid_validity)
+          new_name = serializer.apply_uid_validity(folder.uid_validity)
           old_name = serializer.folder
           if new_name
             Imap::Backup.logger.debug(

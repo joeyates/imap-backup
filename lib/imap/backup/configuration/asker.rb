@@ -1,7 +1,7 @@
 module Imap::Backup
   module Configuration; end
 
-  class Configuration::Asker < Struct.new(:highline)
+  Configuration::Asker = Struct.new(:highline) do
     EMAIL_MATCHER = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]+$/i.freeze
 
     def initialize(highline)

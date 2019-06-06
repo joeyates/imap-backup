@@ -81,8 +81,8 @@ describe Imap::Backup::Serializer::Mbox do
     end
   end
 
-  describe "#set_uid_validity" do
-    let(:result) { subject.set_uid_validity("aaa") }
+  describe "#apply_uid_validity" do
+    let(:result) { subject.apply_uid_validity("aaa") }
 
     context "when the existing uid validity is unset" do
       let!(:result) { super() }

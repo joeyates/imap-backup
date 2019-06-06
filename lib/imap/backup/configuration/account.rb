@@ -1,7 +1,7 @@
 module Imap::Backup
   module Configuration; end
 
-  class Configuration::Account < Struct.new(:store, :account, :highline)
+  Configuration::Account = Struct.new(:store, :account, :highline) do
     def initialize(store, account, highline)
       super
     end
@@ -51,7 +51,9 @@ module Imap::Backup
         others = other_accounts.map { |a| a[:username] }
         Kernel.puts "others: #{others.inspect}"
         if others.include?(username)
-          Kernel.puts "There is already an account set up with that email address"
+          Kernel.puts(
+            "There is already an account set up with that email address"
+          )
         else
           account[:username] = username
           if account[:server].nil? || (account[:server] == "")
