@@ -11,30 +11,15 @@ module Imap::Backup
     end
 
     def apply_uid_validity(value)
-      existing_uid_validity = store.uid_validity
       case
-      when existing_uid_validity.nil?
+      when store.uid_validity.nil?
         store.uid_validity = value
         nil
-      when existing_uid_validity == value
+      when store.uid_validity == value
         # NOOP
         nil
       else
-        digit = nil
-        new_name = nil
-        loop do
-          extra = digit ? ".#{digit}" : ""
-          new_name = "#{folder}.#{existing_uid_validity}#{extra}"
-          test_store = Serializer::MboxStore.new(path, new_name)
-          break if !test_store.exist?
-
-          digit ||= 0
-          digit += 1
-        end
-        store.rename new_name
-        @store = nil
-        store.uid_validity = value
-        new_name
+        apply_new_uid_validity value
       end
     end
 
@@ -73,18 +58,47 @@ module Imap::Backup
         end
     end
 
-    def create_containing_directory
-      relative_path = File.dirname(folder)
-      containing_directory = File.join(path, relative_path)
-      full_path = File.expand_path(containing_directory)
+    def apply_new_uid_validity(value)
+      digit = 0
+      new_name = nil
+      loop do
+        extra = digit.zero? ? "" : ".#{digit}"
+        new_name = "#{folder}.#{store.uid_validity}#{extra}"
+        test_store = Serializer::MboxStore.new(path, new_name)
+        break if !test_store.exist?
 
+        digit += 1
+      end
+      rename_store new_name, value
+    end
+
+    def rename_store(new_name, value)
+      store.rename new_name
+      @store = nil
+      store.uid_validity = value
+      new_name
+    end
+
+    def relative_path
+      File.dirname(folder)
+    end
+
+    def containing_directory
+      File.join(path, relative_path)
+    end
+
+    def full_path
+      File.expand_path(containing_directory)
+    end
+
+    def create_containing_directory
       if !File.directory?(full_path)
-        Imap::Backup::Utils.make_folder(
+        Utils.make_folder(
           path, relative_path, Serializer::DIRECTORY_PERMISSIONS
         )
       end
 
-      if Imap::Backup::Utils.mode(full_path) !=
+      if Utils.mode(full_path) !=
          Serializer::DIRECTORY_PERMISSIONS
         FileUtils.chmod Serializer::DIRECTORY_PERMISSIONS, full_path
       end
