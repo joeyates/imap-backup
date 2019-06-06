@@ -84,23 +84,25 @@ module Imap::Backup
       end
     end
 
+    def path_modification_validator(path)
+      same = store.accounts.find do |a|
+        a[:username] != account[:username] && a[:local_path] == path
+      end
+      if same
+        Kernel.puts "The path '#{path}' is used to backup " \
+          "the account '#{same[:username]}'"
+        false
+      else
+        true
+      end
+    end
+
     def modify_backup_path(menu)
       menu.choice("modify backup path") do
-        validator = ->(p) do
-          same = store.accounts.find do |a|
-            a[:username] != account[:username] && a[:local_path] == p
-          end
-          if same
-            Kernel.puts "The path '#{p}' is used to backup " \
-              "the account '#{same[:username]}'"
-            false
-          else
-            true
-          end
-        end
         existing = account[:local_path].clone
-        account[:local_path] =
-          Configuration::Asker.backup_path(account[:local_path], validator)
+        account[:local_path] = Configuration::Asker.backup_path(
+          account[:local_path], ->(path) { path_modification_validator(path) }
+        )
         account[:modified] = true if existing != account[:local_path]
       end
     end
