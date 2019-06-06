@@ -193,9 +193,6 @@ $ imap-backup status
 
 # Similar Software
 
-* https://github.com/thefloweringash/gmail-imap-backup
-* https://github.com/mleonhard/imapbackup
-* https://github.com/rgrove/larch - copies between IMAP servers
 * https://github.com/OfflineIMAP/offlineimap
 
 # Testing
