@@ -25,7 +25,7 @@ describe Imap::Backup::Account::Folder do
   let(:responses) { [] }
   let(:append_response) { nil }
 
-  context "#uids" do
+  describe "#uids" do
     let(:uids) { [5678, 123] }
 
     before { allow(imap).to receive(:uid_search).and_return(uids) }
@@ -45,7 +45,7 @@ describe Imap::Backup::Account::Folder do
     end
   end
 
-  context "#fetch" do
+  describe "#fetch" do
     let(:message_body) { instance_double(String, force_encoding: nil) }
     let(:attributes) { {"RFC822" => message_body, "other" => "xxx"} }
     let(:fetch_data_item) do
@@ -58,7 +58,7 @@ describe Imap::Backup::Account::Folder do
       expect(subject.fetch(123)).to eq(attributes)
     end
 
-    context "if the server responds with nothing" do
+    context "when the server responds with nothing" do
       before { allow(imap).to receive(:uid_fetch) { nil } }
 
       it "is nil" do
@@ -66,7 +66,7 @@ describe Imap::Backup::Account::Folder do
       end
     end
 
-    context "if the mailbox doesn't exist" do
+    context "when the mailbox doesn't exist" do
       before do
         allow(imap).to receive(:examine).and_raise(missing_mailbox_error)
       end
@@ -83,13 +83,13 @@ describe Imap::Backup::Account::Folder do
     end
   end
 
-  context "#folder"  do
+  describe "#folder"  do
     it "is the name" do
       expect(subject.folder).to eq("my_folder")
     end
   end
 
-  context "#exist?" do
+  describe "#exist?" do
     context "when the folder exists" do
       it "is true" do
         expect(subject.exist?).to be_truthy
@@ -107,7 +107,7 @@ describe Imap::Backup::Account::Folder do
     end
   end
 
-  context "#create" do
+  describe "#create" do
     context "when the folder exists" do
       before { subject.create }
 
@@ -128,7 +128,7 @@ describe Imap::Backup::Account::Folder do
     end
   end
 
-  context "#uid_validity" do
+  describe "#uid_validity" do
     let(:responses) { {"UIDVALIDITY" => ["x", "uid validity"]} }
 
     it "is returned" do
@@ -148,7 +148,7 @@ describe Imap::Backup::Account::Folder do
     end
   end
 
-  context "#append" do
+  describe "#append" do
     let(:message) do
       instance_double(
         Email::Mboxrd::Message,

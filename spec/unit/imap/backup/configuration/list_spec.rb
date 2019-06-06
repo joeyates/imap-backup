@@ -28,7 +28,7 @@ describe Imap::Backup::Configuration::List do
       to receive(:new).with(accounts[1]) { connection2 }
   end
 
-  context "#each_connection" do
+  describe "#each_connection" do
     specify "calls the block with each account's connection" do
       connections = []
 

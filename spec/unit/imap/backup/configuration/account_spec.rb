@@ -18,7 +18,7 @@ describe Imap::Backup::Configuration::Account do
     end
   end
 
-  context "#initialize" do
+  describe "#initialize" do
     subject { described_class.new(store, account, highline) }
 
     let(:store) { "store" }
@@ -32,7 +32,7 @@ describe Imap::Backup::Configuration::Account do
     end
   end
 
-  context "#run" do
+  describe "#run" do
     subject { described_class.new(store, account, highline) }
 
     let(:highline) { instance_double(HighLine) }
@@ -72,21 +72,21 @@ describe Imap::Backup::Configuration::Account do
       end
     end
 
-    context "preparation" do
+    describe "preparation" do
       before { subject.run }
 
       it "clears the screen" do
         expect(Kernel).to have_received(:system).with("clear")
       end
 
-      context "menu" do
+      describe "menu" do
         it "shows the menu" do
           expect(highline).to have_received(:choose)
         end
       end
     end
 
-    context "menu" do
+    describe "menu" do
       [
         "modify email",
         "modify password",
@@ -106,7 +106,7 @@ describe Imap::Backup::Configuration::Account do
       end
     end
 
-    context "account details" do
+    describe "account details" do
       [
         ["email", /email:\s+user@example.com/],
         ["server", /server:\s+imap.example.com/],
@@ -132,7 +132,7 @@ describe Imap::Backup::Configuration::Account do
       end
     end
 
-    context "email" do
+    describe "email" do
       before do
         allow(Imap::Backup::Configuration::Asker).
           to receive(:email) { new_email }
@@ -140,7 +140,7 @@ describe Imap::Backup::Configuration::Account do
         menu.choices["modify email"].call
       end
 
-      context "if the server is blank" do
+      context "when the server is blank" do
         [
           ["GMail", "foo@gmail.com", "imap.gmail.com"],
           ["Fastmail", "bar@fastmail.fm", "imap.fastmail.com"],
@@ -168,7 +168,7 @@ describe Imap::Backup::Configuration::Account do
         end
       end
 
-      context "the email is new" do
+      context "when the email is new" do
         it "modifies the email address" do
           expect(account[:username]).to eq(new_email)
         end
@@ -176,7 +176,7 @@ describe Imap::Backup::Configuration::Account do
         include_examples "it flags the account as modified"
       end
 
-      context "the email already exists" do
+      context "when the email already exists" do
         let(:new_email) { other_email }
 
         it "indicates the error" do
@@ -192,7 +192,7 @@ describe Imap::Backup::Configuration::Account do
       end
     end
 
-    context "password" do
+    describe "password" do
       let(:new_password) { "new_password" }
 
       before do
@@ -202,7 +202,7 @@ describe Imap::Backup::Configuration::Account do
         menu.choices["modify password"].call
       end
 
-      context "if the user enters a password" do
+      context "when the user enters a password" do
         it "updates the password" do
           expect(account[:password]).to eq(new_password)
         end
@@ -210,7 +210,7 @@ describe Imap::Backup::Configuration::Account do
         include_examples "it flags the account as modified"
       end
 
-      context "if the user cancels" do
+      context "when the user cancels" do
         let(:new_password) { nil }
 
         it "does nothing" do
@@ -221,7 +221,7 @@ describe Imap::Backup::Configuration::Account do
       end
     end
 
-    context "server" do
+    describe "server" do
       let(:server) { "server" }
 
       before do
@@ -237,7 +237,7 @@ describe Imap::Backup::Configuration::Account do
       include_examples "it flags the account as modified"
     end
 
-    context "backup_path" do
+    describe "backup_path" do
       let(:new_backup_path) { "/new/path" }
 
       before do
@@ -265,7 +265,7 @@ describe Imap::Backup::Configuration::Account do
       include_examples "it flags the account as modified"
     end
 
-    context "folders" do
+    describe "folders" do
       let(:chooser) do
         instance_double(Imap::Backup::Configuration::FolderChooser, run: nil)
       end
@@ -282,7 +282,7 @@ describe Imap::Backup::Configuration::Account do
       end
     end
 
-    context "connection test" do
+    describe "connection test" do
       before do
         allow(Imap::Backup::Configuration::ConnectionTester).
           to receive(:test).and_return("All fine")
@@ -297,7 +297,7 @@ describe Imap::Backup::Configuration::Account do
       end
     end
 
-    context "deletion" do
+    describe "deletion" do
       let(:confirmed) { true }
 
       before do

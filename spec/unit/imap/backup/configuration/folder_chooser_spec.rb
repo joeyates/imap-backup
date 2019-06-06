@@ -1,7 +1,7 @@
 describe Imap::Backup::Configuration::FolderChooser do
   include HighLineTestHelpers
 
-  context "#run" do
+  describe "#run" do
     subject { described_class.new(account) }
 
     let(:connection) do
@@ -21,7 +21,7 @@ describe Imap::Backup::Configuration::FolderChooser do
       allow(Imap::Backup.logger).to receive(:warn)
     end
 
-    context "display" do
+    describe "display" do
       before { subject.run }
 
       it "clears the screen" do
@@ -33,7 +33,7 @@ describe Imap::Backup::Configuration::FolderChooser do
       end
     end
 
-    context "folder listing" do
+    describe "folder listing" do
       let(:account) { {folders: [{name: "my_folder"}]} }
       let(:remote_folders) do
         # this one is already backed up:
@@ -46,7 +46,7 @@ describe Imap::Backup::Configuration::FolderChooser do
         [folder1, folder2]
       end
 
-      context "display" do
+      describe "display" do
         before { subject.run }
 
         it "shows folders which are being backed up" do
@@ -58,7 +58,7 @@ describe Imap::Backup::Configuration::FolderChooser do
         end
       end
 
-      context "adding folders" do
+      context "when adding folders" do
         before do
           allow(input).to receive(:gets).and_return("2\n", "q\n")
 
@@ -72,7 +72,7 @@ describe Imap::Backup::Configuration::FolderChooser do
         include_examples "it flags the account as modified"
       end
 
-      context "removing folders" do
+      context "when removing folders" do
         before do
           allow(input).to receive(:gets).and_return("1\n", "q\n")
 

@@ -23,23 +23,21 @@ describe Imap::Backup::Downloader do
       subject.run
     end
 
-    context "#run" do
-      context "fetched messages" do
-        it "are saved" do
-          expect(serializer).to have_received(:save).with("111", message)
-        end
+    context "with fetched messages" do
+      it "are saved" do
+        expect(serializer).to have_received(:save).with("111", message)
       end
+    end
 
-      context "messages which are already present" do
-        specify "are skipped" do
-          expect(serializer).to_not have_received(:save).with("222", anything)
-        end
+    context "with messages which are already present" do
+      specify "are skipped" do
+        expect(serializer).to_not have_received(:save).with("222", anything)
       end
+    end
 
-      context "failed fetches" do
-        specify "are skipped" do
-          expect(serializer).to_not have_received(:save).with("333", anything)
-        end
+    context "with failed fetches" do
+      specify "are skipped" do
+        expect(serializer).to_not have_received(:save).with("333", anything)
       end
     end
   end

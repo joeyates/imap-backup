@@ -58,7 +58,7 @@ describe Imap::Backup::Account::Connection do
     end
   end
 
-  context "#initialize" do
+  describe "#initialize" do
     [
       [:username, "username@gmail.com"],
       [:local_path, "local_path"],
@@ -85,7 +85,7 @@ describe Imap::Backup::Account::Connection do
     include_examples "connects to IMAP"
   end
 
-  context "#folders" do
+  describe "#folders" do
     let(:imap_folders) do
       [instance_double(Net::IMAP::MailboxList)]
     end
@@ -95,7 +95,7 @@ describe Imap::Backup::Account::Connection do
     end
   end
 
-  context "#status" do
+  describe "#status" do
     let(:folder) do
       instance_double(Imap::Backup::Account::Folder, uids: [remote_uid])
     end
@@ -119,7 +119,7 @@ describe Imap::Backup::Account::Connection do
     end
   end
 
-  context "#run_backup" do
+  describe "#run_backup" do
     let(:folder) do
       instance_double(
         Imap::Backup::Account::Folder,
@@ -202,7 +202,7 @@ describe Imap::Backup::Account::Connection do
     end
   end
 
-  context "#restore" do
+  describe "#restore" do
     let(:folder) do
       instance_double(
         Imap::Backup::Account::Folder,
@@ -297,7 +297,7 @@ describe Imap::Backup::Account::Connection do
     end
   end
 
-  context "#reconnect" do
+  describe "#reconnect" do
     before { subject.reconnect }
 
     it "disconnects from the server" do
@@ -311,7 +311,7 @@ describe Imap::Backup::Account::Connection do
     end
   end
 
-  context "#disconnect" do
+  describe "#disconnect" do
     before { subject.disconnect }
 
     it "disconnects from the server" do

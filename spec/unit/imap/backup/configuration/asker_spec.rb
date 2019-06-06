@@ -43,7 +43,7 @@ module Imap::Backup
       end
     end
 
-    context "#initialize" do
+    describe "#initialize" do
       it "requires 1 parameter" do
         expect do
           described_class.new
@@ -55,7 +55,7 @@ module Imap::Backup
       end
     end
 
-    context "#email" do
+    describe "#email" do
       let(:email) { "email@example.com" }
       let(:answer) { email }
       let(:result) { subject.email }
@@ -71,7 +71,7 @@ module Imap::Backup
       end
     end
 
-    context "#password" do
+    describe "#password" do
       let(:password1) { "password" }
       let(:password2) { "password" }
       let(:answers) { [true, false] }
@@ -101,7 +101,7 @@ module Imap::Backup
         expect(result).to eq(password1)
       end
 
-      context "different answers" do
+      context "with different answers" do
         let(:password2) { "secret" }
 
         it "asks to continue" do
@@ -111,7 +111,7 @@ module Imap::Backup
       end
     end
 
-    context "#backup_path" do
+    describe "#backup_path" do
       let(:path) { "/path" }
       let(:answer) { path }
       let(:result) { subject.backup_path("", //) }

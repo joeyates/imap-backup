@@ -72,7 +72,7 @@ describe Email::Mboxrd::Message do
     end
   end
 
-  context "#to_serialized" do
+  describe "#to_serialized" do
     let(:mail) { instance_double(Mail::Message, from: [from], date: date) }
 
     before do
@@ -107,7 +107,7 @@ describe Email::Mboxrd::Message do
     end
   end
 
-  context "#from" do
+  describe "#from" do
     before do
       # call original for these tests because we want to test the behaviour of
       # class-under-test given different behaviour of the Mail parser
@@ -148,7 +148,7 @@ describe Email::Mboxrd::Message do
     end
   end
 
-  context "#date" do
+  describe "#date" do
     let(:message_body) { msg_good }
 
     it "returns the date" do

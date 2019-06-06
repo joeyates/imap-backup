@@ -3,7 +3,7 @@
 describe Imap::Backup::Configuration::Setup do
   include HighLineTestHelpers
 
-  context "#initialize" do
+  describe "#initialize" do
     context "without a config file" do
       it "works" do
         described_class.new
@@ -11,7 +11,7 @@ describe Imap::Backup::Configuration::Setup do
     end
   end
 
-  context "#run" do
+  describe "#run" do
     subject { described_class.new }
 
     let(:normal) { {username: "account@example.com"} }
@@ -41,7 +41,7 @@ describe Imap::Backup::Configuration::Setup do
       allow(Kernel).to receive(:system)
     end
 
-    context "main menu" do
+    describe "main menu" do
       before { subject.run }
 
       %w(add\ account save\ and\ exit exit\ without\ saving).each do |choice|
@@ -63,33 +63,33 @@ describe Imap::Backup::Configuration::Setup do
       expect(Imap::Backup).to have_received(:setup_logging)
     end
 
-    context "listing" do
+    describe "listing" do
       let(:accounts) { [normal, modified, deleted] }
       let(:modified) { {username: "modified@example.com", modified: true} }
       let(:deleted) { {username: "deleted@example.com", delete: true} }
 
       before { subject.run }
 
-      context "normal accounts" do
+      describe "normal accounts" do
         it "are listed" do
           expect(output.string).to match(/account@example.com/)
         end
       end
 
-      context "modified accounts" do
+      describe "modified accounts" do
         it "are flagged" do
           expect(output.string).to match(/modified@example.com \*/)
         end
       end
 
-      context "deleted accounts" do
+      describe "deleted accounts" do
         it "are hidden" do
           expect(output.string).to_not match(/delete@example.com/)
         end
       end
     end
 
-    context "adding accounts" do
+    context "when adding accounts" do
       let(:blank_account) do
         {
           username: "new@example.com",
@@ -121,7 +121,7 @@ describe Imap::Backup::Configuration::Setup do
       end
     end
 
-    context "logging" do
+    describe "logging" do
       context "when debug logging is disabled" do
         before do
           allow(input).to receive(:gets).and_return("start\n", "exit\n")

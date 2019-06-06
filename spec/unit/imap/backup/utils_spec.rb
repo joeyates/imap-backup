@@ -9,7 +9,7 @@ describe Imap::Backup::Utils do
     allow(File).to receive(:exist?).with(filename).and_return(exists)
   end
 
-  context ".check_permissions" do
+  describe ".check_permissions" do
     let(:requested) { 0o345 }
 
     context "with existing files" do
@@ -47,7 +47,7 @@ describe Imap::Backup::Utils do
     end
   end
 
-  context ".mode" do
+  describe ".mode" do
     context "with existing files" do
       let(:mode) { 0o2345 }
 
@@ -65,7 +65,7 @@ describe Imap::Backup::Utils do
     end
   end
 
-  context ".make_folder" do
+  describe ".make_folder" do
     before do
       allow(FileUtils).to receive(:mkdir_p)
       allow(FileUtils).to receive(:chmod)

@@ -8,7 +8,8 @@ AllCops:
     Enabled: true
 
 RSpec/ContextWording:
-  Enabled: false
+  Exclude:
+    - "spec/features/**/*"
 RSpec/NestedGroups:
   Max: 4
 RSpec/ReturnFromStub:

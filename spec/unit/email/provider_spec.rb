@@ -1,6 +1,6 @@
 describe Email::Provider do
   describe ".for_address" do
-    context "known providers" do
+    context "with known providers" do
       [
         ["gmail.com", :gmail],
         ["fastmail.fm", :fastmail]

@@ -40,7 +40,7 @@ describe Imap::Backup::Serializer::MboxStore do
     allow(FileUtils).to receive(:chmod)
   end
 
-  context "#uids" do
+  describe "#uids" do
     it "returns the backed-up uids as sorted integers" do
       expect(subject.uids).to eq(uids.map(&:to_i).sort)
     end
@@ -62,7 +62,7 @@ describe Imap::Backup::Serializer::MboxStore do
     end
   end
 
-  context "#add" do
+  describe "#add" do
     let(:mbox_formatted_message) { "message in mbox format" }
     let(:message_uid) { "999" }
     let(:message) do

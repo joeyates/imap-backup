@@ -47,7 +47,7 @@ describe Imap::Backup::Configuration::Store do
   end
 
   describe "#modified?" do
-    context "'with accounts flagged 'modified'" do
+    context "with accounts flagged 'modified'" do
       let(:accounts) { [{name: "foo", modified: true}] }
 
       it "is true" do
@@ -55,7 +55,7 @@ describe Imap::Backup::Configuration::Store do
       end
     end
 
-    context "'with accounts flagged 'delete'" do
+    context "with accounts flagged 'delete'" do
       let(:accounts) { [{name: "foo", delete: true}] }
 
       it "is true" do
@@ -194,7 +194,7 @@ describe Imap::Backup::Configuration::Store do
       end
     end
 
-    context "if the configuration file is missing" do
+    context "when the configuration file is missing" do
       let(:file_exists) { false }
 
       it "doesn't fail" do
@@ -204,7 +204,7 @@ describe Imap::Backup::Configuration::Store do
       end
     end
 
-    context "if the config file permissions are too lax" do
+    context "when the config file permissions are too lax" do
       let(:file_exists) { true }
 
       before do

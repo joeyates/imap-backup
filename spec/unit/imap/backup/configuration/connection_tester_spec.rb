@@ -1,5 +1,5 @@
 describe Imap::Backup::Configuration::ConnectionTester do
-  context ".test" do
+  describe ".test" do
     let(:connection) do
       instance_double(Imap::Backup::Account::Connection, imap: nil)
     end
@@ -9,7 +9,7 @@ describe Imap::Backup::Configuration::ConnectionTester do
       allow(Imap::Backup::Account::Connection).to receive(:new) { connection }
     end
 
-    context "call" do
+    describe "call" do
       before { result }
 
       it "tries to connect" do
@@ -17,7 +17,7 @@ describe Imap::Backup::Configuration::ConnectionTester do
       end
     end
 
-    context "success" do
+    describe "success" do
       before { result }
 
       it "returns success" do
@@ -25,13 +25,13 @@ describe Imap::Backup::Configuration::ConnectionTester do
       end
     end
 
-    context "failure" do
+    describe "failure" do
       before do
         allow(connection).to receive(:imap).and_raise(error)
         result
       end
 
-      context "no connection" do
+      context "with no connection" do
         let(:error) do
           data = OpenStruct.new(text: "bar")
           response = OpenStruct.new(data: data)
@@ -43,7 +43,7 @@ describe Imap::Backup::Configuration::ConnectionTester do
         end
       end
 
-      context "other" do
+      context "when caused by other errors" do
         let(:error) { "Error" }
 
         it "returns error" do

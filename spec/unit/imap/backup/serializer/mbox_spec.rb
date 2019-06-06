@@ -26,10 +26,10 @@ describe Imap::Backup::Serializer::Mbox do
     allow(Imap::Backup::Serializer::MboxStore).to receive(:new) { store }
   end
 
-  context "containing directory" do
+  describe "folder path" do
     before { subject.uids }
 
-    context "when the IMAP folder has multiple elements" do
+    context "when it has multiple elements" do
       let(:imap_folder) { "folder/path" }
 
       context "when the containing directory is missing" do
@@ -42,7 +42,7 @@ describe Imap::Backup::Serializer::Mbox do
       end
     end
 
-    context "when the containing directory permissons are incorrect" do
+    context "when permissions are incorrect" do
       let(:permissions) { 0o777 }
 
       it "corrects them" do
@@ -51,13 +51,13 @@ describe Imap::Backup::Serializer::Mbox do
       end
     end
 
-    context "when the containing directory permissons are correct" do
+    context "when permissons are correct" do
       it "does nothing" do
         expect(FileUtils).to_not have_received(:chmod)
       end
     end
 
-    context "when the containing directory exists" do
+    context "when it exists" do
       it "is not created" do
         expect(Imap::Backup::Utils).to_not have_received(:make_folder).
           with(base_path, File.dirname(imap_folder), 0o700)
@@ -65,7 +65,7 @@ describe Imap::Backup::Serializer::Mbox do
     end
   end
 
-  context "#uids" do
+  describe "#uids" do
     it "calls the store" do
       subject.uids
 
@@ -73,7 +73,7 @@ describe Imap::Backup::Serializer::Mbox do
     end
   end
 
-  context "#save" do
+  describe "#save" do
     it "calls the store" do
       subject.save("foo", "bar")
 
@@ -81,7 +81,7 @@ describe Imap::Backup::Serializer::Mbox do
     end
   end
 
-  context "#set_uid_validity" do
+  describe "#set_uid_validity" do
     let(:result) { subject.set_uid_validity("aaa") }
 
     context "when the existing uid validity is unset" do
