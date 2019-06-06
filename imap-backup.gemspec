@@ -29,7 +29,11 @@ Gem::Specification.new do |gem|
   gem.add_runtime_dependency "rake"
 
   gem.add_development_dependency "codeclimate-test-reporter", "~> 0.4.8"
-  gem.add_development_dependency "pry-byebug"
+  if RUBY_ENGINE == "jruby"
+    gem.add_development_dependency "pry-debugger-jruby"
+  else
+    gem.add_development_dependency "pry-byebug"
+  end
   gem.add_development_dependency "rspec", ">= 3.0.0"
   gem.add_development_dependency "rubocop-rspec"
   gem.add_development_dependency "simplecov"
