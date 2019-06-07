@@ -65,22 +65,6 @@ describe Imap::Backup::Serializer::Mbox do
     end
   end
 
-  describe "#uids" do
-    it "calls the store" do
-      subject.uids
-
-      expect(store).to have_received(:uids)
-    end
-  end
-
-  describe "#save" do
-    it "calls the store" do
-      subject.save("foo", "bar")
-
-      expect(store).to have_received(:add)
-    end
-  end
-
   describe "#apply_uid_validity" do
     let(:result) { subject.apply_uid_validity("aaa") }
 
@@ -156,6 +140,22 @@ describe Imap::Backup::Serializer::Mbox do
           expect(result).to eq("folder.bbb.1")
         end
       end
+    end
+  end
+
+  describe "#uids" do
+    it "calls the store" do
+      subject.uids
+
+      expect(store).to have_received(:uids)
+    end
+  end
+
+  describe "#save" do
+    it "calls the store" do
+      subject.save("foo", "bar")
+
+      expect(store).to have_received(:add)
     end
   end
 end
