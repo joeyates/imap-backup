@@ -14,10 +14,11 @@ describe Imap::Backup::Serializer::MboxStore do
   let(:imap_content) do
     {
       version: Imap::Backup::Serializer::MboxStore::CURRENT_VERSION,
-      uid_validity: 123,
+      uid_validity: uid_validity,
       uids: uids
     }.to_json
   end
+  let(:uid_validity) { 123 }
 
   before do
     allow(File).to receive(:exist?).and_call_original
@@ -40,6 +41,27 @@ describe Imap::Backup::Serializer::MboxStore do
     allow(FileUtils).to receive(:chmod)
   end
 
+  describe "#uid_validity=" do
+    let(:new_uid_validity) { "13" }
+    let(:updated_imap_content) do
+      {
+        version: Imap::Backup::Serializer::MboxStore::CURRENT_VERSION,
+        uid_validity: new_uid_validity,
+        uids: uids
+      }.to_json
+    end
+
+    before { subject.uid_validity = new_uid_validity }
+
+    it "sets uid_validity" do
+      expect(subject.uid_validity).to eq(new_uid_validity)
+    end
+
+    it "writes the imap file" do
+      expect(imap_file).to have_received(:write).with(updated_imap_content)
+    end
+  end
+
   describe "#uids" do
     it "returns the backed-up uids as integers" do
       expect(subject.uids).to eq(uids.map(&:to_i))
@@ -50,6 +72,27 @@ describe Imap::Backup::Serializer::MboxStore do
 
       it "returns an empty Array" do
         expect(subject.uids).to eq([])
+      end
+    end
+
+    context "when the imap file is malformed" do
+      before do
+        allow(JSON).to receive(:parse).and_raise(JSON::ParserError)
+      end
+
+      let!(:result) { subject.uids }
+
+      it "returns an empty Array" do
+        expect(result).to eq([])
+      end
+
+      it "deletes files" do
+        expect(File).to have_received(:unlink).with(imap_pathname)
+        expect(File).to have_received(:unlink).with(mbox_pathname)
+      end
+
+      it "writes a blank mbox file" do
+        expect(mbox_file).to have_received(:write).with("")
       end
     end
 
@@ -74,7 +117,7 @@ describe Imap::Backup::Serializer::MboxStore do
     let(:updated_imap_content) do
       {
         version: Imap::Backup::Serializer::MboxStore::CURRENT_VERSION,
-        uid_validity: 123,
+        uid_validity: uid_validity,
         uids: uids + [999]
       }.to_json
     end
@@ -82,7 +125,6 @@ describe Imap::Backup::Serializer::MboxStore do
     before do
       allow(Email::Mboxrd::Message).to receive(:new).and_return(message)
       allow(File).to receive(:open).with(mbox_pathname, "ab") { mbox_file }
-      subject.uid_validity = 123
     end
 
     it "saves the message to the mbox" do
@@ -153,6 +195,70 @@ describe Imap::Backup::Serializer::MboxStore do
       it "returns nil" do
         expect(result).to be_nil
       end
+    end
+  end
+
+  describe "#update_uid" do
+    let(:old_uid) { "2" }
+    let(:updated_imap_content) do
+      {
+        version: Imap::Backup::Serializer::MboxStore::CURRENT_VERSION,
+        uid_validity: uid_validity,
+        uids: [3, 999, 1]
+      }.to_json
+    end
+
+    before { subject.update_uid(old_uid, "999") }
+
+    it "updates the stored UID" do
+      expect(imap_file).to have_received(:write).with(updated_imap_content)
+    end
+
+    context "when the UID is unknown" do
+      let(:old_uid) { "42" }
+
+      it "does nothing" do
+        expect(imap_file).to_not have_received(:write)
+      end
+    end
+  end
+
+  describe "#reset" do
+    before { subject.reset }
+
+    it "deletes files" do
+      expect(File).to have_received(:unlink).with(imap_pathname)
+      expect(File).to have_received(:unlink).with(mbox_pathname)
+    end
+
+    it "writes a blank mbox file" do
+      expect(mbox_file).to have_received(:write).with("")
+    end
+  end
+
+  describe "#rename" do
+    let(:new_name) { "new_name" }
+    let(:new_folder_path) { File.join(base_path, new_name) }
+    let(:new_imap_name) { new_folder_path + ".imap" }
+    let(:new_mbox_name) { new_folder_path + ".mbox" }
+
+    before do
+      allow(File).to receive(:rename).and_call_original
+      allow(File).to receive(:rename).with(imap_pathname, new_imap_name)
+      allow(File).to receive(:rename).with(mbox_pathname, new_mbox_name)
+      subject.rename(new_name)
+    end
+
+    it "renames the imap file" do
+      expect(File).to have_received(:rename).with(imap_pathname, new_imap_name)
+    end
+
+    it "renames the mbox file" do
+      expect(File).to have_received(:rename).with(mbox_pathname, new_mbox_name)
+    end
+
+    it "updates the folder name" do
+      expect(subject.folder).to eq(new_name)
     end
   end
 end

@@ -166,6 +166,21 @@ describe Imap::Backup::Configuration::Account do
             end
           end
         end
+
+        context "if the domain is unrecognized" do
+          let(:existing_server) { nil }
+          let(:provider) do
+            instance_double(Email::Provider, provider: :default)
+          end
+
+          before do
+            allow(Email::Provider).to receive(:for_address) { provider }
+          end
+
+          it "does not set a default server" do
+            expect(account[:server]).to be_nil
+          end
+        end
       end
 
       context "when the email is new" do
@@ -256,10 +271,20 @@ describe Imap::Backup::Configuration::Account do
         expect(account[:local_path]).to eq(new_backup_path)
       end
 
-      it "validates that the path is not used by other backups" do
-        # rubocop:disable RSpec/InstanceVariable
-        expect(@validator.call(other_existing_path)).to be_falsey
-        # rubocop:enable RSpec/InstanceVariable
+      context "when the path is not used by other backups" do
+        it "is accepts it" do
+          # rubocop:disable RSpec/InstanceVariable
+          expect(@validator.call("/unknown/path")).to be_truthy
+          # rubocop:enable RSpec/InstanceVariable
+        end
+      end
+
+      context "when the path is used by other backups" do
+        it "fails validation" do
+          # rubocop:disable RSpec/InstanceVariable
+          expect(@validator.call(other_existing_path)).to be_falsey
+          # rubocop:enable RSpec/InstanceVariable
+        end
       end
 
       include_examples "it flags the account as modified"

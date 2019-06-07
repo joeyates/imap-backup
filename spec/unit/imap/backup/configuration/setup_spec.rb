@@ -89,6 +89,26 @@ describe Imap::Backup::Configuration::Setup do
       end
     end
 
+    context "when editing accounts" do
+      let(:account) do
+        instance_double(Imap::Backup::Configuration::Account, run: nil)
+      end
+
+      before do
+        allow(input).to receive(:gets).and_return("1\n", "exit\n")
+        allow(Imap::Backup::Configuration::Asker).to receive(:email).
+          with(no_args).and_return("new@example.com")
+        allow(Imap::Backup::Configuration::Account).to receive(:new).
+          with(store, normal, anything).and_return(account)
+
+        subject.run
+      end
+
+      it "edits the account" do
+        expect(account).to have_received(:run)
+      end
+    end
+
     context "when adding accounts" do
       let(:blank_account) do
         {
