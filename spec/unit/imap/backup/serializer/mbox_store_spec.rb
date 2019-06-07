@@ -97,6 +97,15 @@ describe Imap::Backup::Serializer::MboxStore do
       expect(imap_file).to have_received(:write).with(updated_imap_content)
     end
 
+    context "when the message is already downloaded" do
+      let(:uids) { [999] }
+
+      it "skips the message" do
+        subject.add(message_uid, "The\nemail\n")
+        expect(mbox_file).to_not have_received(:write)
+      end
+    end
+
     context "when the message causes parsing errors" do
       before do
         allow(message).to receive(:to_serialized).and_raise(ArgumentError)
