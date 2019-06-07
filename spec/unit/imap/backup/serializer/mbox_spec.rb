@@ -9,7 +9,8 @@ describe Imap::Backup::Serializer::Mbox do
       rename: nil,
       uids: nil,
       uid_validity: existing_uid_validity,
-      "uid_validity=": nil
+      "uid_validity=": nil,
+      update_uid: nil
     )
   end
   let(:imap_folder) { "folder" }
@@ -62,22 +63,6 @@ describe Imap::Backup::Serializer::Mbox do
         expect(Imap::Backup::Utils).to_not have_received(:make_folder).
           with(base_path, File.dirname(imap_folder), 0o700)
       end
-    end
-  end
-
-  describe "#uids" do
-    it "calls the store" do
-      subject.uids
-
-      expect(store).to have_received(:uids)
-    end
-  end
-
-  describe "#save" do
-    it "calls the store" do
-      subject.save("foo", "bar")
-
-      expect(store).to have_received(:add)
     end
   end
 
@@ -156,6 +141,60 @@ describe Imap::Backup::Serializer::Mbox do
           expect(result).to eq("folder.bbb.1")
         end
       end
+    end
+  end
+
+  describe "#force_uid_validity" do
+    before { subject.force_uid_validity("66") }
+
+    it "sets the uid_validity" do
+      expect(store).to have_received(:uid_validity=).with("66")
+    end
+  end
+
+  describe "#uids" do
+    it "calls the store" do
+      subject.uids
+
+      expect(store).to have_received(:uids)
+    end
+  end
+
+  describe "#load" do
+    let(:result) { subject.load("66") }
+
+    before { allow(store).to receive(:load).with("66") { "xxx" } }
+
+    it "returns the value loaded by the store" do
+      expect(result).to eq("xxx")
+    end
+  end
+
+  describe "#save" do
+    before { subject.save("foo", "bar") }
+
+    it "calls the store" do
+      expect(store).to have_received(:add).with("foo", "bar")
+    end
+  end
+
+  describe "#rename" do
+    before { subject.rename("foo") }
+
+    it "calls the store" do
+      expect(store).to have_received(:rename).with("foo")
+    end
+
+    it "updates the folder name" do
+      expect(subject.folder).to eq("foo")
+    end
+  end
+
+  describe "#update_uid" do
+    before { subject.update_uid("foo", "bar") }
+
+    it "calls the store" do
+      expect(store).to have_received(:update_uid).with("foo", "bar")
     end
   end
 end

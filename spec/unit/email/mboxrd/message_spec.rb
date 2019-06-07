@@ -107,7 +107,7 @@ describe Email::Mboxrd::Message do
     end
   end
 
-  describe "#from" do
+  describe "From" do
     before do
       # call original for these tests because we want to test the behaviour of
       # class-under-test given different behaviour of the Mail parser
@@ -160,6 +160,23 @@ describe Email::Mboxrd::Message do
 
       it "returns nil" do
         expect(subject.date).to be_nil
+      end
+    end
+  end
+
+  describe "#imap_body" do
+    let(:message_body) { "Ciao" }
+
+    it "returns the supplied body" do
+      expect(subject.imap_body).to eq(message_body)
+    end
+
+    context "when newlines are not IMAP standard" do
+      let(:message_body) { "Ciao\nHello" }
+      let(:corrected) { "Ciao\r\nHello" }
+
+      it "corrects them" do
+        expect(subject.imap_body).to eq(corrected)
       end
     end
   end

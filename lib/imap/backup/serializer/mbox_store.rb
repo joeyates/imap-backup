@@ -1,6 +1,7 @@
 require "json"
 
 require "email/mboxrd/message"
+require "imap/backup/serializer/mbox_enumerator"
 
 module Imap::Backup
   class Serializer::MboxStore
@@ -71,8 +72,9 @@ module Imap::Backup
       end
     end
 
-    def load(uid)
+    def load(uid_maybe_string)
       do_load if !loaded
+      uid = uid_maybe_string.to_i
       message_index = uids.find_index(uid)
       return nil if message_index.nil?
 
@@ -103,16 +105,12 @@ module Imap::Backup
       @folder = new_name
     end
 
-    def relative_path
-      File.dirname(folder)
-    end
-
     private
 
     def do_load
       data = imap_data
       if data
-        @uids = data[:uids].map(&:to_i).sort
+        @uids = data[:uids].map(&:to_i)
         @uid_validity = data[:uid_validity]
         @loaded = true
       else
@@ -145,33 +143,13 @@ module Imap::Backup
     end
 
     def load_nth(index)
-      each_mbox_message.with_index do |raw, i|
+      enumerator = Serializer::MboxEnumerator.new(mbox_pathname)
+      enumerator.each.with_index do |raw, i|
         next unless i == index
 
         return Email::Mboxrd::Message.from_serialized(raw)
       end
       nil
-    end
-
-    def each_mbox_message
-      Enumerator.new do |e|
-        File.open(mbox_pathname) do |f|
-          lines = []
-
-          loop do
-            line = f.gets
-            break if !line
-
-            if line.start_with?("From ")
-              e.yield lines.join if lines.count.positive?
-              lines = [line]
-            else
-              lines << line
-            end
-          end
-          e.yield lines.join if lines.count.positive?
-        end
-      end
     end
 
     def imap_looks_like_json?
