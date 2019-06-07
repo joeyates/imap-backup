@@ -105,10 +105,6 @@ module Imap::Backup
       @folder = new_name
     end
 
-    def relative_path
-      File.dirname(folder)
-    end
-
     private
 
     def do_load
