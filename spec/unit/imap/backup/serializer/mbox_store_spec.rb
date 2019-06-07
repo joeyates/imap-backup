@@ -15,7 +15,7 @@ describe Imap::Backup::Serializer::MboxStore do
     {
       version: Imap::Backup::Serializer::MboxStore::CURRENT_VERSION,
       uid_validity: 123,
-      uids: uids.sort
+      uids: uids
     }.to_json
   end
 
@@ -41,8 +41,8 @@ describe Imap::Backup::Serializer::MboxStore do
   end
 
   describe "#uids" do
-    it "returns the backed-up uids as sorted integers" do
-      expect(subject.uids).to eq(uids.map(&:to_i).sort)
+    it "returns the backed-up uids as integers" do
+      expect(subject.uids).to eq(uids.map(&:to_i))
     end
 
     context "when the imap file does not exist" do
@@ -75,7 +75,7 @@ describe Imap::Backup::Serializer::MboxStore do
       {
         version: Imap::Backup::Serializer::MboxStore::CURRENT_VERSION,
         uid_validity: 123,
-        uids: (uids + [999]).sort
+        uids: uids + [999]
       }.to_json
     end
 
@@ -125,7 +125,7 @@ describe Imap::Backup::Serializer::MboxStore do
   end
 
   describe "#load" do
-    let(:uid) { "3" }
+    let(:uid) { "1" }
     let(:result) { subject.load(uid) }
     let(:enumerator) do
       instance_double(Imap::Backup::Serializer::MboxEnumerator)
