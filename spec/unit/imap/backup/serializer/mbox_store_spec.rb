@@ -114,4 +114,36 @@ describe Imap::Backup::Serializer::MboxStore do
       end
     end
   end
+
+  describe "#load" do
+    let(:uid) { "3" }
+    let(:result) { subject.load(uid) }
+    let(:enumerator) do
+      instance_double(Imap::Backup::Serializer::MboxEnumerator)
+    end
+    let(:enumeration) { instance_double(Enumerator) }
+
+    before do
+      allow(Imap::Backup::Serializer::MboxEnumerator).
+        to receive(:new) { enumerator }
+      allow(enumerator).to receive(:each) { enumeration }
+      allow(enumeration).
+        to receive(:with_index).
+        and_yield("", 0).
+        and_yield("", 1).
+        and_yield("ciao", 2)
+    end
+
+    it "returns the message" do
+      expect(result.supplied_body).to eq("ciao")
+    end
+
+    context "when the UID is unknown" do
+      let(:uid) { "99" }
+
+      it "returns nil" do
+        expect(result).to be_nil
+      end
+    end
+  end
 end
