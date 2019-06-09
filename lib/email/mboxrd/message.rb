@@ -42,12 +42,7 @@ module Email::Mboxrd
     end
 
     def best_from
-      if parsed.from.is_a?(Enumerable)
-        parsed.from.each do |addr|
-          return addr if addr
-        end
-      end
-
+      return first_from if first_from
       return parsed.sender if parsed.sender
       return parsed.envelope_from if parsed.envelope_from
       return parsed.return_path if parsed.return_path
@@ -62,6 +57,12 @@ module Email::Mboxrd
           from << " " + asctime if asctime != ""
           from
         end
+    end
+
+    def first_from
+      return nil if !parsed.from.is_a?(Enumerable)
+
+      parsed.from.find { |from| from }
     end
 
     def mboxrd_body
