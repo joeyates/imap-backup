@@ -2,6 +2,7 @@ require "imap/backup/serializer/mbox_enumerator"
 
 describe Imap::Backup::Serializer::MboxEnumerator do
   subject { described_class.new(mbox_pathname) }
+
   let(:mbox_pathname) { "/mbox/pathname" }
   let(:mbox_file) { instance_double(File) }
   let(:lines) { message1 + message2 + [nil] }

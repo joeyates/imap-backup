@@ -86,8 +86,11 @@ describe Imap::Backup::Serializer::MboxStore do
         expect(result).to eq([])
       end
 
-      it "deletes files" do
+      it "deletes the imap file" do
         expect(File).to have_received(:unlink).with(imap_pathname)
+      end
+
+      it "deletes the mbox file" do
         expect(File).to have_received(:unlink).with(mbox_pathname)
       end
 
@@ -226,8 +229,11 @@ describe Imap::Backup::Serializer::MboxStore do
   describe "#reset" do
     before { subject.reset }
 
-    it "deletes files" do
+    it "deletes the imap file" do
       expect(File).to have_received(:unlink).with(imap_pathname)
+    end
+
+    it "deletes the mbox file" do
       expect(File).to have_received(:unlink).with(mbox_pathname)
     end
 

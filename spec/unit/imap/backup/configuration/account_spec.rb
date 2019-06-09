@@ -167,7 +167,7 @@ describe Imap::Backup::Configuration::Account do
           end
         end
 
-        context "if the domain is unrecognized" do
+        context "when the domain is unrecognized" do
           let(:existing_server) { nil }
           let(:provider) do
             instance_double(Email::Provider, provider: :default)

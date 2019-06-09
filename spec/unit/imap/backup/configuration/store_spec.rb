@@ -139,7 +139,7 @@ describe Imap::Backup::Configuration::Store do
     before do
       allow(FileUtils).to receive(:mkdir)
       allow(FileUtils).to receive(:chmod)
-      allow(File).to receive(:open).with(file_path, "w") { |&b| b.call file }
+      allow(File).to receive(:open).with(file_path, "w").and_yield(file)
       allow(JSON).to receive(:pretty_generate).and_return("JSON output")
     end
 

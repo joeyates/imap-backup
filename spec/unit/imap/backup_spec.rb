@@ -6,6 +6,7 @@ describe Imap::Backup do
     let!(:previous) { described_class.logger.level }
 
     before { described_class.setup_logging(config) }
+
     after { described_class.logger.level = previous }
 
     context "when config.debug?" do
