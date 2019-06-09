@@ -41,15 +41,6 @@ module Email::Mboxrd
       @parsed ||= Mail.new(supplied_body)
     end
 
-    def best_from
-      return first_from if first_from
-      return parsed.sender if parsed.sender
-      return parsed.envelope_from if parsed.envelope_from
-      return parsed.return_path if parsed.return_path
-
-      ""
-    end
-
     def from
       @from ||=
         begin
@@ -57,6 +48,15 @@ module Email::Mboxrd
           from << " " + asctime if asctime != ""
           from
         end
+    end
+
+    def best_from
+      return first_from if first_from
+      return parsed.sender if parsed.sender
+      return parsed.envelope_from if parsed.envelope_from
+      return parsed.return_path if parsed.return_path
+
+      ""
     end
 
     def first_from
