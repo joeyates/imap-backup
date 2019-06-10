@@ -1,14 +1,25 @@
 language: ruby
+
+services:
+  - docker
+
 rvm:
   - 2.3
   - 2.4
   - 2.5
   - 2.6
   - jruby-19mode
+
 branches:
   only:
     - master
+
 before_install:
   - gem update --system
   - gem update bundler
-script: "bundle exec rspec --tag ~docker"
+
+script:
+  - docker pull antespi/docker-imap-devel:latest
+  - docker run -d --env MAIL_ADDRESS=address@example.org --env MAIL_PASS=pass --env MAILNAME=example.org --publish 8993:993 antespi/docker-imap-devel:latest
+  - sleep 10
+  - bundle exec rake

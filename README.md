@@ -213,18 +213,10 @@ docker run \
   antespi/docker-imap-devel:latest
 ```
 
-Currently, the integration tests with Docker are excluded from the CI run.
+To exclude Docker-based tests:
 
-To run **just** the Docker-based tests:
-
-```
-rspec -t docker
-```
-
-To run **all** specs, including the integration tests, do the following:
-
-```
-rspec -O .rspec-all
+```sh
+$ rspec --tag ~docker
 ```
 
 ## Contributing
