@@ -61,6 +61,8 @@ module Imap::Backup
 
       fetch_data_item = fetch_data_items[0]
       attributes = fetch_data_item.attr
+      return nil if !attributes.key?("RFC822")
+
       attributes["RFC822"].force_encoding("utf-8")
       attributes
     rescue FolderNotFound

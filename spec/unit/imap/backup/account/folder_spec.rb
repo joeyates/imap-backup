@@ -76,6 +76,14 @@ describe Imap::Backup::Account::Folder do
       end
     end
 
+    context "when the response doesn't have RFC822" do
+      let(:attributes) { {} }
+
+      it "is nil" do
+        expect(subject.fetch(123)).to be_nil
+      end
+    end
+
     it "sets the encoding on the message" do
       subject.fetch(123)
 
