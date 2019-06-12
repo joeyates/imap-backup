@@ -85,6 +85,9 @@ module EmailServerHelpers
   def server_delete_folder(folder)
     imap.delete folder
     imap.disconnect
+  rescue StandardError => e
+    puts e.to_s
+  ensure
     @imap = nil
   end
 
