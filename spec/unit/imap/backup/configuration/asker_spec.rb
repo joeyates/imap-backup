@@ -1,5 +1,3 @@
-# rubocop:disable Metrics/ModuleLength
-
 module Imap::Backup
   describe Configuration::Asker do
     subject { described_class.new(highline) }
@@ -134,5 +132,3 @@ module Imap::Backup
     end
   end
 end
-
-# rubocop:enable Metrics/ModuleLength

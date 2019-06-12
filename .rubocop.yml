@@ -1,4 +1,6 @@
-inherit_from: https://gitlab.com/snippets/1744945/raw
+inherit_from:
+  - https://gitlab.com/snippets/1744945/raw
+  - .rubocop_todo.yml
 
 AllCops:
   TargetRubyVersion: 2.3
