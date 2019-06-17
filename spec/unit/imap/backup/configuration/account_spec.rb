@@ -242,8 +242,10 @@ describe Imap::Backup::Configuration::Account do
       let(:server) { "server" }
 
       before do
-        allow(highline).to receive(:ask).with("server: ").and_return(server)
+        allow(highline).to receive(:ask).with("server: ") { server }
+
         subject.run
+
         menu.choices["modify server"].call
       end
 
@@ -312,7 +314,7 @@ describe Imap::Backup::Configuration::Account do
     describe "connection test" do
       before do
         allow(Imap::Backup::Configuration::ConnectionTester).
-          to receive(:test).and_return("All fine")
+          to receive(:test) { "All fine" }
         allow(highline).to receive(:ask)
         subject.run
         menu.choices["test connection"].call
@@ -328,7 +330,7 @@ describe Imap::Backup::Configuration::Account do
       let(:confirmed) { true }
 
       before do
-        allow(highline).to receive(:agree).and_return(confirmed)
+        allow(highline).to receive(:agree) { confirmed }
         subject.run
         catch :done do
           menu.choices["delete"].call

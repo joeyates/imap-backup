@@ -132,7 +132,7 @@ describe Imap::Backup::Configuration::FolderChooser do
         allow(Imap::Backup::Account::Connection).
           to receive(:new).with(account).and_raise("error")
         allow(Imap::Backup::Configuration::Setup.highline).
-          to receive(:ask).and_return("q")
+          to receive(:ask) { "q" }
       end
 
       it "prints an error message" do

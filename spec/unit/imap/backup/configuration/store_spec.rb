@@ -20,11 +20,11 @@ describe Imap::Backup::Configuration::Store do
     allow(File).to receive(:exist?).and_call_original
     allow(File).to receive(:exist?).with(file_path) { file_exists }
     allow(Imap::Backup::Utils).
-      to receive(:stat).with(directory).and_return(0o700)
+      to receive(:stat).with(directory) { 0o700 }
     allow(Imap::Backup::Utils).
-      to receive(:stat).with(file_path).and_return(0o600)
-    allow(Imap::Backup::Utils).to receive(:check_permissions).and_return(nil)
-    allow(File).to receive(:read).with(file_path).and_return(configuration)
+      to receive(:stat).with(file_path) { 0o600 }
+    allow(Imap::Backup::Utils).to receive(:check_permissions) { nil }
+    allow(File).to receive(:read).with(file_path) { configuration }
   end
 
   describe ".exist?" do
@@ -140,7 +140,7 @@ describe Imap::Backup::Configuration::Store do
       allow(FileUtils).to receive(:mkdir)
       allow(FileUtils).to receive(:chmod)
       allow(File).to receive(:open).with(file_path, "w").and_yield(file)
-      allow(JSON).to receive(:pretty_generate).and_return("JSON output")
+      allow(JSON).to receive(:pretty_generate) { "JSON output" }
     end
 
     it "creates the config directory" do

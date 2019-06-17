@@ -28,7 +28,7 @@ describe Imap::Backup::Account::Folder do
   describe "#uids" do
     let(:uids) { [5678, 123] }
 
-    before { allow(imap).to receive(:uid_search).and_return(uids) }
+    before { allow(imap).to receive(:uid_search) { uids } }
 
     it "lists available messages" do
       expect(subject.uids).to eq(uids.reverse)

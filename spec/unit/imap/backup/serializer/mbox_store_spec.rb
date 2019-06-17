@@ -132,7 +132,7 @@ describe Imap::Backup::Serializer::MboxStore do
     end
 
     before do
-      allow(Email::Mboxrd::Message).to receive(:new).and_return(message)
+      allow(Email::Mboxrd::Message).to receive(:new) { message }
       allow(File).to receive(:open).with(mbox_pathname, "ab") { mbox_file }
     end
 

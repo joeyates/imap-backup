@@ -97,9 +97,9 @@ describe Imap::Backup::Configuration::Setup do
       before do
         allow(input).to receive(:gets).and_return("1\n", "exit\n")
         allow(Imap::Backup::Configuration::Asker).to receive(:email).
-          with(no_args).and_return("new@example.com")
+          with(no_args) { "new@example.com" }
         allow(Imap::Backup::Configuration::Account).to receive(:new).
-          with(store, normal, anything).and_return(account)
+          with(store, normal, anything) { account }
       end
 
       it "edits the account" do
@@ -125,9 +125,9 @@ describe Imap::Backup::Configuration::Setup do
       before do
         allow(input).to receive(:gets).and_return("add\n", "exit\n")
         allow(Imap::Backup::Configuration::Asker).to receive(:email).
-          with(no_args).and_return("new@example.com")
+          with(no_args) { "new@example.com" }
         allow(Imap::Backup::Configuration::Account).to receive(:new).
-          with(store, blank_account, anything).and_return(account)
+          with(store, blank_account, anything) { account }
 
         subject.run
       end
@@ -203,7 +203,7 @@ describe Imap::Backup::Configuration::Setup do
 
     context "when 'save' is selected" do
       before do
-        allow(input).to receive(:gets).and_return("save\n")
+        allow(input).to receive(:gets) { "save\n" }
       end
 
       it "exits" do
@@ -220,7 +220,7 @@ describe Imap::Backup::Configuration::Setup do
 
     context "when 'exit without saving' is selected" do
       before do
-        allow(input).to receive(:gets).and_return("exit\n")
+        allow(input).to receive(:gets) { "exit\n" }
       end
 
       it "exits" do

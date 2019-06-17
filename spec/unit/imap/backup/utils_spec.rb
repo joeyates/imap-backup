@@ -5,8 +5,8 @@ describe Imap::Backup::Utils do
   let(:exists) { true }
 
   before do
-    allow(File).to receive(:stat).and_return(stat)
-    allow(File).to receive(:exist?).with(filename).and_return(exists)
+    allow(File).to receive(:stat) { stat }
+    allow(File).to receive(:exist?).with(filename) { exists }
   end
 
   describe ".check_permissions" do

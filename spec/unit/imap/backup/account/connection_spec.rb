@@ -99,7 +99,7 @@ describe Imap::Backup::Account::Connection do
     let(:remote_uid) { "remote_uid" }
 
     before do
-      allow(Imap::Backup::Account::Folder).to receive(:new).and_return(folder)
+      allow(Imap::Backup::Account::Folder).to receive(:new) { folder }
       allow(Imap::Backup::Serializer::Mbox).to receive(:new) { serializer }
     end
 
@@ -137,9 +137,9 @@ describe Imap::Backup::Account::Connection do
     context "with supplied backup_folders" do
       before do
         allow(Imap::Backup::Account::Folder).to receive(:new).
-          with(subject, self.class.backup_folder).and_return(folder)
+          with(subject, self.class.backup_folder) { folder }
         allow(Imap::Backup::Serializer::Mbox).to receive(:new).
-          with(local_path, self.class.backup_folder).and_return(serializer)
+          with(local_path, self.class.backup_folder) { serializer }
       end
 
       it "runs the downloader" do
@@ -166,9 +166,9 @@ describe Imap::Backup::Account::Connection do
 
       before do
         allow(Imap::Backup::Account::Folder).to receive(:new).
-          with(subject, "foo").and_return(folder)
+          with(subject, "foo") { folder }
         allow(Imap::Backup::Serializer::Mbox).to receive(:new).
-          with(local_path, "foo").and_return(serializer)
+          with(local_path, "foo") { serializer }
       end
 
       context "when supplied backup_folders is nil" do

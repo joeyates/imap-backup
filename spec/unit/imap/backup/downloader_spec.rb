@@ -34,7 +34,7 @@ describe Imap::Backup::Downloader do
 
     context "with failed fetches" do
       specify "are skipped" do
-        allow(folder).to receive(:fetch).with("333").and_return(nil)
+        allow(folder).to receive(:fetch).with("333") { nil }
         expect(serializer).to_not receive(:save).with("333", anything)
 
         subject.run
