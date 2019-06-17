@@ -30,9 +30,9 @@ module Imap::Backup
     ].each do |method, params, prompt|
       context ".#{method}" do
         it "asks for input" do
-          described_class.send(method, *params)
+          expect(highline).to receive(:ask).with("#{prompt}: ")
 
-          expect(highline).to have_received(:ask).with("#{prompt}: ")
+          described_class.send(method, *params)
         end
 
         it "returns the answer" do
@@ -56,16 +56,15 @@ module Imap::Backup
     describe "#email" do
       let(:email) { "email@example.com" }
       let(:answer) { email }
-      let(:result) { subject.email }
-
-      before { result }
 
       it "asks for an email" do
-        expect(highline).to have_received(:ask).with(/email/)
+        expect(highline).to receive(:ask).with(/email/)
+
+        subject.email
       end
 
       it "returns the address" do
-        expect(result).to eq(email)
+        expect(subject.email).to eq(email)
       end
     end
 
@@ -73,7 +72,6 @@ module Imap::Backup
       let(:password1) { "password" }
       let(:password2) { "password" }
       let(:answers) { [true, false] }
-      let(:result) { subject.password }
 
       before do
         i = 0
@@ -84,27 +82,32 @@ module Imap::Backup
           i += 1
           answer
         end
-        result
       end
 
       it "asks for a password" do
-        expect(highline).to have_received(:ask).with("password: ")
+        expect(highline).to receive(:ask).with("password: ")
+
+        subject.password
       end
 
       it "asks for confirmation" do
-        expect(highline).to have_received(:ask).with("repeat password: ")
+        expect(highline).to receive(:ask).with("repeat password: ")
+
+        subject.password
       end
 
       it "returns the password" do
-        expect(result).to eq(password1)
+        expect(subject.password).to eq(password1)
       end
 
       context "with different answers" do
         let(:password2) { "secret" }
 
         it "asks to continue" do
-          expect(highline).to have_received(:agree).
+          expect(highline).to receive(:agree).
             at_least(:once).with(/Continue\?/)
+
+          subject.password
         end
       end
     end
@@ -112,22 +115,22 @@ module Imap::Backup
     describe "#backup_path" do
       let(:path) { "/path" }
       let(:answer) { path }
-      let(:result) { subject.backup_path("", //) }
 
       before do
         allow(highline).to receive(:ask) do |&b|
           b.call query
           path
         end
-        result
       end
 
       it "asks for a directory" do
-        expect(highline).to have_received(:ask).with(/directory/)
+        expect(highline).to receive(:ask).with(/directory/)
+
+        subject.backup_path("", //)
       end
 
       it "returns the path" do
-        expect(result).to eq(path)
+        expect(subject.backup_path("", //)).to eq(path)
       end
     end
   end

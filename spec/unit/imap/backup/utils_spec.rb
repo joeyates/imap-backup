@@ -72,22 +72,21 @@ describe Imap::Backup::Utils do
     end
 
     it "does nothing if an empty path is supplied" do
-      described_class.make_folder("aaa", "", 0o222)
+      expect(FileUtils).to_not receive(:mkdir_p)
 
-      expect(FileUtils).to_not have_received(:mkdir_p)
+      described_class.make_folder("aaa", "", 0o222)
     end
 
     it "creates the path" do
-      described_class.make_folder("/base/path", "new/folder", 0o222)
+      expect(FileUtils).to receive(:mkdir_p).with("/base/path/new/folder")
 
-      expect(FileUtils).to have_received(:mkdir_p).with("/base/path/new/folder")
+      described_class.make_folder("/base/path", "new/folder", 0o222)
     end
 
     it "sets permissions on the path" do
-      described_class.make_folder("/base/path/new", "folder", 0o222)
+      expect(FileUtils).to receive(:chmod).with(0o222, "/base/path/new/folder")
 
-      expect(FileUtils).
-        to have_received(:chmod).with(0o222, "/base/path/new/folder")
+      described_class.make_folder("/base/path/new", "folder", 0o222)
     end
   end
 end

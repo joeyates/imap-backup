@@ -144,15 +144,15 @@ describe Imap::Backup::Configuration::Store do
     end
 
     it "creates the config directory" do
-      subject.save
+      expect(FileUtils).to receive(:mkdir).with(directory)
 
-      expect(FileUtils).to have_received(:mkdir).with(directory)
+      subject.save
     end
 
     it "saves the configuration" do
-      subject.save
+      expect(file).to receive(:write).with("JSON output")
 
-      expect(file).to have_received(:write).with("JSON output")
+      subject.save
     end
 
     context "when accounts are modified" do
@@ -164,7 +164,9 @@ describe Imap::Backup::Configuration::Store do
         expected = Marshal.load(Marshal.dump(data))
         expected[:accounts][0].delete(:modified)
 
-        expect(JSON).to have_received(:pretty_generate).with(expected)
+        expect(JSON).to receive(:pretty_generate).with(expected)
+
+        subject.save
       end
     end
 
@@ -176,21 +178,21 @@ describe Imap::Backup::Configuration::Store do
         ]
       end
 
-      before { subject.save }
-
       it "does not save them" do
         expected = Marshal.load(Marshal.dump(data))
         expected[:accounts].pop
 
-        expect(JSON).to have_received(:pretty_generate).with(expected)
+        expect(JSON).to receive(:pretty_generate).with(expected)
+
+        subject.save
       end
     end
 
     context "when file permissions are too open" do
-      before { subject.save }
-
       it "sets them to 0600" do
-        expect(FileUtils).to have_received(:chmod).with(0o600, file_path)
+        expect(FileUtils).to receive(:chmod).with(0o600, file_path)
+
+        subject.save
       end
     end
 

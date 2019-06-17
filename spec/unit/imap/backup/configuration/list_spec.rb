@@ -35,18 +35,21 @@ describe Imap::Backup::Configuration::List do
       allow(Imap::Backup::Configuration::Store).
         to receive(:exist?) { config_exists }
       allow(Imap::Backup).to receive(:setup_logging)
-      subject.setup_logging
     end
 
     it "sets global logging level" do
-      expect(Imap::Backup).to have_received(:setup_logging).with(store)
+      expect(Imap::Backup).to receive(:setup_logging).with(store)
+
+      subject.setup_logging
     end
 
     context "without a config" do
       let(:config_exists) { false }
 
       it "does nothing" do
-        expect(Imap::Backup).to_not have_received(:setup_logging).with(store)
+        expect(Imap::Backup).to_not receive(:setup_logging).with(store)
+
+        subject.setup_logging
       end
     end
   end

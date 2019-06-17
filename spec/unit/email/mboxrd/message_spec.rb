@@ -80,9 +80,9 @@ describe Email::Mboxrd::Message do
     end
 
     it "does not modify the message" do
-      subject.to_serialized
+      expect(message_body).to_not receive(:force_encoding).with("binary")
 
-      expect(message_body).to_not have_received(:force_encoding).with("binary")
+      subject.to_serialized
     end
 
     it "adds a 'From ' line at the start" do

@@ -7,37 +7,37 @@ describe Imap::Backup::Downloader do
       instance_double(
         Imap::Backup::Account::Folder,
         fetch: message,
-        name: "folder"
+        name: "folder",
+        uids: folder_uids
       )
     end
     let(:folder_uids) { %w(111 222 333) }
     let(:serializer) do
-      instance_double(Imap::Backup::Serializer::Mbox, save: nil)
-    end
-    let(:serializer_uids) { ["222"] }
-
-    before do
-      allow(folder).to receive(:uids).and_return(folder_uids)
-      allow(serializer).to receive(:uids).and_return(serializer_uids)
-      allow(folder).to receive(:fetch).with("333").and_return(nil)
-      subject.run
+      instance_double(Imap::Backup::Serializer::Mbox, save: nil, uids: ["222"])
     end
 
     context "with fetched messages" do
-      it "are saved" do
-        expect(serializer).to have_received(:save).with("111", message)
+      specify "are saved" do
+        expect(serializer).to receive(:save).with("111", message)
+
+        subject.run
       end
     end
 
     context "with messages which are already present" do
       specify "are skipped" do
-        expect(serializer).to_not have_received(:save).with("222", anything)
+        expect(serializer).to_not receive(:save).with("222", anything)
+
+        subject.run
       end
     end
 
     context "with failed fetches" do
       specify "are skipped" do
-        expect(serializer).to_not have_received(:save).with("333", anything)
+        allow(folder).to receive(:fetch).with("333").and_return(nil)
+        expect(serializer).to_not receive(:save).with("333", anything)
+
+        subject.run
       end
     end
   end

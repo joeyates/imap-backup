@@ -22,13 +22,15 @@ describe Imap::Backup::Configuration::FolderChooser do
     end
 
     describe "display" do
-      before { subject.run }
-
       it "clears the screen" do
-        expect(Kernel).to have_received(:system).with("clear")
+        expect(Kernel).to receive(:system).with("clear")
+
+        subject.run
       end
 
       it "shows the menu" do
+        subject.run
+
         expect(output.string).to match %r{Add/remove folders}
       end
     end
@@ -114,13 +116,14 @@ describe Imap::Backup::Configuration::FolderChooser do
 
       before do
         allow(Imap::Backup::Configuration::Setup.highline).
-          to receive(:ask).and_return("q")
-        subject.run
+          to receive(:ask) { "q" }
       end
 
       it "asks to press a key" do
         expect(Imap::Backup::Configuration::Setup.highline).
-          to have_received(:ask).with("Press a key ")
+          to receive(:ask).with("Press a key ")
+
+        subject.run
       end
     end
 
@@ -130,17 +133,20 @@ describe Imap::Backup::Configuration::FolderChooser do
           to receive(:new).with(account).and_raise("error")
         allow(Imap::Backup::Configuration::Setup.highline).
           to receive(:ask).and_return("q")
-        subject.run
       end
 
       it "prints an error message" do
         expect(Imap::Backup.logger).
-          to have_received(:warn).with("Connection failed")
+          to receive(:warn).with("Connection failed")
+
+        subject.run
       end
 
       it "asks to continue" do
         expect(Imap::Backup::Configuration::Setup.highline).
-          to have_received(:ask).with("Press a key ")
+          to receive(:ask).with("Press a key ")
+
+        subject.run
       end
     end
   end

@@ -51,14 +51,16 @@ describe Imap::Backup::Serializer::MboxStore do
       }.to_json
     end
 
-    before { subject.uid_validity = new_uid_validity }
-
     it "sets uid_validity" do
+      subject.uid_validity = new_uid_validity
+
       expect(subject.uid_validity).to eq(new_uid_validity)
     end
 
     it "writes the imap file" do
-      expect(imap_file).to have_received(:write).with(updated_imap_content)
+      expect(imap_file).to receive(:write).with(updated_imap_content)
+
+      subject.uid_validity = new_uid_validity
     end
   end
 
@@ -80,22 +82,26 @@ describe Imap::Backup::Serializer::MboxStore do
         allow(JSON).to receive(:parse).and_raise(JSON::ParserError)
       end
 
-      let!(:result) { subject.uids }
-
       it "returns an empty Array" do
-        expect(result).to eq([])
+        expect(subject.uids).to eq([])
       end
 
       it "deletes the imap file" do
-        expect(File).to have_received(:unlink).with(imap_pathname)
+        expect(File).to receive(:unlink).with(imap_pathname)
+
+        subject.uids
       end
 
       it "deletes the mbox file" do
-        expect(File).to have_received(:unlink).with(mbox_pathname)
+        expect(File).to receive(:unlink).with(mbox_pathname)
+
+        subject.uids
       end
 
       it "writes a blank mbox file" do
-        expect(mbox_file).to have_received(:write).with("")
+        expect(mbox_file).to receive(:write).with("")
+
+        subject.uids
       end
     end
 
@@ -131,23 +137,24 @@ describe Imap::Backup::Serializer::MboxStore do
     end
 
     it "saves the message to the mbox" do
-      subject.add(message_uid, "The\nemail\n")
+      expect(mbox_file).to receive(:write).with(mbox_formatted_message)
 
-      expect(mbox_file).to have_received(:write).with(mbox_formatted_message)
+      subject.add(message_uid, "The\nemail\n")
     end
 
     it "saves the uid to the imap file" do
-      subject.add(message_uid, "The\nemail\n")
+      expect(imap_file).to receive(:write).with(updated_imap_content)
 
-      expect(imap_file).to have_received(:write).with(updated_imap_content)
+      subject.add(message_uid, "The\nemail\n")
     end
 
     context "when the message is already downloaded" do
       let(:uids) { [999] }
 
       it "skips the message" do
+        expect(mbox_file).to_not receive(:write)
+
         subject.add(message_uid, "The\nemail\n")
-        expect(mbox_file).to_not have_received(:write)
       end
     end
 
@@ -157,8 +164,9 @@ describe Imap::Backup::Serializer::MboxStore do
       end
 
       it "skips the message" do
+        expect(mbox_file).to_not receive(:write)
+
         subject.add(message_uid, "The\nemail\n")
-        expect(mbox_file).to_not have_received(:write)
       end
 
       it "does not fail" do
@@ -171,7 +179,6 @@ describe Imap::Backup::Serializer::MboxStore do
 
   describe "#load" do
     let(:uid) { "1" }
-    let(:result) { subject.load(uid) }
     let(:enumerator) do
       instance_double(Imap::Backup::Serializer::MboxEnumerator)
     end
@@ -189,14 +196,14 @@ describe Imap::Backup::Serializer::MboxStore do
     end
 
     it "returns the message" do
-      expect(result.supplied_body).to eq("ciao")
+      expect(subject.load(uid).supplied_body).to eq("ciao")
     end
 
     context "when the UID is unknown" do
       let(:uid) { "99" }
 
       it "returns nil" do
-        expect(result).to be_nil
+        expect(subject.load(uid)).to be_nil
       end
     end
   end
@@ -211,34 +218,40 @@ describe Imap::Backup::Serializer::MboxStore do
       }.to_json
     end
 
-    before { subject.update_uid(old_uid, "999") }
-
     it "updates the stored UID" do
-      expect(imap_file).to have_received(:write).with(updated_imap_content)
+      expect(imap_file).to receive(:write).with(updated_imap_content)
+
+      subject.update_uid(old_uid, "999")
     end
 
     context "when the UID is unknown" do
       let(:old_uid) { "42" }
 
       it "does nothing" do
-        expect(imap_file).to_not have_received(:write)
+        expect(imap_file).to_not receive(:write)
+
+        subject.update_uid(old_uid, "999")
       end
     end
   end
 
   describe "#reset" do
-    before { subject.reset }
-
     it "deletes the imap file" do
-      expect(File).to have_received(:unlink).with(imap_pathname)
+      expect(File).to receive(:unlink).with(imap_pathname)
+
+      subject.reset
     end
 
     it "deletes the mbox file" do
-      expect(File).to have_received(:unlink).with(mbox_pathname)
+      expect(File).to receive(:unlink).with(mbox_pathname)
+
+      subject.reset
     end
 
     it "writes a blank mbox file" do
-      expect(mbox_file).to have_received(:write).with("")
+      expect(mbox_file).to receive(:write).with("")
+
+      subject.reset
     end
   end
 
@@ -252,18 +265,23 @@ describe Imap::Backup::Serializer::MboxStore do
       allow(File).to receive(:rename).and_call_original
       allow(File).to receive(:rename).with(imap_pathname, new_imap_name)
       allow(File).to receive(:rename).with(mbox_pathname, new_mbox_name)
-      subject.rename(new_name)
     end
 
     it "renames the imap file" do
-      expect(File).to have_received(:rename).with(imap_pathname, new_imap_name)
+      expect(File).to receive(:rename).with(imap_pathname, new_imap_name)
+
+      subject.rename(new_name)
     end
 
     it "renames the mbox file" do
-      expect(File).to have_received(:rename).with(mbox_pathname, new_mbox_name)
+      expect(File).to receive(:rename).with(mbox_pathname, new_mbox_name)
+
+      subject.rename(new_name)
     end
 
     it "updates the folder name" do
+      subject.rename(new_name)
+
       expect(subject.folder).to eq(new_name)
     end
   end

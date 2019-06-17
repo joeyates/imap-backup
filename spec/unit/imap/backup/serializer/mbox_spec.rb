@@ -28,8 +28,6 @@ describe Imap::Backup::Serializer::Mbox do
   end
 
   describe "folder path" do
-    before { subject.uids }
-
     context "when it has multiple elements" do
       let(:imap_folder) { "folder/path" }
 
@@ -37,8 +35,10 @@ describe Imap::Backup::Serializer::Mbox do
         let(:dir_exists) { false }
 
         it "is created" do
-          expect(Imap::Backup::Utils).to have_received(:make_folder).
+          expect(Imap::Backup::Utils).to receive(:make_folder).
             with(base_path, File.dirname(imap_folder), 0o700)
+
+          subject.uids
         end
       end
     end
@@ -48,57 +48,66 @@ describe Imap::Backup::Serializer::Mbox do
 
       it "corrects them" do
         path = File.expand_path(File.join(base_path, File.dirname(imap_folder)))
-        expect(FileUtils).to have_received(:chmod).with(0o700, path)
+        expect(FileUtils).to receive(:chmod).with(0o700, path)
+
+        subject.uids
       end
     end
 
     context "when permissons are correct" do
       it "does nothing" do
-        expect(FileUtils).to_not have_received(:chmod)
+        expect(FileUtils).to_not receive(:chmod)
+
+        subject.uids
       end
     end
 
     context "when it exists" do
       it "is not created" do
-        expect(Imap::Backup::Utils).to_not have_received(:make_folder).
+        expect(Imap::Backup::Utils).to_not receive(:make_folder).
           with(base_path, File.dirname(imap_folder), 0o700)
+
+        subject.uids
       end
     end
   end
 
   describe "#apply_uid_validity" do
-    let(:result) { subject.apply_uid_validity("aaa") }
-
     context "when the existing uid validity is unset" do
-      let!(:result) { super() }
-
       it "sets uid validity" do
-        expect(store).to have_received(:uid_validity=).with("aaa")
+        expect(store).to receive(:uid_validity=).with("aaa")
+
+        subject.apply_uid_validity("aaa")
       end
 
       it "does not rename the store" do
-        expect(store).to_not have_received(:rename)
+        expect(store).to_not receive(:rename)
+
+        subject.apply_uid_validity("aaa")
       end
 
       it "returns nil" do
-        expect(result).to be_nil
+        expect(subject.apply_uid_validity("aaa")).to be_nil
       end
     end
 
     context "when the uid validity is unchanged" do
-      let!(:result) { super() }
       let(:existing_uid_validity) { "aaa" }
 
       it "does not set uid validity" do
-        expect(store).to_not have_received(:uid_validity=)
+        expect(store).to_not receive(:uid_validity=)
+
+        subject.apply_uid_validity("aaa")
       end
 
       it "does not rename the store" do
-        expect(store).to_not have_received(:rename)
+        expect(store).to_not receive(:rename)
+
+        subject.apply_uid_validity("aaa")
       end
 
       it "returns nil" do
-        expect(result).to be_nil
+        expect(subject.apply_uid_validity("aaa")).to be_nil
       end
     end
 
@@ -113,20 +122,23 @@ describe Imap::Backup::Serializer::Mbox do
         allow(Imap::Backup::Serializer::MboxStore).
           to receive(:new).with(anything, /bbb/) { existing_store }
         allow(existing_store).to receive(:exist?).and_return(exists, false)
-        result
       end
 
       it "sets uid validity" do
-        expect(store).to have_received(:uid_validity=).with("aaa")
+        expect(store).to receive(:uid_validity=).with("aaa")
+
+        subject.apply_uid_validity("aaa")
       end
 
       context "when adding the uid validity does not cause a name clash" do
         it "renames the store, adding the existing uid validity" do
-          expect(store).to have_received(:rename).with("folder.bbb")
+          expect(store).to receive(:rename).with("folder.bbb")
+
+          subject.apply_uid_validity("aaa")
         end
 
         it "returns the new name" do
-          expect(result).to eq("folder.bbb")
+          expect(subject.apply_uid_validity("aaa")).to eq("folder.bbb")
         end
       end
 
@@ -134,67 +146,69 @@ describe Imap::Backup::Serializer::Mbox do
         let(:exists) { true }
 
         it "renames the store, adding the existing uid validity and a digit" do
-          expect(store).to have_received(:rename).with("folder.bbb.1")
+          expect(store).to receive(:rename).with("folder.bbb.1")
+
+          subject.apply_uid_validity("aaa")
         end
 
         it "returns the new name" do
-          expect(result).to eq("folder.bbb.1")
+          expect(subject.apply_uid_validity("aaa")).to eq("folder.bbb.1")
         end
       end
     end
   end
 
   describe "#force_uid_validity" do
-    before { subject.force_uid_validity("66") }
-
     it "sets the uid_validity" do
-      expect(store).to have_received(:uid_validity=).with("66")
+      expect(store).to receive(:uid_validity=).with("66")
+
+      subject.force_uid_validity("66")
     end
   end
 
   describe "#uids" do
     it "calls the store" do
-      subject.uids
+      expect(store).to receive(:uids)
 
-      expect(store).to have_received(:uids)
+      subject.uids
     end
   end
 
   describe "#load" do
-    let(:result) { subject.load("66") }
-
     before { allow(store).to receive(:load).with("66") { "xxx" } }
 
     it "returns the value loaded by the store" do
-      expect(result).to eq("xxx")
+      expect(subject.load("66")).to eq("xxx")
     end
   end
 
   describe "#save" do
-    before { subject.save("foo", "bar") }
-
     it "calls the store" do
-      expect(store).to have_received(:add).with("foo", "bar")
+      expect(store).to receive(:add).with("foo", "bar")
+
+      subject.save("foo", "bar")
     end
   end
 
   describe "#rename" do
-    before { subject.rename("foo") }
-
     it "calls the store" do
-      expect(store).to have_received(:rename).with("foo")
+      expect(store).to receive(:rename).with("foo")
+
+      subject.rename("foo")
     end
 
     it "updates the folder name" do
+      subject.rename("foo")
+
       expect(subject.folder).to eq("foo")
     end
   end
 
   describe "#update_uid" do
-    before { subject.update_uid("foo", "bar") }
-
     it "calls the store" do
-      expect(store).to have_received(:update_uid).with("foo", "bar")
+      expect(store).to receive(:update_uid).with("foo", "bar")
+
+      subject.update_uid("foo", "bar")
     end
   end
 end

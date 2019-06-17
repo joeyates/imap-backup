@@ -16,22 +16,27 @@ describe Imap::Backup::Uploader do
     before do
       allow(serializer).to receive(:load).with(1) { "missing message" }
       allow(serializer).to receive(:load).with(2) { "existing message" }
-      subject.run
     end
 
     context "with messages that are missing" do
       it "restores them" do
-        expect(folder).to have_received(:append).with("missing message")
+        expect(folder).to receive(:append).with("missing message")
+
+        subject.run
       end
 
       it "updates the local message id" do
-        expect(serializer).to have_received(:update_uid).with(1, 99)
+        expect(serializer).to receive(:update_uid).with(1, 99)
+
+        subject.run
       end
     end
 
     context "with messages that are present on server" do
       it "does nothing" do
-        expect(folder).to_not have_received(:append).with("existing message")
+        expect(folder).to_not receive(:append).with("existing message")
+
+        subject.run
       end
     end
   end

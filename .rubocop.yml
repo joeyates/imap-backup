@@ -12,6 +12,8 @@ AllCops:
 RSpec/ContextWording:
   Exclude:
     - "spec/features/**/*"
+RSpec/MessageSpies:
+  Enabled: false
 RSpec/NestedGroups:
   Max: 4
 RSpec/ReturnFromStub:

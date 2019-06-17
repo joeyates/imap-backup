@@ -49,10 +49,6 @@ describe Imap::Backup::Account::Connection do
   end
 
   shared_examples "connects to IMAP" do
-    it "sets up the IMAP connection" do
-      expect(Net::IMAP).to have_received(:new)
-    end
-
     it "logs in to the imap server" do
       expect(imap).to have_received(:login)
     end
@@ -70,8 +66,9 @@ describe Imap::Backup::Account::Connection do
     end
 
     it "creates the path" do
+      expect(Imap::Backup::Utils).to receive(:make_folder)
+
       subject.username
-      expect(Imap::Backup::Utils).to have_received(:make_folder)
     end
   end
 
@@ -143,18 +140,21 @@ describe Imap::Backup::Account::Connection do
           with(subject, self.class.backup_folder).and_return(folder)
         allow(Imap::Backup::Serializer::Mbox).to receive(:new).
           with(local_path, self.class.backup_folder).and_return(serializer)
-        subject.run_backup
       end
 
       it "runs the downloader" do
-        expect(downloader).to have_received(:run)
+        expect(downloader).to receive(:run)
+
+        subject.run_backup
       end
 
       context "when a folder does not exist" do
         let(:exists) { false }
 
         it "does not run the downloader" do
-          expect(downloader).to_not have_received(:run)
+          expect(downloader).to_not receive(:run)
+
+          subject.run_backup
         end
       end
     end
@@ -174,20 +174,20 @@ describe Imap::Backup::Account::Connection do
       context "when supplied backup_folders is nil" do
         let(:backup_folders) { nil }
 
-        before { subject.run_backup }
-
         it "runs the downloader for each folder" do
-          expect(downloader).to have_received(:run).exactly(:once)
+          expect(downloader).to receive(:run).exactly(:once)
+
+          subject.run_backup
         end
       end
 
       context "when supplied backup_folders is an empty list" do
         let(:backup_folders) { [] }
 
-        before { subject.run_backup }
-
         it "runs the downloader for each folder" do
-          expect(downloader).to have_received(:run).exactly(:once)
+          expect(downloader).to receive(:run).exactly(:once)
+
+          subject.run_backup
         end
       end
 
@@ -249,12 +249,12 @@ describe Imap::Backup::Account::Connection do
         with(updated_folder, updated_serializer) { updated_uploader }
       allow(Pathname).to receive(:glob).
         and_yield(Pathname.new(File.join(local_path, "my_folder.imap")))
-      subject.restore
     end
 
     it "sets local uid validity" do
-      expect(serializer).
-        to have_received(:apply_uid_validity).with(uid_validity)
+      expect(serializer).to receive(:apply_uid_validity).with(uid_validity)
+
+      subject.restore
     end
 
     context "when folders exist" do
@@ -262,22 +262,30 @@ describe Imap::Backup::Account::Connection do
         let(:new_uid_validity) { "new name" }
 
         it "creates the new folder" do
-          expect(updated_folder).to have_received(:create)
+          expect(updated_folder).to receive(:create)
+
+          subject.restore
         end
 
         it "sets the renamed folder's uid validity" do
           expect(updated_serializer).
-            to have_received(:force_uid_validity).with("new uid validity")
+            to receive(:force_uid_validity).with("new uid validity")
+
+          subject.restore
         end
 
         it "creates the uploader with updated folder and serializer" do
-          expect(updated_uploader).to have_received(:run)
+          expect(updated_uploader).to receive(:run)
+
+          subject.restore
         end
       end
 
       context "when the local folder is not renamed" do
         it "runs the uploader" do
-          expect(uploader).to have_received(:run)
+          expect(uploader).to receive(:run)
+
+          subject.restore
         end
       end
     end
@@ -286,37 +294,44 @@ describe Imap::Backup::Account::Connection do
       let(:exists) { false }
 
       it "creates the folder" do
-        expect(folder).to have_received(:create)
+        expect(folder).to receive(:create)
+
+        subject.restore
       end
 
-      it "sets local uid validity" do
+      it "forces local uid validity" do
+        expect(serializer).to receive(:force_uid_validity).with(uid_validity)
+
+        subject.restore
       end
 
       it "runs the uploader" do
-        expect(uploader).to have_received(:run)
+        expect(uploader).to receive(:run)
+
+        subject.restore
       end
     end
   end
 
   describe "#reconnect" do
-    before { subject.reconnect }
-
     it "disconnects from the server" do
-      expect(imap).to have_received(:disconnect)
+      expect(imap).to receive(:disconnect)
+
+      subject.reconnect
     end
 
     it "causes reconnection on future access" do
-      allow(Net::IMAP).to receive(:new) { imap }
-      subject.imap
-      expect(Net::IMAP).to have_received(:new).twice
+      expect(Net::IMAP).to receive(:new)
+
+      subject.reconnect
     end
   end
 
   describe "#disconnect" do
-    before { subject.disconnect }
-
     it "disconnects from the server" do
-      expect(imap).to have_received(:disconnect)
+      expect(imap).to receive(:disconnect)
+
+      subject.disconnect
     end
   end
 end

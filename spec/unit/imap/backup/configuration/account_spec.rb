@@ -73,15 +73,17 @@ describe Imap::Backup::Configuration::Account do
     end
 
     describe "preparation" do
-      before { subject.run }
-
       it "clears the screen" do
-        expect(Kernel).to have_received(:system).with("clear")
+        expect(Kernel).to receive(:system).with("clear")
+
+        subject.run
       end
 
       describe "menu" do
         it "shows the menu" do
-          expect(highline).to have_received(:choose)
+          expect(highline).to receive(:choose)
+
+          subject.run
         end
       end
     end

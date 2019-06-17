@@ -85,9 +85,9 @@ describe Imap::Backup::Account::Folder do
     end
 
     it "sets the encoding on the message" do
-      subject.fetch(123)
+      expect(message_body).to receive(:force_encoding).with("utf-8")
 
-      expect(message_body).to have_received(:force_encoding).with("utf-8")
+      subject.fetch(123)
     end
   end
 
@@ -117,21 +117,22 @@ describe Imap::Backup::Account::Folder do
 
   describe "#create" do
     context "when the folder exists" do
-      before { subject.create }
-
       it "is does not create the folder" do
-        expect(imap).to_not have_received(:create)
+        expect(imap).to_not receive(:create)
+
+        subject.create
       end
     end
 
     context "when the folder doesn't exist" do
       before do
         allow(imap).to receive(:examine).and_raise(missing_mailbox_error)
-        subject.create
       end
 
       it "is does not create the folder" do
-        expect(imap).to have_received(:create)
+        expect(imap).to receive(:create)
+
+        subject.create
       end
     end
   end
@@ -168,26 +169,27 @@ describe Imap::Backup::Account::Folder do
     let(:append_response) do
       OpenStruct.new(data: OpenStruct.new(code: OpenStruct.new(data: "1 2")))
     end
-    let(:result) { subject.append(message) }
-
-    before do
-      result
-    end
 
     it "appends the message" do
-      expect(imap).to have_received(:append)
+      expect(imap).to receive(:append)
+
+      subject.append(message)
     end
 
     it "sets the date and time" do
-      expect(imap).to have_received(:append).
+      expect(imap).to receive(:append).
         with(anything, anything, anything, message_date)
+
+      subject.append(message)
     end
 
     it "returns the new uid" do
-      expect(result).to eq(2)
+      expect(subject.append(message)).to eq(2)
     end
 
     it "set the new uid validity" do
+      subject.append(message)
+
       expect(subject.uid_validity).to eq(1)
     end
   end

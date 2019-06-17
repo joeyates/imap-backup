@@ -52,15 +52,15 @@ describe Imap::Backup::Configuration::Setup do
     end
 
     it "clears the screen" do
-      subject.run
+      expect(Kernel).to receive(:system).with("clear")
 
-      expect(Kernel).to have_received(:system).with("clear")
+      subject.run
     end
 
     it "updates logging status" do
-      subject.run
+      expect(Imap::Backup).to receive(:setup_logging)
 
-      expect(Imap::Backup).to have_received(:setup_logging)
+      subject.run
     end
 
     describe "listing" do
@@ -100,12 +100,12 @@ describe Imap::Backup::Configuration::Setup do
           with(no_args).and_return("new@example.com")
         allow(Imap::Backup::Configuration::Account).to receive(:new).
           with(store, normal, anything).and_return(account)
-
-        subject.run
       end
 
       it "edits the account" do
-        expect(account).to have_received(:run)
+        expect(account).to receive(:run)
+
+        subject.run
       end
     end
 
@@ -145,20 +145,25 @@ describe Imap::Backup::Configuration::Setup do
       context "when debug logging is disabled" do
         before do
           allow(input).to receive(:gets).and_return("start\n", "exit\n")
-          subject.run
         end
 
         it "shows a menu item" do
+          subject.run
+
           expect(output.string).to include("start logging")
         end
 
         context "when selected" do
           it "sets the debug flag" do
-            expect(store).to have_received(:debug=).with(true)
+            expect(store).to receive(:debug=).with(true)
+
+            subject.run
           end
 
           it "updates logging status" do
-            expect(Imap::Backup).to have_received(:setup_logging).twice
+            expect(Imap::Backup).to receive(:setup_logging).twice
+
+            subject.run
           end
         end
       end
@@ -168,10 +173,11 @@ describe Imap::Backup::Configuration::Setup do
 
         before do
           allow(input).to receive(:gets).and_return("stop\n", "exit\n")
-          subject.run
         end
 
         it "shows a menu item" do
+          subject.run
+
           expect(output.string).to include("stop logging")
         end
 
@@ -181,11 +187,15 @@ describe Imap::Backup::Configuration::Setup do
           end
 
           it "unsets the debug flag" do
-            expect(store).to have_received(:debug=).with(false)
+            expect(store).to receive(:debug=).with(false)
+
+            subject.run
           end
 
           it "updates logging status" do
-            expect(Imap::Backup).to have_received(:setup_logging).twice
+            expect(Imap::Backup).to receive(:setup_logging).twice
+
+            subject.run
           end
         end
       end
@@ -194,40 +204,45 @@ describe Imap::Backup::Configuration::Setup do
     context "when 'save' is selected" do
       before do
         allow(input).to receive(:gets).and_return("save\n")
-        subject.run
       end
 
       it "exits" do
         # N.B. this will hang forever if save does not cause an exit
+        subject.run
       end
 
       it "saves the configuration" do
-        expect(store).to have_received(:save)
+        expect(store).to receive(:save)
+
+        subject.run
       end
     end
 
     context "when 'exit without saving' is selected" do
       before do
         allow(input).to receive(:gets).and_return("exit\n")
-
-        subject.run
       end
 
       it "exits" do
         # N.B. this will hang forever if quit does not cause an exit
+        subject.run
       end
 
       context "when the configuration is modified" do
         let(:modified) { true }
 
         it "doesn't save the configuration" do
-          expect(store).to_not have_received(:save)
+          expect(store).to_not receive(:save)
+
+          subject.run
         end
       end
 
       context "when the configuration isn't modified" do
         it "doesn't save the configuration" do
-          expect(store).to_not have_received(:save)
+          expect(store).to_not receive(:save)
+
+          subject.run
         end
       end
     end
