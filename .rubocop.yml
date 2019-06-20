@@ -5,3 +5,4 @@ AllCops:
     - "bin/stubs/*"
   DisplayCopNames:
     Enabled: true
+        require: rubocop-rails
