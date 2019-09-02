@@ -1,23 +1,6 @@
 # rubocop:disable RSpec/NestedGroups
 
 describe Imap::Backup::Configuration::Account do
-  class MockHighlineMenu
-    attr_reader :choices
-    attr_accessor :header
-
-    def initialize
-      @choices = {}
-    end
-
-    def choice(name, &block)
-      choices[name] = block
-    end
-
-    def hidden(name, &block)
-      choices[name] = block
-    end
-  end
-
   describe "#initialize" do
     subject { described_class.new(store, account, highline) }
 
@@ -35,8 +18,27 @@ describe Imap::Backup::Configuration::Account do
   describe "#run" do
     subject { described_class.new(store, account, highline) }
 
+    let(:highline_menu_class) do
+      Class.new do
+        attr_reader :choices
+        attr_accessor :header
+
+        def initialize
+          @choices = {}
+        end
+
+        def choice(name, &block)
+          choices[name] = block
+        end
+
+        def hidden(name, &block)
+          choices[name] = block
+        end
+      end
+    end
+
     let(:highline) { instance_double(HighLine) }
-    let(:menu) { MockHighlineMenu.new }
+    let(:menu) { highline_menu_class.new }
     let(:store) do
       instance_double(Imap::Backup::Configuration::Store, accounts: accounts)
     end
