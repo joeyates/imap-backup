@@ -83,12 +83,6 @@ describe Imap::Backup::Account::Folder do
         expect(subject.fetch(123)).to be_nil
       end
     end
-
-    it "sets the encoding on the message" do
-      expect(message_body).to receive(:force_encoding).with("utf-8")
-
-      subject.fetch(123)
-    end
   end
 
   describe "#folder" do

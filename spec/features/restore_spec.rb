@@ -109,4 +109,28 @@ RSpec.describe "restore", type: :feature, docker: true do
       end
     end
   end
+
+  context "when non-Unicode encodings are used" do
+    let(:server_message) do
+      message_as_server_message(msg_iso8859)
+    end
+    let(:messages_as_mbox) do
+      message_as_mbox_entry(msg_iso8859)
+    end
+    let(:message_uids) { [uid_iso8859] }
+    let(:uid_validity) { server_uid_validity(folder) }
+
+    let(:pre) do
+      server_create_folder folder
+      uid_validity
+    end
+
+    it "maintains encodings" do
+      message =
+        server_messages(folder).
+        first["RFC822"]
+
+      expect(message).to eq(server_message)
+    end
+  end
 end

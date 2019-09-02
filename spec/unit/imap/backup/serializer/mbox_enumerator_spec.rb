@@ -21,11 +21,16 @@ describe Imap::Backup::Serializer::MboxEnumerator do
 
   before do
     allow(File).to receive(:open).and_call_original
-    allow(File).to receive(:open).with(mbox_pathname).and_yield(mbox_file)
+    allow(File).to receive(:open).with(mbox_pathname, "rb").and_yield(mbox_file)
     allow(mbox_file).to receive(:gets).and_return(*lines)
   end
 
   describe "#each" do
+    it "reads files as binary" do
+      expect(File).to receive(:open).with(mbox_pathname, "rb")
+      subject.each {}
+    end
+
     it "yields messages" do
       expect { |b| subject.each(&b) }.
         to yield_successive_args(message1.join, message2.join)

@@ -79,12 +79,6 @@ describe Email::Mboxrd::Message do
       allow(Mail).to receive(:new).with(cloned_message_body) { mail }
     end
 
-    it "does not modify the message" do
-      expect(message_body).to_not receive(:force_encoding).with("binary")
-
-      subject.to_serialized
-    end
-
     it "adds a 'From ' line at the start" do
       expected = "From #{from} #{date.asctime}\n"
       expect(subject.to_serialized).to start_with(expected)

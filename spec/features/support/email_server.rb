@@ -38,9 +38,7 @@ module EmailServerHelpers
     return nil if fetch_data_items.nil?
 
     fetch_data_item = fetch_data_items[0]
-    attributes = fetch_data_item.attr
-    attributes["RFC822"].force_encoding("utf-8")
-    attributes
+    fetch_data_item.attr
   end
 
   def delete_emails(folder)

@@ -9,7 +9,7 @@ module Imap::Backup
     def each
       return enum_for(:each) if !block_given?
 
-      File.open(mbox_pathname) do |f|
+      File.open(mbox_pathname, "rb") do |f|
         lines = []
 
         loop do
