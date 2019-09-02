@@ -57,30 +57,7 @@ module Imap::Backup
 
     def restore
       local_folders do |serializer, folder|
-        exists = folder.exist?
-        if exists
-          Imap::Backup.logger.debug(
-            "Folder '#{folder.name}' already exists on server"
-          )
-          new_name = serializer.apply_uid_validity(folder.uid_validity)
-          old_name = serializer.folder
-          if new_name
-            Imap::Backup.logger.debug(
-              "Backup '#{old_name}' renamed and restored to '#{new_name}'"
-            )
-            new_serializer = Serializer::Mbox.new(local_path, new_name)
-            new_folder = Account::Folder.new(self, new_name)
-            new_folder.create
-            new_serializer.force_uid_validity(new_folder.uid_validity)
-            Uploader.new(new_folder, new_serializer).run
-          else
-            Uploader.new(folder, serializer).run
-          end
-        else
-          folder.create
-          serializer.force_uid_validity(folder.uid_validity)
-          Uploader.new(folder, serializer).run
-        end
+        restore_folder serializer, folder
       end
     end
 
@@ -114,6 +91,33 @@ module Imap::Backup
         folder = Account::Folder.new(self, folder_info[:name])
         serializer = Serializer::Mbox.new(local_path, folder_info[:name])
         yield folder, serializer
+      end
+    end
+
+    def restore_folder(serializer, folder)
+      existing_uids = folder.uids
+      if existing_uids.any?
+        Imap::Backup.logger.debug(
+          "There's already a '#{folder.name}' folder with emails"
+        )
+        new_name = serializer.apply_uid_validity(folder.uid_validity)
+        old_name = serializer.folder
+        if new_name
+          Imap::Backup.logger.debug(
+            "Backup '#{old_name}' renamed and restored to '#{new_name}'"
+          )
+          new_serializer = Serializer::Mbox.new(local_path, new_name)
+          new_folder = Account::Folder.new(self, new_name)
+          new_folder.create
+          new_serializer.force_uid_validity(new_folder.uid_validity)
+          Uploader.new(new_folder, new_serializer).run
+        else
+          Uploader.new(folder, serializer).run
+        end
+      else
+        folder.create
+        serializer.force_uid_validity(folder.uid_validity)
+        Uploader.new(folder, serializer).run
       end
     end
 

@@ -207,12 +207,12 @@ describe Imap::Backup::Account::Connection do
       instance_double(
         Imap::Backup::Account::Folder,
         create: nil,
-        exist?: exists,
+        uids: uids,
         name: "my_folder",
         uid_validity: uid_validity
       )
     end
-    let(:exists) { true }
+    let(:uids) { [99] }
     let(:uid_validity) { 123 }
     let(:serialized_folder) { "old name" }
     let(:uploader) do
@@ -257,7 +257,7 @@ describe Imap::Backup::Account::Connection do
       subject.restore
     end
 
-    context "when folders exist" do
+    context "when folders exist with contents" do
       context "when the local folder is renamed" do
         let(:new_uid_validity) { "new name" }
 
@@ -290,8 +290,8 @@ describe Imap::Backup::Account::Connection do
       end
     end
 
-    context "when folders don't exist" do
-      let(:exists) { false }
+    context "when folders don't exist or are empty" do
+      let(:uids) { [] }
 
       it "creates the folder" do
         expect(folder).to receive(:create)
