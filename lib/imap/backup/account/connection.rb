@@ -59,6 +59,9 @@ module Imap::Backup
       local_folders do |serializer, folder|
         exists = folder.exist?
         if exists
+          Imap::Backup.logger.debug(
+            "Folder '#{folder.name}' already exists on server"
+          )
           new_name = serializer.apply_uid_validity(folder.uid_validity)
           old_name = serializer.folder
           if new_name

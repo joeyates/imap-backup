@@ -9,9 +9,18 @@ module Imap::Backup
     end
 
     def run
-      missing_uids.each do |uid|
+      count = missing_uids.count
+      return if count.zero?
+
+      Imap::Backup.logger.debug "[#{folder.name}] #{count} to restore"
+      missing_uids.each.with_index do |uid, i|
         message = serializer.load(uid)
         next if message.nil?
+
+        log_prefix = "[#{folder.name}] uid: #{uid} (#{i + 1}/#{count}) -"
+        Imap::Backup.logger.debug(
+          "#{log_prefix} #{message.supplied_body.size} bytes"
+        )
 
         new_uid = folder.append(message)
         serializer.update_uid(uid, new_uid)
