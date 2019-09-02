@@ -204,13 +204,17 @@ Integration tests (feature specs) are run against a Docker image
 
 In one shell, run the Docker image:
 
-```
-docker run \
+```sh
+$ docker run \
   --env MAIL_ADDRESS=address@example.org \
   --env MAIL_PASS=pass \
   --env MAILNAME=example.org \
   --publish 8993:993 \
   antespi/docker-imap-devel:latest
+```
+
+```sh
+$ rake
 ```
 
 To exclude Docker-based tests:
