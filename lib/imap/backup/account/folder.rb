@@ -52,6 +52,16 @@ module Imap::Backup
       imap.uid_search(["ALL"]).sort
     rescue FolderNotFound
       []
+    rescue NoMethodError
+      message = <<~MESSAGE
+        Folder '#{name}' caused NoMethodError
+        probably
+        `undefined method `[]' for nil:NilClass (NoMethodError)`
+        in `search_internal` in stdlib net/imap.rb.
+        This is caused by `@responses["SEARCH"] being unset/undefined
+      MESSAGE
+      Imap::Backup.logger.warn message
+      []
     end
 
     def fetch(uid)

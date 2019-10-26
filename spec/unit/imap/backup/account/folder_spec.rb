@@ -43,6 +43,20 @@ describe Imap::Backup::Account::Folder do
         expect(subject.uids).to eq([])
       end
     end
+
+    context "with no SEARCH response in Net::IMAP" do
+      let(:no_method_error) do
+        NoMethodError.new("Somethimes SEARCH responses come out undefined")
+      end
+
+      before do
+        allow(imap).to receive(:examine).and_raise(no_method_error)
+      end
+
+      it "returns an empty array" do
+        expect(subject.uids).to eq([])
+      end
+    end
   end
 
   describe "#fetch" do
