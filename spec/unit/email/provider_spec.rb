@@ -1,4 +1,6 @@
 describe Email::Provider do
+  subject { described_class.new(:gmail) }
+
   describe ".for_address" do
     context "with known providers" do
       [
@@ -19,8 +21,6 @@ describe Email::Provider do
       end
     end
   end
-
-  subject { described_class.new(:gmail) }
 
   describe "#options" do
     it "returns options" do
