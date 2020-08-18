@@ -3,7 +3,6 @@ inherit_from:
   - .rubocop_todo.yml
 
 AllCops:
-  TargetRubyVersion: 2.3
   Exclude:
     - "bin/stubs/*"
   DisplayCopNames:
