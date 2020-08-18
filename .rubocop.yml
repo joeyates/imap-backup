@@ -1,5 +1,5 @@
 inherit_from:
-  - https://gitlab.com/snippets/1744945/raw
+  - https://raw.githubusercontent.com/leanpanda-com/rubocop/0.89.1/rubocop-rspec.yml
   - .rubocop_todo.yml
 
 AllCops:
