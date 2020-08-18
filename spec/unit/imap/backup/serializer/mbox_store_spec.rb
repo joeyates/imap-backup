@@ -4,10 +4,10 @@ describe Imap::Backup::Serializer::MboxStore do
   let(:base_path) { "/base/path" }
   let(:folder) { "the/folder" }
   let(:folder_path) { File.join(base_path, folder) }
-  let(:imap_pathname) { folder_path + ".imap" }
+  let(:imap_pathname) { "#{folder_path}.imap" }
   let(:imap_exists) { true }
   let(:imap_file) { instance_double(File, write: nil, close: nil) }
-  let(:mbox_pathname) { folder_path + ".mbox" }
+  let(:mbox_pathname) { "#{folder_path}.mbox" }
   let(:mbox_exists) { true }
   let(:mbox_file) { instance_double(File, write: nil, close: nil) }
   let(:uids) { [3, 2, 1] }
@@ -258,8 +258,8 @@ describe Imap::Backup::Serializer::MboxStore do
   describe "#rename" do
     let(:new_name) { "new_name" }
     let(:new_folder_path) { File.join(base_path, new_name) }
-    let(:new_imap_name) { new_folder_path + ".imap" }
-    let(:new_mbox_name) { new_folder_path + ".mbox" }
+    let(:new_imap_name) { "#{new_folder_path}.imap" }
+    let(:new_mbox_name) { "#{new_folder_path}.mbox" }
 
     before do
       allow(File).to receive(:rename).and_call_original

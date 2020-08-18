@@ -60,7 +60,7 @@ RSpec.describe "backup", type: :feature, docker: true do
         connection.run_backup
         server_rename_folder folder, new_name
       end
-      let(:renamed_folder) { folder + "." + original_folder_uid_validity.to_s }
+      let(:renamed_folder) { "#{folder}.#{original_folder_uid_validity}" }
 
       after do
         server_delete_folder new_name
@@ -82,7 +82,7 @@ RSpec.describe "backup", type: :feature, docker: true do
         end
 
         it "moves the old backup to a uniquely named directory" do
-          renamed = folder + "." + original_folder_uid_validity.to_s + ".1"
+          renamed = "#{folder}.#{original_folder_uid_validity}.1"
           expect(mbox_content(renamed)).to eq(message_as_mbox_entry(msg3))
         end
       end

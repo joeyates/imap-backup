@@ -129,7 +129,7 @@ describe Email::Mboxrd::Message do
       let(:message_body) { msg_no_from_but_return_path }
 
       it "'return path' is used as 'from'" do
-        expect(subject.to_serialized).to start_with("From " + from + "\n")
+        expect(subject.to_serialized).to start_with("From #{from}\n")
       end
     end
 
@@ -137,7 +137,7 @@ describe Email::Mboxrd::Message do
       let(:message_body) { msg_no_from_but_sender }
 
       it "Sender is used as 'from'" do
-        expect(subject.to_serialized).to start_with("From " + from + "\n")
+        expect(subject.to_serialized).to start_with("From #{from}\n")
       end
     end
   end

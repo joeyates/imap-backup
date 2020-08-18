@@ -26,11 +26,11 @@ module BackupDirectoryHelpers
   end
 
   def mbox_path(name)
-    File.join(local_backup_path, name + ".mbox")
+    File.join(local_backup_path, "#{name}.mbox")
   end
 
   def imap_path(name)
-    File.join(local_backup_path, name + ".imap")
+    File.join(local_backup_path, "#{name}.imap")
   end
 
   def imap_content(name)

@@ -98,8 +98,8 @@ module Imap::Backup
     end
 
     def rename(new_name)
-      new_mbox_pathname = absolute_path(new_name + ".mbox")
-      new_imap_pathname = absolute_path(new_name + ".imap")
+      new_mbox_pathname = absolute_path("#{new_name}.mbox")
+      new_imap_pathname = absolute_path("#{new_name}.imap")
       File.rename(mbox_pathname, new_mbox_pathname)
       File.rename(imap_pathname, new_imap_pathname)
       @folder = new_name
@@ -191,11 +191,11 @@ module Imap::Backup
     end
 
     def mbox_pathname
-      absolute_path(folder + ".mbox")
+      absolute_path("#{folder}.mbox")
     end
 
     def imap_pathname
-      absolute_path(folder + ".imap")
+      absolute_path("#{folder}.imap")
     end
   end
 end
