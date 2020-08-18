@@ -21,7 +21,7 @@ module Email::Mboxrd
     end
 
     def to_serialized
-      "From " + from + "\n" + mboxrd_body
+      "From #{from}\n" + mboxrd_body
     end
 
     def date
@@ -44,7 +44,7 @@ module Email::Mboxrd
       @from ||=
         begin
           from = best_from.dup
-          from << " " + asctime if asctime != ""
+          from << " #{asctime}" if asctime != ""
           from
         end
     end

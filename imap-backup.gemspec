@@ -13,7 +13,7 @@ Gem::Specification.new do |gem|
   gem.executables   = gem.files.grep(%r{^bin/}).map { |f| File.basename(f) }
   gem.test_files    = gem.files.grep(%r{^spec/})
   gem.require_paths = ["lib"]
-  gem.required_ruby_version = [">= 2.3.0"]
+  gem.required_ruby_version = [">= 2.4.0"]
   gem.version = Imap::Backup::VERSION
 
   gem.post_install_message = <<-MESSAGE.gsub(/^\s{4}/m, "")
