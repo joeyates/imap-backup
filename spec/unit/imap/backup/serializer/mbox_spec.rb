@@ -182,6 +182,14 @@ describe Imap::Backup::Serializer::Mbox do
     end
   end
 
+  describe "#each_message" do
+    it "calls the store" do
+      expect(store).to receive(:each_message).with([1])
+
+      subject.each_message([1])
+    end
+  end
+
   describe "#save" do
     it "calls the store" do
       expect(store).to receive(:add).with("foo", "bar")

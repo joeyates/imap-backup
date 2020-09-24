@@ -13,8 +13,7 @@ module Imap::Backup
       return if count.zero?
 
       Imap::Backup.logger.debug "[#{folder.name}] #{count} to restore"
-      missing_uids.each.with_index do |uid, i|
-        message = serializer.load(uid)
+      serializer.each_message(missing_uids).with_index do |(uid, message), i|
         next if message.nil?
 
         log_prefix = "[#{folder.name}] uid: #{uid} (#{i + 1}/#{count}) -"
