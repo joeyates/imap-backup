@@ -35,6 +35,10 @@ module Imap::Backup
       store.load(uid)
     end
 
+    def each_message(uids)
+      store.each_message(uids)
+    end
+
     def save(uid, message)
       store.add(uid, message)
     end

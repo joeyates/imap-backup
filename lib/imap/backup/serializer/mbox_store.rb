@@ -81,6 +81,22 @@ module Imap::Backup
       load_nth(message_index)
     end
 
+    def each_message(required_uids)
+      return enum_for(:each_message, required_uids) if !block_given?
+
+      indexes = required_uids.each.with_object({}) do |uid, acc|
+        index = uids.find_index(uid)
+        acc[index] = uid if index
+      end
+      enumerator = Serializer::MboxEnumerator.new(mbox_pathname)
+      enumerator.each.with_index do |raw, i|
+        uid = indexes[i]
+        next if !uid
+
+        yield uid, Email::Mboxrd::Message.from_serialized(raw)
+      end
+    end
+
     def update_uid(old, new)
       index = uids.find_index(old.to_i)
       return if index.nil?

@@ -20,10 +20,13 @@ describe Imap::Backup::Uploader do
     instance_double(Email::Mboxrd::Message, supplied_body: "existing message")
   end
 
+  def message_enumerator
+    yield [1, missing_message]
+  end
+
   describe "#run" do
     before do
-      allow(serializer).to receive(:load).with(1) { missing_message }
-      allow(serializer).to receive(:load).with(2) { existing_message }
+      allow(serializer).to receive(:each_message).and_return(enum_for(:message_enumerator))
     end
 
     context "with messages that are missing" do

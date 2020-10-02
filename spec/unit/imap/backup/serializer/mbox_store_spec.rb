@@ -208,6 +208,47 @@ describe Imap::Backup::Serializer::MboxStore do
     end
   end
 
+  describe "#each_message" do
+    let(:enumerator) do
+      instance_double(Imap::Backup::Serializer::MboxEnumerator)
+    end
+    let(:enumeration) { instance_double(Enumerator) }
+
+    before do
+      allow(Imap::Backup::Serializer::MboxEnumerator).
+        to receive(:new) { enumerator }
+      allow(enumerator).to receive(:each) { enumeration }
+      allow(enumeration).
+        to receive(:with_index).
+        and_yield("", 0).
+        and_yield("", 1).
+        and_yield("ciao", 2)
+    end
+
+    it "yields messages" do
+      expect { |b| subject.each_message([1], &b) }.
+        to yield_successive_args([1, instance_of(Email::Mboxrd::Message)])
+    end
+
+    it "yields the requested message uid" do
+      subject.each_message([1]) do |uid, _message|
+        expect(uid).to eq(1)
+      end
+    end
+
+    it "yields the requested message" do
+      subject.each_message([1]) do |_uid, message|
+        expect(message.supplied_body).to eq("ciao")
+      end
+    end
+
+    context "without a block" do
+      it "returns an Enumerator" do
+        expect(subject.each_message([1])).to be_a(Enumerator)
+      end
+    end
+  end
+
   describe "#update_uid" do
     let(:old_uid) { "2" }
     let(:updated_imap_content) do
