@@ -133,16 +133,13 @@ describe Imap::Backup::Account::Connection do
     before do
       allow(Imap::Backup::Downloader).
         to receive(:new).with(folder, serializer) { downloader }
+      allow(Imap::Backup::Account::Folder).to receive(:new).
+        with(subject, BACKUP_FOLDER) { folder }
+      allow(Imap::Backup::Serializer::Mbox).to receive(:new).
+        with(LOCAL_PATH, BACKUP_FOLDER) { serializer }
     end
 
     context "with supplied backup_folders" do
-      before do
-        allow(Imap::Backup::Account::Folder).to receive(:new).
-          with(subject, BACKUP_FOLDER) { folder }
-        allow(Imap::Backup::Serializer::Mbox).to receive(:new).
-          with(LOCAL_PATH, BACKUP_FOLDER) { serializer }
-      end
-
       it "runs the downloader" do
         expect(downloader).to receive(:run)
 
@@ -200,6 +197,12 @@ describe Imap::Backup::Account::Connection do
           expect { subject.run_backup }.to_not raise_error
         end
       end
+    end
+
+    context "imap preconnect" do
+      before { subject.run_backup }
+
+      include_examples "connects to IMAP"
     end
   end
 
