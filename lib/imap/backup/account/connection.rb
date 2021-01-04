@@ -84,6 +84,13 @@ module Imap::Backup
       @imap
     end
 
+    def server
+      return @server if @server
+      return nil if provider.nil?
+
+      @server = provider.host
+    end
+
     def backup_folders
       return @backup_folders if @backup_folders && !@backup_folders.empty?
 
@@ -152,13 +159,6 @@ module Imap::Backup
 
     def provider
       @provider ||= Email::Provider.for_address(username)
-    end
-
-    def server
-      return @server if @server
-      return nil if provider.nil?
-
-      @server = provider.host
     end
 
     def provider_options

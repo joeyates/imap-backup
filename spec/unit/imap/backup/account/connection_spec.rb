@@ -6,6 +6,7 @@ describe Imap::Backup::Account::Connection do
   LOCAL_UID = "local_uid"
   PASSWORD = "secret"
   ROOT_NAME = "foo"
+  SERVER = "imap.example.com"
   USERNAME = "username@example.com"
 
   subject { described_class.new(options) }
@@ -19,7 +20,8 @@ describe Imap::Backup::Account::Connection do
       username: USERNAME,
       password: PASSWORD,
       local_path: LOCAL_PATH,
-      folders: backup_folders
+      folders: backup_folders,
+      server: SERVER
     }
   end
   let(:backup_folders) { [FOLDER_CONFIG] }
@@ -56,7 +58,8 @@ describe Imap::Backup::Account::Connection do
       [:username, USERNAME],
       [:password, PASSWORD],
       [:local_path, LOCAL_PATH],
-      [:backup_folders, [FOLDER_CONFIG]]
+      [:backup_folders, [FOLDER_CONFIG]],
+      [:server, SERVER]
     ].each do |attr, expected|
       it "expects #{attr}" do
         expect(subject.public_send(attr)).to eq(expected)
