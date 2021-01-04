@@ -6,7 +6,7 @@ describe Imap::Backup::Account::Connection do
   LOCAL_UID = "local_uid"
   PASSWORD = "secret"
   ROOT_NAME = "foo"
-  USERNAME = "username@gmail.com"
+  USERNAME = "username@example.com"
 
   subject { described_class.new(options) }
 
