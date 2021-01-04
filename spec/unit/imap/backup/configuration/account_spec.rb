@@ -46,7 +46,7 @@ describe Imap::Backup::Configuration::Account do
     let(:account) do
       {
         username: existing_email,
-        server: existing_server,
+        server: current_server,
         local_path: "/backup/path",
         folders: [{name: "my_folder"}],
         password: existing_password
@@ -60,7 +60,7 @@ describe Imap::Backup::Configuration::Account do
     end
     let(:existing_email) { "user@example.com" }
     let(:new_email) { "foo@example.com" }
-    let(:existing_server) { "imap.example.com" }
+    let(:current_server) { "imap.example.com" }
     let(:existing_password) { "password" }
     let(:other_email) { "other@example.com" }
     let(:other_existing_path) { "/other/existing/path" }
@@ -154,7 +154,7 @@ describe Imap::Backup::Configuration::Account do
             let(:new_email) { email }
 
             context "with nil" do
-              let(:existing_server) { nil }
+              let(:current_server) { nil }
 
               it "sets a default server" do
                 expect(account[:server]).to eq(expected)
@@ -162,7 +162,7 @@ describe Imap::Backup::Configuration::Account do
             end
 
             context "with an empty string" do
-              let(:existing_server) { "" }
+              let(:current_server) { "" }
 
               it "sets a default server" do
                 expect(account[:server]).to eq(expected)
@@ -172,7 +172,7 @@ describe Imap::Backup::Configuration::Account do
         end
 
         context "when the domain is unrecognized" do
-          let(:existing_server) { nil }
+          let(:current_server) { nil }
           let(:provider) do
             instance_double(Email::Provider, provider: :default)
           end
