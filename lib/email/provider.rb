@@ -1,6 +1,8 @@
 module Email; end
 
 class Email::Provider
+  GMAIL_IMAP_SERVER = "imap.gmail.com"
+
   def self.for_address(address)
     case
     when address.end_with?("@fastmail.com")
@@ -27,7 +29,7 @@ class Email::Provider
   def host
     case provider
     when :gmail
-      "imap.gmail.com"
+      GMAIL_IMAP_SERVER
     when :fastmail
       "imap.fastmail.com"
     end
