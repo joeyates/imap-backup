@@ -136,7 +136,7 @@ describe Imap::Backup::Configuration::Account do
       end
     end
 
-    describe "email" do
+    describe "choosing 'modify email'" do
       before do
         allow(Imap::Backup::Configuration::Asker).
           to receive(:email) { new_email }
@@ -211,7 +211,7 @@ describe Imap::Backup::Configuration::Account do
       end
     end
 
-    describe "password" do
+    describe "choosing 'modify password'" do
       let(:new_password) { "new_password" }
 
       before do
@@ -240,7 +240,7 @@ describe Imap::Backup::Configuration::Account do
       end
     end
 
-    describe "server" do
+    describe "choosing 'modify server'" do
       let(:server) { "server" }
 
       before do
@@ -258,7 +258,7 @@ describe Imap::Backup::Configuration::Account do
       include_examples "it flags the account as modified"
     end
 
-    describe "backup_path" do
+    describe "choosing 'modify backup path'" do
       let(:new_backup_path) { "/new/path" }
 
       before do
@@ -296,7 +296,7 @@ describe Imap::Backup::Configuration::Account do
       include_examples "it flags the account as modified"
     end
 
-    describe "folders" do
+    describe "choosing 'choose backup folders'" do
       let(:chooser) do
         instance_double(Imap::Backup::Configuration::FolderChooser, run: nil)
       end
@@ -313,7 +313,7 @@ describe Imap::Backup::Configuration::Account do
       end
     end
 
-    describe "connection test" do
+    describe "choosing 'test connection'" do
       before do
         allow(Imap::Backup::Configuration::ConnectionTester).
           to receive(:test) { "All fine" }
@@ -328,7 +328,7 @@ describe Imap::Backup::Configuration::Account do
       end
     end
 
-    describe "deletion" do
+    describe "choosing 'delete'" do
       let(:confirmed) { true }
 
       before do
