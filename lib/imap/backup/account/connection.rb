@@ -84,6 +84,12 @@ module Imap::Backup
       @imap
     end
 
+    def backup_folders
+      return @backup_folders if @backup_folders && !@backup_folders.empty?
+
+      (folders || []).map { |f| {name: f.name} }
+    end
+
     private
 
     def each_folder
@@ -131,12 +137,6 @@ module Imap::Backup
 
     def masked_password
       password.gsub(/./, "x")
-    end
-
-    def backup_folders
-      return @backup_folders if @backup_folders && !@backup_folders.empty?
-
-      (folders || []).map { |f| {name: f.name} }
     end
 
     def local_folders

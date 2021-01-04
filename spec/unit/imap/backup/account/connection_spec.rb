@@ -59,7 +59,7 @@ describe Imap::Backup::Account::Connection do
       [:backup_folders, [FOLDER_CONFIG]]
     ].each do |attr, expected|
       it "expects #{attr}" do
-        expect(subject.send(attr)).to eq(expected)
+        expect(subject.public_send(attr)).to eq(expected)
       end
     end
 
