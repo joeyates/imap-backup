@@ -66,7 +66,13 @@ module Imap::Backup
 
     def modify_password(menu)
       menu.choice("modify password") do
-        password = Configuration::Asker.password
+        password =
+          if account[:server] == Email::Provider::GMAIL_IMAP_SERVER
+            Configuration::GMailOAuth2.new(account).run
+          else
+            Configuration::Asker.password
+          end
+
         if !password.nil?
           account[:password] = password
           account[:modified] = true

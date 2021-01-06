@@ -136,6 +136,10 @@ describe Imap::Backup::Configuration::Setup do
         expect(accounts[1]).to eq(blank_account)
       end
 
+      context "when the account is a GMail account" do
+        it "sets the server"
+      end
+
       it "doesn't flag the unedited account as modified" do
         expect(accounts[1][:modified]).to be_nil
       end

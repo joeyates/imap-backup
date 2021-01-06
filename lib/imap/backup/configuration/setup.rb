@@ -75,7 +75,12 @@ module Imap::Backup
         password: "",
         local_path: File.join(config.path, username.tr("@", "_")),
         folders: []
-      }
+      }.tap do |c|
+        server = Email::Provider.for_address(username)
+        if server.host
+          c[:server] = server.host
+        end
+      end
     end
 
     def edit_account(username)
