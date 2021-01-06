@@ -1,13 +1,18 @@
 # rubocop:disable RSpec/NestedGroups
 
 describe Imap::Backup::Configuration::Account do
+  ACCOUNT = "account"
+  GMAIL_IMAP_SERVER = "imap.gmail.com"
+  HIGHLINE = "highline"
+  STORE = "store"
+
+  subject { described_class.new(store, account, highline) }
+
+  let(:account) { ACCOUNT }
+  let(:highline) { HIGHLINE }
+  let(:store) { STORE }
+
   describe "#initialize" do
-    subject { described_class.new(store, account, highline) }
-
-    let(:store) { "store" }
-    let(:account) { "account" }
-    let(:highline) { "highline" }
-
     [:store, :account, :highline].each do |param|
       it "expects #{param}" do
         expect(subject.send(param)).to eq(send(param))
@@ -16,8 +21,6 @@ describe Imap::Backup::Configuration::Account do
   end
 
   describe "#run" do
-    subject { described_class.new(store, account, highline) }
-
     let(:highline_menu_class) do
       Class.new do
         attr_reader :choices
