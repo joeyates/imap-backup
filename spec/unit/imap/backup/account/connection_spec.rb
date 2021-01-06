@@ -1,7 +1,10 @@
+require "ostruct"
+
 describe Imap::Backup::Account::Connection do
   BACKUP_FOLDER = "backup_folder"
   FOLDER_CONFIG = {name: BACKUP_FOLDER}.freeze
   FOLDER_NAME = "my_folder"
+  GMAIL_IMAP_SERVER = "imap.gmail.com"
   LOCAL_PATH = "local_path"
   LOCAL_UID = "local_uid"
   PASSWORD = "secret"
@@ -12,7 +15,7 @@ describe Imap::Backup::Account::Connection do
   subject { described_class.new(options) }
 
   let(:imap) do
-    instance_double(Net::IMAP, login: nil, disconnect: nil)
+    instance_double(Net::IMAP, authenticate: nil, login: nil, disconnect: nil)
   end
   let(:imap_folders) { [] }
   let(:options) do
@@ -21,7 +24,7 @@ describe Imap::Backup::Account::Connection do
       password: PASSWORD,
       local_path: LOCAL_PATH,
       folders: backup_folders,
-      server: SERVER
+      server: server
     }
   end
   let(:backup_folders) { [FOLDER_CONFIG] }
@@ -38,6 +41,7 @@ describe Imap::Backup::Account::Connection do
     )
   end
   let(:serialized_folder) { nil }
+  let(:server) { SERVER }
   let(:new_uid_validity) { nil }
 
   before do
@@ -78,6 +82,61 @@ describe Imap::Backup::Account::Connection do
 
     it "returns the IMAP connection" do
       expect(result).to eq(imap)
+    end
+
+    it "uses the password" do
+      expect(imap).to have_received(:login).with(USERNAME, PASSWORD)
+    end
+
+    context "with the GMail IMAP server" do
+      ACCESS_TOKEN = "access_token"
+
+      let(:server) { GMAIL_IMAP_SERVER }
+      let(:is_refresh_token) { true }
+      let(:result) { nil }
+      let(:authenticator) do
+        instance_double(
+          GMail::Authenticator,
+          credentials: credentials
+        )
+      end
+      let(:credentials) { OpenStruct.new(access_token: ACCESS_TOKEN) }
+
+      before do
+        allow(GMail::Authenticator).
+          to receive(:is_refresh_token?) { is_refresh_token }
+        allow(GMail::Authenticator).
+          to receive(:new).
+          with(email: USERNAME, token: PASSWORD) { authenticator }
+      end
+
+      context "when the password is our copy of a GMail refresh token" do
+        it "uses the OAuth2 access_token to authenticate" do
+          subject.imap
+
+          expect(imap).to have_received(:authenticate).with(
+            "XOAUTH2", USERNAME, ACCESS_TOKEN
+          )
+        end
+
+        context "when the refresh token is invalid" do
+          let(:credentials) { nil }
+
+          it "raises" do
+            expect { subject.imap }.to raise_error(String)
+          end
+        end
+      end
+
+      context "when the password is not our copy of a GMail refresh token" do
+        let(:is_refresh_token) { false }
+
+        it "uses the password" do
+          subject.imap
+
+          expect(imap).to have_received(:login).with(USERNAME, PASSWORD)
+        end
+      end
     end
 
     include_examples "connects to IMAP"

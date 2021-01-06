@@ -1,9 +1,14 @@
 require "net/imap"
+require "gmail_xoauth"
+
+require "gmail/authenticator"
 
 module Imap::Backup
   module Account; end
 
   class Account::Connection
+    class InvalidGMailOAuth2RefreshToken < StandardError; end
+
     attr_reader :connection_options
     attr_reader :local_path
     attr_reader :password
@@ -78,8 +83,16 @@ module Imap::Backup
         "Creating IMAP instance: #{server}, options: #{options.inspect}"
       )
       @imap = Net::IMAP.new(server, options)
-      Imap::Backup.logger.debug "Logging in: #{username}/#{masked_password}"
-      @imap.login(username, password)
+      if is_gmail? && GMail::Authenticator.is_refresh_token?(password)
+        authenticator = GMail::Authenticator.new(email: username, token: password)
+        credentials = authenticator.credentials
+        raise InvalidGMailOAuth2RefreshToken if !credentials
+        Imap::Backup.logger.debug "Logging in with OAuth2 token: #{username}"
+        @imap.authenticate("XOAUTH2", username, credentials.access_token)
+      else
+        Imap::Backup.logger.debug "Logging in: #{username}/#{masked_password}"
+        @imap.login(username, password)
+      end
       Imap::Backup.logger.debug "Login complete"
       @imap
     end
@@ -144,6 +157,10 @@ module Imap::Backup
 
     def masked_password
       password.gsub(/./, "x")
+    end
+
+    def is_gmail?
+      server == Email::Provider::GMAIL_IMAP_SERVER
     end
 
     def local_folders
