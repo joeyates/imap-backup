@@ -1,0 +1,119 @@
+require "gmail/authenticator"
+require "googleauth"
+
+describe GMail::Authenticator do
+  ACCESS_TOKEN = "access_token"
+  AUTHORIZATION_URL = "authorization_url"
+  CLIENT_ID = "client_id"
+  CLIENT_SECRET = "client_secret"
+  CODE = "code"
+  CREDENTIALS = "credentials"
+  EMAIL = "email"
+  EXPIRATION_TIME_MILLIS = "expiration_time_millis"
+  GMAIL_READ_SCOPE = "https://mail.google.com/"
+  IMAP_BACKUP_TOKEN = "imap_backup_token"
+  OOB_URI = "urn:ietf:wg:oauth:2.0:oob"
+  REFRESH_TOKEN = "refresh_token"
+
+  subject { described_class.new(**params) }
+
+  let(:params) do
+    {
+      email: EMAIL,
+      token: IMAP_BACKUP_TOKEN
+    }
+  end
+
+  let(:authorizer) do
+    instance_double(Google::Auth::UserAuthorizer)
+  end
+
+  let(:imap_backup_token) do
+    instance_double(
+      GMail::Authenticator::ImapBackupToken,
+      access_token: ACCESS_TOKEN,
+      client_id: CLIENT_ID,
+      client_secret: CLIENT_SECRET,
+      expiration_time_millis: EXPIRATION_TIME_MILLIS,
+      refresh_token: REFRESH_TOKEN,
+      valid?: true
+    )
+  end
+
+  let(:token_store) do
+    instance_double(Google::Auth::Stores::InMemoryTokenStore)
+  end
+
+  before do
+    allow(Google::Auth::UserAuthorizer).
+      to receive(:new).
+      with(
+        instance_of(Google::Auth::ClientId),
+        GMAIL_READ_SCOPE,
+        token_store
+      ) { authorizer }
+    allow(authorizer).to receive(:get_authorization_url).
+      with(base_url: OOB_URI) { AUTHORIZATION_URL }
+    allow(authorizer).to receive(:get_credentials).
+      with(EMAIL) { CREDENTIALS }
+    allow(authorizer).to receive(:get_credentials_from_code).
+      with(user_id: EMAIL, code: CODE, base_url: OOB_URI) { CREDENTIALS }
+    allow(Google::Auth::Stores::InMemoryTokenStore).
+      to receive(:new) { token_store }
+    allow(token_store).to receive(:store).
+      with(EMAIL, anything) # TODO: use a JSON matcher
+    allow(GMail::Authenticator::ImapBackupToken).
+      to receive(:new).
+      with(IMAP_BACKUP_TOKEN) { imap_backup_token }
+  end
+
+  describe "#initialize" do
+    [:email, :token].each do |param|
+      context "parameter #{param}" do
+        let(:params) { super().dup.reject { |k| k == param } }
+
+        it "is expected" do
+          expect { subject }.to raise_error(
+            ArgumentError, /missing keyword: :#{param}/
+          )
+        end
+      end
+    end
+  end
+
+  describe "#credentials" do
+    let!(:result) { subject.credentials }
+
+    it "attempts to get credentials" do
+      expect(authorizer).to have_received(:get_credentials)
+    end
+
+    it "returns the result" do
+      expect(result).to eq(CREDENTIALS)
+    end
+  end
+
+  describe "#authorization_url" do
+    let!(:result) { subject.authorization_url }
+
+    it "requests an authorization URL" do
+      expect(authorizer).to have_received(:get_authorization_url)
+    end
+
+    it "returns the result" do
+      expect(result).to eq(AUTHORIZATION_URL)
+    end
+  end
+
+  describe "#credentials_from_code" do
+    let!(:result) { subject.credentials_from_code(CODE) }
+
+    it "requests credentials" do
+      expect(authorizer).to have_received(:get_credentials_from_code)
+    end
+
+    it "returns credentials" do
+      expect(result).to eq(CREDENTIALS)
+    end
+  end
+end

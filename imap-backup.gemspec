@@ -24,6 +24,8 @@ Gem::Specification.new do |gem|
     **deleted** and a full new backup created.
   MESSAGE
 
+  gem.add_runtime_dependency "gmail_xoauth"
+  gem.add_runtime_dependency "googleauth"
   gem.add_runtime_dependency "highline"
   gem.add_runtime_dependency "mail"
   gem.add_runtime_dependency "rake"
