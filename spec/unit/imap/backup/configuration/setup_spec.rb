@@ -3,6 +3,8 @@
 describe Imap::Backup::Configuration::Setup do
   include HighLineTestHelpers
 
+  GMAIL_IMAP_SERVER = "imap.gmail.com"
+
   describe "#initialize" do
     context "without a config file" do
       it "works" do
@@ -112,32 +114,51 @@ describe Imap::Backup::Configuration::Setup do
     context "when adding accounts" do
       let(:blank_account) do
         {
-          username: "new@example.com",
+          username: added_email,
           password: "",
-          local_path: "/base/path/new_example.com",
+          local_path: local_path,
           folders: []
         }
       end
       let(:account) do
         instance_double(Imap::Backup::Configuration::Account, run: nil)
       end
+      let(:added_email) { "new@example.com" }
+      let(:local_path) { "/base/path/new_example.com" }
 
       before do
         allow(input).to receive(:gets).and_return("add\n", "exit\n")
         allow(Imap::Backup::Configuration::Asker).to receive(:email).
-          with(no_args) { "new@example.com" }
+          with(no_args) { added_email }
         allow(Imap::Backup::Configuration::Account).to receive(:new).
-          with(store, blank_account, anything) { account }
+          with(store, anything, anything) { account }
 
         subject.run
       end
 
-      it "adds account data" do
-        expect(accounts[1]).to eq(blank_account)
+      it "sets username" do
+        expect(accounts[1][:username]).to eq(added_email)
+      end
+
+      it "sets blank password" do
+        expect(accounts[1][:password]).to eq("")
+      end
+
+      it "sets local_path" do
+        expect(accounts[1][:local_path]).to eq(local_path)
+      end
+
+      it "sets folders" do
+        expect(accounts[1][:folders]).to eq([])
       end
 
       context "when the account is a GMail account" do
-        it "sets the server"
+        let(:added_email) { "new@gmail.com" }
+        let(:local_path) { "/base/path/new_gmail.com" }
+
+        it "sets the server" do
+          expect(accounts[1][:server]).to eq(GMAIL_IMAP_SERVER)
+        end
       end
 
       it "doesn't flag the unedited account as modified" do
