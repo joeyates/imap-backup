@@ -25,11 +25,11 @@ module Imap::Backup
 
     def run
       Kernel.system("clear")
-      puts BANNER
+      Kernel.puts BANNER
       @client_id = highline.ask("client_id: ")
       @client_secret = highline.ask("client_secret: ")
 
-      puts <<~MESSAGE
+      Kernel.puts <<~MESSAGE
 
       Open the following URL in your browser
 
@@ -46,7 +46,7 @@ module Imap::Backup
 
       raise "Failed" if !@credentials
 
-      token = JSON.parse(token_store[email])
+      token = JSON.parse(token_store.load(email))
       token["client_secret"] = client_secret
       token.to_json
     end
