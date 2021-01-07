@@ -44,6 +44,12 @@ describe GMail::Authenticator do
     instance_double(Google::Auth::Stores::InMemoryTokenStore)
   end
 
+  let(:credentials) do
+    instance_double(Google::Auth::UserRefreshCredentials, refresh!: true)
+  end
+
+  let(:expired) { false }
+
   before do
     allow(Google::Auth::UserAuthorizer).
       to receive(:new).
@@ -55,9 +61,14 @@ describe GMail::Authenticator do
     allow(authorizer).to receive(:get_authorization_url).
       with(base_url: OOB_URI) { AUTHORIZATION_URL }
     allow(authorizer).to receive(:get_credentials).
-      with(EMAIL) { CREDENTIALS }
+      with(EMAIL) { credentials }
     allow(authorizer).to receive(:get_credentials_from_code).
       with(user_id: EMAIL, code: CODE, base_url: OOB_URI) { CREDENTIALS }
+
+    allow(Google::Auth::UserRefreshCredentials).
+      to receive(:new) { credentials }
+    allow(credentials).to receive(:expired?) { expired }
+
     allow(Google::Auth::Stores::InMemoryTokenStore).
       to receive(:new) { token_store }
     allow(token_store).to receive(:store).
@@ -89,7 +100,15 @@ describe GMail::Authenticator do
     end
 
     it "returns the result" do
-      expect(result).to eq(CREDENTIALS)
+      expect(result).to eq(credentials)
+    end
+
+    context "when the access_token has expired" do
+      let(:expired) { true }
+
+      it "refreshes it" do
+        expect(credentials).to have_received(:refresh!)
+      end
     end
   end
 

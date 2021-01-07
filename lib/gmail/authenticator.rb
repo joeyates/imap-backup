@@ -89,7 +89,9 @@ class GMail::Authenticator
   end
 
   def credentials
-    authorizer.get_credentials(email)
+    authorizer.get_credentials(email).tap do |c|
+      c.refresh! if c.expired?
+    end
   end
 
   def credentials_from_code(code)
