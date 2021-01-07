@@ -1,4 +1,4 @@
-# Setting up GMail Authentication for imap_backup
+# Setting up GMail Authentication for imap-backup
 
 # Create a Google project
 
@@ -96,11 +96,11 @@ Copy both "Your Client ID"
 
 And "Your Client Secret".
 
-# Set up imap_backup
+# Set up imap-backup
 
-Run `imap_backup setup`.
+Run `imap-backup setup`.
 
-![Initial imap_backup menu](16-initial-menu.png)
+![Initial imap-backup menu](16-initial-menu.png)
 
 Choose 'add account'.
 
@@ -151,7 +151,7 @@ Click on the copy logo to copy the success code.
 
 ![Paste the code](26-type-code-into-imap_backup.png)
 
-Paste the success code into imap_backup.
+Paste the success code into imap-backup.
 
 Finally, choose 'test connection'.
 
@@ -163,4 +163,4 @@ Now choose 'return to main menu',
 
 Then 'save and exit'.
 
-Your imap_backup is now configured to back up your GMail.
+Your imap-backup is now configured to back up your GMail.
