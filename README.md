@@ -16,11 +16,11 @@
 [Rubygem]: http://rubygems.org/gems/imap-backup "Ruby gem at rubygems.org"
 [Continuous Integration]: http://travis-ci.org/joeyates/imap-backup "Build status by Travis-CI"
 
-## Version 2
+## GMail
 
-With versions above 2.x, this gems stores IMAP metadata in a
-backwardly-incompatible way. When upgrading, all old backups will be gradually
-deleted to allow for the new file format to be introduced.
+GMail OAuth2 authentication is supported.
+
+To set it up, [follow the HOWTO](docs/setting-up-gmail.md).
 
 # Installation
 
@@ -114,13 +114,6 @@ Specifically, if you are using a self-signed certificate and get SSL errors, e.g
   ]
 }
 ```
-
-## GMail
-
-* Enable IMAP access to your account via the GMail interface (Settings/Forwarding and POP/IMAP),
-* Under 'Sign-in & security', 'Signing in to Google', 'App passwords', generate a password
-  for imap-backup,
-* In imap-backup setup, set the server to imap.gmail.com
 
 # Security
 
