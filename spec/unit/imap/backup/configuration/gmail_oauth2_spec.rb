@@ -1,12 +1,11 @@
-describe Imap::Backup::Configuration::GMailOAuth2 do
+describe Imap::Backup::Configuration::GmailOauth2 do
   include HighLineTestHelpers
-
-  AUTHORIZATION_URL = "some long authorization_url"
-  CREDENTIALS = "credentials"
-  JSON_TOKEN = %Q({"sentinel":"foo"})
 
   subject { described_class.new(account) }
 
+  let(:authorization_url) { "some long authorization_url" }
+  let(:credentials) { "credentials" }
+  let(:json_token) { '{"sentinel":"foo"}' }
   let!(:highline_streams) { prepare_highline }
   let(:highline) { Imap::Backup::Configuration::Setup.highline }
   let(:input) { highline_streams[0] }
@@ -16,14 +15,14 @@ describe Imap::Backup::Configuration::GMailOAuth2 do
   let(:authorizer) do
     instance_double(
       Google::Auth::UserAuthorizer,
-      get_authorization_url: AUTHORIZATION_URL,
-      get_and_store_credentials_from_code: CREDENTIALS
+      get_authorization_url: authorization_url,
+      get_and_store_credentials_from_code: credentials
     )
   end
   let(:token_store) do
     instance_double(
       Google::Auth::Stores::InMemoryTokenStore,
-      load: JSON_TOKEN
+      load: json_token
     )
   end
 
@@ -63,7 +62,7 @@ describe Imap::Backup::Configuration::GMailOAuth2 do
     it "displays the authorization URL" do
       expect(Kernel).
         to have_received(:puts).
-        with(/#{AUTHORIZATION_URL}/)
+        with(/#{authorization_url}/)
     end
 
     it "requests the success code" do
@@ -75,11 +74,11 @@ describe Imap::Backup::Configuration::GMailOAuth2 do
     end
 
     it "returns the credentials" do
-      expect(result).to match(%Q("sentinel":"foo"))
+      expect(result).to match('"sentinel":"foo"')
     end
 
     it "includes the client_secret in the credentials" do
-      expect(result).to match(%Q("client_secret":"my_secret"))
+      expect(result).to match('"client_secret":"my_secret"')
     end
   end
 end

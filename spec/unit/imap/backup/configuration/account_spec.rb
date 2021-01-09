@@ -1,10 +1,8 @@
-# rubocop:disable RSpec/NestedGroups
-
 describe Imap::Backup::Configuration::Account do
-  ACCOUNT = "account"
-  GMAIL_IMAP_SERVER = "imap.gmail.com"
-  HIGHLINE = "highline"
-  STORE = "store"
+  ACCOUNT = "account".freeze
+  GMAIL_IMAP_SERVER = "imap.gmail.com".freeze
+  HIGHLINE = "highline".freeze
+  STORE = "store".freeze
 
   subject { described_class.new(store, account, highline) }
 
@@ -217,15 +215,15 @@ describe Imap::Backup::Configuration::Account do
     describe "choosing 'modify password'" do
       let(:new_password) { "new_password" }
       let(:gmail_oauth2) do
-        instance_double(Imap::Backup::Configuration::GMailOAuth2, run: nil)
+        instance_double(Imap::Backup::Configuration::GmailOauth2, run: nil)
       end
 
       before do
         allow(Imap::Backup::Configuration::Asker).
           to receive(:password) { new_password }
-        allow(Imap::Backup::Configuration::GMailOAuth2).
+        allow(Imap::Backup::Configuration::GmailOauth2).
           to receive(:new).
-          with(account) { gmail_oauth2 }
+            with(account) { gmail_oauth2 }
         subject.run
         menu.choices["modify password"].call
       end
@@ -372,5 +370,3 @@ describe Imap::Backup::Configuration::Account do
     end
   end
 end
-
-# rubocop:enable RSpec/NestedGroups

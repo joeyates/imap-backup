@@ -1,16 +1,16 @@
 require "ostruct"
 
 describe Imap::Backup::Account::Connection do
-  BACKUP_FOLDER = "backup_folder"
+  BACKUP_FOLDER = "backup_folder".freeze
   FOLDER_CONFIG = {name: BACKUP_FOLDER}.freeze
-  FOLDER_NAME = "my_folder"
-  GMAIL_IMAP_SERVER = "imap.gmail.com"
-  LOCAL_PATH = "local_path"
-  LOCAL_UID = "local_uid"
-  PASSWORD = "secret"
-  ROOT_NAME = "foo"
-  SERVER = "imap.example.com"
-  USERNAME = "username@example.com"
+  FOLDER_NAME = "my_folder".freeze
+  GMAIL_IMAP_SERVER = "imap.gmail.com".freeze
+  LOCAL_PATH = "local_path".freeze
+  LOCAL_UID = "local_uid".freeze
+  PASSWORD = "secret".freeze
+  ROOT_NAME = "foo".freeze
+  SERVER = "imap.example.com".freeze
+  USERNAME = "username@example.com".freeze
 
   subject { described_class.new(options) }
 
@@ -89,25 +89,25 @@ describe Imap::Backup::Account::Connection do
     end
 
     context "with the GMail IMAP server" do
-      ACCESS_TOKEN = "access_token"
+      ACCESS_TOKEN = "access_token".freeze
 
       let(:server) { GMAIL_IMAP_SERVER }
-      let(:is_refresh_token) { true }
+      let(:refresh_token) { true }
       let(:result) { nil }
       let(:authenticator) do
         instance_double(
-          GMail::Authenticator,
+          Gmail::Authenticator,
           credentials: credentials
         )
       end
       let(:credentials) { OpenStruct.new(access_token: ACCESS_TOKEN) }
 
       before do
-        allow(GMail::Authenticator).
-          to receive(:is_refresh_token?) { is_refresh_token }
-        allow(GMail::Authenticator).
+        allow(Gmail::Authenticator).
+          to receive(:refresh_token?) { refresh_token }
+        allow(Gmail::Authenticator).
           to receive(:new).
-          with(email: USERNAME, token: PASSWORD) { authenticator }
+            with(email: USERNAME, token: PASSWORD) { authenticator }
       end
 
       context "when the password is our copy of a GMail refresh token" do
@@ -129,7 +129,7 @@ describe Imap::Backup::Account::Connection do
       end
 
       context "when the password is not our copy of a GMail refresh token" do
-        let(:is_refresh_token) { false }
+        let(:refresh_token) { false }
 
         it "uses the password" do
           subject.imap
@@ -258,7 +258,7 @@ describe Imap::Backup::Account::Connection do
       end
     end
 
-    context "imap preconnect" do
+    context "when run" do
       before { subject.run_backup }
 
       include_examples "connects to IMAP"

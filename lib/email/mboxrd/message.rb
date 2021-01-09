@@ -10,9 +10,11 @@ module Email::Mboxrd
       cleaned = serialized.gsub(/^>(>*From)/, "\\1")
       # Serialized messages in this format *should* start with a line
       #   From xxx yy zz
+      # rubocop:disable Style/IfUnlessModifier
       if cleaned.start_with?("From ")
         cleaned = cleaned.sub(/^From .*[\r\n]*/, "")
       end
+      # rubocop:enable Style/IfUnlessModifier
       new(cleaned)
     end
 

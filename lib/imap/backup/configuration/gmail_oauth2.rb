@@ -1,8 +1,8 @@
 module Imap::Backup
   module Configuration; end
 
-  class Configuration::GMailOAuth2
-    BANNER = <<~BANNER
+  class Configuration::GmailOauth2
+    BANNER = <<~BANNER.freeze
       GMail OAuth2 Setup
 
       You need to authorize imap_backup to get access to your email.
@@ -12,8 +12,8 @@ module Imap::Backup
 
     BANNER
 
-    GMAIL_READ_SCOPE = "https://mail.google.com/"
-    OOB_URI = "urn:ietf:wg:oauth:2.0:oob"
+    GMAIL_READ_SCOPE = "https://mail.google.com/".freeze
+    OOB_URI = "urn:ietf:wg:oauth:2.0:oob".freeze
 
     attr_reader :account
     attr_reader :client_id
@@ -31,11 +31,11 @@ module Imap::Backup
 
       Kernel.puts <<~MESSAGE
 
-      Open the following URL in your browser
+        Open the following URL in your browser
 
-      #{authorization_url}
+        #{authorization_url}
 
-      Then copy the success code
+        Then copy the success code
 
       MESSAGE
 
@@ -72,7 +72,7 @@ module Imap::Backup
     end
 
     def token_store
-      @token_store ||= Google::Auth::Stores::InMemoryTokenStore.new()
+      @token_store ||= Google::Auth::Stores::InMemoryTokenStore.new
     end
 
     def authorization_url

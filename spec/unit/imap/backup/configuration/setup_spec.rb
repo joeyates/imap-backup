@@ -1,9 +1,27 @@
-# rubocop:disable RSpec/NestedGroups
-
 describe Imap::Backup::Configuration::Setup do
   include HighLineTestHelpers
 
-  GMAIL_IMAP_SERVER = "imap.gmail.com"
+  subject { described_class.new }
+
+  let(:normal) { {username: "account@example.com"} }
+  let(:accounts) { [normal] }
+  let(:store) do
+    instance_double(
+      Imap::Backup::Configuration::Store,
+      "accounts": accounts,
+      "path": "/base/path",
+      "save": nil,
+      "debug?": debug,
+      "debug=": nil,
+      "modified?": modified
+    )
+  end
+  let(:debug) { false }
+  let(:modified) { false }
+  let!(:highline_streams) { prepare_highline }
+  let(:input) { highline_streams[0] }
+  let(:output) { highline_streams[1] }
+  let(:gmail_imap_server) { "imap.gmail.com" }
 
   describe "#initialize" do
     context "without a config file" do
@@ -14,27 +32,6 @@ describe Imap::Backup::Configuration::Setup do
   end
 
   describe "#run" do
-    subject { described_class.new }
-
-    let(:normal) { {username: "account@example.com"} }
-    let(:accounts) { [normal] }
-    let(:store) do
-      instance_double(
-        Imap::Backup::Configuration::Store,
-        "accounts": accounts,
-        "path": "/base/path",
-        "save": nil,
-        "debug?": debug,
-        "debug=": nil,
-        "modified?": modified
-      )
-    end
-    let(:debug) { false }
-    let(:modified) { false }
-    let!(:highline_streams) { prepare_highline }
-    let(:input) { highline_streams[0] }
-    let(:output) { highline_streams[1] }
-
     before do
       allow(Imap::Backup::Configuration::Store).to receive(:new) { store }
       allow(Imap::Backup).to receive(:setup_logging)
@@ -157,7 +154,7 @@ describe Imap::Backup::Configuration::Setup do
         let(:local_path) { "/base/path/new_gmail.com" }
 
         it "sets the server" do
-          expect(accounts[1][:server]).to eq(GMAIL_IMAP_SERVER)
+          expect(accounts[1][:server]).to eq(gmail_imap_server)
         end
       end
 
@@ -273,5 +270,3 @@ describe Imap::Backup::Configuration::Setup do
     end
   end
 end
-
-# rubocop:enable RSpec/NestedGroups

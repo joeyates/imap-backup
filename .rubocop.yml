@@ -11,10 +11,10 @@ AllCops:
 RSpec/ContextWording:
   Exclude:
     - "spec/features/**/*"
+RSpec/LeakyConstantDeclaration:
+  Enabled: false
 RSpec/MessageSpies:
   Enabled: false
-RSpec/NestedGroups:
-  Max: 4
 RSpec/ReturnFromStub:
   Enabled: false
 Style/EmptyCaseCondition:

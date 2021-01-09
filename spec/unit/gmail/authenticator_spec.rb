@@ -1,19 +1,19 @@
 require "gmail/authenticator"
 require "googleauth"
 
-describe GMail::Authenticator do
-  ACCESS_TOKEN = "access_token"
-  AUTHORIZATION_URL = "authorization_url"
-  CLIENT_ID = "client_id"
-  CLIENT_SECRET = "client_secret"
-  CODE = "code"
-  CREDENTIALS = "credentials"
-  EMAIL = "email"
-  EXPIRATION_TIME_MILLIS = "expiration_time_millis"
-  GMAIL_READ_SCOPE = "https://mail.google.com/"
-  IMAP_BACKUP_TOKEN = "imap_backup_token"
-  OOB_URI = "urn:ietf:wg:oauth:2.0:oob"
-  REFRESH_TOKEN = "refresh_token"
+describe Gmail::Authenticator do
+  ACCESS_TOKEN = "access_token".freeze
+  AUTHORIZATION_URL = "authorization_url".freeze
+  CLIENT_ID = "client_id".freeze
+  CLIENT_SECRET = "client_secret".freeze
+  CODE = "code".freeze
+  CREDENTIALS = "credentials".freeze
+  EMAIL = "email".freeze
+  EXPIRATION_TIME_MILLIS = "expiration_time_millis".freeze
+  GMAIL_READ_SCOPE = "https://mail.google.com/".freeze
+  IMAP_BACKUP_TOKEN = "imap_backup_token".freeze
+  OOB_URI = "urn:ietf:wg:oauth:2.0:oob".freeze
+  REFRESH_TOKEN = "refresh_token".freeze
 
   subject { described_class.new(**params) }
 
@@ -30,7 +30,7 @@ describe GMail::Authenticator do
 
   let(:imap_backup_token) do
     instance_double(
-      GMail::Authenticator::ImapBackupToken,
+      Gmail::Authenticator::ImapBackupToken,
       access_token: ACCESS_TOKEN,
       client_id: CLIENT_ID,
       client_secret: CLIENT_SECRET,
@@ -53,11 +53,11 @@ describe GMail::Authenticator do
   before do
     allow(Google::Auth::UserAuthorizer).
       to receive(:new).
-      with(
-        instance_of(Google::Auth::ClientId),
-        GMAIL_READ_SCOPE,
-        token_store
-      ) { authorizer }
+        with(
+          instance_of(Google::Auth::ClientId),
+          GMAIL_READ_SCOPE,
+          token_store
+        ) { authorizer }
     allow(authorizer).to receive(:get_authorization_url).
       with(base_url: OOB_URI) { AUTHORIZATION_URL }
     allow(authorizer).to receive(:get_credentials).
@@ -73,9 +73,9 @@ describe GMail::Authenticator do
       to receive(:new) { token_store }
     allow(token_store).to receive(:store).
       with(EMAIL, anything) # TODO: use a JSON matcher
-    allow(GMail::Authenticator::ImapBackupToken).
+    allow(Gmail::Authenticator::ImapBackupToken).
       to receive(:new).
-      with(IMAP_BACKUP_TOKEN) { imap_backup_token }
+        with(IMAP_BACKUP_TOKEN) { imap_backup_token }
   end
 
   describe "#initialize" do

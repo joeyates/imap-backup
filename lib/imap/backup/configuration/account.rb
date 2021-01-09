@@ -56,9 +56,11 @@ module Imap::Backup
           )
         else
           account[:username] = username
+          # rubocop:disable Style/IfUnlessModifier
           if account[:server].nil? || (account[:server] == "")
             account[:server] = default_server(username)
           end
+          # rubocop:enable Style/IfUnlessModifier
           account[:modified] = true
         end
       end
@@ -68,7 +70,7 @@ module Imap::Backup
       menu.choice("modify password") do
         password =
           if account[:server] == Email::Provider::GMAIL_IMAP_SERVER
-            Configuration::GMailOAuth2.new(account).run
+            Configuration::GmailOauth2.new(account).run
           else
             Configuration::Asker.password
           end

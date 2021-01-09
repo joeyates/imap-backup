@@ -1,9 +1,9 @@
 require "googleauth"
 require "google/auth/stores/in_memory_token_store"
 
-module GMail; end
+module Gmail; end
 
-class GMail::Authenticator
+class Gmail::Authenticator
   class MalformedImapBackupToken < StandardError; end
 
   class ImapBackupToken
@@ -69,13 +69,13 @@ class GMail::Authenticator
     end
   end
 
-  GMAIL_READ_SCOPE = "https://mail.google.com/"
-  OOB_URI = "urn:ietf:wg:oauth:2.0:oob"
+  GMAIL_READ_SCOPE = "https://mail.google.com/".freeze
+  OOB_URI = "urn:ietf:wg:oauth:2.0:oob".freeze
 
   attr_reader :email
   attr_reader :token
 
-  def self.is_refresh_token?(text)
+  def self.refresh_token?(text)
     ImapBackupToken.new(text).valid?
   end
 
@@ -153,7 +153,7 @@ class GMail::Authenticator
 
   def token_store
     @token_store ||=
-      Google::Auth::Stores::InMemoryTokenStore.new().tap do |t|
+      Google::Auth::Stores::InMemoryTokenStore.new.tap do |t|
         t.store(email, store_token)
       end
   end

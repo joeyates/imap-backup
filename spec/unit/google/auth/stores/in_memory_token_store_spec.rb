@@ -1,10 +1,10 @@
 require "google/auth/stores/in_memory_token_store"
 
 describe Google::Auth::Stores::InMemoryTokenStore do
-  KEY = "key"
-  VALUE = "value"
+  KEY = "key".freeze
+  VALUE = "value".freeze
 
-  subject { described_class.new() }
+  subject { described_class.new }
 
   describe "#load" do
     it "returns an item's value" do

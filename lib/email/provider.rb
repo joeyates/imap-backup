@@ -1,7 +1,7 @@
 module Email; end
 
 class Email::Provider
-  GMAIL_IMAP_SERVER = "imap.gmail.com"
+  GMAIL_IMAP_SERVER = "imap.gmail.com".freeze
 
   def self.for_address(address)
     case

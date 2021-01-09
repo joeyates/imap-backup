@@ -77,9 +77,7 @@ module Imap::Backup
         folders: []
       }.tap do |c|
         server = Email::Provider.for_address(username)
-        if server.host
-          c[:server] = server.host
-        end
+        c[:server] = server.host if server.host
       end
     end
 
