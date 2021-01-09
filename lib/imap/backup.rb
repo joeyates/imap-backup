@@ -7,6 +7,7 @@ require "imap/backup/configuration/account"
 require "imap/backup/configuration/asker"
 require "imap/backup/configuration/connection_tester"
 require "imap/backup/configuration/folder_chooser"
+require "imap/backup/configuration/gmail_oauth2"
 require "imap/backup/configuration/list"
 require "imap/backup/configuration/setup"
 require "imap/backup/configuration/store"
@@ -28,7 +29,7 @@ module Imap::Backup
     attr_reader :logger
 
     def initialize
-      @logger = ::Logger.new(STDOUT)
+      @logger = ::Logger.new($stdout)
     end
   end
 

@@ -38,7 +38,7 @@ RSpec.describe "backup", type: :feature, docker: true do
     end
 
     it "saves a file version" do
-      expect(imap_metadata[:version].to_s).to match(/^[0-9\.]$/)
+      expect(imap_metadata[:version].to_s).to match(/^[0-9.]$/)
     end
 
     it "records IMAP ids" do

@@ -48,9 +48,12 @@ parser.parse!
 
 options[:command] = ARGV.shift if !ARGV.empty?
 
+# rubocop:disable Style/IfUnlessModifier
 if KNOWN_COMMANDS.find { |c| c[:name] == options[:command] }.nil?
   raise "Unknown command '#{options[:command]}'"
 end
+
+# rubocop:enable Style/IfUnlessModifier
 
 if options[:command] == "help"
   puts parser

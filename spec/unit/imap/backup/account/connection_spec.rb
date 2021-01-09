@@ -1,50 +1,53 @@
-describe Imap::Backup::Account::Connection do
-  def self.backup_folder
-    "backup_folder"
-  end
+require "ostruct"
 
-  def self.folder_config
-    {name: backup_folder}
-  end
+describe Imap::Backup::Account::Connection do
+  BACKUP_FOLDER = "backup_folder".freeze
+  FOLDER_CONFIG = {name: BACKUP_FOLDER}.freeze
+  FOLDER_NAME = "my_folder".freeze
+  GMAIL_IMAP_SERVER = "imap.gmail.com".freeze
+  LOCAL_PATH = "local_path".freeze
+  LOCAL_UID = "local_uid".freeze
+  PASSWORD = "secret".freeze
+  ROOT_NAME = "foo".freeze
+  SERVER = "imap.example.com".freeze
+  USERNAME = "username@example.com".freeze
 
   subject { described_class.new(options) }
 
   let(:imap) do
-    instance_double(Net::IMAP, login: nil, disconnect: nil)
+    instance_double(Net::IMAP, authenticate: nil, login: nil, disconnect: nil)
   end
   let(:imap_folders) { [] }
   let(:options) do
     {
-      username: username,
-      password: "password",
-      local_path: local_path,
-      folders: backup_folders
+      username: USERNAME,
+      password: PASSWORD,
+      local_path: LOCAL_PATH,
+      folders: backup_folders,
+      server: server
     }
   end
-  let(:local_path) { "local_path" }
-  let(:backup_folders) { [self.class.folder_config] }
-  let(:username) { "username@gmail.com" }
+  let(:backup_folders) { [FOLDER_CONFIG] }
   let(:root_info) do
-    instance_double(Net::IMAP::MailboxList, name: root_name)
+    instance_double(Net::IMAP::MailboxList, name: ROOT_NAME)
   end
-  let(:root_name) { "foo" }
   let(:serializer) do
     instance_double(
       Imap::Backup::Serializer::Mbox,
       folder: serialized_folder,
       force_uid_validity: nil,
       apply_uid_validity: new_uid_validity,
-      uids: [local_uid]
+      uids: [LOCAL_UID]
     )
   end
   let(:serialized_folder) { nil }
+  let(:server) { SERVER }
   let(:new_uid_validity) { nil }
-  let(:local_uid) { "local_uid" }
 
   before do
     allow(Net::IMAP).to receive(:new) { imap }
     allow(imap).to receive(:list).with("", "") { [root_info] }
-    allow(imap).to receive(:list).with(root_name, "*") { imap_folders }
+    allow(imap).to receive(:list).with(ROOT_NAME, "*") { imap_folders }
     allow(Imap::Backup::Utils).to receive(:make_folder)
   end
 
@@ -56,12 +59,14 @@ describe Imap::Backup::Account::Connection do
 
   describe "#initialize" do
     [
-      [:username, "username@gmail.com"],
-      [:local_path, "local_path"],
-      [:backup_folders, [folder_config]]
+      [:username, USERNAME],
+      [:password, PASSWORD],
+      [:local_path, LOCAL_PATH],
+      [:backup_folders, [FOLDER_CONFIG]],
+      [:server, SERVER]
     ].each do |attr, expected|
       it "expects #{attr}" do
-        expect(subject.send(attr)).to eq(expected)
+        expect(subject.public_send(attr)).to eq(expected)
       end
     end
 
@@ -77,6 +82,61 @@ describe Imap::Backup::Account::Connection do
 
     it "returns the IMAP connection" do
       expect(result).to eq(imap)
+    end
+
+    it "uses the password" do
+      expect(imap).to have_received(:login).with(USERNAME, PASSWORD)
+    end
+
+    context "with the GMail IMAP server" do
+      ACCESS_TOKEN = "access_token".freeze
+
+      let(:server) { GMAIL_IMAP_SERVER }
+      let(:refresh_token) { true }
+      let(:result) { nil }
+      let(:authenticator) do
+        instance_double(
+          Gmail::Authenticator,
+          credentials: credentials
+        )
+      end
+      let(:credentials) { OpenStruct.new(access_token: ACCESS_TOKEN) }
+
+      before do
+        allow(Gmail::Authenticator).
+          to receive(:refresh_token?) { refresh_token }
+        allow(Gmail::Authenticator).
+          to receive(:new).
+            with(email: USERNAME, token: PASSWORD) { authenticator }
+      end
+
+      context "when the password is our copy of a GMail refresh token" do
+        it "uses the OAuth2 access_token to authenticate" do
+          subject.imap
+
+          expect(imap).to have_received(:authenticate).with(
+            "XOAUTH2", USERNAME, ACCESS_TOKEN
+          )
+        end
+
+        context "when the refresh token is invalid" do
+          let(:credentials) { nil }
+
+          it "raises" do
+            expect { subject.imap }.to raise_error(String)
+          end
+        end
+      end
+
+      context "when the password is not our copy of a GMail refresh token" do
+        let(:refresh_token) { false }
+
+        it "uses the password" do
+          subject.imap
+
+          expect(imap).to have_received(:login).with(USERNAME, PASSWORD)
+        end
+      end
     end
 
     include_examples "connects to IMAP"
@@ -104,11 +164,11 @@ describe Imap::Backup::Account::Connection do
     end
 
     it "returns the names of folders" do
-      expect(subject.status[0][:name]).to eq(self.class.backup_folder)
+      expect(subject.status[0][:name]).to eq(BACKUP_FOLDER)
     end
 
     it "returns local message uids" do
-      expect(subject.status[0][:local]).to eq([local_uid])
+      expect(subject.status[0][:local]).to eq([LOCAL_UID])
     end
 
     it "retrieves the available uids" do
@@ -132,16 +192,13 @@ describe Imap::Backup::Account::Connection do
     before do
       allow(Imap::Backup::Downloader).
         to receive(:new).with(folder, serializer) { downloader }
+      allow(Imap::Backup::Account::Folder).to receive(:new).
+        with(subject, BACKUP_FOLDER) { folder }
+      allow(Imap::Backup::Serializer::Mbox).to receive(:new).
+        with(LOCAL_PATH, BACKUP_FOLDER) { serializer }
     end
 
     context "with supplied backup_folders" do
-      before do
-        allow(Imap::Backup::Account::Folder).to receive(:new).
-          with(subject, self.class.backup_folder) { folder }
-        allow(Imap::Backup::Serializer::Mbox).to receive(:new).
-          with(local_path, self.class.backup_folder) { serializer }
-      end
-
       it "runs the downloader" do
         expect(downloader).to receive(:run)
 
@@ -161,14 +218,14 @@ describe Imap::Backup::Account::Connection do
 
     context "without supplied backup_folders" do
       let(:imap_folders) do
-        [instance_double(Net::IMAP::MailboxList, name: "foo")]
+        [instance_double(Net::IMAP::MailboxList, name: ROOT_NAME)]
       end
 
       before do
         allow(Imap::Backup::Account::Folder).to receive(:new).
-          with(subject, "foo") { folder }
+          with(subject, ROOT_NAME) { folder }
         allow(Imap::Backup::Serializer::Mbox).to receive(:new).
-          with(local_path, "foo") { serializer }
+          with(LOCAL_PATH, ROOT_NAME) { serializer }
       end
 
       context "when supplied backup_folders is nil" do
@@ -200,6 +257,12 @@ describe Imap::Backup::Account::Connection do
         end
       end
     end
+
+    context "when run" do
+      before { subject.run_backup }
+
+      include_examples "connects to IMAP"
+    end
   end
 
   describe "#restore" do
@@ -208,7 +271,7 @@ describe Imap::Backup::Account::Connection do
         Imap::Backup::Account::Folder,
         create: nil,
         uids: uids,
-        name: "my_folder",
+        name: FOLDER_NAME,
         uid_validity: uid_validity
       )
     end
@@ -236,9 +299,9 @@ describe Imap::Backup::Account::Connection do
 
     before do
       allow(Imap::Backup::Account::Folder).to receive(:new).
-        with(subject, "my_folder") { folder }
+        with(subject, FOLDER_NAME) { folder }
       allow(Imap::Backup::Serializer::Mbox).to receive(:new).
-        with(anything, "my_folder") { serializer }
+        with(anything, FOLDER_NAME) { serializer }
       allow(Imap::Backup::Account::Folder).to receive(:new).
         with(subject, "new name") { updated_folder }
       allow(Imap::Backup::Serializer::Mbox).to receive(:new).
@@ -248,7 +311,7 @@ describe Imap::Backup::Account::Connection do
       allow(Imap::Backup::Uploader).to receive(:new).
         with(updated_folder, updated_serializer) { updated_uploader }
       allow(Pathname).to receive(:glob).
-        and_yield(Pathname.new(File.join(local_path, "my_folder.imap")))
+        and_yield(Pathname.new(File.join(LOCAL_PATH, "#{FOLDER_NAME}.imap")))
     end
 
     it "sets local uid validity" do

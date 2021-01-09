@@ -1,13 +1,16 @@
-# rubocop:disable RSpec/NestedGroups
-
 describe Imap::Backup::Configuration::Account do
+  ACCOUNT = "account".freeze
+  GMAIL_IMAP_SERVER = "imap.gmail.com".freeze
+  HIGHLINE = "highline".freeze
+  STORE = "store".freeze
+
+  subject { described_class.new(store, account, highline) }
+
+  let(:account) { ACCOUNT }
+  let(:highline) { HIGHLINE }
+  let(:store) { STORE }
+
   describe "#initialize" do
-    subject { described_class.new(store, account, highline) }
-
-    let(:store) { "store" }
-    let(:account) { "account" }
-    let(:highline) { "highline" }
-
     [:store, :account, :highline].each do |param|
       it "expects #{param}" do
         expect(subject.send(param)).to eq(send(param))
@@ -16,8 +19,6 @@ describe Imap::Backup::Configuration::Account do
   end
 
   describe "#run" do
-    subject { described_class.new(store, account, highline) }
-
     let(:highline_menu_class) do
       Class.new do
         attr_reader :choices
@@ -46,7 +47,7 @@ describe Imap::Backup::Configuration::Account do
     let(:account) do
       {
         username: existing_email,
-        server: existing_server,
+        server: current_server,
         local_path: "/backup/path",
         folders: [{name: "my_folder"}],
         password: existing_password
@@ -60,7 +61,7 @@ describe Imap::Backup::Configuration::Account do
     end
     let(:existing_email) { "user@example.com" }
     let(:new_email) { "foo@example.com" }
-    let(:existing_server) { "imap.example.com" }
+    let(:current_server) { "imap.example.com" }
     let(:existing_password) { "password" }
     let(:other_email) { "other@example.com" }
     let(:other_existing_path) { "/other/existing/path" }
@@ -136,7 +137,7 @@ describe Imap::Backup::Configuration::Account do
       end
     end
 
-    describe "email" do
+    describe "choosing 'modify email'" do
       before do
         allow(Imap::Backup::Configuration::Asker).
           to receive(:email) { new_email }
@@ -146,7 +147,7 @@ describe Imap::Backup::Configuration::Account do
 
       context "when the server is blank" do
         [
-          ["GMail", "foo@gmail.com", "imap.gmail.com"],
+          ["GMail", "foo@gmail.com", GMAIL_IMAP_SERVER],
           ["Fastmail", "bar@fastmail.fm", "imap.fastmail.com"],
           ["Fastmail", "bar@fastmail.com", "imap.fastmail.com"]
         ].each do |service, email, expected|
@@ -154,7 +155,7 @@ describe Imap::Backup::Configuration::Account do
             let(:new_email) { email }
 
             context "with nil" do
-              let(:existing_server) { nil }
+              let(:current_server) { nil }
 
               it "sets a default server" do
                 expect(account[:server]).to eq(expected)
@@ -162,7 +163,7 @@ describe Imap::Backup::Configuration::Account do
             end
 
             context "with an empty string" do
-              let(:existing_server) { "" }
+              let(:current_server) { "" }
 
               it "sets a default server" do
                 expect(account[:server]).to eq(expected)
@@ -172,7 +173,7 @@ describe Imap::Backup::Configuration::Account do
         end
 
         context "when the domain is unrecognized" do
-          let(:existing_server) { nil }
+          let(:current_server) { nil }
           let(:provider) do
             instance_double(Email::Provider, provider: :default)
           end
@@ -211,12 +212,18 @@ describe Imap::Backup::Configuration::Account do
       end
     end
 
-    describe "password" do
+    describe "choosing 'modify password'" do
       let(:new_password) { "new_password" }
+      let(:gmail_oauth2) do
+        instance_double(Imap::Backup::Configuration::GmailOauth2, run: nil)
+      end
 
       before do
         allow(Imap::Backup::Configuration::Asker).
           to receive(:password) { new_password }
+        allow(Imap::Backup::Configuration::GmailOauth2).
+          to receive(:new).
+            with(account) { gmail_oauth2 }
         subject.run
         menu.choices["modify password"].call
       end
@@ -238,9 +245,17 @@ describe Imap::Backup::Configuration::Account do
 
         include_examples "it doesn't flag the account as modified"
       end
+
+      context "when the server is for GMail" do
+        let(:current_server) { GMAIL_IMAP_SERVER }
+
+        it "sets up GMail OAuth2" do
+          expect(gmail_oauth2).to have_received(:run)
+        end
+      end
     end
 
-    describe "server" do
+    describe "choosing 'modify server'" do
       let(:server) { "server" }
 
       before do
@@ -258,7 +273,7 @@ describe Imap::Backup::Configuration::Account do
       include_examples "it flags the account as modified"
     end
 
-    describe "backup_path" do
+    describe "choosing 'modify backup path'" do
       let(:new_backup_path) { "/new/path" }
 
       before do
@@ -296,7 +311,7 @@ describe Imap::Backup::Configuration::Account do
       include_examples "it flags the account as modified"
     end
 
-    describe "folders" do
+    describe "choosing 'choose backup folders'" do
       let(:chooser) do
         instance_double(Imap::Backup::Configuration::FolderChooser, run: nil)
       end
@@ -313,7 +328,7 @@ describe Imap::Backup::Configuration::Account do
       end
     end
 
-    describe "connection test" do
+    describe "choosing 'test connection'" do
       before do
         allow(Imap::Backup::Configuration::ConnectionTester).
           to receive(:test) { "All fine" }
@@ -328,7 +343,7 @@ describe Imap::Backup::Configuration::Account do
       end
     end
 
-    describe "deletion" do
+    describe "choosing 'delete'" do
       let(:confirmed) { true }
 
       before do
@@ -355,5 +370,3 @@ describe Imap::Backup::Configuration::Account do
     end
   end
 end
-
-# rubocop:enable RSpec/NestedGroups

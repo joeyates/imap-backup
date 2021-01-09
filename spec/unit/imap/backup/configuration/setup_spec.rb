@@ -1,7 +1,27 @@
-# rubocop:disable RSpec/NestedGroups
-
 describe Imap::Backup::Configuration::Setup do
   include HighLineTestHelpers
+
+  subject { described_class.new }
+
+  let(:normal) { {username: "account@example.com"} }
+  let(:accounts) { [normal] }
+  let(:store) do
+    instance_double(
+      Imap::Backup::Configuration::Store,
+      "accounts": accounts,
+      "path": "/base/path",
+      "save": nil,
+      "debug?": debug,
+      "debug=": nil,
+      "modified?": modified
+    )
+  end
+  let(:debug) { false }
+  let(:modified) { false }
+  let!(:highline_streams) { prepare_highline }
+  let(:input) { highline_streams[0] }
+  let(:output) { highline_streams[1] }
+  let(:gmail_imap_server) { "imap.gmail.com" }
 
   describe "#initialize" do
     context "without a config file" do
@@ -12,27 +32,6 @@ describe Imap::Backup::Configuration::Setup do
   end
 
   describe "#run" do
-    subject { described_class.new }
-
-    let(:normal) { {username: "account@example.com"} }
-    let(:accounts) { [normal] }
-    let(:store) do
-      instance_double(
-        Imap::Backup::Configuration::Store,
-        "accounts": accounts,
-        "path": "/base/path",
-        "save": nil,
-        "debug?": debug,
-        "debug=": nil,
-        "modified?": modified
-      )
-    end
-    let(:debug) { false }
-    let(:modified) { false }
-    let!(:highline_streams) { prepare_highline }
-    let(:input) { highline_streams[0] }
-    let(:output) { highline_streams[1] }
-
     before do
       allow(Imap::Backup::Configuration::Store).to receive(:new) { store }
       allow(Imap::Backup).to receive(:setup_logging)
@@ -112,28 +111,51 @@ describe Imap::Backup::Configuration::Setup do
     context "when adding accounts" do
       let(:blank_account) do
         {
-          username: "new@example.com",
+          username: added_email,
           password: "",
-          local_path: "/base/path/new_example.com",
+          local_path: local_path,
           folders: []
         }
       end
       let(:account) do
         instance_double(Imap::Backup::Configuration::Account, run: nil)
       end
+      let(:added_email) { "new@example.com" }
+      let(:local_path) { "/base/path/new_example.com" }
 
       before do
         allow(input).to receive(:gets).and_return("add\n", "exit\n")
         allow(Imap::Backup::Configuration::Asker).to receive(:email).
-          with(no_args) { "new@example.com" }
+          with(no_args) { added_email }
         allow(Imap::Backup::Configuration::Account).to receive(:new).
-          with(store, blank_account, anything) { account }
+          with(store, anything, anything) { account }
 
         subject.run
       end
 
-      it "adds account data" do
-        expect(accounts[1]).to eq(blank_account)
+      it "sets username" do
+        expect(accounts[1][:username]).to eq(added_email)
+      end
+
+      it "sets blank password" do
+        expect(accounts[1][:password]).to eq("")
+      end
+
+      it "sets local_path" do
+        expect(accounts[1][:local_path]).to eq(local_path)
+      end
+
+      it "sets folders" do
+        expect(accounts[1][:folders]).to eq([])
+      end
+
+      context "when the account is a GMail account" do
+        let(:added_email) { "new@gmail.com" }
+        let(:local_path) { "/base/path/new_gmail.com" }
+
+        it "sets the server" do
+          expect(accounts[1][:server]).to eq(gmail_imap_server)
+        end
       end
 
       it "doesn't flag the unedited account as modified" do
@@ -248,5 +270,3 @@ describe Imap::Backup::Configuration::Setup do
     end
   end
 end
-
-# rubocop:enable RSpec/NestedGroups

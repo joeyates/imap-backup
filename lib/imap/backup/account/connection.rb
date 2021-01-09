@@ -1,9 +1,14 @@
 require "net/imap"
+require "gmail_xoauth"
+
+require "gmail/authenticator"
 
 module Imap::Backup
   module Account; end
 
   class Account::Connection
+    class InvalidGmailOauth2RefreshToken < StandardError; end
+
     attr_reader :connection_options
     attr_reader :local_path
     attr_reader :password
@@ -78,10 +83,32 @@ module Imap::Backup
         "Creating IMAP instance: #{server}, options: #{options.inspect}"
       )
       @imap = Net::IMAP.new(server, options)
-      Imap::Backup.logger.debug "Logging in: #{username}/#{masked_password}"
-      @imap.login(username, password)
+      if gmail? && Gmail::Authenticator.refresh_token?(password)
+        authenticator = Gmail::Authenticator.new(email: username, token: password)
+        credentials = authenticator.credentials
+        raise InvalidGmailOauth2RefreshToken if !credentials
+
+        Imap::Backup.logger.debug "Logging in with OAuth2 token: #{username}"
+        @imap.authenticate("XOAUTH2", username, credentials.access_token)
+      else
+        Imap::Backup.logger.debug "Logging in: #{username}/#{masked_password}"
+        @imap.login(username, password)
+      end
       Imap::Backup.logger.debug "Login complete"
       @imap
+    end
+
+    def server
+      return @server if @server
+      return nil if provider.nil?
+
+      @server = provider.host
+    end
+
+    def backup_folders
+      return @backup_folders if @backup_folders && !@backup_folders.empty?
+
+      (folders || []).map { |f| {name: f.name} }
     end
 
     private
@@ -133,10 +160,8 @@ module Imap::Backup
       password.gsub(/./, "x")
     end
 
-    def backup_folders
-      return @backup_folders if @backup_folders && !@backup_folders.empty?
-
-      (folders || []).map { |f| {name: f.name} }
+    def gmail?
+      server == Email::Provider::GMAIL_IMAP_SERVER
     end
 
     def local_folders
@@ -152,13 +177,6 @@ module Imap::Backup
 
     def provider
       @provider ||= Email::Provider.for_address(username)
-    end
-
-    def server
-      return @server if @server
-      return nil if provider.nil?
-
-      @server = provider.host
     end
 
     def provider_options
