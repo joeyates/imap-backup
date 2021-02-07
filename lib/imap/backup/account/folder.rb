@@ -90,8 +90,8 @@ module Imap::Backup
     def examine
       imap.examine(name)
     rescue Net::IMAP::NoResponseError
-      Imap::Backup.logger.warn "Folder '#{name}' does not exist"
-      raise FolderNotFound, "Folder '#{name}' does not exist"
+      Imap::Backup.logger.warn "Folder '#{name}' does not exist on server"
+      raise FolderNotFound, "Folder '#{name}' does not exist on server"
     end
 
     def extract_uid(response)
