@@ -77,13 +77,15 @@ describe Imap::Backup::Account::Connection do
   end
 
   describe "#imap" do
-    let!(:result) { subject.imap }
+    let(:result) { subject.imap }
 
     it "returns the IMAP connection" do
       expect(result).to eq(imap)
     end
 
     it "uses the password" do
+      result
+
       expect(imap).to have_received(:login).with(USERNAME, PASSWORD)
     end
 
@@ -138,7 +140,24 @@ describe Imap::Backup::Account::Connection do
       end
     end
 
-    include_examples "connects to IMAP"
+    context "when the first login attempt fails" do
+      before do
+        outcomes = [-> { raise EOFError }, -> { true }]
+        allow(imap).to receive(:login) { outcomes.shift.call }
+      end
+
+      it "retries" do
+        subject.imap
+
+        expect(imap).to have_received(:login).twice
+      end
+    end
+
+    context "when run" do
+      before { subject.imap }
+
+      include_examples "connects to IMAP"
+    end
   end
 
   describe "#folders" do

@@ -51,18 +51,18 @@ module Imap::Backup
     private
 
     def data
-      return @data if @data
-
-      if File.exist?(pathname)
-        Utils.check_permissions pathname, 0o600
-        contents = File.read(pathname)
-        @data = JSON.parse(contents, symbolize_names: true)
-      else
-        @data = {accounts: []}
-      end
-      @data[:debug] = false unless @data.include?(:debug)
-      @data[:debug] = false unless [true, false].include?(@data[:debug])
-      @data
+      @data ||=
+        begin
+          if File.exist?(pathname)
+            Utils.check_permissions pathname, 0o600
+            contents = File.read(pathname)
+            data = JSON.parse(contents, symbolize_names: true)
+          else
+            data = {accounts: []}
+          end
+          data[:debug] = data.key?(:debug) ? data[:debug] == true : false
+          data
+        end
     end
 
     def remove_modified_flags

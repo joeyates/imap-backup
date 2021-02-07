@@ -2,12 +2,17 @@ require "net/imap"
 require "gmail_xoauth"
 
 require "gmail/authenticator"
+require "retry_on_error"
 
 module Imap::Backup
   module Account; end
 
   class Account::Connection
     class InvalidGmailOauth2RefreshToken < StandardError; end
+
+    include RetryOnError
+
+    LOGIN_RETRY_CLASSES = [EOFError, Errno::ECONNRESET, SocketError].freeze
 
     attr_reader :connection_options
     attr_reader :local_path
@@ -79,26 +84,27 @@ module Imap::Backup
     end
 
     def imap
-      return @imap unless @imap.nil?
+      @imap ||=
+        retry_on_error(errors: LOGIN_RETRY_CLASSES) do
+          options = provider_options
+          Imap::Backup.logger.debug(
+            "Creating IMAP instance: #{server}, options: #{options.inspect}"
+          )
+          imap = Net::IMAP.new(server, options)
+          if gmail? && Gmail::Authenticator.refresh_token?(password)
+            authenticator = Gmail::Authenticator.new(email: username, token: password)
+            credentials = authenticator.credentials
+            raise InvalidGmailOauth2RefreshToken if !credentials
 
-      options = provider_options
-      Imap::Backup.logger.debug(
-        "Creating IMAP instance: #{server}, options: #{options.inspect}"
-      )
-      @imap = Net::IMAP.new(server, options)
-      if gmail? && Gmail::Authenticator.refresh_token?(password)
-        authenticator = Gmail::Authenticator.new(email: username, token: password)
-        credentials = authenticator.credentials
-        raise InvalidGmailOauth2RefreshToken if !credentials
-
-        Imap::Backup.logger.debug "Logging in with OAuth2 token: #{username}"
-        @imap.authenticate("XOAUTH2", username, credentials.access_token)
-      else
-        Imap::Backup.logger.debug "Logging in: #{username}/#{masked_password}"
-        @imap.login(username, password)
-      end
-      Imap::Backup.logger.debug "Login complete"
-      @imap
+            Imap::Backup.logger.debug "Logging in with OAuth2 token: #{username}"
+            imap.authenticate("XOAUTH2", username, credentials.access_token)
+          else
+            Imap::Backup.logger.debug "Logging in: #{username}/#{masked_password}"
+            imap.login(username, password)
+          end
+          Imap::Backup.logger.debug "Login complete"
+          imap
+        end
     end
 
     def server
@@ -175,7 +181,7 @@ module Imap::Backup
     def backup_folders
       @backup_folders ||=
         begin
-          if @config_folders && @config_folders.any?
+          if @config_folders&.any?
             @config_folders
           else
             folders.map { |name| {name: name} }
