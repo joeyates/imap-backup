@@ -1,5 +1,7 @@
 require "forwardable"
 
+require "retry_on_error"
+
 module Imap::Backup
   module Account; end
 
@@ -7,8 +9,10 @@ module Imap::Backup
 
   class Account::Folder
     extend Forwardable
+    include RetryOnError
 
     REQUESTED_ATTRIBUTES = %w[RFC822 FLAGS INTERNALDATE].freeze
+    UID_FETCH_RETRY_CLASSES = [EOFError].freeze
 
     attr_reader :connection
     attr_reader :name
@@ -66,7 +70,10 @@ module Imap::Backup
 
     def fetch(uid)
       examine
-      fetch_data_items = imap.uid_fetch([uid.to_i], REQUESTED_ATTRIBUTES)
+      fetch_data_items =
+        retry_on_error(errors: UID_FETCH_RETRY_CLASSES) do
+          imap.uid_fetch([uid.to_i], REQUESTED_ATTRIBUTES)
+        end
       return nil if fetch_data_items.nil?
 
       fetch_data_item = fetch_data_items[0]

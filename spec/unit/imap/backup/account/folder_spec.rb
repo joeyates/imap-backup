@@ -103,6 +103,23 @@ describe Imap::Backup::Account::Folder do
         expect(subject.fetch(123)).to be_nil
       end
     end
+
+    context "when the first fetch_uid attempts fail" do
+      before do
+        outcomes = [-> { raise EOFError }, -> { [fetch_data_item] }]
+        allow(imap).to receive(:uid_fetch) { outcomes.shift.call }
+      end
+
+      it "retries" do
+        subject.fetch(123)
+
+        expect(imap).to have_received(:uid_fetch).twice
+      end
+
+      it "succeeds" do
+        subject.fetch(123)
+      end
+    end
   end
 
   describe "#folder" do
