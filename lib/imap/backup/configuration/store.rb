@@ -60,8 +60,7 @@ module Imap::Backup
           else
             data = {accounts: []}
           end
-          data[:debug] = false unless data.include?(:debug)
-          data[:debug] = false unless [true, false].include?(data[:debug])
+          data[:debug] = data.key?(:debug) ? data[:debug] == true : false
           data
         end
     end
