@@ -143,11 +143,21 @@ describe Imap::Backup::Account::Connection do
 
   describe "#folders" do
     let(:imap_folders) do
-      [instance_double(Net::IMAP::MailboxList)]
+      [instance_double(Net::IMAP::MailboxList, name: BACKUP_FOLDER)]
     end
 
     it "returns the list of folders" do
-      expect(subject.folders).to eq(imap_folders)
+      expect(subject.folders).to eq([BACKUP_FOLDER])
+    end
+
+    context "with non-ASCII folder names" do
+      let(:imap_folders) do
+        [instance_double(Net::IMAP::MailboxList, name: "Gel&APY-scht")]
+      end
+
+      it "converts them to UTF-8" do
+        expect(subject.folders).to eq(["Gelöscht"])
+      end
     end
   end
 

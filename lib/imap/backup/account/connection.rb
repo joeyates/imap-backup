@@ -29,13 +29,16 @@ module Imap::Backup
       @folders ||=
         begin
           root = provider_root
-          folders = imap.list(root, "*")
-          if folders.nil?
+          mailbox_lists = imap.list(root, "*")
+
+          if mailbox_lists.nil?
             message = "Unable to get folder list for account #{username}"
             Imap::Backup.logger.info message
             raise message
           end
-          folders
+
+          utf7_encoded = mailbox_lists.map(&:name)
+          utf7_encoded.map { |n| Net::IMAP.decode_utf7(n) }
         end
     end
 
