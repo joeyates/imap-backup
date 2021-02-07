@@ -79,7 +79,7 @@ module Imap::Backup
     end
 
     def imap
-      return @imap unless @imap.nil?
+      return @imap if !@imap.nil?
 
       options = provider_options
       Imap::Backup.logger.debug(

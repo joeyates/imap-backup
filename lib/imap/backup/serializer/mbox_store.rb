@@ -161,7 +161,7 @@ module Imap::Backup
     def load_nth(index)
       enumerator = Serializer::MboxEnumerator.new(mbox_pathname)
       enumerator.each.with_index do |raw, i|
-        next unless i == index
+        next if i != index
 
         return Email::Mboxrd::Message.from_serialized(raw)
       end
@@ -169,7 +169,7 @@ module Imap::Backup
     end
 
     def imap_looks_like_json?
-      return false unless imap_exist?
+      return false if !imap_exist?
 
       content = File.read(imap_pathname)
       content.start_with?("{")
