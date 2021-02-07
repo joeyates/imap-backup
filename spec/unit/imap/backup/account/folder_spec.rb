@@ -1,7 +1,10 @@
 # rubocop:disable RSpec/PredicateMatcher
 
 describe Imap::Backup::Account::Folder do
-  subject { described_class.new(connection, "my_folder") }
+  FOLDER_NAME = "Gelöscht"
+  ENCODED_FOLDER_NAME = "Gel&APY-scht"
+
+  subject { described_class.new(connection, FOLDER_NAME) }
 
   let(:imap) do
     instance_double(
@@ -16,7 +19,7 @@ describe Imap::Backup::Account::Folder do
     instance_double(Imap::Backup::Account::Connection, imap: imap)
   end
   let(:missing_mailbox_data) do
-    OpenStruct.new(text: "Unknown Mailbox: my_folder")
+    OpenStruct.new(text: "Unknown Mailbox: #{FOLDER_NAME}")
   end
   let(:missing_mailbox_response) { OpenStruct.new(data: missing_mailbox_data) }
   let(:missing_mailbox_error) do
@@ -36,7 +39,8 @@ describe Imap::Backup::Account::Folder do
 
     context "with missing mailboxes" do
       before do
-        allow(imap).to receive(:examine).and_raise(missing_mailbox_error)
+        allow(imap).to receive(:examine).
+          with(ENCODED_FOLDER_NAME).and_raise(missing_mailbox_error)
       end
 
       it "returns an empty array" do
@@ -50,7 +54,8 @@ describe Imap::Backup::Account::Folder do
       end
 
       before do
-        allow(imap).to receive(:examine).and_raise(no_method_error)
+        allow(imap).to receive(:examine).
+          with(ENCODED_FOLDER_NAME).and_raise(missing_mailbox_error)
       end
 
       it "returns an empty array" do
@@ -82,7 +87,8 @@ describe Imap::Backup::Account::Folder do
 
     context "when the mailbox doesn't exist" do
       before do
-        allow(imap).to receive(:examine).and_raise(missing_mailbox_error)
+        allow(imap).to receive(:examine).
+          with(ENCODED_FOLDER_NAME).and_raise(missing_mailbox_error)
       end
 
       it "is nil" do
@@ -101,7 +107,7 @@ describe Imap::Backup::Account::Folder do
 
   describe "#folder" do
     it "is the name" do
-      expect(subject.folder).to eq("my_folder")
+      expect(subject.folder).to eq(FOLDER_NAME)
     end
   end
 
@@ -114,7 +120,8 @@ describe Imap::Backup::Account::Folder do
 
     context "when the folder doesn't exist" do
       before do
-        allow(imap).to receive(:examine).and_raise(missing_mailbox_error)
+        allow(imap).to receive(:examine).
+          with(ENCODED_FOLDER_NAME).and_raise(missing_mailbox_error)
       end
 
       it "is false" do
@@ -134,11 +141,18 @@ describe Imap::Backup::Account::Folder do
 
     context "when the folder doesn't exist" do
       before do
-        allow(imap).to receive(:examine).and_raise(missing_mailbox_error)
+        allow(imap).to receive(:examine).
+          with(ENCODED_FOLDER_NAME).and_raise(missing_mailbox_error)
       end
 
-      it "is does not create the folder" do
+      it "creates the folder" do
         expect(imap).to receive(:create)
+
+        subject.create
+      end
+
+      it "encodes the folder name" do
+        expect(imap).to receive(:create).with(ENCODED_FOLDER_NAME)
 
         subject.create
       end
@@ -154,7 +168,8 @@ describe Imap::Backup::Account::Folder do
 
     context "when the folder doesn't exist" do
       before do
-        allow(imap).to receive(:examine).and_raise(missing_mailbox_error)
+        allow(imap).to receive(:examine).
+          with(ENCODED_FOLDER_NAME).and_raise(missing_mailbox_error)
       end
 
       it "raises an error" do

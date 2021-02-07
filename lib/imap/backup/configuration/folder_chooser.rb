@@ -15,7 +15,7 @@ module Imap::Backup
         return
       end
 
-      if folders.nil?
+      if imap_folders.nil?
         Imap::Backup.logger.warn "Unable to get folder list"
         highline.ask "Press a key "
         return
@@ -44,29 +44,28 @@ module Imap::Backup
     end
 
     def add_folders(menu)
-      folders.each do |folder|
-        name = folder.name
-        mark = selected?(name) ? "+" : "-"
-        menu.choice("#{mark} #{name}") do
-          toggle_selection name
+      imap_folders.each do |folder|
+        mark = selected?(folder) ? "+" : "-"
+        menu.choice("#{mark} #{folder}") do
+          toggle_selection folder
         end
       end
     end
 
     def selected?(folder_name)
-      backup_folders = account[:folders]
-      return false if backup_folders.nil?
+      config_folders = account[:folders]
+      return false if config_folders.nil?
 
-      backup_folders.find { |f| f[:name] == folder_name }
+      config_folders.find { |f| f[:name] == folder_name }
     end
 
     def remove_missing
       removed = []
-      backup_folders = []
+      config_folders = []
       account[:folders].each do |f|
-        found = folders.find { |folder| folder.name == f[:name] }
+        found = imap_folders.find { |folder| folder == f[:name] }
         if found
-          backup_folders << f
+          config_folders << f
         else
           removed << f[:name]
         end
@@ -74,7 +73,7 @@ module Imap::Backup
 
       return if removed.empty?
 
-      account[:folders] = backup_folders
+      account[:folders] = config_folders
       account[:modified] = true
 
       Kernel.puts <<~MESSAGE
@@ -101,8 +100,8 @@ module Imap::Backup
       nil
     end
 
-    def folders
-      @folders ||= connection.folders
+    def imap_folders
+      @imap_folders ||= connection.folders
     end
 
     def highline

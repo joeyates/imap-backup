@@ -36,7 +36,7 @@ module Imap::Backup
     def create
       return if exist?
 
-      imap.create(name)
+      imap.create(utf7_encoded_name)
     end
 
     def uid_validity
@@ -81,22 +81,27 @@ module Imap::Backup
     def append(message)
       body = message.imap_body
       date = message.date&.to_time
-      response = imap.append(name, body, nil, date)
+      response = imap.append(utf7_encoded_name, body, nil, date)
       extract_uid(response)
     end
 
     private
 
     def examine
-      imap.examine(name)
+      imap.examine(utf7_encoded_name)
     rescue Net::IMAP::NoResponseError
-      Imap::Backup.logger.warn "Folder '#{name}' does not exist"
-      raise FolderNotFound, "Folder '#{name}' does not exist"
+      Imap::Backup.logger.warn "Folder '#{name}' does not exist on server"
+      raise FolderNotFound, "Folder '#{name}' does not exist on server"
     end
 
     def extract_uid(response)
       @uid_validity, uid = response.data.code.data.split(" ").map(&:to_i)
       uid
+    end
+
+    def utf7_encoded_name
+      @utf7_encoded_name ||=
+        Net::IMAP.encode_utf7(name).force_encoding("ASCII-8BIT")
     end
   end
 end

@@ -18,7 +18,7 @@ module Imap::Backup
       @username = options[:username]
       @password = options[:password]
       @local_path = options[:local_path]
-      @backup_folders = options[:folders]
+      @config_folders = options[:folders]
       @server = options[:server]
       @connection_options = options[:connection_options] || {}
       @folders = nil
@@ -29,21 +29,24 @@ module Imap::Backup
       @folders ||=
         begin
           root = provider_root
-          @folders = imap.list(root, "*")
-          if @folders.nil?
-            Imap::Backup.logger.warn(
-              "Unable to get folder list for account #{username}"
-            )
+          mailbox_lists = imap.list(root, "*")
+
+          if mailbox_lists.nil?
+            message = "Unable to get folder list for account #{username}"
+            Imap::Backup.logger.info message
+            raise message
           end
-          @folders
+
+          utf7_encoded = mailbox_lists.map(&:name)
+          utf7_encoded.map { |n| Net::IMAP.decode_utf7(n) }
         end
     end
 
     def status
-      backup_folders.map do |folder|
-        f = Account::Folder.new(self, folder[:name])
-        s = Serializer::Mbox.new(local_path, folder[:name])
-        {name: folder[:name], local: s.uids, remote: f.uids}
+      backup_folders.map do |backup_folder|
+        f = Account::Folder.new(self, backup_folder[:name])
+        s = Serializer::Mbox.new(local_path, backup_folder[:name])
+        {name: backup_folder[:name], local: s.uids, remote: f.uids}
       end
     end
 
@@ -105,18 +108,12 @@ module Imap::Backup
       @server = provider.host
     end
 
-    def backup_folders
-      return @backup_folders if @backup_folders && !@backup_folders.empty?
-
-      (folders || []).map { |f| {name: f.name} }
-    end
-
     private
 
     def each_folder
-      backup_folders.each do |folder_info|
-        folder = Account::Folder.new(self, folder_info[:name])
-        serializer = Serializer::Mbox.new(local_path, folder_info[:name])
+      backup_folders.each do |backup_folder|
+        folder = Account::Folder.new(self, backup_folder[:name])
+        serializer = Serializer::Mbox.new(local_path, backup_folder[:name])
         yield folder, serializer
       end
     end
@@ -173,6 +170,17 @@ module Imap::Backup
         folder = Account::Folder.new(self, name)
         yield serializer, folder
       end
+    end
+
+    def backup_folders
+      @backup_folders ||=
+        begin
+          if @config_folders && @config_folders.any?
+            @config_folders
+          else
+            folders.map { |name| {name: name} }
+          end
+        end
     end
 
     def provider

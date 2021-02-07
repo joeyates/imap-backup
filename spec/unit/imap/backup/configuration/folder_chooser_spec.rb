@@ -6,11 +6,11 @@ describe Imap::Backup::Configuration::FolderChooser do
 
     let(:connection) do
       instance_double(
-        Imap::Backup::Account::Connection, folders: remote_folders
+        Imap::Backup::Account::Connection, folders: connection_folders
       )
     end
     let(:account) { {folders: []} }
-    let(:remote_folders) { [] }
+    let(:connection_folders) { [] }
     let!(:highline_streams) { prepare_highline }
     let(:input) { highline_streams[0] }
     let(:output) { highline_streams[1] }
@@ -37,15 +37,9 @@ describe Imap::Backup::Configuration::FolderChooser do
 
     describe "folder listing" do
       let(:account) { {folders: [{name: "my_folder"}]} }
-      let(:remote_folders) do
-        # this one is already backed up:
-        folder1 = instance_double(
-          Imap::Backup::Account::Folder, name: "my_folder"
-        )
-        folder2 = instance_double(
-          Imap::Backup::Account::Folder, name: "another_folder"
-        )
-        [folder1, folder2]
+      let(:connection_folders) do
+        # N.B. my_folder is already backed up
+        %w(my_folder another_folder)
       end
 
       describe "display" do
@@ -93,7 +87,7 @@ describe Imap::Backup::Configuration::FolderChooser do
       let(:account) do
         {folders: [{name: "on_server"}, {name: "not_on_server"}]}
       end
-      let(:remote_folders) do
+      let(:connection_folders) do
         [
           instance_double(Imap::Backup::Account::Folder, name: "on_server")
         ]
@@ -112,7 +106,7 @@ describe Imap::Backup::Configuration::FolderChooser do
     end
 
     context "when folders are not available" do
-      let(:remote_folders) { nil }
+      let(:connection_folders) { nil }
 
       before do
         allow(Imap::Backup::Configuration::Setup.highline).

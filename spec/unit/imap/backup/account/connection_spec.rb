@@ -23,11 +23,11 @@ describe Imap::Backup::Account::Connection do
       username: USERNAME,
       password: PASSWORD,
       local_path: LOCAL_PATH,
-      folders: backup_folders,
+      folders: config_folders,
       server: server
     }
   end
-  let(:backup_folders) { [FOLDER_CONFIG] }
+  let(:config_folders) { [FOLDER_CONFIG] }
   let(:root_info) do
     instance_double(Net::IMAP::MailboxList, name: ROOT_NAME)
   end
@@ -62,7 +62,6 @@ describe Imap::Backup::Account::Connection do
       [:username, USERNAME],
       [:password, PASSWORD],
       [:local_path, LOCAL_PATH],
-      [:backup_folders, [FOLDER_CONFIG]],
       [:server, SERVER]
     ].each do |attr, expected|
       it "expects #{attr}" do
@@ -144,11 +143,21 @@ describe Imap::Backup::Account::Connection do
 
   describe "#folders" do
     let(:imap_folders) do
-      [instance_double(Net::IMAP::MailboxList)]
+      [instance_double(Net::IMAP::MailboxList, name: BACKUP_FOLDER)]
     end
 
     it "returns the list of folders" do
-      expect(subject.folders).to eq(imap_folders)
+      expect(subject.folders).to eq([BACKUP_FOLDER])
+    end
+
+    context "with non-ASCII folder names" do
+      let(:imap_folders) do
+        [instance_double(Net::IMAP::MailboxList, name: "Gel&APY-scht")]
+      end
+
+      it "converts them to UTF-8" do
+        expect(subject.folders).to eq(["Gelöscht"])
+      end
     end
   end
 
@@ -198,7 +207,7 @@ describe Imap::Backup::Account::Connection do
         with(LOCAL_PATH, BACKUP_FOLDER) { serializer }
     end
 
-    context "with supplied backup_folders" do
+    context "with supplied config_folders" do
       it "runs the downloader" do
         expect(downloader).to receive(:run)
 
@@ -216,7 +225,7 @@ describe Imap::Backup::Account::Connection do
       end
     end
 
-    context "without supplied backup_folders" do
+    context "without supplied config_folders" do
       let(:imap_folders) do
         [instance_double(Net::IMAP::MailboxList, name: ROOT_NAME)]
       end
@@ -228,8 +237,8 @@ describe Imap::Backup::Account::Connection do
           with(LOCAL_PATH, ROOT_NAME) { serializer }
       end
 
-      context "when supplied backup_folders is nil" do
-        let(:backup_folders) { nil }
+      context "when supplied config_folders is nil" do
+        let(:config_folders) { nil }
 
         it "runs the downloader for each folder" do
           expect(downloader).to receive(:run).exactly(:once)
@@ -238,8 +247,8 @@ describe Imap::Backup::Account::Connection do
         end
       end
 
-      context "when supplied backup_folders is an empty list" do
-        let(:backup_folders) { [] }
+      context "when supplied config_folders is an empty list" do
+        let(:config_folders) { [] }
 
         it "runs the downloader for each folder" do
           expect(downloader).to receive(:run).exactly(:once)
@@ -249,11 +258,13 @@ describe Imap::Backup::Account::Connection do
       end
 
       context "when the imap server doesn't return folders" do
-        let(:backup_folders) { nil }
+        let(:config_folders) { nil }
         let(:imap_folders) { nil }
 
-        it "does not fail" do
-          expect { subject.run_backup }.to_not raise_error
+        it "fails" do
+          expect do
+            subject.run_backup
+          end.to raise_error(RuntimeError, /Unable to get folder list/)
         end
       end
     end
