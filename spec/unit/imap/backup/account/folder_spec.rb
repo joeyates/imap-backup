@@ -1,8 +1,8 @@
 # rubocop:disable RSpec/PredicateMatcher
 
 describe Imap::Backup::Account::Folder do
-  FOLDER_NAME = "Gelöscht"
-  ENCODED_FOLDER_NAME = "Gel&APY-scht"
+  FOLDER_NAME = "Gelöscht".freeze
+  ENCODED_FOLDER_NAME = "Gel&APY-scht".freeze
 
   subject { described_class.new(connection, FOLDER_NAME) }
 
