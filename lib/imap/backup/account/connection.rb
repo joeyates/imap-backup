@@ -29,13 +29,13 @@ module Imap::Backup
       @folders ||=
         begin
           root = provider_root
-          @folders = imap.list(root, "*")
-          if @folders.nil?
+          folders = imap.list(root, "*")
+          if folders.nil?
             Imap::Backup.logger.warn(
               "Unable to get folder list for account #{username}"
             )
           end
-          @folders
+          folders
         end
     end
 
