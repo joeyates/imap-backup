@@ -79,26 +79,27 @@ module Imap::Backup
     end
 
     def imap
-      return @imap if !@imap.nil?
+      @imap ||=
+        begin
+          options = provider_options
+          Imap::Backup.logger.debug(
+            "Creating IMAP instance: #{server}, options: #{options.inspect}"
+          )
+          imap = Net::IMAP.new(server, options)
+          if gmail? && Gmail::Authenticator.refresh_token?(password)
+            authenticator = Gmail::Authenticator.new(email: username, token: password)
+            credentials = authenticator.credentials
+            raise InvalidGmailOauth2RefreshToken if !credentials
 
-      options = provider_options
-      Imap::Backup.logger.debug(
-        "Creating IMAP instance: #{server}, options: #{options.inspect}"
-      )
-      @imap = Net::IMAP.new(server, options)
-      if gmail? && Gmail::Authenticator.refresh_token?(password)
-        authenticator = Gmail::Authenticator.new(email: username, token: password)
-        credentials = authenticator.credentials
-        raise InvalidGmailOauth2RefreshToken if !credentials
-
-        Imap::Backup.logger.debug "Logging in with OAuth2 token: #{username}"
-        @imap.authenticate("XOAUTH2", username, credentials.access_token)
-      else
-        Imap::Backup.logger.debug "Logging in: #{username}/#{masked_password}"
-        @imap.login(username, password)
-      end
-      Imap::Backup.logger.debug "Login complete"
-      @imap
+            Imap::Backup.logger.debug "Logging in with OAuth2 token: #{username}"
+            imap.authenticate("XOAUTH2", username, credentials.access_token)
+          else
+            Imap::Backup.logger.debug "Logging in: #{username}/#{masked_password}"
+            imap.login(username, password)
+          end
+          Imap::Backup.logger.debug "Login complete"
+          imap
+        end
     end
 
     def server
