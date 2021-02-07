@@ -252,8 +252,10 @@ describe Imap::Backup::Account::Connection do
         let(:backup_folders) { nil }
         let(:imap_folders) { nil }
 
-        it "does not fail" do
-          expect { subject.run_backup }.to_not raise_error
+        it "fails" do
+          expect do
+            subject.run_backup
+          end.to raise_error(RuntimeError, /Unable to get folder list/)
         end
       end
     end

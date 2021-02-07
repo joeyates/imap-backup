@@ -31,9 +31,9 @@ module Imap::Backup
           root = provider_root
           folders = imap.list(root, "*")
           if folders.nil?
-            Imap::Backup.logger.warn(
-              "Unable to get folder list for account #{username}"
-            )
+            message = "Unable to get folder list for account #{username}"
+            Imap::Backup.logger.info message
+            raise message
           end
           folders
         end
@@ -173,6 +173,12 @@ module Imap::Backup
         folder = Account::Folder.new(self, name)
         yield serializer, folder
       end
+    end
+
+    def backup_folders
+      return @backup_folders if @backup_folders && !@backup_folders.empty?
+
+      folders.map { |f| {name: f.name} }
     end
 
     def provider
