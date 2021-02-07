@@ -105,12 +105,6 @@ module Imap::Backup
       @server = provider.host
     end
 
-    def backup_folders
-      return @backup_folders if @backup_folders && !@backup_folders.empty?
-
-      (folders || []).map { |f| {name: f.name} }
-    end
-
     private
 
     def each_folder

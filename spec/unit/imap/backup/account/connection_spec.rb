@@ -62,7 +62,6 @@ describe Imap::Backup::Account::Connection do
       [:username, USERNAME],
       [:password, PASSWORD],
       [:local_path, LOCAL_PATH],
-      [:backup_folders, [FOLDER_CONFIG]],
       [:server, SERVER]
     ].each do |attr, expected|
       it "expects #{attr}" do
