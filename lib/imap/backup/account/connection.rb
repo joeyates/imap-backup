@@ -2,6 +2,7 @@ require "net/imap"
 require "gmail_xoauth"
 
 require "gmail/authenticator"
+require "retry_on_error"
 
 module Imap::Backup
   module Account; end
@@ -9,7 +10,9 @@ module Imap::Backup
   class Account::Connection
     class InvalidGmailOauth2RefreshToken < StandardError; end
 
-    RETRY_CLASSES = [EOFError, Errno::ECONNRESET, SocketError].freeze
+    include RetryOnError
+
+    LOGIN_RETRY_CLASSES = [EOFError, Errno::ECONNRESET, SocketError].freeze
 
     attr_reader :connection_options
     attr_reader :local_path
@@ -82,7 +85,7 @@ module Imap::Backup
 
     def imap
       @imap ||=
-        retry_on_error do
+        retry_on_error(errors: LOGIN_RETRY_CLASSES) do
           options = provider_options
           Imap::Backup.logger.debug(
             "Creating IMAP instance: #{server}, options: #{options.inspect}"
@@ -203,19 +206,6 @@ module Imap::Backup
 
       root_info = imap.list("", "")[0]
       @provider_root = root_info.name
-    end
-
-    def retry_on_error(limit: 10, errors: RETRY_CLASSES)
-      tries ||= 1
-      yield
-    rescue *errors => e
-      if tries < limit
-        message = "#{e}, Net::IMAP call failed attempt #{tries} of #{limit}"
-        Imap::Backup.logger.debug message
-        tries += 1
-        retry
-      end
-      raise e
     end
   end
 end
