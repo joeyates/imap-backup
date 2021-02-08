@@ -1,0 +1,51 @@
+version: 2.1
+
+orbs:
+  ruby: circleci/ruby@1.1.2
+
+references:
+  restore: &restore
+    restore_cache:
+      keys:
+        - 'imap.backup.<< parameters.ruby_version >>.{{checksum "imap-backup.gemspec"}}'
+  bundle: &bundle
+    run:
+      name: Install Ruby dependencies
+      command: |
+        bundle install
+        bundle clean
+  save: &save
+    save_cache:
+      key: 'imap.backup.<< parameters.ruby_version >>.{{checksum "imap-backup.gemspec"}}'
+      paths:
+        - vendor/bundle
+
+jobs:
+  test:
+    parameters:
+      ruby_version:
+        type: string
+    environment:
+      BUNDLE_PATH: ./vendor/bundle
+      DOCKER_IMAP_PORT: 993
+    docker:
+      - image: "cimg/ruby:<< parameters.ruby_version >>"
+      - image: antespi/docker-imap-devel:latest
+        environment:
+          MAIL_ADDRESS: address@example.org
+          MAIL_PASS: pass
+          MAILNAME: example.org
+    steps:
+      - checkout
+      - <<: *restore
+      - <<: *bundle
+      - <<: *save
+      - ruby/rspec-test
+
+workflows:
+  all-tests:
+    jobs:
+      - test:
+          matrix:
+            parameters:
+              ruby_version: ["2.4", "2.5", "2.6", "2.7"]
