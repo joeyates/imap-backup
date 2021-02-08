@@ -2,6 +2,6 @@
 :username: 'address@example.org'
 :password: 'pass'
 :connection_options:
-  :port: 8993
+  :port: <%= ENV.fetch("DOCKER_IMAP_SERVER", 993) %>
   :ssl:
     :verify_mode: 0
