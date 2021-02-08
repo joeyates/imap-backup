@@ -85,7 +85,7 @@ describe Gmail::Authenticator do
 
         it "is expected" do
           expect { subject }.to raise_error(
-            ArgumentError, /missing keyword: :#{param}/
+            ArgumentError, /missing keyword: :?#{param}/
           )
         end
       end
