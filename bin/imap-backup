@@ -82,7 +82,7 @@ when "folders"
       warn "Unable to list account folders"
       exit 1
     end
-    folders.each { |f| puts "\t#{f.name}" }
+    folders.each { |f| puts "\t#{f}" }
   end
 when "restore"
   configuration.each_connection(&:restore)
