@@ -26,8 +26,20 @@ module Imap::Backup
     def run
       Kernel.system("clear")
       Kernel.puts BANNER
-      @client_id = highline.ask("client_id: ")
-      @client_secret = highline.ask("client_secret: ")
+
+      keep = if token.valid?
+        highline.agree("Use existing client info?")
+      else
+        false
+      end
+
+      if keep
+        @client_id = token.client_id
+        @client_secret = token.client_secret
+      else
+        @client_id = highline.ask("client_id: ")
+        @client_secret = highline.ask("client_secret: ")
+      end
 
       Kernel.puts <<~MESSAGE
 
@@ -46,15 +58,23 @@ module Imap::Backup
 
       raise "Failed" if !@credentials
 
-      token = JSON.parse(token_store.load(email))
-      token["client_secret"] = client_secret
-      token.to_json
+      new_token = JSON.parse(token_store.load(email))
+      new_token["client_secret"] = client_secret
+      new_token.to_json
     end
 
     private
 
     def email
       account[:username]
+    end
+
+    def password
+      account[:password]
+    end
+
+    def token
+      @token ||= Gmail::Authenticator::ImapBackupToken.new(password)
     end
 
     def highline
