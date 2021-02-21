@@ -213,6 +213,12 @@ $ rake
 To exclude Docker-based tests:
 
 ```sh
+rake no-docker
+```
+
+or
+
+```sh
 $ rspec --tag ~docker
 ```
 
