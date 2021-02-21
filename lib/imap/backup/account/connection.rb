@@ -64,7 +64,12 @@ module Imap::Backup
 
         Imap::Backup.logger.debug "[#{folder.name}] running backup"
         serializer.apply_uid_validity(folder.uid_validity)
-        Downloader.new(folder, serializer).run
+        begin
+          Downloader.new(folder, serializer).run
+        rescue Net::IMAP::ByeResponseError
+          reconnect
+          retry
+        end
       end
     end
 

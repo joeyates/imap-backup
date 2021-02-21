@@ -288,6 +288,24 @@ describe Imap::Backup::Account::Connection do
       end
     end
 
+    context "when the IMAP session expires" do
+      before do
+        data = OpenStruct.new(data: "Session expired")
+        response = OpenStruct.new(data: data)
+        outcomes = [
+          -> { raise Net::IMAP::ByeResponseError, response },
+          -> { nil }
+        ]
+        allow(downloader).to receive(:run) { outcomes.shift.call }
+      end
+
+      it "reconnects" do
+        expect(downloader).to receive(:run).exactly(:twice)
+
+        subject.run_backup
+      end
+    end
+
     context "when run" do
       before { subject.run_backup }
 
