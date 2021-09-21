@@ -43,7 +43,7 @@ describe Imap::Backup::Configuration::Setup do
     describe "main menu" do
       before { subject.run }
 
-      %w(add\ account save\ and\ exit exit\ without\ saving).each do |choice|
+      ["add account", "save and exit", "exit without saving"].each do |choice|
         it "includes #{choice}" do
           expect(output.string).to include(choice)
         end

@@ -8,7 +8,7 @@ module Imap::Backup
       You need to authorize imap_backup to get access to your email.
       To do so, please follow the instructions here:
 
-      https://github.com/joeyates/imap-backup/blob/main/docs/setting-up-gmail.md
+      https://github.com/joeyates/imap-backup/blob/main/docs/setting-up-gmail-with-oauth2.md
 
     BANNER
 

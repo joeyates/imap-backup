@@ -12,7 +12,6 @@ describe Imap::Backup::Utils do
   describe ".check_permissions" do
     let(:requested) { 0o345 }
 
-    # rubocop:disable RSpec/EmptyExampleGroup
     context "with existing files" do
       [
         [0o100, "less than the limit", true],
@@ -37,7 +36,6 @@ describe Imap::Backup::Utils do
         end
       end
     end
-    # rubocop:enable RSpec/EmptyExampleGroup
 
     context "with non-existent files" do
       let(:exists) { false }

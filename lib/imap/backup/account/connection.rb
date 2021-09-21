@@ -96,7 +96,7 @@ module Imap::Backup
             "Creating IMAP instance: #{server}, options: #{options.inspect}"
           )
           imap = Net::IMAP.new(server, options)
-          if gmail? && Gmail::Authenticator.refresh_token?(password)
+          if use_gmail_oauth2? && Gmail::Authenticator.refresh_token?(password)
             authenticator = Gmail::Authenticator.new(email: username, token: password)
             credentials = authenticator.credentials
             raise InvalidGmailOauth2RefreshToken if !credentials
@@ -168,8 +168,10 @@ module Imap::Backup
       password.gsub(/./, "x")
     end
 
-    def gmail?
-      server == Email::Provider::GMAIL_IMAP_SERVER
+    def use_gmail_oauth2?
+      # TODO: test use of ENV
+      server == Email::Provider::GMAIL_IMAP_SERVER &&
+        ENV["IMAP_BACKUP_ENABLE_GMAIL_OAUTH2"]
     end
 
     def local_folders
