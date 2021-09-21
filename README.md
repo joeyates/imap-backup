@@ -16,11 +16,17 @@
 [Rubygem]: http://rubygems.org/gems/imap-backup "Ruby gem at rubygems.org"
 [Continuous Integration]: https://circleci.com/gh/joeyates/imap-backup "Build status by CirceCI"
 
-## GMail
+# GMail
 
-GMail OAuth2 authentication is supported.
+With GMail, you will need to enable 'App passwords' on your account.
 
-To set it up, [follow the HOWTO](docs/setting-up-gmail.md).
+## GMail OAuth2
+
+GMail OAuth2 authentication is supported, but as GMail's policy requires
+users to set up an application specific to their account, the feature
+is disabled by default.
+
+To set it up, [follow the HOWTO](docs/setting-up-gmail-with-oauth2.md).
 
 # Installation
 
