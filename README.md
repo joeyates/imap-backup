@@ -18,13 +18,15 @@
 
 # GMail
 
-With GMail, you will need to enable 'App passwords' on your account.
+To use imap-backup with GMail, you will need to enable 'App passwords' on your account.
 
 ## GMail OAuth2
 
 GMail OAuth2 authentication is supported, but as GMail's policy requires
 users to set up an application specific to their account, the feature
 is disabled by default.
+
+You will need to set the environment variable IMAP_BACKUP_ENABLE_GMAIL_OAUTH2.
 
 To set it up, [follow the HOWTO](docs/setting-up-gmail-with-oauth2.md).
 

@@ -83,7 +83,6 @@ module Imap::Backup
     end
 
     def use_gmail_oauth2?(account)
-      # TODO: test use of ENV
       account[:server] == Email::Provider::GMAIL_IMAP_SERVER &&
         ENV["IMAP_BACKUP_ENABLE_GMAIL_OAUTH2"]
     end

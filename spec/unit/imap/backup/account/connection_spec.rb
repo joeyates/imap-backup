@@ -111,7 +111,15 @@ describe Imap::Backup::Account::Connection do
             with(email: USERNAME, token: PASSWORD) { authenticator }
       end
 
-      context "when the password is our copy of a GMail refresh token" do
+      context "when the password is our copy of a GMail refresh token and  the environment IMAP_BACKUP_ENABLE_GMAIL_OAUTH2 is set" do
+        before do
+          ENV["IMAP_BACKUP_ENABLE_GMAIL_OAUTH2"] = "1"
+        end
+
+        after do
+          ENV.delete("IMAP_BACKUP_ENABLE_GMAIL_OAUTH2")
+        end
+
         it "uses the OAuth2 access_token to authenticate" do
           subject.imap
 
