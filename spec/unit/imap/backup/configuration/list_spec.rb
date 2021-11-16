@@ -35,6 +35,7 @@ describe Imap::Backup::Configuration::List do
       allow(Imap::Backup::Configuration::Store).
         to receive(:exist?) { config_exists }
       allow(Imap::Backup).to receive(:setup_logging)
+      allow(store).to receive(:debug?)
     end
 
     it "sets global logging level" do
