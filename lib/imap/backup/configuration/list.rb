@@ -12,6 +12,7 @@ module Imap::Backup
       return if !config_exists?
 
       Imap::Backup.setup_logging config
+      Net::IMAP.debug = config.debug?
     end
 
     def each_connection
