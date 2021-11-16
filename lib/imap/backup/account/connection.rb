@@ -80,7 +80,7 @@ module Imap::Backup
     end
 
     def disconnect
-      imap.disconnect
+      imap.disconnect if @imap
     end
 
     def reconnect
