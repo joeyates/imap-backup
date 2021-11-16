@@ -36,11 +36,11 @@ module Email::Mboxrd
       supplied_body.gsub(/(?<!\r)\n/, "\r\n")
     end
 
-    private
-
     def parsed
       @parsed ||= Mail.new(supplied_body)
     end
+
+    private
 
     def from
       @from ||=

@@ -73,6 +73,19 @@ module Imap::Backup
       end
     end
 
+    def local_folders
+      return enum_for(:local_folders) if !block_given?
+
+      glob = File.join(local_path, "**", "*.imap")
+      base = Pathname.new(local_path)
+      Pathname.glob(glob) do |path|
+        name = path.relative_path_from(base).to_s[0..-6]
+        serializer = Serializer::Mbox.new(local_path, name)
+        folder = Account::Folder.new(self, name)
+        yield serializer, folder
+      end
+    end
+
     def restore
       local_folders do |serializer, folder|
         restore_folder serializer, folder
@@ -172,17 +185,6 @@ module Imap::Backup
       # TODO: test use of ENV
       server == Email::Provider::GMAIL_IMAP_SERVER &&
         ENV["IMAP_BACKUP_ENABLE_GMAIL_OAUTH2"]
-    end
-
-    def local_folders
-      glob = File.join(local_path, "**", "*.imap")
-      base = Pathname.new(local_path)
-      Pathname.glob(glob) do |path|
-        name = path.relative_path_from(base).to_s[0..-6]
-        serializer = Serializer::Mbox.new(local_path, name)
-        folder = Account::Folder.new(self, name)
-        yield serializer, folder
-      end
     end
 
     def backup_folders
