@@ -27,7 +27,7 @@ jobs:
         type: string
     environment:
       BUNDLE_PATH: ./vendor/bundle
-      DOCKER_IMAP_PORT: 993
+      DOCKER_IMAP_SERVER: 993
     docker:
       - image: "cimg/ruby:<< parameters.ruby_version >>"
       - image: antespi/docker-imap-devel:latest
