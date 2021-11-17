@@ -433,24 +433,49 @@ describe Imap::Backup::Account::Connection do
   end
 
   describe "#reconnect" do
-    it "disconnects from the server" do
-      expect(imap).to receive(:disconnect)
+    context "when the IMAP connection has been used" do
+      before { subject.imap }
 
-      subject.reconnect
+      it "disconnects from the server" do
+        expect(imap).to receive(:disconnect)
+
+        subject.reconnect
+      end
+    end
+
+    context "when the IMAP connection has not been used" do
+      it "does not disconnect from the server" do
+        expect(imap).to_not receive(:disconnect)
+
+        subject.reconnect
+      end
     end
 
     it "causes reconnection on future access" do
       expect(Net::IMAP).to receive(:new)
 
       subject.reconnect
+      subject.imap
     end
   end
 
   describe "#disconnect" do
-    it "disconnects from the server" do
-      expect(imap).to receive(:disconnect)
+    context "when the IMAP connection has been used" do
+      it "disconnects from the server" do
+        subject.imap
 
-      subject.disconnect
+        expect(imap).to receive(:disconnect)
+
+        subject.disconnect
+      end
+    end
+
+    context "when the IMAP connection has not been used" do
+      it "does not disconnect from the server" do
+        expect(imap).to_not receive(:disconnect)
+
+        subject.disconnect
+      end
     end
   end
 end

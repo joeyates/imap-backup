@@ -21,6 +21,7 @@ Gem::Specification.new do |gem|
   gem.add_runtime_dependency "highline"
   gem.add_runtime_dependency "mail"
   gem.add_runtime_dependency "rake"
+  gem.add_runtime_dependency "thor", "~> 1.1"
 
   gem.add_development_dependency "codeclimate-test-reporter", "~> 0.4.8"
   if RUBY_ENGINE == "jruby"

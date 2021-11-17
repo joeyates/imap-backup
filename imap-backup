@@ -3,6 +3,7 @@
 $LOAD_PATH.unshift(File.expand_path("../lib/", __dir__))
 require "imap/backup/cli"
 
-Imap::Backup::Configuration::List.new.setup_logging
-
 Imap::Backup::CLI.start(ARGV)
+
+__END__
+
