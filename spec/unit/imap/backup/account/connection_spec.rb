@@ -90,56 +90,11 @@ describe Imap::Backup::Account::Connection do
     end
 
     context "with the GMail IMAP server" do
-      ACCESS_TOKEN = "access_token".freeze
-
       let(:server) { GMAIL_IMAP_SERVER }
       let(:refresh_token) { true }
       let(:result) { nil }
-      let(:authenticator) do
-        instance_double(
-          Gmail::Authenticator,
-          credentials: credentials
-        )
-      end
-      let(:credentials) { OpenStruct.new(access_token: ACCESS_TOKEN) }
-
-      before do
-        allow(Gmail::Authenticator).
-          to receive(:refresh_token?) { refresh_token }
-        allow(Gmail::Authenticator).
-          to receive(:new).
-            with(email: USERNAME, token: PASSWORD) { authenticator }
-      end
-
-      context "when the password is our copy of a GMail refresh token and  the environment IMAP_BACKUP_ENABLE_GMAIL_OAUTH2 is set" do
-        before do
-          ENV["IMAP_BACKUP_ENABLE_GMAIL_OAUTH2"] = "1"
-        end
-
-        after do
-          ENV.delete("IMAP_BACKUP_ENABLE_GMAIL_OAUTH2")
-        end
-
-        it "uses the OAuth2 access_token to authenticate" do
-          subject.imap
-
-          expect(imap).to have_received(:authenticate).with(
-            "XOAUTH2", USERNAME, ACCESS_TOKEN
-          )
-        end
-
-        context "when the refresh token is invalid" do
-          let(:credentials) { nil }
-
-          it "raises" do
-            expect { subject.imap }.to raise_error(String)
-          end
-        end
-      end
 
       context "when the password is not our copy of a GMail refresh token" do
-        let(:refresh_token) { false }
-
         it "uses the password" do
           subject.imap
 

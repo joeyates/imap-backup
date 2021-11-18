@@ -1,15 +1,11 @@
 require "net/imap"
-require "gmail_xoauth"
 
-require "gmail/authenticator"
 require "retry_on_error"
 
 module Imap::Backup
   module Account; end
 
   class Account::Connection
-    class InvalidGmailOauth2RefreshToken < StandardError; end
-
     include RetryOnError
 
     LOGIN_RETRY_CLASSES = [EOFError, Errno::ECONNRESET, SocketError].freeze
@@ -109,17 +105,8 @@ module Imap::Backup
             "Creating IMAP instance: #{server}, options: #{options.inspect}"
           )
           imap = Net::IMAP.new(server, options)
-          if use_gmail_oauth2? && Gmail::Authenticator.refresh_token?(password)
-            authenticator = Gmail::Authenticator.new(email: username, token: password)
-            credentials = authenticator.credentials
-            raise InvalidGmailOauth2RefreshToken if !credentials
-
-            Imap::Backup.logger.debug "Logging in with OAuth2 token: #{username}"
-            imap.authenticate("XOAUTH2", username, credentials.access_token)
-          else
-            Imap::Backup.logger.debug "Logging in: #{username}/#{masked_password}"
-            imap.login(username, password)
-          end
+          Imap::Backup.logger.debug "Logging in: #{username}/#{masked_password}"
+          imap.login(username, password)
           Imap::Backup.logger.debug "Login complete"
           imap
         end
@@ -179,12 +166,6 @@ module Imap::Backup
 
     def masked_password
       password.gsub(/./, "x")
-    end
-
-    def use_gmail_oauth2?
-      # TODO: test use of ENV
-      server == Email::Provider::GMAIL_IMAP_SERVER &&
-        ENV["IMAP_BACKUP_ENABLE_GMAIL_OAUTH2"]
     end
 
     def backup_folders
