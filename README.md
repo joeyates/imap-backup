@@ -36,6 +36,20 @@ To set it up, [follow the HOWTO](docs/setting-up-gmail-with-oauth2.md).
 $ gem install 'imap-backup'
 ```
 
+# Commands
+
+For a full list, run
+
+```
+$ imap-backup help
+```
+
+For more information about a command, run
+
+```shell
+$ imap-backup help COMMAND
+```
+
 # Setup
 
 In order to do backups, you need to add accounts via a menu-driven command
@@ -147,6 +161,16 @@ Alternatively, add it to your crontab.
 Each folder is saved to an mbox file.
 Alongside each mbox is a file with extension '.imap', which lists the source IMAP
 UIDs to allow a full restore.
+
+# Local commands
+
+There a various commands for viewing local backup status.
+
+To view the list, use
+
+```shell
+$ imap_backup help local
+```
 
 # Troubleshooting
 
