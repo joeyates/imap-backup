@@ -3,13 +3,13 @@ module Imap::Backup
     include Thor::Actions
     include CLI::Helpers
 
-    desc "accounts", "list locally backed-up accounts"
+    desc "accounts", "List locally backed-up accounts"
     def accounts
       connections = Imap::Backup::Configuration::List.new
       connections.accounts.each { |a| puts a[:username] }
     end
 
-    desc "folders EMAIL", "list account folders"
+    desc "folders EMAIL", "List account folders"
     def folders(email)
       connections = Imap::Backup::Configuration::List.new
       account = connections.accounts.find { |a| a[:username] == email }
@@ -21,7 +21,7 @@ module Imap::Backup
       end
     end
 
-    desc "emails EMAIL FOLDER", "list emails in a folder"
+    desc "emails EMAIL FOLDER", "List emails in a folder"
     def emails(email, folder_name)
       connections = Imap::Backup::Configuration::List.new
       account = connections.accounts.find { |a| a[:username] == email }
@@ -49,7 +49,7 @@ module Imap::Backup
       end
     end
 
-    desc "email EMAIL FOLDER UID", "show an email"
+    desc "email EMAIL FOLDER UID", "Show an email"
     def email(email, folder_name, uid)
       connections = Imap::Backup::Configuration::List.new
       account = connections.accounts.find { |a| a[:username] == email }

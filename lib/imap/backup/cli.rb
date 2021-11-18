@@ -82,6 +82,6 @@ class Imap::Backup::CLI < Thor
     Status.new(symbolized(options)).run
   end
 
-  desc "local subcommand ...ARGS", "View local info"
+  desc "local SUBCOMMAND [OPTIONS]", "View local info"
   subcommand "local", Local
 end
