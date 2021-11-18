@@ -68,23 +68,13 @@ module Imap::Backup
 
     def modify_password(menu)
       menu.choice("modify password") do
-        password =
-          if use_gmail_oauth2?(account)
-            Configuration::GmailOauth2.new(account).run
-          else
-            Configuration::Asker.password
-          end
+        password = Configuration::Asker.password
 
         if !password.nil?
           account[:password] = password
           account[:modified] = true
         end
       end
-    end
-
-    def use_gmail_oauth2?(account)
-      account[:server] == Email::Provider::GMAIL_IMAP_SERVER &&
-        ENV["IMAP_BACKUP_ENABLE_GMAIL_OAUTH2"]
     end
 
     def modify_server(menu)

@@ -241,49 +241,6 @@ describe Imap::Backup::Configuration::Account do
       end
     end
 
-    describe "choosing 'modify password' when the server is for GMail" do
-      let(:new_password) { "new_password" }
-      let(:current_server) { GMAIL_IMAP_SERVER }
-      let(:gmail_oauth2) do
-        instance_double(Imap::Backup::Configuration::GmailOauth2, run: nil)
-      end
-
-      before do
-        allow(Imap::Backup::Configuration::Asker).
-          to receive(:password) { new_password }
-        allow(Imap::Backup::Configuration::GmailOauth2).
-          to receive(:new).
-            with(account) { gmail_oauth2 }
-      end
-
-      context "when the environment IMAP_BACKUP_ENABLE_GMAIL_OAUTH2 is set" do
-        before do
-          ENV["IMAP_BACKUP_ENABLE_GMAIL_OAUTH2"] = "1"
-          subject.run
-          menu.choices["modify password"].call
-        end
-
-        after do
-          ENV.delete("IMAP_BACKUP_ENABLE_GMAIL_OAUTH2")
-        end
-
-        it "sets up GMail OAuth2" do
-          expect(gmail_oauth2).to have_received(:run)
-        end
-      end
-
-      context "when the environment IMAP_BACKUP_ENABLE_GMAIL_OAUTH2 is not set" do
-        before do
-          subject.run
-          menu.choices["modify password"].call
-        end
-
-        it "sets up GMail OAuth2" do
-          expect(gmail_oauth2).to_not have_received(:run)
-        end
-      end
-    end
-
     describe "choosing 'modify server'" do
       let(:server) { "server" }
 

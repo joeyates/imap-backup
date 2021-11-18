@@ -16,8 +16,6 @@ Gem::Specification.new do |gem|
   gem.required_ruby_version = ">= 2.5"
   gem.version = Imap::Backup::VERSION
 
-  gem.add_runtime_dependency "gmail_xoauth"
-  gem.add_runtime_dependency "googleauth"
   gem.add_runtime_dependency "highline"
   gem.add_runtime_dependency "mail"
   gem.add_runtime_dependency "rake"
