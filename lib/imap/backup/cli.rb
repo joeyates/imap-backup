@@ -1,5 +1,7 @@
 require "thor"
 
+module Imap; end
+
 module Imap::Backup
   class CLI < Thor
     require "imap/backup/cli/helpers"
