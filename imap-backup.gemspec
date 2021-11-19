@@ -1,5 +1,6 @@
 $LOAD_PATH.unshift(File.expand_path("lib", __dir__))
 require "imap/backup/version"
+require "rake/file_list"
 
 Gem::Specification.new do |gem|
   gem.name          = "imap-backup"
@@ -8,6 +9,7 @@ Gem::Specification.new do |gem|
   gem.authors       = ["Joe Yates"]
   gem.email         = ["joe.g.yates@gmail.com"]
   gem.homepage      = "https://github.com/joeyates/imap-backup"
+  gem.licenses      = ["MIT"]
 
   gem.files         = `git ls-files`.split($OUTPUT_RECORD_SEPARATOR)
   gem.executables   = gem.files.grep(%r{^bin/}).map { |f| File.basename(f) }
