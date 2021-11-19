@@ -11,7 +11,15 @@ Gem::Specification.new do |gem|
   gem.homepage      = "https://github.com/joeyates/imap-backup"
   gem.licenses      = ["MIT"]
 
-  gem.files         = `git ls-files`.split($OUTPUT_RECORD_SEPARATOR)
+  # Build list of files manually, see also
+  # https://github.com/rubygems/rubygems/blob/master/bundler/bundler.gemspec#L37
+  gem.files         = %w[bin/imap-backup]
+  gem.files         += Dir.glob("docs/*{.png,.md}")
+  gem.files         += Dir.glob("lib/**/*.rb")
+  gem.files         += Dir.glob("spec/**/*{.rb,.yml}")
+  gem.files         += %w[imap-backup.gemspec]
+  gem.files         += %w[LICENSE README.md]
+
   gem.executables   = gem.files.grep(%r{^bin/}).map { |f| File.basename(f) }
   gem.test_files    = gem.files.grep(%r{^spec/})
   gem.require_paths = ["lib"]
