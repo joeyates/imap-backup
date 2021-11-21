@@ -21,8 +21,8 @@ module Imap::Backup
       end
     end
 
-    desc "emails EMAIL FOLDER", "List emails in a folder"
-    def emails(email, folder_name)
+    desc "list EMAIL FOLDER", "List emails in a folder"
+    def list(email, folder_name)
       connections = Imap::Backup::Configuration::List.new
       account = connections.accounts.find { |a| a[:username] == email }
       raise "#{email} is not a configured account" if !account
