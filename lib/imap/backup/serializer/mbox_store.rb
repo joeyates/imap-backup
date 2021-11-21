@@ -84,7 +84,8 @@ module Imap::Backup
     def each_message(required_uids)
       return enum_for(:each_message, required_uids) if !block_given?
 
-      indexes = required_uids.each.with_object({}) do |uid, acc|
+      indexes = required_uids.each.with_object({}) do |uid_maybe_string, acc|
+        uid = uid_maybe_string.to_i
         index = uids.find_index(uid)
         acc[index] = uid if index
       end

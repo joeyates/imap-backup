@@ -53,8 +53,13 @@ module Imap::Backup
       end
     end
 
-    desc "email EMAIL FOLDER UID", "Show an email"
-    def email(email, folder_name, uid)
+    desc "show EMAIL FOLDER UID[,UID]", "Show one or more emails"
+    long_desc <<~DESC
+      Prints out the requested emails.
+      If more than one UID is given, they are separated by a header indicating
+      the UID.
+    DESC
+    def show(email, folder_name, uids)
       connections = Imap::Backup::Configuration::List.new
       account = connections.accounts.find { |a| a[:username] == email }
       raise "#{email} is not a configured account" if !account
@@ -65,10 +70,17 @@ module Imap::Backup
       end
       raise "Folder '#{folder_name}' not found" if !folder_serializer
 
-      loaded_message = folder_serializer.load(uid)
-      raise "Message #{uid} not found in folder '#{folder_name}'" if !loaded_message
-
-      puts loaded_message.supplied_body
+      uid_list = uids.split(",")
+      folder_serializer.each_message(uid_list).each do |uid, message|
+        if uid_list.count > 1
+          puts <<~HEADER
+            #{"-" * 80}
+            #{format("| UID: %-71s |", uid)}
+            #{"-" * 80}
+          HEADER
+        end
+        puts message.supplied_body
+      end
     end
   end
 end
