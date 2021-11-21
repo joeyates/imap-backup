@@ -40,7 +40,7 @@ module Imap::Backup
       @uids || []
     end
 
-    def add(uid, message)
+    def add(uid, body)
       do_load if !loaded
       raise "Can't add messages without uid_validity" if !uid_validity
 
@@ -52,7 +52,6 @@ module Imap::Backup
         return
       end
 
-      body = message["RFC822"]
       mboxrd_message = Email::Mboxrd::Message.new(body)
       mbox = nil
       begin

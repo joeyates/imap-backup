@@ -2,7 +2,8 @@ describe Imap::Backup::Downloader do
   describe "#run" do
     subject { described_class.new(folder, serializer) }
 
-    let(:message) { {"RFC822" => "blah"} }
+    let(:body) { "blah" }
+    let(:message) { {"RFC822" => body} }
     let(:folder) do
       instance_double(
         Imap::Backup::Account::Folder,
@@ -18,7 +19,7 @@ describe Imap::Backup::Downloader do
 
     context "with fetched messages" do
       specify "are saved" do
-        expect(serializer).to receive(:save).with("111", message)
+        expect(serializer).to receive(:save).with("111", body)
 
         subject.run
       end
