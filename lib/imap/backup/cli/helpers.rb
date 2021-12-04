@@ -10,7 +10,6 @@ module Imap::Backup::CLI::Helpers
       connections = Imap::Backup::Configuration::List.new(names)
     rescue Imap::Backup::ConfigurationNotFound
       raise "imap-backup is not configured. Run `imap-backup setup`"
-      return
     end
 
     connections.each_connection do |connection|

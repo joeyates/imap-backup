@@ -73,7 +73,7 @@ module Imap::Backup
       Configure email accounts to back up.
     DESC
     def setup
-      Setup.new().run
+      Setup.new.run
     end
 
     desc "status", "Show backup status"

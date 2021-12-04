@@ -1,7 +1,7 @@
 class Imap::Backup::CLI::Setup < Thor
   include Thor::Actions
 
-  def initialize()
+  def initialize
     super([])
   end
 

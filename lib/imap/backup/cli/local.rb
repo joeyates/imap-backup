@@ -28,7 +28,7 @@ module Imap::Backup
       raise "#{email} is not a configured account" if !account
 
       account_connection = Imap::Backup::Account::Connection.new(account)
-      folder_serializer, folder = account_connection.local_folders.find do |(_s, f)|
+      folder_serializer, _folder = account_connection.local_folders.find do |(_s, f)|
         f.name == folder_name
       end
       raise "Folder '#{folder_name}' not found" if !folder_serializer
@@ -74,9 +74,9 @@ module Imap::Backup
       folder_serializer.each_message(uid_list).each do |uid, message|
         if uid_list.count > 1
           puts <<~HEADER
-            #{"-" * 80}
-            #{format("| UID: %-71s |", uid)}
-            #{"-" * 80}
+            #{'-' * 80}
+            #{format('| UID: %-71s |', uid)}
+            #{'-' * 80}
           HEADER
         end
         puts message.supplied_body

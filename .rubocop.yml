@@ -19,3 +19,5 @@ RSpec/ReturnFromStub:
   Enabled: false
 Style/EmptyCaseCondition:
   Enabled: false
+Style/ClassAndModuleChildren:
+  Enabled: false
