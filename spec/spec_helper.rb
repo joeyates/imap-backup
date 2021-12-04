@@ -15,5 +15,6 @@ SimpleCov.start do
 end
 
 require "imap/backup"
+require "imap/backup/cli"
 
 silence_logging
