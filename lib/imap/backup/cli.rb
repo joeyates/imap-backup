@@ -13,6 +13,7 @@ module Imap::Backup
     autoload :Restore, "imap/backup/cli/restore"
     autoload :Setup, "imap/backup/cli/setup"
     autoload :Status, "imap/backup/cli/status"
+    autoload :Utils, "imap/backup/cli/utils"
 
     include Helpers
 
@@ -87,5 +88,8 @@ module Imap::Backup
 
     desc "local SUBCOMMAND [OPTIONS]", "View local info"
     subcommand "local", Local
+
+    desc "utils SUBCOMMAND [OPTIONS]", "Various utilities"
+    subcommand "utils", Utils
   end
 end
