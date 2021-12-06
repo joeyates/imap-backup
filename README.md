@@ -178,6 +178,7 @@ If you have problems:
   "debug": true
 }
 ```
+
 # Restore
 
 All missing messages are pushed to the IMAP server.
