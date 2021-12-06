@@ -9,21 +9,18 @@ Gem::Specification.new do |gem|
   gem.email         = ["joe.g.yates@gmail.com"]
   gem.homepage      = "https://github.com/joeyates/imap-backup"
   gem.licenses      = ["MIT"]
+  gem.version       = Imap::Backup::VERSION
 
-  # Build list of files manually, see also
-  # https://github.com/rubygems/rubygems/blob/master/bundler/bundler.gemspec#L37
   gem.files         = %w[bin/imap-backup]
-  gem.files         += Dir.glob("docs/*{.png,.md}")
+  gem.files         += Dir.glob("docs/*.md")
   gem.files         += Dir.glob("lib/**/*.rb")
-  gem.files         += Dir.glob("spec/**/*{.rb,.yml}")
   gem.files         += %w[imap-backup.gemspec]
   gem.files         += %w[LICENSE README.md]
 
   gem.executables   = gem.files.grep(%r{^bin/}).map { |f| File.basename(f) }
-  gem.test_files    = gem.files.grep(%r{^spec/})
+  gem.test_files    = Dir.glob("spec/**/*{.rb,.yml}")
   gem.require_paths = ["lib"]
   gem.required_ruby_version = ">= 2.5"
-  gem.version = Imap::Backup::VERSION
 
   gem.add_runtime_dependency "highline"
   gem.add_runtime_dependency "mail"
