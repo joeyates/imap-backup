@@ -16,10 +16,6 @@
 [Rubygem]: http://rubygems.org/gems/imap-backup "Ruby gem at rubygems.org"
 [Continuous Integration]: https://circleci.com/gh/joeyates/imap-backup "Build status by CirceCI"
 
-# GMail
-
-To use imap-backup with GMail, you will need to enable 'App passwords' on your account.
-
 # Installation
 
 ```shell
@@ -50,6 +46,10 @@ Run:
 ```shell
 $ imap-backup setup
 ```
+
+## GMail
+
+To use imap-backup with GMail, you will need to enable 'App passwords' on your account.
 
 ## Folders
 
@@ -178,6 +178,7 @@ If you have problems:
   "debug": true
 }
 ```
+
 # Restore
 
 All missing messages are pushed to the IMAP server.
@@ -206,48 +207,7 @@ $ imap-backup status
 * Restartable - calculate start point based on already downloaded messages
 * Standalone - do not rely on an email client or MTA
 
-# Similar Software
+# Documentation
 
-* https://github.com/OfflineIMAP/offlineimap
-
-# Testing
-
-## Integration Tests
-
-Integration tests (feature specs) are run against a Docker image
-(antespi/docker-imap-devel:latest).
-
-In one shell, run the Docker image:
-
-```sh
-$ docker run \
-  --env MAIL_ADDRESS=address@example.org \
-  --env MAIL_PASS=pass \
-  --env MAILNAME=example.org \
-  --publish 8993:993 \
-  antespi/docker-imap-devel:latest
-```
-
-```sh
-$ rake
-```
-
-To exclude Docker-based tests:
-
-```sh
-rake no-docker
-```
-
-or
-
-```sh
-$ rspec --tag ~docker
-```
-
-## Contributing
-
-1. Fork it
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Added some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create new Pull Request
+* [Development](./docs/development.md)
+* [Restore](./docs/restore.md)
