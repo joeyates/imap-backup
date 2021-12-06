@@ -209,3 +209,4 @@ $ imap-backup status
 # Documentation
 
 * [Development](./docs/development.md)
+* [Restore](./docs/restore.md)
