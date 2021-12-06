@@ -17,10 +17,6 @@ Gem::Specification.new do |gem|
   gem.files         += %w[imap-backup.gemspec]
   gem.files         += %w[LICENSE README.md]
 
-  gem.extra_rdoc_files += Dir.glob("README.md")
-  gem.extra_rdoc_files += Dir.glob("docs/*.md")
-  gem.rdoc_options = ["--main", "README.md"]
-
   gem.executables   = gem.files.grep(%r{^bin/}).map { |f| File.basename(f) }
   gem.test_files    = Dir.glob("spec/**/*{.rb,.yml}")
   gem.require_paths = ["lib"]
