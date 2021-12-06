@@ -16,10 +16,6 @@
 [Rubygem]: http://rubygems.org/gems/imap-backup "Ruby gem at rubygems.org"
 [Continuous Integration]: https://circleci.com/gh/joeyates/imap-backup "Build status by CirceCI"
 
-# GMail
-
-To use imap-backup with GMail, you will need to enable 'App passwords' on your account.
-
 # Installation
 
 ```shell
@@ -50,6 +46,10 @@ Run:
 ```shell
 $ imap-backup setup
 ```
+
+## GMail
+
+To use imap-backup with GMail, you will need to enable 'App passwords' on your account.
 
 ## Folders
 
