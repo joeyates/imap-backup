@@ -15,8 +15,8 @@ module Imap::Backup
       account = connections.accounts.find { |a| a[:username] == email }
       raise "#{email} is not a configured account" if !account
 
-      account_connection = Imap::Backup::Account::Connection.new(account)
-      account_connection.local_folders.each do |_s, f|
+      connection = Imap::Backup::Account::Connection.new(account)
+      connection.local_folders.each do |_s, f|
         puts %("#{f.name}")
       end
     end
@@ -27,8 +27,8 @@ module Imap::Backup
       account = connections.accounts.find { |a| a[:username] == email }
       raise "#{email} is not a configured account" if !account
 
-      account_connection = Imap::Backup::Account::Connection.new(account)
-      folder_serializer, _folder = account_connection.local_folders.find do |(_s, f)|
+      connection = Imap::Backup::Account::Connection.new(account)
+      folder_serializer, _folder = connection.local_folders.find do |(_s, f)|
         f.name == folder_name
       end
       raise "Folder '#{folder_name}' not found" if !folder_serializer
@@ -64,8 +64,8 @@ module Imap::Backup
       account = connections.accounts.find { |a| a[:username] == email }
       raise "#{email} is not a configured account" if !account
 
-      account_connection = Imap::Backup::Account::Connection.new(account)
-      folder_serializer, _folder = account_connection.local_folders.find do |(_s, f)|
+      connection = Imap::Backup::Account::Connection.new(account)
+      folder_serializer, _folder = connection.local_folders.find do |(_s, f)|
         f.name == folder_name
       end
       raise "Folder '#{folder_name}' not found" if !folder_serializer
