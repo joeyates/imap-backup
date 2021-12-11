@@ -1,9 +1,13 @@
+require "forwardable"
 require "mail"
 
 module Email; end
 
 module Email::Mboxrd
   class Message
+    extend Forwardable
+    def_delegators :@parsed, :subject
+
     attr_reader :supplied_body
 
     def self.from_serialized(serialized)
@@ -36,11 +40,11 @@ module Email::Mboxrd
       supplied_body.gsub(/(?<!\r)\n/, "\r\n")
     end
 
+    private
+
     def parsed
       @parsed ||= Mail.new(supplied_body)
     end
-
-    private
 
     def from
       @from ||=

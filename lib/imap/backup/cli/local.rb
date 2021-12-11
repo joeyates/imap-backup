@@ -42,8 +42,8 @@ module Imap::Backup
       folder_serializer.each_message(uids).map do |uid, message|
         m = {
           uid: uid,
-          date: message.parsed.date.to_s,
-          subject: message.parsed.subject || ""
+          date: message.date.to_s,
+          subject: message.subject || ""
         }
         if m[:subject].length > max_subject
           puts format("% 10<uid>u: %.#{max_subject - 3}<subject>s... - %<date>s", m)
