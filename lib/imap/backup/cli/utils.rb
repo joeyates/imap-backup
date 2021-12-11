@@ -12,15 +12,14 @@ module Imap::Backup
 
       connection = Imap::Backup::Account::Connection.new(account)
 
-      connection.local_folders.each do |_s, f|
+      connection.local_folders.each do |serializer, folder|
         next if !folder.exist?
-        do_ignore_folder_history(connection, folder)
+        do_ignore_folder_history(folder, serializer)
       end
     end
 
     no_commands do
-      def do_ignore_folder_history(connection, folder)
-        serializer = Imap::Backup::Serializer::Mbox.new(connection.local_path, folder.name)
+      def do_ignore_folder_history(folder, serializer)
         uids = folder.uids - serializer.uids
         Imap::Backup.logger.info "Folder '#{folder.name}' - #{uids.length} messages"
 
