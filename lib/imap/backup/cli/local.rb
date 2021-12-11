@@ -6,7 +6,7 @@ module Imap::Backup
     desc "accounts", "List locally backed-up accounts"
     def accounts
       connections = Imap::Backup::Configuration::List.new
-      connections.accounts.each { |a| puts a[:username] }
+      connections.accounts.each { |a| Kernel.puts a[:username] }
     end
 
     desc "folders EMAIL", "List account folders"
@@ -17,7 +17,7 @@ module Imap::Backup
 
       connection = Imap::Backup::Account::Connection.new(account)
       connection.local_folders.each do |_s, f|
-        puts %("#{f.name}")
+        Kernel.puts %("#{f.name}")
       end
     end
 
@@ -34,8 +34,8 @@ module Imap::Backup
       raise "Folder '#{folder_name}' not found" if !folder_serializer
 
       max_subject = 60
-      puts format("%-10<uid>s  %-#{max_subject}<subject>s - %<date>s", {uid: "UID", subject: "Subject", date: "Date"})
-      puts "-" * (12 + max_subject + 28)
+      Kernel.puts format("%-10<uid>s  %-#{max_subject}<subject>s - %<date>s", {uid: "UID", subject: "Subject", date: "Date"})
+      Kernel.puts "-" * (12 + max_subject + 28)
 
       uids = folder_serializer.uids
 
@@ -46,9 +46,9 @@ module Imap::Backup
           subject: message.subject || ""
         }
         if m[:subject].length > max_subject
-          puts format("% 10<uid>u: %.#{max_subject - 3}<subject>s... - %<date>s", m)
+          Kernel.puts format("% 10<uid>u: %.#{max_subject - 3}<subject>s... - %<date>s", m)
         else
-          puts format("% 10<uid>u: %-#{max_subject}<subject>s - %<date>s", m)
+          Kernel.puts format("% 10<uid>u: %-#{max_subject}<subject>s - %<date>s", m)
         end
       end
     end
@@ -73,13 +73,13 @@ module Imap::Backup
       uid_list = uids.split(",")
       folder_serializer.each_message(uid_list).each do |uid, message|
         if uid_list.count > 1
-          puts <<~HEADER
+          Kernel.puts <<~HEADER
             #{'-' * 80}
             #{format('| UID: %-71s |', uid)}
             #{'-' * 80}
           HEADER
         end
-        puts message.supplied_body
+        Kernel.puts message.supplied_body
       end
     end
   end
