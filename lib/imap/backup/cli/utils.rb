@@ -1,16 +1,13 @@
 module Imap::Backup
   class CLI::Utils < Thor
     include Thor::Actions
+    include CLI::Helpers
 
     FAKE_EMAIL = "fake@email.com"
 
     desc "ignore-history EMAIL", "Skip downloading emails up to today for all configured folders"
     def ignore_history(email)
-      connections = Imap::Backup::Configuration::List.new
-      account = connections.accounts.find { |a| a[:username] == email }
-      raise "#{email} is not a configured account" if !account
-
-      connection = Imap::Backup::Account::Connection.new(account)
+      connection = connection(email)
 
       connection.local_folders.each do |serializer, folder|
         next if !folder.exist?
