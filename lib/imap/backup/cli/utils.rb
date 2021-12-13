@@ -1,13 +1,10 @@
-require "thunderbird/local_folder"
-require "thunderbird/mailbox"
-require "thunderbird/profiles"
+require "imap/backup/thunderbird/mailbox_exporter"
 
 module Imap::Backup
   class CLI::Utils < Thor
     include Thor::Actions
     include CLI::Helpers
 
-    EXPORT_PREFIX = "imap-backup"
     FAKE_EMAIL = "fake@email.com"
 
     desc "ignore-history EMAIL", "Skip downloading emails up to today for all configured folders"
@@ -54,7 +51,9 @@ module Imap::Backup
       end
 
       connection.local_folders.each do |serializer, folder|
-        export_mailbox(email, serializer, folder, profile, force: force)
+        Thunderbird::MailboxExporter.new(
+          email, serializer, profile, force: force
+        ).run
       end
     end
 
@@ -82,44 +81,6 @@ module Imap::Backup
         else
           Thunderbird::Profiles.new.default
         end
-      end
-
-      def export_mailbox(email, serializer, folder, profile, force: false)
-        folder_path = File.dirname(folder.name)
-        mailbox_name = File.basename(folder.name)
-        top_level_folders = [EXPORT_PREFIX, email]
-        prefixed_folder_path =
-          if folder_path == "."
-            File.join(top_level_folders)
-          else
-            File.join(top_level_folders, folder_path)
-          end
-        local_folder = Thunderbird::LocalFolder.new(profile, prefixed_folder_path)
-
-        local_folder.set_up
-
-        mailbox = Thunderbird::Mailbox.new(local_folder, mailbox_name)
-
-        if mailbox.msf_exists?
-          if force
-            Kernel.puts "Deleting '#{mailbox.msf_path}' as --force option was supplied"
-            File.unlink mailbox.msf_path
-          else
-            Kernel.puts "Skipping export of '#{folder.name}' as '#{mailbox.msf_path}' exists"
-            return
-          end
-        end
-
-        if mailbox.exists?
-          if force
-            Kernel.puts "Overwriting '#{mailbox.path}' as --force option was supplied"
-          else
-            Kernel.puts "Skipping export of '#{folder.name}' as '#{mailbox.path}' exists"
-            return
-          end
-        end
-
-        FileUtils.cp serializer.mbox_pathname, mailbox.path
       end
     end
   end
