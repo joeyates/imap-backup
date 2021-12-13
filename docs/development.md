@@ -2,18 +2,12 @@
 
 ## Integration Tests
 
-Integration tests (feature specs) are run against a Docker image
-(antespi/docker-imap-devel:latest).
-
-In one shell, run the Docker image:
+Integration tests (feature specs) are run against a local IMAP server
+controlled by Docker Compose, which needs to be started
+before running the test suite.
 
 ```sh
-$ docker run \
-  --env MAIL_ADDRESS=address@example.org \
-  --env MAIL_PASS=pass \
-  --env MAILNAME=example.org \
-  --publish 8993:993 \
-  antespi/docker-imap-devel:latest
+$ docker-compose up -d
 ```
 
 ```sh

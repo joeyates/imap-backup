@@ -1,7 +1,12 @@
+require "forwardable"
+
 require "imap/backup/serializer/mbox_store"
 
 module Imap::Backup
   class Serializer::Mbox
+    extend Forwardable
+    def_delegators :store, :mbox_pathname
+
     attr_reader :path
     attr_reader :folder
 

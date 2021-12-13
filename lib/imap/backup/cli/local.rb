@@ -11,11 +11,8 @@ module Imap::Backup
 
     desc "folders EMAIL", "List account folders"
     def folders(email)
-      connections = Imap::Backup::Configuration::List.new
-      account = connections.accounts.find { |a| a[:username] == email }
-      raise "#{email} is not a configured account" if !account
+      connection = connection(email)
 
-      connection = Imap::Backup::Account::Connection.new(account)
       connection.local_folders.each do |_s, f|
         Kernel.puts %("#{f.name}")
       end
@@ -23,11 +20,8 @@ module Imap::Backup
 
     desc "list EMAIL FOLDER", "List emails in a folder"
     def list(email, folder_name)
-      connections = Imap::Backup::Configuration::List.new
-      account = connections.accounts.find { |a| a[:username] == email }
-      raise "#{email} is not a configured account" if !account
+      connection = connection(email)
 
-      connection = Imap::Backup::Account::Connection.new(account)
       folder_serializer, _folder = connection.local_folders.find do |(_s, f)|
         f.name == folder_name
       end
@@ -60,11 +54,8 @@ module Imap::Backup
       the UID.
     DESC
     def show(email, folder_name, uids)
-      connections = Imap::Backup::Configuration::List.new
-      account = connections.accounts.find { |a| a[:username] == email }
-      raise "#{email} is not a configured account" if !account
+      connection = connection(email)
 
-      connection = Imap::Backup::Account::Connection.new(account)
       folder_serializer, _folder = connection.local_folders.find do |(_s, f)|
         f.name == folder_name
       end

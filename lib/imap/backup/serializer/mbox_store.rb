@@ -121,6 +121,14 @@ module Imap::Backup
       @folder = new_name
     end
 
+    def mbox_pathname
+      absolute_path("#{folder}.mbox")
+    end
+
+    def imap_pathname
+      absolute_path("#{folder}.imap")
+    end
+
     private
 
     def do_load
@@ -204,14 +212,6 @@ module Imap::Backup
 
     def absolute_path(relative_path)
       File.join(path, relative_path)
-    end
-
-    def mbox_pathname
-      absolute_path("#{folder}.mbox")
-    end
-
-    def imap_pathname
-      absolute_path("#{folder}.imap")
     end
   end
 end

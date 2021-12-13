@@ -1,20 +1,59 @@
+require "imap/backup/thunderbird/mailbox_exporter"
+
 module Imap::Backup
   class CLI::Utils < Thor
     include Thor::Actions
+    include CLI::Helpers
 
     FAKE_EMAIL = "fake@email.com"
 
     desc "ignore-history EMAIL", "Skip downloading emails up to today for all configured folders"
     def ignore_history(email)
-      connections = Imap::Backup::Configuration::List.new
-      account = connections.accounts.find { |a| a[:username] == email }
-      raise "#{email} is not a configured account" if !account
-
-      connection = Imap::Backup::Account::Connection.new(account)
+      connection = connection(email)
 
       connection.local_folders.each do |serializer, folder|
         next if !folder.exist?
         do_ignore_folder_history(folder, serializer)
+      end
+    end
+
+    desc "export-to-thunderbird EMAIL [OPTIONS]",
+      <<~DOC
+        [Experimental] Copy backed up emails to Thunderbird.
+        A folder called 'imap-backup/EMAIL' is created under 'Local Folders'.
+      DOC
+    method_option(
+      "force",
+      type: :boolean,
+      banner: "overwrite existing mailboxes",
+      aliases: ["-f"]
+    )
+    method_option(
+      "profile",
+      type: :string,
+      banner: "the name of the Thunderbird profile to copy emails to",
+      aliases: ["-p"]
+    )
+    def export_to_thunderbird(email)
+      opts = symbolized(options)
+      force = opts.key?(:force) ? opts[:force] : false
+      profile_name = opts[:profile]
+
+      connection = connection(email)
+      profile = thunderbird_profile(profile_name)
+
+      if !profile
+        if profile_name
+          raise "Thunderbird profile '#{profile_name}' not found"
+        else
+          raise "Default Thunderbird profile not found"
+        end
+      end
+
+      connection.local_folders.each do |serializer, folder|
+        Thunderbird::MailboxExporter.new(
+          email, serializer, profile, force: force
+        ).run
       end
     end
 
@@ -33,6 +72,14 @@ module Imap::Backup
           MESSAGE
 
           serializer.save(uid, message)
+        end
+      end
+
+      def thunderbird_profile(name = nil)
+        if name
+          Thunderbird::Profiles.new.profile(name)
+        else
+          Thunderbird::Profiles.new.default
         end
       end
     end

@@ -16,14 +16,15 @@ describe Imap::Backup::CLI::Utils do
       exist?: true,
       name: "name",
       uid_validity: "uid_validity",
-      uids: ["123"]
+      uids: ["123", "456"]
     )
   end
   let(:serializer) do
     instance_double(
       Imap::Backup::Serializer::Mbox,
-      uids: ["123", "456"],
-      apply_uid_validity: nil
+      uids: ["123", "789"],
+      apply_uid_validity: nil,
+      save: nil
     )
   end
   let(:email) { "foo@example.com" }
@@ -34,12 +35,16 @@ describe Imap::Backup::CLI::Utils do
   end
 
   describe "ignore_history" do
-    it "ensures the local UID validity matches the server"
+    it "ensures the local UID validity matches the server" do
+      subject.ignore_history(email)
+
+      expect(serializer).to have_received(:apply_uid_validity).with("uid_validity")
+    end
 
     it "fills the local folder with fake emails" do
       subject.ignore_history(email)
 
-      TODO
+      expect(serializer).to have_received(:save).with("456", /From: fake@email.com/)
     end
   end
 end
