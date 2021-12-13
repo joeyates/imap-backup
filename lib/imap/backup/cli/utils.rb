@@ -7,6 +7,7 @@ module Imap::Backup
     include Thor::Actions
     include CLI::Helpers
 
+    EXPORT_PREFIX = "imap-backup"
     FAKE_EMAIL = "fake@email.com"
 
     desc "ignore-history EMAIL", "Skip downloading emails up to today for all configured folders"
@@ -53,7 +54,7 @@ module Imap::Backup
       end
 
       connection.local_folders.each do |serializer, folder|
-        export_mailbox(serializer, folder, profile, force: force)
+        export_mailbox(email, serializer, folder, profile, force: force)
       end
     end
 
@@ -83,15 +84,19 @@ module Imap::Backup
         end
       end
 
-      def export_mailbox(serializer, folder, profile, force: false)
+      def export_mailbox(email, serializer, folder, profile, force: false)
         folder_path = File.dirname(folder.name)
         mailbox_name = File.basename(folder.name)
-        local_folder =
+        top_level_folders = [EXPORT_PREFIX, email]
+        prefixed_folder_path =
           if folder_path == "."
-            Thunderbird::LocalFolder.new(profile, "")
+            File.join(top_level_folders)
           else
-            Thunderbird::LocalFolder.new(profile, folder_path)
+            File.join(top_level_folders, folder_path)
           end
+        local_folder = Thunderbird::LocalFolder.new(profile, prefixed_folder_path)
+
+        local_folder.set_up
 
         mailbox = Thunderbird::Mailbox.new(local_folder, mailbox_name)
 
