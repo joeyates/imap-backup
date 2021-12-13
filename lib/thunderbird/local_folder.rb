@@ -27,7 +27,7 @@ class Thunderbird::LocalFolder
 
   def parent
     if folder_path_elements.count > 0
-      new(profile, File.join(folder_path_elements[0..-2]))
+      self.class.new(profile, File.join(folder_path_elements[0..-2]))
     end
   end
 
@@ -37,6 +37,10 @@ class Thunderbird::LocalFolder
 
   def directory_exists?
     File.exists?(full_path)
+  end
+
+  def is_directory?
+    File.directory?(full_path)
   end
 
   def subdirectories
@@ -72,16 +76,16 @@ class Thunderbird::LocalFolder
     return if !parent_ok
 
     case
-    when local_folder_placeholder.exists? && !exists?
+    when local_folder_placeholder.exists? && !directory_exists?
       Kernel.puts "Can't set up folder '#{folder_path}': '#{local_folder_placeholder.path}' exists, but '#{full_path}' is missing"
       false
     when directory_exists? && !local_folder_placeholder.exists?
       Kernel.puts "Can't set up folder '#{folder_path}': '#{full_path}' exists, but '#{local_folder_placeholder.path}' is missing"
       false
-    when local_folder_placeholder.is_regular?
+    when local_folder_placeholder.exists? && !local_folder_placeholder.is_regular?
       Kernel.puts "Can't set up folder '#{folder_path}': '#{local_folder_placeholder.path}' exists, but it is not a regular file"
       false
-    when is_directory?
+    when directory_exists? && !is_directory?
       Kernel.puts "Can't set up folder '#{folder_path}': '#{full_path}' exists, but it is not a directory"
       false
     else

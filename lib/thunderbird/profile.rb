@@ -10,13 +10,19 @@ class Thunderbird::Profile
     @entries = entries
   end
 
-  def path
+  def root
     if relative?
       File.join(Thunderbird.new.data_path, entries[:Path])
     else
       entries[:Path]
     end
   end
+
+  def local_folders_path
+    File.join(root, "Mail", "Local Folders")
+  end
+
+  private
 
   def relative?
     entries[:IsRelative] == "1"
