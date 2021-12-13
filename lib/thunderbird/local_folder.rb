@@ -58,6 +58,8 @@ class Thunderbird::LocalFolder
     ensure_initialized
   end
 
+  private
+
   def ensure_initialized
     return true if !parent
 
