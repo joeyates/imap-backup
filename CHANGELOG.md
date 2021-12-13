@@ -24,3 +24,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 * `local` commands to list accounts, folders and emails and to view single
   emails.
+
+## [4.0.1] - 2021-12-13
+
+### Added
+
+* Experimental `utils export-to-thunderbird` command that copies downloaded
+  mailboxes to Thunderbird.
