@@ -1,4 +1,4 @@
-require "net/imap"
+require "imap/backup/client/default"
 
 require "retry_on_error"
 
@@ -29,17 +29,15 @@ module Imap::Backup
     def folders
       @folders ||=
         begin
-          root = provider_root
-          mailbox_lists = imap.list(root, "*")
+          folders = client.list
 
-          if mailbox_lists.nil?
+          if folders.empty?
             message = "Unable to get folder list for account #{username}"
             Imap::Backup.logger.info message
             raise message
           end
 
-          utf7_encoded = mailbox_lists.map(&:name)
-          utf7_encoded.map { |n| Net::IMAP.decode_utf7(n) }
+          folders
         end
     end
 
@@ -54,7 +52,7 @@ module Imap::Backup
     def run_backup
       Imap::Backup.logger.debug "Running backup of account: #{username}"
       # start the connection so we get logging messages in the right order
-      imap
+      client
       each_folder do |folder, serializer|
         next if !folder.exist?
 
@@ -89,34 +87,31 @@ module Imap::Backup
     end
 
     def disconnect
-      imap.disconnect if @imap
+      client.disconnect if @client
     end
 
     def reconnect
       disconnect
-      @imap = nil
+      @client = nil
     end
 
-    def imap
-      @imap ||=
+    def client
+      @client ||=
         retry_on_error(errors: LOGIN_RETRY_CLASSES) do
           options = provider_options
           Imap::Backup.logger.debug(
             "Creating IMAP instance: #{server}, options: #{options.inspect}"
           )
-          imap = Net::IMAP.new(server, options)
+          client = Client::Default.new(server, options)
           Imap::Backup.logger.debug "Logging in: #{username}/#{masked_password}"
-          imap.login(username, password)
+          client.login(username, password)
           Imap::Backup.logger.debug "Login complete"
-          imap
+          client
         end
     end
 
     def server
-      return @server if @server
-      return nil if provider.nil?
-
-      @server = provider.host
+      @server ||= provider.host
     end
 
     private
@@ -185,17 +180,6 @@ module Imap::Backup
 
     def provider_options
       provider.options.merge(connection_options)
-    end
-
-    # 6.3.8. LIST Command
-    # An empty ("" string) mailbox name argument is a special request to
-    # return the hierarchy delimiter and the root name of the name given
-    # in the reference.
-    def provider_root
-      return @provider_root if @provider_root
-
-      root_info = imap.list("", "")[0]
-      @provider_root = root_info.name
     end
   end
 end

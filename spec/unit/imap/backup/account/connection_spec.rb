@@ -14,8 +14,10 @@ describe Imap::Backup::Account::Connection do
 
   subject { described_class.new(options) }
 
-  let(:imap) do
-    instance_double(Net::IMAP, authenticate: nil, login: nil, disconnect: nil)
+  let(:client) do
+    instance_double(
+      Imap::Backup::Client::Default, authenticate: nil, login: nil, disconnect: nil
+    )
   end
   let(:imap_folders) { [] }
   let(:options) do
@@ -45,15 +47,14 @@ describe Imap::Backup::Account::Connection do
   let(:new_uid_validity) { nil }
 
   before do
-    allow(Net::IMAP).to receive(:new) { imap }
-    allow(imap).to receive(:list).with("", "") { [root_info] }
-    allow(imap).to receive(:list).with(ROOT_NAME, "*") { imap_folders }
+    allow(Imap::Backup::Client::Default).to receive(:new) { client }
+    allow(client).to receive(:list) { imap_folders }
     allow(Imap::Backup::Utils).to receive(:make_folder)
   end
 
   shared_examples "connects to IMAP" do
     it "logs in to the imap server" do
-      expect(imap).to have_received(:login)
+      expect(client).to have_received(:login)
     end
   end
 
@@ -76,48 +77,34 @@ describe Imap::Backup::Account::Connection do
     end
   end
 
-  describe "#imap" do
-    let(:result) { subject.imap }
+  describe "#client" do
+    let(:result) { subject.client }
 
     it "returns the IMAP connection" do
-      expect(result).to eq(imap)
+      expect(result).to eq(client)
     end
 
     it "uses the password" do
       result
 
-      expect(imap).to have_received(:login).with(USERNAME, PASSWORD)
-    end
-
-    context "with the GMail IMAP server" do
-      let(:server) { GMAIL_IMAP_SERVER }
-      let(:refresh_token) { true }
-      let(:result) { nil }
-
-      context "when the password is not our copy of a GMail refresh token" do
-        it "uses the password" do
-          subject.imap
-
-          expect(imap).to have_received(:login).with(USERNAME, PASSWORD)
-        end
-      end
+      expect(client).to have_received(:login).with(USERNAME, PASSWORD)
     end
 
     context "when the first login attempt fails" do
       before do
         outcomes = [-> { raise EOFError }, -> { true }]
-        allow(imap).to receive(:login) { outcomes.shift.call }
+        allow(client).to receive(:login) { outcomes.shift.call }
       end
 
       it "retries" do
-        subject.imap
+        subject.client
 
-        expect(imap).to have_received(:login).twice
+        expect(client).to have_received(:login).twice
       end
     end
 
     context "when run" do
-      before { subject.imap }
+      before { subject.client }
 
       include_examples "connects to IMAP"
     end
@@ -125,21 +112,11 @@ describe Imap::Backup::Account::Connection do
 
   describe "#folders" do
     let(:imap_folders) do
-      [instance_double(Net::IMAP::MailboxList, name: BACKUP_FOLDER)]
+      [BACKUP_FOLDER]
     end
 
     it "returns the list of folders" do
       expect(subject.folders).to eq([BACKUP_FOLDER])
-    end
-
-    context "with non-ASCII folder names" do
-      let(:imap_folders) do
-        [instance_double(Net::IMAP::MailboxList, name: "Gel&APY-scht")]
-      end
-
-      it "converts them to UTF-8" do
-        expect(subject.folders).to eq(["Gelöscht"])
-      end
     end
   end
 
@@ -208,9 +185,7 @@ describe Imap::Backup::Account::Connection do
     end
 
     context "without supplied config_folders" do
-      let(:imap_folders) do
-        [instance_double(Net::IMAP::MailboxList, name: ROOT_NAME)]
-      end
+      let(:imap_folders) { [ROOT_NAME] }
 
       before do
         allow(Imap::Backup::Account::Folder).to receive(:new).
@@ -241,7 +216,7 @@ describe Imap::Backup::Account::Connection do
 
       context "when the imap server doesn't return folders" do
         let(:config_folders) { nil }
-        let(:imap_folders) { nil }
+        let(:imap_folders) { [] }
 
         it "fails" do
           expect do
@@ -389,10 +364,10 @@ describe Imap::Backup::Account::Connection do
 
   describe "#reconnect" do
     context "when the IMAP connection has been used" do
-      before { subject.imap }
+      before { subject.client }
 
       it "disconnects from the server" do
-        expect(imap).to receive(:disconnect)
+        expect(client).to receive(:disconnect)
 
         subject.reconnect
       end
@@ -400,26 +375,26 @@ describe Imap::Backup::Account::Connection do
 
     context "when the IMAP connection has not been used" do
       it "does not disconnect from the server" do
-        expect(imap).to_not receive(:disconnect)
+        expect(client).to_not receive(:disconnect)
 
         subject.reconnect
       end
     end
 
     it "causes reconnection on future access" do
-      expect(Net::IMAP).to receive(:new)
+      expect(Imap::Backup::Client::Default).to receive(:new)
 
       subject.reconnect
-      subject.imap
+      subject.client
     end
   end
 
   describe "#disconnect" do
     context "when the IMAP connection has been used" do
       it "disconnects from the server" do
-        subject.imap
+        subject.client
 
-        expect(imap).to receive(:disconnect)
+        expect(client).to receive(:disconnect)
 
         subject.disconnect
       end
@@ -427,7 +402,7 @@ describe Imap::Backup::Account::Connection do
 
     context "when the IMAP connection has not been used" do
       it "does not disconnect from the server" do
-        expect(imap).to_not receive(:disconnect)
+        expect(client).to_not receive(:disconnect)
 
         subject.disconnect
       end

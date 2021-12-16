@@ -17,7 +17,7 @@ module Imap::Backup
     attr_reader :connection
     attr_reader :name
 
-    delegate imap: :connection
+    delegate client: :connection
 
     def initialize(connection, name)
       @connection = connection
@@ -40,20 +40,20 @@ module Imap::Backup
     def create
       return if exist?
 
-      imap.create(utf7_encoded_name)
+      client.create(utf7_encoded_name)
     end
 
     def uid_validity
       @uid_validity ||=
         begin
           examine
-          imap.responses["UIDVALIDITY"][-1]
+          client.responses["UIDVALIDITY"][-1]
         end
     end
 
     def uids
       examine
-      imap.uid_search(["ALL"]).sort
+      client.uid_search(["ALL"]).sort
     rescue FolderNotFound
       []
     rescue NoMethodError
@@ -72,7 +72,7 @@ module Imap::Backup
       examine
       fetch_data_items =
         retry_on_error(errors: UID_FETCH_RETRY_CLASSES) do
-          imap.uid_fetch([uid.to_i], [BODY_ATTRIBUTE])
+          client.uid_fetch([uid.to_i], [BODY_ATTRIBUTE])
         end
       return nil if fetch_data_items.nil?
 
@@ -87,14 +87,14 @@ module Imap::Backup
     def append(message)
       body = message.imap_body
       date = message.date&.to_time
-      response = imap.append(utf7_encoded_name, body, nil, date)
+      response = client.append(utf7_encoded_name, body, nil, date)
       extract_uid(response)
     end
 
     private
 
     def examine
-      imap.examine(utf7_encoded_name)
+      client.examine(utf7_encoded_name)
     rescue Net::IMAP::NoResponseError
       Imap::Backup.logger.warn "Folder '#{name}' does not exist on server"
       raise FolderNotFound, "Folder '#{name}' does not exist on server"
