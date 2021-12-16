@@ -1,5 +1,5 @@
 module EmailServerHelpers
-  REQUESTED_ATTRIBUTES = %w(RFC822 FLAGS INTERNALDATE).freeze
+  REQUESTED_ATTRIBUTES = ["BODY[]"].freeze
   DEFAULT_EMAIL = "address@example.org".freeze
 
   def send_email(folder, options)
@@ -28,7 +28,7 @@ module EmailServerHelpers
   end
 
   def server_message_to_body(message)
-    message["RFC822"]
+    message["BODY[]"]
   end
 
   def server_fetch_email(folder, uid)

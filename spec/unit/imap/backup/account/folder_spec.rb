@@ -66,7 +66,7 @@ describe Imap::Backup::Account::Folder do
 
   describe "#fetch" do
     let(:message_body) { instance_double(String, force_encoding: nil) }
-    let(:attributes) { {"RFC822" => message_body, "other" => "xxx"} }
+    let(:attributes) { {"BODY[]" => message_body, "other" => "xxx"} }
     let(:fetch_data_item) do
       instance_double(Net::IMAP::FetchData, attr: attributes)
     end
@@ -74,7 +74,7 @@ describe Imap::Backup::Account::Folder do
     before { allow(imap).to receive(:uid_fetch) { [fetch_data_item] } }
 
     it "returns the message" do
-      expect(subject.fetch(123)).to eq(attributes)
+      expect(subject.fetch(123)).to eq(message_body)
     end
 
     context "when the server responds with nothing" do
@@ -96,7 +96,7 @@ describe Imap::Backup::Account::Folder do
       end
     end
 
-    context "when the response doesn't have RFC822" do
+    context "when the response doesn't include 'BODY[]'" do
       let(:attributes) { {} }
 
       it "is nil" do

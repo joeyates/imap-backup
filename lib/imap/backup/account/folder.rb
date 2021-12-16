@@ -11,7 +11,7 @@ module Imap::Backup
     extend Forwardable
     include RetryOnError
 
-    REQUESTED_ATTRIBUTES = %w[RFC822 FLAGS INTERNALDATE].freeze
+    BODY_ATTRIBUTE = "BODY[]"
     UID_FETCH_RETRY_CLASSES = [EOFError].freeze
 
     attr_reader :connection
@@ -72,15 +72,14 @@ module Imap::Backup
       examine
       fetch_data_items =
         retry_on_error(errors: UID_FETCH_RETRY_CLASSES) do
-          imap.uid_fetch([uid.to_i], REQUESTED_ATTRIBUTES)
+          imap.uid_fetch([uid.to_i], [BODY_ATTRIBUTE])
         end
       return nil if fetch_data_items.nil?
 
       fetch_data_item = fetch_data_items[0]
       attributes = fetch_data_item.attr
-      return nil if !attributes.key?("RFC822")
 
-      attributes
+      attributes[BODY_ATTRIBUTE]
     rescue FolderNotFound
       nil
     end

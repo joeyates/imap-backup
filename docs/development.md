@@ -41,8 +41,7 @@ response = imap.append("INBOX", message, nil, nil)
 imap.examine("INBOX")
 uids = imap.uid_search(["ALL"]).sort
 
-REQUESTED_ATTRIBUTES = ["RFC822", "FLAGS", "INTERNALDATE"].freeze
-fetch_data_items = imap.uid_fetch(uids, REQUESTED_ATTRIBUTES)
+fetch_data_items = imap.uid_fetch(uids, ["BODY[]"])
 ```
 
 # Contributing
