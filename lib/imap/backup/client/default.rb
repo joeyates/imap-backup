@@ -23,14 +23,18 @@ module Imap::Backup
 
       return [] if mailbox_lists.nil?
 
-      utf7_encoded = mailbox_lists.map(&:name)
-      utf7_encoded.map { |n| Net::IMAP.decode_utf7(n) }
+      mailbox_lists.map { |ml| extract_name(ml) }
     end
 
     private
 
     def imap
       @imap ||= Net::IMAP.new(*args)
+    end
+
+    def extract_name(mailbox_list)
+      utf7_encoded = mailbox_list.name
+      Net::IMAP.decode_utf7(utf7_encoded)
     end
 
     # 6.3.8. LIST Command

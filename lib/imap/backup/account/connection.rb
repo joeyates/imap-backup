@@ -1,3 +1,4 @@
+require "imap/backup/client/apple_mail"
 require "imap/backup/client/default"
 
 require "retry_on_error"
@@ -102,7 +103,12 @@ module Imap::Backup
           Imap::Backup.logger.debug(
             "Creating IMAP instance: #{server}, options: #{options.inspect}"
           )
-          client = Client::Default.new(server, options)
+          client =
+            if provider.is_a?(Email::Provider::AppleMail)
+              Client::AppleMail.new(server, options)
+            else
+              Client::Default.new(server, options)
+            end
           Imap::Backup.logger.debug "Logging in: #{username}/#{masked_password}"
           client.login(username, password)
           Imap::Backup.logger.debug "Login complete"
