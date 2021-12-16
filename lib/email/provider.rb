@@ -1,4 +1,5 @@
 require "email/provider/default"
+require "email/provider/apple_mail"
 require "email/provider/fastmail"
 require "email/provider/gmail"
 
@@ -13,6 +14,12 @@ class Email::Provider
       Email::Provider::Fastmail.new
     when address.end_with?("@gmail.com")
       Email::Provider::GMail.new
+    when address.end_with?("@icloud.com")
+      Email::Provider::AppleMail.new
+    when address.end_with?("@mac.com")
+      Email::Provider::AppleMail.new
+    when address.end_with?("@me.com")
+      Email::Provider::AppleMail.new
     else
       Email::Provider::Default.new
     end

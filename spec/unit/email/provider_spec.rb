@@ -4,7 +4,10 @@ describe Email::Provider do
       [
         ["fastmail.com", "Fastmail .com", Email::Provider::Fastmail],
         ["fastmail.fm", "Fastmail .fm", Email::Provider::Fastmail],
-        ["gmail.com", "GMail", Email::Provider::GMail]
+        ["gmail.com", "GMail", Email::Provider::GMail],
+        ["icloud.com", "Apple Mail icloud.com", Email::Provider::AppleMail],
+        ["mac.com", "Apple Mail mac.com", Email::Provider::AppleMail],
+        ["me.com", "Apple Mail me.com", Email::Provider::AppleMail]
       ].each do |domain, name, klass|
         it "recognizes #{name} addresses" do
           address = "foo@#{domain}"
