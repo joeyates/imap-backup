@@ -147,7 +147,7 @@ module Imap::Backup
 
     def default_server(username)
       provider = Email::Provider.for_address(username)
-      if provider.provider == :default
+      if provider === Email::Provider::Default
         Kernel.puts "Can't decide provider for email address '#{username}'"
         return nil
       end

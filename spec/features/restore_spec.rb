@@ -152,7 +152,7 @@ RSpec.describe "restore", type: :feature, docker: true do
     it "maintains encodings" do
       message =
         server_messages(folder).
-        first["RFC822"]
+        first["BODY[]"]
 
       expect(message).to eq(server_message)
     end

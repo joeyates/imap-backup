@@ -1,7 +1,7 @@
 describe Imap::Backup::Configuration::ConnectionTester do
   describe ".test" do
     let(:connection) do
-      instance_double(Imap::Backup::Account::Connection, imap: nil)
+      instance_double(Imap::Backup::Account::Connection, client: nil)
     end
 
     before do
@@ -10,7 +10,7 @@ describe Imap::Backup::Configuration::ConnectionTester do
 
     describe "call" do
       it "tries to connect" do
-        expect(connection).to receive(:imap)
+        expect(connection).to receive(:client)
 
         subject.test("foo")
       end
@@ -24,7 +24,7 @@ describe Imap::Backup::Configuration::ConnectionTester do
 
     describe "failure" do
       before do
-        allow(connection).to receive(:imap).and_raise(error)
+        allow(connection).to receive(:client).and_raise(error)
       end
 
       context "with no connection" do

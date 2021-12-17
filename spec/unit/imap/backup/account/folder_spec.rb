@@ -6,9 +6,9 @@ describe Imap::Backup::Account::Folder do
 
   subject { described_class.new(connection, FOLDER_NAME) }
 
-  let(:imap) do
+  let(:client) do
     instance_double(
-      Net::IMAP,
+      Imap::Backup::Client::Default,
       append: append_response,
       create: nil,
       examine: nil,
@@ -16,7 +16,7 @@ describe Imap::Backup::Account::Folder do
     )
   end
   let(:connection) do
-    instance_double(Imap::Backup::Account::Connection, imap: imap)
+    instance_double(Imap::Backup::Account::Connection, client: client)
   end
   let(:missing_mailbox_data) do
     OpenStruct.new(text: "Unknown Mailbox: #{FOLDER_NAME}")
@@ -31,7 +31,7 @@ describe Imap::Backup::Account::Folder do
   describe "#uids" do
     let(:uids) { [5678, 123] }
 
-    before { allow(imap).to receive(:uid_search) { uids } }
+    before { allow(client).to receive(:uid_search) { uids } }
 
     it "lists available messages" do
       expect(subject.uids).to eq(uids.reverse)
@@ -39,7 +39,7 @@ describe Imap::Backup::Account::Folder do
 
     context "with missing mailboxes" do
       before do
-        allow(imap).to receive(:examine).
+        allow(client).to receive(:examine).
           with(ENCODED_FOLDER_NAME).and_raise(missing_mailbox_error)
       end
 
@@ -54,7 +54,7 @@ describe Imap::Backup::Account::Folder do
       end
 
       before do
-        allow(imap).to receive(:examine).
+        allow(client).to receive(:examine).
           with(ENCODED_FOLDER_NAME).and_raise(missing_mailbox_error)
       end
 
@@ -66,19 +66,19 @@ describe Imap::Backup::Account::Folder do
 
   describe "#fetch" do
     let(:message_body) { instance_double(String, force_encoding: nil) }
-    let(:attributes) { {"RFC822" => message_body, "other" => "xxx"} }
+    let(:attributes) { {"BODY[]" => message_body, "other" => "xxx"} }
     let(:fetch_data_item) do
       instance_double(Net::IMAP::FetchData, attr: attributes)
     end
 
-    before { allow(imap).to receive(:uid_fetch) { [fetch_data_item] } }
+    before { allow(client).to receive(:uid_fetch) { [fetch_data_item] } }
 
     it "returns the message" do
-      expect(subject.fetch(123)).to eq(attributes)
+      expect(subject.fetch(123)).to eq(message_body)
     end
 
     context "when the server responds with nothing" do
-      before { allow(imap).to receive(:uid_fetch) { nil } }
+      before { allow(client).to receive(:uid_fetch) { nil } }
 
       it "is nil" do
         expect(subject.fetch(123)).to be_nil
@@ -87,7 +87,7 @@ describe Imap::Backup::Account::Folder do
 
     context "when the mailbox doesn't exist" do
       before do
-        allow(imap).to receive(:examine).
+        allow(client).to receive(:examine).
           with(ENCODED_FOLDER_NAME).and_raise(missing_mailbox_error)
       end
 
@@ -96,7 +96,7 @@ describe Imap::Backup::Account::Folder do
       end
     end
 
-    context "when the response doesn't have RFC822" do
+    context "when the response doesn't include 'BODY[]'" do
       let(:attributes) { {} }
 
       it "is nil" do
@@ -107,13 +107,13 @@ describe Imap::Backup::Account::Folder do
     context "when the first fetch_uid attempts fail" do
       before do
         outcomes = [-> { raise EOFError }, -> { [fetch_data_item] }]
-        allow(imap).to receive(:uid_fetch) { outcomes.shift.call }
+        allow(client).to receive(:uid_fetch) { outcomes.shift.call }
       end
 
       it "retries" do
         subject.fetch(123)
 
-        expect(imap).to have_received(:uid_fetch).twice
+        expect(client).to have_received(:uid_fetch).twice
       end
 
       it "succeeds" do
@@ -137,7 +137,7 @@ describe Imap::Backup::Account::Folder do
 
     context "when the folder doesn't exist" do
       before do
-        allow(imap).to receive(:examine).
+        allow(client).to receive(:examine).
           with(ENCODED_FOLDER_NAME).and_raise(missing_mailbox_error)
       end
 
@@ -150,7 +150,7 @@ describe Imap::Backup::Account::Folder do
   describe "#create" do
     context "when the folder exists" do
       it "is does not create the folder" do
-        expect(imap).to_not receive(:create)
+        expect(client).to_not receive(:create)
 
         subject.create
       end
@@ -158,18 +158,18 @@ describe Imap::Backup::Account::Folder do
 
     context "when the folder doesn't exist" do
       before do
-        allow(imap).to receive(:examine).
+        allow(client).to receive(:examine).
           with(ENCODED_FOLDER_NAME).and_raise(missing_mailbox_error)
       end
 
       it "creates the folder" do
-        expect(imap).to receive(:create)
+        expect(client).to receive(:create)
 
         subject.create
       end
 
       it "encodes the folder name" do
-        expect(imap).to receive(:create).with(ENCODED_FOLDER_NAME)
+        expect(client).to receive(:create).with(ENCODED_FOLDER_NAME)
 
         subject.create
       end
@@ -185,7 +185,7 @@ describe Imap::Backup::Account::Folder do
 
     context "when the folder doesn't exist" do
       before do
-        allow(imap).to receive(:examine).
+        allow(client).to receive(:examine).
           with(ENCODED_FOLDER_NAME).and_raise(missing_mailbox_error)
       end
 
@@ -211,13 +211,13 @@ describe Imap::Backup::Account::Folder do
     end
 
     it "appends the message" do
-      expect(imap).to receive(:append)
+      expect(client).to receive(:append)
 
       subject.append(message)
     end
 
     it "sets the date and time" do
-      expect(imap).to receive(:append).
+      expect(client).to receive(:append).
         with(anything, anything, anything, message_date)
 
       subject.append(message)

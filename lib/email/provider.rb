@@ -1,37 +1,27 @@
+require "email/provider/default"
+require "email/provider/apple_mail"
+require "email/provider/fastmail"
+require "email/provider/gmail"
+
 module Email; end
 
 class Email::Provider
-  GMAIL_IMAP_SERVER = "imap.gmail.com".freeze
-
   def self.for_address(address)
     case
     when address.end_with?("@fastmail.com")
-      new(:fastmail)
-    when address.end_with?("@gmail.com")
-      new(:gmail)
+      Email::Provider::Fastmail.new
     when address.end_with?("@fastmail.fm")
-      new(:fastmail)
+      Email::Provider::Fastmail.new
+    when address.end_with?("@gmail.com")
+      Email::Provider::GMail.new
+    when address.end_with?("@icloud.com")
+      Email::Provider::AppleMail.new
+    when address.end_with?("@mac.com")
+      Email::Provider::AppleMail.new
+    when address.end_with?("@me.com")
+      Email::Provider::AppleMail.new
     else
-      new(:default)
-    end
-  end
-
-  attr_reader :provider
-
-  def initialize(provider)
-    @provider = provider
-  end
-
-  def options
-    {port: 993, ssl: {ssl_version: :TLSv1_2}}
-  end
-
-  def host
-    case provider
-    when :gmail
-      GMAIL_IMAP_SERVER
-    when :fastmail
-      "imap.fastmail.com"
+      Email::Provider::Default.new
     end
   end
 end

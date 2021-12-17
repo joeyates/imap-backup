@@ -1,40 +1,27 @@
 describe Email::Provider do
-  subject { described_class.new(:gmail) }
-
   describe ".for_address" do
     context "with known providers" do
       [
-        ["gmail.com", :gmail],
-        ["fastmail.fm", :fastmail]
-      ].each do |domain, provider|
-        it "recognizes #{provider}" do
+        ["fastmail.com", "Fastmail .com", Email::Provider::Fastmail],
+        ["fastmail.fm", "Fastmail .fm", Email::Provider::Fastmail],
+        ["gmail.com", "GMail", Email::Provider::GMail],
+        ["icloud.com", "Apple Mail icloud.com", Email::Provider::AppleMail],
+        ["mac.com", "Apple Mail mac.com", Email::Provider::AppleMail],
+        ["me.com", "Apple Mail me.com", Email::Provider::AppleMail]
+      ].each do |domain, name, klass|
+        it "recognizes #{name} addresses" do
           address = "foo@#{domain}"
-          expect(described_class.for_address(address).provider).to eq(provider)
+          expect(described_class.for_address(address)).to be_a(klass)
         end
       end
     end
 
     context "with unknown providers" do
       it "returns a default provider" do
-        result = described_class.for_address("foo@unknown.com").provider
-        expect(result).to eq(:default)
+        result = described_class.for_address("foo@unknown.com")
+
+        expect(result).to be_a(Email::Provider::Default)
       end
-    end
-  end
-
-  describe "#options" do
-    it "returns options" do
-      expect(subject.options).to be_a(Hash)
-    end
-
-    it "forces TLSv1_2" do
-      expect(subject.options[:ssl][:ssl_version]).to eq(:TLSv1_2)
-    end
-  end
-
-  describe "#host" do
-    it "returns host" do
-      expect(subject.host).to eq("imap.gmail.com")
     end
   end
 end

@@ -3,11 +3,10 @@ describe Imap::Backup::Downloader do
     subject { described_class.new(folder, serializer) }
 
     let(:body) { "blah" }
-    let(:message) { {"RFC822" => body} }
     let(:folder) do
       instance_double(
         Imap::Backup::Account::Folder,
-        fetch: message,
+        fetch: body,
         name: "folder",
         uids: folder_uids
       )
