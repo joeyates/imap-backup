@@ -1,6 +1,6 @@
 # Each subdirectory is "accompanied" by a blank
 # file of the same name (without the '.sbd' extension)
-class Thunderbird::LocalFolderPlaceholder
+class Thunderbird::SubdirectoryPlaceholder
   attr_reader :path
 
   def initialize(path)
@@ -15,7 +15,7 @@ class Thunderbird::LocalFolderPlaceholder
     File.file?(path)
   end
 
-  def ensure_initialized
+  def touch
     FileUtils.touch path
   end
 end

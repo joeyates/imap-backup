@@ -1,10 +1,11 @@
 require "thunderbird"
+require "thunderbird/install"
 require "thunderbird/profile"
 
 # http://kb.mozillazine.org/Profiles.ini_file
 class Thunderbird::Profiles
-  def default
-    title, entries = blocks.find { |_name, entries| entries[:Default] == "1" }
+  def profile_for_path(path)
+    title, entries = blocks.find { |_name, entries| entries[:Path] == path }
 
     Thunderbird::Profile.new(title, entries) if title
   end
@@ -12,9 +13,14 @@ class Thunderbird::Profiles
   def profile(name)
     title, entries = blocks.find { |_name, entries| entries[:Name] == name }
 
-    return nil if !title
-
     Thunderbird::Profile.new(title, entries) if title
+  end
+
+  def installs
+    @installs ||= begin
+      pairs = blocks.filter { |name, _entries| name.start_with?("Install") }
+      pairs.map { |title, entries| Thunderbird::Install.new(title, entries) }
+    end
   end
 
   private
@@ -31,7 +37,11 @@ class Thunderbird::Profiles
 
         loop do
           line = f.gets
-          break if !line
+          if !line
+            blocks[title] = entries if title
+            break
+          end
+
           line.chomp!
 
           # Is this line the start of a new block

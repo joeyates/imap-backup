@@ -76,10 +76,18 @@ module Imap::Backup
       end
 
       def thunderbird_profile(name = nil)
+        profiles = Thunderbird::Profiles.new
         if name
-          Thunderbird::Profiles.new.profile(name)
+          profiles.profile(name)
         else
-          Thunderbird::Profiles.new.default
+          if profiles.installs.count > 1
+            raise <<~MESSAGE
+              Thunderbird has multiple installs, so no default profile exists.
+              Please supply a profile name
+            MESSAGE
+          end
+
+          profiles.installs[0].default
         end
       end
     end
