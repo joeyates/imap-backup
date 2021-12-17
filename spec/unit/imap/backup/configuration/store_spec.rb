@@ -1,4 +1,5 @@
 require "json"
+require "os"
 
 # rubocop:disable RSpec/PredicateMatcher
 
@@ -189,10 +190,16 @@ describe Imap::Backup::Configuration::Store do
     end
 
     context "when file permissions are too open" do
-      it "sets them to 0600" do
-        expect(FileUtils).to receive(:chmod).with(0o600, file_path)
+      context "on UNIX" do
+        before do
+          allow(OS).to receive(:windows?) { false }
+        end
 
-        subject.save
+        it "sets them to 0600" do
+          expect(FileUtils).to receive(:chmod).with(0o600, file_path)
+
+          subject.save
+        end
       end
     end
 
@@ -206,18 +213,24 @@ describe Imap::Backup::Configuration::Store do
       end
     end
 
-    context "when the config file permissions are too lax" do
-      let(:file_exists) { true }
-
+    context "on UNIX" do
       before do
-        allow(Imap::Backup::Utils).to receive(:check_permissions).
-          with(file_path, 0o600).and_raise("Error")
+        allow(OS).to receive(:windows?) { false }
       end
 
-      it "fails" do
-        expect do
-          subject.save
-        end.to raise_error(RuntimeError, "Error")
+      context "when the config file permissions are too lax" do
+        let(:file_exists) { true }
+
+        before do
+          allow(Imap::Backup::Utils).to receive(:check_permissions).
+            with(file_path, 0o600).and_raise("Error")
+        end
+
+        it "fails" do
+          expect do
+            subject.save
+          end.to raise_error(RuntimeError, "Error")
+        end
       end
     end
   end

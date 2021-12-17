@@ -1,4 +1,5 @@
 require "json"
+require "os"
 
 module Imap::Backup
   module Configuration; end
@@ -25,11 +26,12 @@ module Imap::Backup
     end
 
     def save
-      mkdir_private path
+      FileUtils.mkdir(path) if !File.directory?(path)
+      make_private(path) if !windows?
       remove_modified_flags
       remove_deleted_accounts
       File.open(pathname, "w") { |f| f.write(JSON.pretty_generate(data)) }
-      FileUtils.chmod 0o600, pathname
+      FileUtils.chmod(0o600, pathname) if !windows?
     end
 
     def accounts
@@ -54,7 +56,7 @@ module Imap::Backup
       @data ||=
         begin
           if File.exist?(pathname)
-            Utils.check_permissions pathname, 0o600
+            Utils.check_permissions(pathname, 0o600) if !windows?
             contents = File.read(pathname)
             data = JSON.parse(contents, symbolize_names: true)
           else
@@ -73,9 +75,12 @@ module Imap::Backup
       accounts.reject! { |a| a[:delete] }
     end
 
-    def mkdir_private(path)
-      FileUtils.mkdir(path) if !File.directory?(path)
+    def make_private(path)
       FileUtils.chmod(0o700, path) if Utils.mode(path) != 0o700
+    end
+
+    def windows?
+      OS.windows?
     end
   end
 end
