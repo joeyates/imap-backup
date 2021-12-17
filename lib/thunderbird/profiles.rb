@@ -29,7 +29,11 @@ class Thunderbird::Profiles
 
         loop do
           line = f.gets
-          break if !line
+          if !line
+            blocks[title] = entries if title
+            break
+          end
+
           line.chomp!
 
           # Is this line the start of a new block
