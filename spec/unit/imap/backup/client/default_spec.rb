@@ -11,11 +11,10 @@ describe Imap::Backup::Client::Default do
   describe "#list" do
     context "with non-ASCII folder names" do
       let(:imap_folders) do
-        [instance_double(Net::IMAP::MailboxList, name:"Gel&APY-scht")]
+        [instance_double(Net::IMAP::MailboxList, name: "Gel&APY-scht")]
       end
 
       it "converts them to UTF-8" do
-        puts "subject: #{subject}"
         expect(subject.list).to eq(["Gelöscht"])
       end
     end

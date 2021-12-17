@@ -28,15 +28,15 @@ class Thunderbird::LocalFolder
   end
 
   def exists?
-    File.exists?(full_path)
+    File.exist?(full_path)
   end
 
   def msf_path
-    path + ".msf"
+    "#{path}.msf"
   end
 
   def msf_exists?
-    File.exists?(msf_path)
+    File.exist?(msf_path)
   end
 
   private
@@ -46,9 +46,9 @@ class Thunderbird::LocalFolder
   end
 
   def subdirectory
-    if in_subdirectory?
-      Thunderbird::Subdirectory.new(profile, subdirectory_path)
-    end
+    return nil if !in_subdirectory?
+
+    Thunderbird::Subdirectory.new(profile, subdirectory_path)
   end
 
   def path_elements

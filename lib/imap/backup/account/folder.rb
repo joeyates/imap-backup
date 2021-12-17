@@ -11,7 +11,7 @@ module Imap::Backup
     extend Forwardable
     include RetryOnError
 
-    BODY_ATTRIBUTE = "BODY[]"
+    BODY_ATTRIBUTE = "BODY[]".freeze
     UID_FETCH_RETRY_CLASSES = [EOFError].freeze
 
     attr_reader :connection

@@ -16,13 +16,13 @@ describe Imap::Backup::CLI::Utils do
       exist?: true,
       name: "name",
       uid_validity: "uid_validity",
-      uids: ["123", "456"]
+      uids: %w(123 456)
     )
   end
   let(:serializer) do
     instance_double(
       Imap::Backup::Serializer::Mbox,
-      uids: ["123", "789"],
+      uids: %w(123 789),
       apply_uid_validity: nil,
       save: nil
     )

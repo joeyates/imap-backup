@@ -12,9 +12,7 @@ class Thunderbird::Subdirectory
   end
 
   def set_up
-    if !sub_directory?
-      raise "Cannot create a subdirectory without a path"
-    end
+    raise "Cannot create a subdirectory without a path" if !sub_directory?
 
     if sub_sub_directory?
       parent_ok = parent.set_up
@@ -47,9 +45,9 @@ class Thunderbird::Subdirectory
   end
 
   def parent
-    if sub_sub_directory?
-      self.class.new(profile, File.join(path_elements[0..-2]))
-    end
+    return nil if !sub_sub_directory?
+
+    self.class.new(profile, File.join(path_elements[0..-2]))
   end
 
   # placeholder relative path is 'Foo.sbd/Bar.sbd/Baz'
@@ -66,10 +64,10 @@ class Thunderbird::Subdirectory
   end
 
   def exists?
-    File.exists?(full_path)
+    File.exist?(full_path)
   end
 
-  def is_directory?
+  def directory?
     File.directory?(full_path)
   end
 
@@ -85,10 +83,10 @@ class Thunderbird::Subdirectory
     when exists? && !placeholder.exists?
       Kernel.puts "Can't set up folder '#{folder_path}': '#{full_path}' exists, but '#{placeholder.path}' is missing"
       false
-    when placeholder.exists? && !placeholder.is_regular?
+    when placeholder.exists? && !placeholder.regular?
       Kernel.puts "Can't set up folder '#{folder_path}': '#{placeholder.path}' exists, but it is not a regular file"
       false
-    when exists? && !is_directory?
+    when exists? && !directory?
       Kernel.puts "Can't set up folder '#{folder_path}': '#{full_path}' exists, but it is not a directory"
       false
     else

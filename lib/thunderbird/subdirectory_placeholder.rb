@@ -8,10 +8,10 @@ class Thunderbird::SubdirectoryPlaceholder
   end
 
   def exists?
-    File.exists?(path)
+    File.exist?(path)
   end
 
-  def is_regular?
+  def regular?
     File.file?(path)
   end
 

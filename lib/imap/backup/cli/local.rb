@@ -28,7 +28,10 @@ module Imap::Backup
       raise "Folder '#{folder_name}' not found" if !folder_serializer
 
       max_subject = 60
-      Kernel.puts format("%-10<uid>s  %-#{max_subject}<subject>s - %<date>s", {uid: "UID", subject: "Subject", date: "Date"})
+      Kernel.puts format(
+        "%-10<uid>s  %-#{max_subject}<subject>s - %<date>s",
+        {uid: "UID", subject: "Subject", date: "Date"}
+      )
       Kernel.puts "-" * (12 + max_subject + 28)
 
       uids = folder_serializer.uids

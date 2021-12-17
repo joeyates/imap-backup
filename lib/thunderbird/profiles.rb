@@ -53,12 +53,10 @@ class Thunderbird::Profiles
             # Start a new block
             title = match[1]
             entries = {}
-          else
+          elsif line != ""
             # Collect entries until we get to the next title
-            if line != ""
-              key, value = line.split("=")
-              entries[key.to_sym] = value
-            end
+            key, value = line.split("=")
+            entries[key.to_sym] = value
           end
         end
       end

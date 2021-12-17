@@ -9,6 +9,7 @@ module Imap::Backup::CLI::Helpers
     connections = Imap::Backup::Configuration::List.new
     account = connections.accounts.find { |a| a[:username] == email }
     raise "#{email} is not a configured account" if !account
+
     account
   end
 

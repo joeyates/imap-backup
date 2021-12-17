@@ -3,7 +3,7 @@ require "thunderbird/profiles"
 
 module Imap::Backup
   class Thunderbird::MailboxExporter
-    EXPORT_PREFIX = "imap-backup"
+    EXPORT_PREFIX = "imap-backup".freeze
 
     attr_reader :email
     attr_reader :serializer

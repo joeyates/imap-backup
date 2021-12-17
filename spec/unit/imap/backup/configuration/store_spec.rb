@@ -190,7 +190,7 @@ describe Imap::Backup::Configuration::Store do
     end
 
     context "when file permissions are too open" do
-      context "on UNIX" do
+      context "when on UNIX" do
         before do
           allow(OS).to receive(:windows?) { false }
         end
@@ -213,7 +213,7 @@ describe Imap::Backup::Configuration::Store do
       end
     end
 
-    context "on UNIX" do
+    context "when on UNIX" do
       before do
         allow(OS).to receive(:windows?) { false }
       end
