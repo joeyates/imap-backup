@@ -1,6 +1,12 @@
+require "os"
+
 class Thunderbird
   def data_path
-    # TODO: Handle other OSes
-    File.join(Dir.home, ".thunderbird")
+    case
+    when OS.windows?
+      File.join(ENV["APPDATA"].gsub("\\", "/"), "Thunderbird")
+    when OS.linux?
+      File.join(Dir.home, ".thunderbird")
+    end
   end
 end

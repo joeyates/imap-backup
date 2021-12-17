@@ -12,8 +12,6 @@ class Thunderbird::Profiles
   def profile(name)
     title, entries = blocks.find { |_name, entries| entries[:Name] == name }
 
-    return nil if !title
-
     Thunderbird::Profile.new(title, entries) if title
   end
 

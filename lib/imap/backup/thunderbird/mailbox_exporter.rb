@@ -1,5 +1,4 @@
 require "thunderbird/local_folder"
-require "thunderbird/mailbox"
 require "thunderbird/profiles"
 
 module Imap::Backup
@@ -19,28 +18,29 @@ module Imap::Backup
     end
 
     def run
-      local_folder.set_up
+      local_folder_ok = local_folder.set_up
+      return if !local_folder_ok
 
-      if mailbox.msf_exists?
+      if local_folder.msf_exists?
         if force
-          Kernel.puts "Deleting '#{mailbox.msf_path}' as --force option was supplied"
-          File.unlink mailbox.msf_path
+          Kernel.puts "Deleting '#{local_folder.msf_path}' as --force option was supplied"
+          File.unlink local_folder.msf_path
         else
-          Kernel.puts "Skipping export of '#{folder.name}' as '#{mailbox.msf_path}' exists"
+          Kernel.puts "Skipping export of '#{serializer.folder}' as '#{local_folder.msf_path}' exists"
           return false
         end
       end
 
-      if mailbox.exists?
+      if local_folder.exists?
         if force
-          Kernel.puts "Overwriting '#{mailbox.path}' as --force option was supplied"
+          Kernel.puts "Overwriting '#{local_folder.path}' as --force option was supplied"
         else
-          Kernel.puts "Skipping export of '#{folder.name}' as '#{mailbox.path}' exists"
+          Kernel.puts "Skipping export of '#{serializer.folder}' as '#{local_folder.path}' exists"
           return false
         end
       end
 
-      FileUtils.cp serializer.mbox_pathname, mailbox.path
+      FileUtils.cp serializer.mbox_pathname, local_folder.full_path
 
       true
     end
@@ -49,22 +49,9 @@ module Imap::Backup
 
     def local_folder
       @local_folder ||= begin
-        folder_path = File.dirname(serializer.folder)
         top_level_folders = [EXPORT_PREFIX, email]
-        prefixed_folder_path =
-          if folder_path == "."
-            File.join(top_level_folders)
-          else
-            File.join(top_level_folders, folder_path)
-          end
+        prefixed_folder_path = File.join(top_level_folders, serializer.folder)
         Thunderbird::LocalFolder.new(profile, prefixed_folder_path)
-      end
-    end
-
-    def mailbox
-      @mailbox ||= begin
-        mailbox_name = File.basename(serializer.folder)
-        Thunderbird::Mailbox.new(local_folder, mailbox_name)
       end
     end
   end
