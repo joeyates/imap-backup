@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [4.0.4] - 2021-12-21
+
+### Changed
+
+* Configure logger to log synchronously so that output is in sync with
+  the Mail gems debugging output.
+
 ## [4.0.3] - 2021-12-17
 
 ### Added
