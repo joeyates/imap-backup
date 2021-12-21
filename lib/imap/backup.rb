@@ -29,6 +29,7 @@ module Imap::Backup
 
     def initialize
       @logger = ::Logger.new($stdout)
+      $stdout.sync = true
     end
   end
 
