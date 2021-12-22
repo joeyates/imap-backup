@@ -53,7 +53,7 @@ module Imap::Backup
     end
 
     def selected?(folder_name)
-      config_folders = account[:folders]
+      config_folders = account.folders
       return false if config_folders.nil?
 
       config_folders.find { |f| f[:name] == folder_name }
@@ -62,7 +62,7 @@ module Imap::Backup
     def remove_missing
       removed = []
       config_folders = []
-      account[:folders].each do |f|
+      account.folders.each do |f|
         found = imap_folders.find { |folder| folder == f[:name] }
         if found
           config_folders << f
@@ -73,8 +73,7 @@ module Imap::Backup
 
       return if removed.empty?
 
-      account[:folders] = config_folders
-      account[:modified] = true
+      account.folders = config_folders
 
       Kernel.puts <<~MESSAGE
         The following folders have been removed: #{removed.join(', ')}
@@ -85,12 +84,11 @@ module Imap::Backup
 
     def toggle_selection(folder_name)
       if selected?(folder_name)
-        changed = account[:folders].reject! { |f| f[:name] == folder_name }
-        account[:modified] = true if changed
+        new_list = account.folders.filter { |f| f[:name] != folder_name }
+        account.folders = new_list
       else
-        account[:folders] ||= []
-        account[:folders] << {name: folder_name}
-        account[:modified] = true
+        existing = account.folders || []
+        account.folders = existing + [{name: folder_name}]
       end
     end
 
