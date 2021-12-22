@@ -9,7 +9,14 @@ describe Imap::Backup::Configuration::FolderChooser do
         Imap::Backup::Account::Connection, folders: connection_folders
       )
     end
-    let(:account) { {folders: []} }
+    let(:account) do
+      instance_double(
+        Imap::Backup::Account,
+        folders: account_folders,
+        "folders=": nil
+      )
+    end
+    let(:account_folders) { [] }
     let(:connection_folders) { [] }
     let!(:highline_streams) { prepare_highline }
     let(:input) { highline_streams[0] }
@@ -36,7 +43,7 @@ describe Imap::Backup::Configuration::FolderChooser do
     end
 
     describe "folder listing" do
-      let(:account) { {folders: [{name: "my_folder"}]} }
+      let(:account_folders) { [{name: "my_folder"}]}
       let(:connection_folders) do
         # N.B. my_folder is already backed up
         %w(my_folder another_folder)
@@ -62,7 +69,8 @@ describe Imap::Backup::Configuration::FolderChooser do
         end
 
         specify "are added to the account" do
-          expect(account[:folders]).to include(name: "another_folder")
+          expect(account).to have_received(:"folders=").
+            with([{name: "my_folder"}, {name: "another_folder"}])
         end
       end
 
@@ -74,20 +82,16 @@ describe Imap::Backup::Configuration::FolderChooser do
         end
 
         specify "are removed from the account" do
-          expect(account[:folders]).to_not include(name: "my_folder")
+          expect(account).to have_received(:"folders=").with([])
         end
       end
     end
 
     context "with missing remote folders" do
-      let(:account) do
-        {folders: [{name: "on_server"}, {name: "not_on_server"}]}
+      let(:account_folders) do
+        [{name: "on_server"}, {name: "not_on_server"}]
       end
-      let(:connection_folders) do
-        [
-          instance_double(Imap::Backup::Account::Folder, name: "on_server")
-        ]
-      end
+      let(:connection_folders) { ["on_server"] }
 
       before do
         allow(Kernel).to receive(:puts)
@@ -95,7 +99,8 @@ describe Imap::Backup::Configuration::FolderChooser do
       end
 
       specify "are removed from the account" do
-        expect(account[:folders]).to_not include(name: "not_on_server")
+        expect(account).to have_received(:"folders=").
+          with([{name: "on_server"}])
       end
     end
 
