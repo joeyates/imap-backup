@@ -1,7 +1,7 @@
 module Imap::Backup
-  module Configuration; end
+  class Setup; end
 
-  Configuration::Asker = Struct.new(:highline) do
+  Setup::Asker = Struct.new(:highline) do
     EMAIL_MATCHER = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]+$/i.freeze
 
     def initialize(highline)
@@ -40,15 +40,15 @@ module Imap::Backup
     end
 
     def self.email(default = "")
-      new(Configuration::Setup.highline).email(default)
+      new(Setup.highline).email(default)
     end
 
     def self.password
-      new(Configuration::Setup.highline).password
+      new(Setup.highline).password
     end
 
     def self.backup_path(default, validator)
-      new(Configuration::Setup.highline).backup_path(default, validator)
+      new(Setup.highline).backup_path(default, validator)
     end
   end
 end

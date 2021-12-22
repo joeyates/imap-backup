@@ -1,4 +1,4 @@
-describe Imap::Backup::Configuration::Setup do
+describe Imap::Backup::Setup do
   include HighLineTestHelpers
 
   subject { described_class.new }
@@ -128,15 +128,15 @@ describe Imap::Backup::Configuration::Setup do
 
     context "when editing accounts" do
       let(:account) do
-        instance_double(Imap::Backup::Configuration::Account, run: nil)
+        instance_double(Imap::Backup::Setup::Account, run: nil)
       end
       let(:config_modified) { true }
 
       before do
         allow(input).to receive(:gets).and_return("1\n", "exit\n")
-        allow(Imap::Backup::Configuration::Asker).to receive(:email).
+        allow(Imap::Backup::Setup::Asker).to receive(:email).
           with(no_args) { "new@example.com" }
-        allow(Imap::Backup::Configuration::Account).to receive(:new).
+        allow(Imap::Backup::Setup::Account).to receive(:new).
           with(store, normal_account, anything) { account }
       end
 
@@ -157,7 +157,7 @@ describe Imap::Backup::Configuration::Setup do
         }
       end
       let(:account) do
-        instance_double(Imap::Backup::Configuration::Account, run: nil)
+        instance_double(Imap::Backup::Setup::Account, run: nil)
       end
       let(:config_modified) { true }
       let(:added_email) { "new@example.com" }
@@ -165,9 +165,9 @@ describe Imap::Backup::Configuration::Setup do
 
       before do
         allow(input).to receive(:gets).and_return("add\n", "exit\n")
-        allow(Imap::Backup::Configuration::Asker).to receive(:email).
+        allow(Imap::Backup::Setup::Asker).to receive(:email).
           with(no_args) { added_email }
-        allow(Imap::Backup::Configuration::Account).to receive(:new).
+        allow(Imap::Backup::Setup::Account).to receive(:new).
           with(store, anything, anything) { account }
 
         subject.run

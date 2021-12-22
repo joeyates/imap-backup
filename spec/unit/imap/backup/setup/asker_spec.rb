@@ -1,5 +1,5 @@
 module Imap::Backup
-  describe Configuration::Asker do
+  describe Setup::Asker do
     subject { described_class.new(highline) }
 
     let(:highline) { double }
@@ -16,7 +16,7 @@ module Imap::Backup
     let(:answer) { "foo" }
 
     before do
-      allow(Configuration::Setup).to receive(:highline) { highline }
+      allow(Setup).to receive(:highline) { highline }
       allow(highline).to receive(:ask) do |&b|
         b.call query
         answer

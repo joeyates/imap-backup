@@ -1,7 +1,7 @@
 module Imap::Backup
-  module Configuration; end
+  class Setup; end
 
-  module Configuration::ConnectionTester
+  module Setup::ConnectionTester
     def self.test(account)
       Account::Connection.new(account).client
       "Connection successful"

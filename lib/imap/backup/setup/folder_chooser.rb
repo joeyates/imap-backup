@@ -1,7 +1,7 @@
 module Imap::Backup
-  module Configuration; end
+  class Setup; end
 
-  class Configuration::FolderChooser
+  class Setup::FolderChooser
     attr_reader :account
 
     def initialize(account)
@@ -103,7 +103,7 @@ module Imap::Backup
     end
 
     def highline
-      Configuration::Setup.highline
+      Setup.highline
     end
   end
 end

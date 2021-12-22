@@ -1,4 +1,4 @@
-describe Imap::Backup::Configuration::ConnectionTester do
+describe Imap::Backup::Setup::ConnectionTester do
   describe ".test" do
     let(:connection) do
       instance_double(Imap::Backup::Account::Connection, client: nil)

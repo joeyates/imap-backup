@@ -1,4 +1,4 @@
-describe Imap::Backup::Configuration::Account do
+describe Imap::Backup::Setup::Account do
   ACCOUNT = "account".freeze
   GMAIL_IMAP_SERVER = "imap.gmail.com".freeze
   HIGHLINE = "highline".freeze
@@ -145,7 +145,7 @@ describe Imap::Backup::Configuration::Account do
       before do
         allow(account).to receive(:"username=")
         allow(account).to receive(:"server=")
-        allow(Imap::Backup::Configuration::Asker).
+        allow(Imap::Backup::Setup::Asker).
           to receive(:email) { new_email }
         subject.run
         menu.choices["modify email"].call
@@ -219,7 +219,7 @@ describe Imap::Backup::Configuration::Account do
 
       before do
         allow(account).to receive(:"password=")
-        allow(Imap::Backup::Configuration::Asker).
+        allow(Imap::Backup::Setup::Asker).
           to receive(:password) { new_password }
         subject.run
         menu.choices["modify password"].call
@@ -264,7 +264,7 @@ describe Imap::Backup::Configuration::Account do
         allow(account).to receive(:"local_path=")
         @validator = nil
         allow(
-          Imap::Backup::Configuration::Asker
+          Imap::Backup::Setup::Asker
         ).to receive(:backup_path) do |_path, validator|
           @validator = validator
           new_backup_path
@@ -296,11 +296,11 @@ describe Imap::Backup::Configuration::Account do
 
     describe "choosing 'choose backup folders'" do
       let(:chooser) do
-        instance_double(Imap::Backup::Configuration::FolderChooser, run: nil)
+        instance_double(Imap::Backup::Setup::FolderChooser, run: nil)
       end
 
       before do
-        allow(Imap::Backup::Configuration::FolderChooser).
+        allow(Imap::Backup::Setup::FolderChooser).
           to receive(:new) { chooser }
         subject.run
         menu.choices["choose backup folders"].call
@@ -313,7 +313,7 @@ describe Imap::Backup::Configuration::Account do
 
     describe "choosing 'test connection'" do
       before do
-        allow(Imap::Backup::Configuration::ConnectionTester).
+        allow(Imap::Backup::Setup::ConnectionTester).
           to receive(:test) { "All fine" }
         allow(highline).to receive(:ask)
         subject.run
@@ -321,7 +321,7 @@ describe Imap::Backup::Configuration::Account do
       end
 
       it "tests the connection" do
-        expect(Imap::Backup::Configuration::ConnectionTester).
+        expect(Imap::Backup::Setup::ConnectionTester).
           to have_received(:test).with(account)
       end
     end

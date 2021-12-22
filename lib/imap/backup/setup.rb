@@ -3,9 +3,7 @@ require "highline"
 require "imap/backup/account"
 
 module Imap::Backup
-  module Configuration; end
-
-  class Configuration::Setup
+  class Setup
     class << self
       attr_accessor :highline
     end
@@ -59,7 +57,7 @@ module Imap::Backup
 
     def add_account_item(menu)
       menu.choice("add account") do
-        username = Configuration::Asker.email
+        username = Asker.email
         edit_account username
       end
     end
@@ -95,9 +93,7 @@ module Imap::Backup
         account = default_account_config(username)
         config.accounts << account
       end
-      Configuration::Account.new(
-        config, account, Configuration::Setup.highline
-      ).run
+      Account.new(config, account, Setup.highline).run
     end
   end
 end

@@ -1,7 +1,7 @@
 module Imap::Backup
-  module Configuration; end
+  class Setup; end
 
-  Configuration::Account = Struct.new(:store, :account, :highline) do
+  Setup::Account = Struct.new(:store, :account, :highline) do
     def initialize(store, account, highline)
       super
     end
@@ -57,7 +57,7 @@ module Imap::Backup
 
     def modify_email(menu)
       menu.choice("modify email") do
-        username = Configuration::Asker.email(username)
+        username = Setup::Asker.email(username)
         Kernel.puts "username: #{username}"
         other_accounts = store.accounts.reject { |a| a == account }
         others = other_accounts.map { |a| a.username }
@@ -80,7 +80,7 @@ module Imap::Backup
 
     def modify_password(menu)
       menu.choice("modify password") do
-        password = Configuration::Asker.password
+        password = Setup::Asker.password
 
         account.password = password if !password.nil?
       end
@@ -116,7 +116,7 @@ module Imap::Backup
     def modify_backup_path(menu)
       menu.choice("modify backup path") do
         existing = account.local_path.clone
-        account.local_path = Configuration::Asker.backup_path(
+        account.local_path = Setup::Asker.backup_path(
           account.local_path, ->(path) { path_modification_validator(path) }
         )
       end
@@ -124,13 +124,13 @@ module Imap::Backup
 
     def choose_folders(menu)
       menu.choice("choose backup folders") do
-        Configuration::FolderChooser.new(account).run
+        Setup::FolderChooser.new(account).run
       end
     end
 
     def test_connection(menu)
       menu.choice("test connection") do
-        result = Configuration::ConnectionTester.test(account)
+        result = Setup::ConnectionTester.test(account)
         Kernel.puts result
         highline.ask "Press a key "
       end
