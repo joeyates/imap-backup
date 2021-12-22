@@ -1,3 +1,5 @@
+require "imap/backup/setup/helpers"
+
 module Imap::Backup
   class Setup; end
 
@@ -35,7 +37,11 @@ module Imap::Backup
 
     def show_menu
       highline.choose do |menu|
-        menu.header = "Add/remove folders"
+        menu.header = <<~MENU.chomp
+          #{helpers.title_prefix} Add/remove folders
+
+          Select a folder (toggles)
+        MENU
         menu.index = :number
         add_folders menu
         menu.choice("(q) return to the account menu") { throw :done }
@@ -104,6 +110,10 @@ module Imap::Backup
 
     def highline
       Setup.highline
+    end
+
+    def helpers
+      Setup::Helpers.new
     end
   end
 end

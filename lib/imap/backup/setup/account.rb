@@ -1,3 +1,5 @@
+require "imap/backup/setup/helpers"
+
 module Imap::Backup
   class Setup; end
 
@@ -43,7 +45,7 @@ module Imap::Backup
           "\n  connection options: #{escaped}"
         end
       menu.header = <<~HEADER.chomp
-        Account#{modified}
+        #{helpers.title_prefix} Account#{modified}
 
         email      #{account.username}
         password   #{masked_password}
@@ -166,6 +168,10 @@ module Imap::Backup
       end
 
       provider.host
+    end
+
+    def helpers
+      Setup::Helpers.new
     end
   end
 end

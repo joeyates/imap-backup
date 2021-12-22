@@ -1,6 +1,7 @@
 require "highline"
 
 require "imap/backup/account"
+require "imap/backup/setup/helpers"
 
 module Imap::Backup
   class Setup
@@ -24,7 +25,7 @@ module Imap::Backup
     def show_menu
       self.class.highline.choose do |menu|
         menu.header = <<~MENU.chomp
-          Main Menu
+          #{helpers.title_prefix} Main Menu
 
           Choose an action
         MENU
@@ -94,6 +95,10 @@ module Imap::Backup
         config.accounts << account
       end
       Account.new(config, account, Setup.highline).run
+    end
+
+    def helpers
+      Helpers.new
     end
   end
 end
