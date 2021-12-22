@@ -83,14 +83,9 @@ module Imap::Backup
     def update(field, value)
       if changes[field]
         change = changes[field]
-        if change[:from] == value
-          changes.delete(field)
-        else
-          set_field!(field, value)
-        end
-      else
-        set_field!(field, value)
+        changes.delete(field) if change[:from] == value
       end
+      set_field!(field, value)
     end
 
     def set_field!(field, value)
