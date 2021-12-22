@@ -3,8 +3,31 @@ describe Imap::Backup::Configuration::Setup do
 
   subject { described_class.new }
 
-  let(:normal) { {username: "account@example.com"} }
-  let(:accounts) { [normal] }
+  let(:normal_account) do
+    instance_double(
+      Imap::Backup::Account,
+      username: "account@example.com",
+      marked_for_deletion?: false,
+      modified?: false
+    )
+  end
+  let(:modified_account) do
+    instance_double(
+      Imap::Backup::Account,
+      username: "modified@example.com",
+      marked_for_deletion?: false,
+      modified?: true
+    )
+  end
+  let(:deleted_account) do
+    instance_double(
+      Imap::Backup::Account,
+      username: "delete@example.com",
+      marked_for_deletion?: true,
+      modified?: false
+    )
+  end
+  let(:accounts) { [normal_account] }
   let(:store) do
     instance_double(
       Imap::Backup::Configuration::Store,
@@ -63,9 +86,7 @@ describe Imap::Backup::Configuration::Setup do
     end
 
     describe "listing" do
-      let(:accounts) { [normal, modified, deleted] }
-      let(:modified) { {username: "modified@example.com", modified: true} }
-      let(:deleted) { {username: "deleted@example.com", delete: true} }
+      let(:accounts) { [normal_account, modified_account, deleted_account] }
 
       before { subject.run }
 
@@ -98,7 +119,7 @@ describe Imap::Backup::Configuration::Setup do
         allow(Imap::Backup::Configuration::Asker).to receive(:email).
           with(no_args) { "new@example.com" }
         allow(Imap::Backup::Configuration::Account).to receive(:new).
-          with(store, normal, anything) { account }
+          with(store, normal_account, anything) { account }
       end
 
       it "edits the account" do
@@ -134,19 +155,19 @@ describe Imap::Backup::Configuration::Setup do
       end
 
       it "sets username" do
-        expect(accounts[1][:username]).to eq(added_email)
+        expect(accounts[1].username).to eq(added_email)
       end
 
       it "sets blank password" do
-        expect(accounts[1][:password]).to eq("")
+        expect(accounts[1].password).to eq("")
       end
 
       it "sets local_path" do
-        expect(accounts[1][:local_path]).to eq(local_path)
+        expect(accounts[1].local_path).to eq(local_path)
       end
 
       it "sets folders" do
-        expect(accounts[1][:folders]).to eq([])
+        expect(accounts[1].folders).to eq([])
       end
 
       context "when the account is a GMail account" do
@@ -154,12 +175,12 @@ describe Imap::Backup::Configuration::Setup do
         let(:local_path) { "/base/path/new_gmail.com" }
 
         it "sets the server" do
-          expect(accounts[1][:server]).to eq(gmail_imap_server)
+          expect(accounts[1].server).to eq(gmail_imap_server)
         end
       end
 
       it "doesn't flag the unedited account as modified" do
-        expect(accounts[1][:modified]).to be_nil
+        expect(accounts[1].modified?).to be_falsey
       end
     end
 

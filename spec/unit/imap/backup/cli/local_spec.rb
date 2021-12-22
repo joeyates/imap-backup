@@ -1,8 +1,15 @@
 describe Imap::Backup::CLI::Local do
   let(:list) do
-    instance_double(Imap::Backup::Configuration::List, accounts: accounts)
+    instance_double(Imap::Backup::Configuration::List, accounts: [account])
   end
-  let(:accounts) { [{username: email}] }
+  let(:account) do
+    instance_double(
+      Imap::Backup::Account,
+      username: email,
+      marked_for_deletion?: false,
+      modified?: false
+    )
+  end
   let(:connection) do
     instance_double(
       Imap::Backup::Account::Connection,

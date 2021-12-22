@@ -22,9 +22,10 @@ module Imap::Backup
         header menu
         modify_email menu
         modify_password menu
-        modify_server menu
         modify_backup_path menu
         choose_folders menu
+        modify_server menu
+        modify_connection_options menu
         test_connection menu
         delete_account menu
         menu.choice("return to main menu") { throw :done }
@@ -33,13 +34,20 @@ module Imap::Backup
     end
 
     def header(menu)
-      menu.header = <<-HEADER.gsub(/^\s{8}/m, "")
+      connection_options =
+        if account.connection_options
+          escaped =
+            JSON.generate(account.connection_options).
+            gsub('"', '\"')
+          "\n  connection options: #{escaped}"
+        end
+      menu.header = <<~HEADER
         Account:
-          email:    #{account[:username]}
-          server:   #{account[:server]}
-          path:     #{account[:local_path]}
-          folders:  #{folders.map { |f| f[:name] }.join(', ')}
+          email:    #{account.username}
           password: #{masked_password}
+          path:     #{account.local_path}
+          folders:  #{folders.map { |f| f[:name] }.join(', ')}
+          server:   #{account.server}#{connection_options}
       HEADER
     end
 
@@ -48,20 +56,20 @@ module Imap::Backup
         username = Configuration::Asker.email(username)
         Kernel.puts "username: #{username}"
         other_accounts = store.accounts.reject { |a| a == account }
-        others = other_accounts.map { |a| a[:username] }
+        others = other_accounts.map { |a| a.username }
         Kernel.puts "others: #{others.inspect}"
         if others.include?(username)
           Kernel.puts(
             "There is already an account set up with that email address"
           )
         else
-          account[:username] = username
+          account.username = username
           # rubocop:disable Style/IfUnlessModifier
-          if account[:server].nil? || (account[:server] == "")
-            account[:server] = default_server(username)
+          default = default_server(username)
+          if default && (account.server.nil? || (account.server == ""))
+            account.server = default
           end
           # rubocop:enable Style/IfUnlessModifier
-          account[:modified] = true
         end
       end
     end
@@ -70,30 +78,31 @@ module Imap::Backup
       menu.choice("modify password") do
         password = Configuration::Asker.password
 
-        if !password.nil?
-          account[:password] = password
-          account[:modified] = true
-        end
+        account.password = password if !password.nil?
       end
     end
 
     def modify_server(menu)
       menu.choice("modify server") do
         server = highline.ask("server: ")
-        if !server.nil?
-          account[:server] = server
-          account[:modified] = true
-        end
+        account.server = server if !server.nil?
+      end
+    end
+
+    def modify_connection_options(menu)
+      menu.choice("modify connection options") do
+        connection_options = highline.ask("connections options (as JSON): ")
+        account.connection_options = connection_options if !connection_options.nil?
       end
     end
 
     def path_modification_validator(path)
       same = store.accounts.find do |a|
-        a[:username] != account[:username] && a[:local_path] == path
+        a.username != account.username && a.local_path == path
       end
       if same
         Kernel.puts "The path '#{path}' is used to backup " \
-          "the account '#{same[:username]}'"
+          "the account '#{same.username}'"
         false
       else
         true
@@ -102,11 +111,10 @@ module Imap::Backup
 
     def modify_backup_path(menu)
       menu.choice("modify backup path") do
-        existing = account[:local_path].clone
-        account[:local_path] = Configuration::Asker.backup_path(
-          account[:local_path], ->(path) { path_modification_validator(path) }
+        existing = account.local_path.clone
+        account.local_path = Configuration::Asker.backup_path(
+          account.local_path, ->(path) { path_modification_validator(path) }
         )
-        account[:modified] = true if existing != account[:local_path]
       end
     end
 
@@ -127,21 +135,21 @@ module Imap::Backup
     def delete_account(menu)
       menu.choice("delete") do
         if highline.agree("Are you sure? (y/n) ")
-          account[:delete] = true
+          account.mark_for_deletion!
           throw :done
         end
       end
     end
 
     def folders
-      account[:folders] || []
+      account.folders || []
     end
 
     def masked_password
-      if (account[:password] == "") || account[:password].nil?
+      if (account.password == "") || account.password.nil?
         "(unset)"
       else
-        account[:password].gsub(/./, "x")
+        account.password.gsub(/./, "x")
       end
     end
 

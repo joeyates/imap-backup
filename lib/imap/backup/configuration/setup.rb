@@ -1,5 +1,7 @@
 require "highline"
 
+require "imap/backup/account"
+
 module Imap::Backup
   module Configuration; end
 
@@ -39,12 +41,12 @@ module Imap::Backup
 
     def account_items(menu)
       config.accounts.each do |account|
-        next if account[:delete]
+        next if account.marked_for_deletion?
 
-        item = account[:username].clone
-        item << " *" if account[:modified]
+        item = account.username.clone
+        item << " *" if account.modified?
         menu.choice(item) do
-          edit_account account[:username]
+          edit_account account.username
         end
       end
     end
@@ -70,19 +72,19 @@ module Imap::Backup
     end
 
     def default_account_config(username)
-      {
+      ::Imap::Backup::Account.new(
         username: username,
         password: "",
         local_path: File.join(config.path, username.tr("@", "_")),
         folders: []
-      }.tap do |c|
+      ).tap do |a|
         server = Email::Provider.for_address(username)
-        c[:server] = server.host if server.host
+        a.server = server.host if server.host
       end
     end
 
     def edit_account(username)
-      account = config.accounts.find { |a| a[:username] == username }
+      account = config.accounts.find { |a| a.username == username }
       if account.nil?
         account = default_account_config(username)
         config.accounts << account

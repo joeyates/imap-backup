@@ -4,25 +4,17 @@ require "imap/backup/client/default"
 require "retry_on_error"
 
 module Imap::Backup
-  module Account; end
+  class Account; end
 
   class Account::Connection
     include RetryOnError
 
     LOGIN_RETRY_CLASSES = [EOFError, Errno::ECONNRESET, SocketError].freeze
 
-    attr_reader :connection_options
-    attr_reader :local_path
-    attr_reader :password
-    attr_reader :username
+    attr_reader :account
 
-    def initialize(options)
-      @username = options[:username]
-      @password = options[:password]
-      @local_path = options[:local_path]
-      @config_folders = options[:folders]
-      @server = options[:server]
-      @connection_options = options[:connection_options] || {}
+    def initialize(account)
+      @account = account
       @folders = nil
       create_account_folder
     end
@@ -33,7 +25,7 @@ module Imap::Backup
           folders = client.list
 
           if folders.empty?
-            message = "Unable to get folder list for account #{username}"
+            message = "Unable to get folder list for account #{account.username}"
             Imap::Backup.logger.info message
             raise message
           end
@@ -45,13 +37,13 @@ module Imap::Backup
     def status
       backup_folders.map do |backup_folder|
         f = Account::Folder.new(self, backup_folder[:name])
-        s = Serializer::Mbox.new(local_path, backup_folder[:name])
+        s = Serializer::Mbox.new(account.local_path, backup_folder[:name])
         {name: backup_folder[:name], local: s.uids, remote: f.uids}
       end
     end
 
     def run_backup
-      Imap::Backup.logger.debug "Running backup of account: #{username}"
+      Imap::Backup.logger.debug "Running backup of account: #{account.username}"
       # start the connection so we get logging messages in the right order
       client
       each_folder do |folder, serializer|
@@ -71,11 +63,11 @@ module Imap::Backup
     def local_folders
       return enum_for(:local_folders) if !block_given?
 
-      glob = File.join(local_path, "**", "*.imap")
-      base = Pathname.new(local_path)
+      glob = File.join(account.local_path, "**", "*.imap")
+      base = Pathname.new(account.local_path)
       Pathname.glob(glob) do |path|
         name = path.relative_path_from(base).to_s[0..-6]
-        serializer = Serializer::Mbox.new(local_path, name)
+        serializer = Serializer::Mbox.new(account.local_path, name)
         folder = Account::Folder.new(self, name)
         yield serializer, folder
       end
@@ -109,15 +101,15 @@ module Imap::Backup
             else
               Client::Default.new(server, options)
             end
-          Imap::Backup.logger.debug "Logging in: #{username}/#{masked_password}"
-          client.login(username, password)
+          Imap::Backup.logger.debug "Logging in: #{account.username}/#{masked_password}"
+          client.login(account.username, account.password)
           Imap::Backup.logger.debug "Login complete"
           client
         end
     end
 
     def server
-      @server ||= provider.host
+      @server ||= account.server || provider.host
     end
 
     private
@@ -125,7 +117,7 @@ module Imap::Backup
     def each_folder
       backup_folders.each do |backup_folder|
         folder = Account::Folder.new(self, backup_folder[:name])
-        serializer = Serializer::Mbox.new(local_path, backup_folder[:name])
+        serializer = Serializer::Mbox.new(account.local_path, backup_folder[:name])
         yield folder, serializer
       end
     end
@@ -142,7 +134,7 @@ module Imap::Backup
           Imap::Backup.logger.debug(
             "Backup '#{old_name}' renamed and restored to '#{new_name}'"
           )
-          new_serializer = Serializer::Mbox.new(local_path, new_name)
+          new_serializer = Serializer::Mbox.new(account.local_path, new_name)
           new_folder = Account::Folder.new(self, new_name)
           new_folder.create
           new_serializer.force_uid_validity(new_folder.uid_validity)
@@ -159,21 +151,21 @@ module Imap::Backup
 
     def create_account_folder
       Utils.make_folder(
-        File.dirname(local_path),
-        File.basename(local_path),
+        File.dirname(account.local_path),
+        File.basename(account.local_path),
         Serializer::DIRECTORY_PERMISSIONS
       )
     end
 
     def masked_password
-      password.gsub(/./, "x")
+      account.password.gsub(/./, "x")
     end
 
     def backup_folders
       @backup_folders ||=
         begin
-          if @config_folders&.any?
-            @config_folders
+          if account.folders&.any?
+            account.folders
           else
             folders.map { |name| {name: name} }
           end
@@ -181,11 +173,11 @@ module Imap::Backup
     end
 
     def provider
-      @provider ||= Email::Provider.for_address(username)
+      @provider ||= Email::Provider.for_address(account.username)
     end
 
     def provider_options
-      provider.options.merge(connection_options)
+      provider.options.merge(account.connection_options || {})
     end
   end
 end

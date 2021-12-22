@@ -12,7 +12,7 @@ describe Imap::Backup::Account::Connection do
   SERVER = "imap.example.com".freeze
   USERNAME = "username@example.com".freeze
 
-  subject { described_class.new(options) }
+  subject { described_class.new(account) }
 
   let(:client) do
     instance_double(
@@ -20,14 +20,16 @@ describe Imap::Backup::Account::Connection do
     )
   end
   let(:imap_folders) { [] }
-  let(:options) do
-    {
+  let(:account) do
+    instance_double(
+      Imap::Backup::Account,
       username: USERNAME,
       password: PASSWORD,
       local_path: LOCAL_PATH,
       folders: config_folders,
-      server: server
-    }
+      server: server,
+      connection_options: nil
+    )
   end
   let(:config_folders) { [FOLDER_CONFIG] }
   let(:root_info) do
@@ -59,21 +61,10 @@ describe Imap::Backup::Account::Connection do
   end
 
   describe "#initialize" do
-    [
-      [:username, USERNAME],
-      [:password, PASSWORD],
-      [:local_path, LOCAL_PATH],
-      [:server, SERVER]
-    ].each do |attr, expected|
-      it "expects #{attr}" do
-        expect(subject.public_send(attr)).to eq(expected)
-      end
-    end
-
     it "creates the path" do
       expect(Imap::Backup::Utils).to receive(:make_folder)
 
-      subject.username
+      subject
     end
   end
 

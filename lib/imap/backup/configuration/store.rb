@@ -1,11 +1,14 @@
 require "json"
 require "os"
 
+require "imap/backup/account"
+
 module Imap::Backup
   module Configuration; end
 
   class Configuration::Store
     CONFIGURATION_DIRECTORY = File.expand_path("~/.imap-backup")
+    VERSION = "2.0"
 
     attr_reader :pathname
 
@@ -19,6 +22,7 @@ module Imap::Backup
 
     def initialize(pathname = self.class.default_pathname)
       @pathname = pathname
+      @debug = nil
     end
 
     def path
@@ -26,31 +30,51 @@ module Imap::Backup
     end
 
     def save
+      ensure_loaded!
       FileUtils.mkdir(path) if !File.directory?(path)
       make_private(path) if !windows?
       remove_modified_flags
       remove_deleted_accounts
-      File.open(pathname, "w") { |f| f.write(JSON.pretty_generate(data)) }
+      save_data = {
+        version: VERSION,
+        accounts: accounts.map(&:to_h),
+        debug: debug?
+      }
+      File.open(pathname, "w") { |f| f.write(JSON.pretty_generate(save_data)) }
       FileUtils.chmod(0o600, pathname) if !windows?
     end
 
     def accounts
-      data[:accounts]
+      @accounts ||= begin
+        ensure_loaded!
+        data[:accounts].map { |data| Account.new(data) }
+      end
     end
 
     def modified?
-      accounts.any? { |a| a[:modified] || a[:delete] }
+      ensure_loaded!
+      accounts.any? { |a| a.modified? || a.marked_for_deletion? }
     end
 
     def debug?
-      data[:debug]
+      ensure_loaded!
+      @debug
     end
 
     def debug=(value)
-      data[:debug] = [true, false].include?(value) ? value : false
+      ensure_loaded!
+      @debug = [true, false].include?(value) ? value : false
     end
 
     private
+
+    def ensure_loaded!
+      return true if @data
+
+      data
+      @debug = data.key?(:debug) ? data[:debug] == true : false
+      true
+    end
 
     def data
       @data ||=
@@ -58,21 +82,19 @@ module Imap::Backup
           if File.exist?(pathname)
             Utils.check_permissions(pathname, 0o600) if !windows?
             contents = File.read(pathname)
-            data = JSON.parse(contents, symbolize_names: true)
+            JSON.parse(contents, symbolize_names: true)
           else
-            data = {accounts: []}
+            {accounts: []}
           end
-          data[:debug] = data.key?(:debug) ? data[:debug] == true : false
-          data
         end
     end
 
     def remove_modified_flags
-      accounts.each { |a| a.delete(:modified) }
+      accounts.each { |a| a.clear_changes! }
     end
 
     def remove_deleted_accounts
-      accounts.reject! { |a| a[:delete] }
+      accounts.reject! { |a| a.marked_for_deletion? }
     end
 
     def make_private(path)
