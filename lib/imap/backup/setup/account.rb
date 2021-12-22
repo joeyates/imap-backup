@@ -42,7 +42,7 @@ module Imap::Backup
           escaped =
             JSON.generate(account.connection_options).
             gsub('"', '\"')
-          "\n  connection options: #{escaped}"
+          "\n  connection options #{escaped}"
         end
       menu.header = <<~HEADER.chomp
         #{helpers.title_prefix} Account#{modified}
