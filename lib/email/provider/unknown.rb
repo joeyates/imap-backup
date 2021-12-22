@@ -1,7 +1,6 @@
-module Email; end
-class Email::Provider; end
+require "email/provider/base"
 
-class Email::Provider::Default
+class Email::Provider::Unknown < Email::Provider::Base
   # We don't know how to guess the IMAP server
   def host
   end

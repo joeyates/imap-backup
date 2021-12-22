@@ -1,7 +1,7 @@
-require "email/provider/default"
 require "email/provider/apple_mail"
 require "email/provider/fastmail"
 require "email/provider/gmail"
+require "email/provider/unknown"
 
 module Email; end
 
@@ -21,7 +21,7 @@ class Email::Provider
     when address.end_with?("@me.com")
       Email::Provider::AppleMail.new
     else
-      Email::Provider::Default.new
+      Email::Provider::Unknown.new
     end
   end
 end

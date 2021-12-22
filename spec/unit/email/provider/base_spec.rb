@@ -1,10 +1,4 @@
 describe Email::Provider::Default do
-  describe "#host" do
-    it "is unset" do
-      expect(subject.host).to be_nil
-    end
-  end
-
   describe "#options" do
     it "returns options" do
       expect(subject.options).to be_a(Hash)
