@@ -130,7 +130,7 @@ module Imap::Backup
 
     def test_connection(menu)
       menu.choice("test connection") do
-        result = Setup::ConnectionTester.test(account)
+        result = Setup::ConnectionTester.new(account).test
         Kernel.puts result
         highline.ask "Press a key "
       end

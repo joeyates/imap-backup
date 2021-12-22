@@ -312,17 +312,23 @@ describe Imap::Backup::Setup::Account do
     end
 
     describe "choosing 'test connection'" do
+      let(:connection_tester) do
+        instance_double(
+          Imap::Backup::Setup::ConnectionTester,
+          test: "All fine"
+        )
+      end
+
       before do
         allow(Imap::Backup::Setup::ConnectionTester).
-          to receive(:test) { "All fine" }
+          to receive(:new) { connection_tester }
         allow(highline).to receive(:ask)
         subject.run
         menu.choices["test connection"].call
       end
 
       it "tests the connection" do
-        expect(Imap::Backup::Setup::ConnectionTester).
-          to have_received(:test).with(account)
+        expect(connection_tester).to have_received(:test)
       end
     end
 

@@ -1,5 +1,7 @@
 describe Imap::Backup::Setup::ConnectionTester do
-  describe ".test" do
+  describe "#test" do
+    subject { described_class.new("foo") }
+
     let(:connection) do
       instance_double(Imap::Backup::Account::Connection, client: nil)
     end
@@ -8,17 +10,15 @@ describe Imap::Backup::Setup::ConnectionTester do
       allow(Imap::Backup::Account::Connection).to receive(:new) { connection }
     end
 
-    describe "call" do
-      it "tries to connect" do
-        expect(connection).to receive(:client)
+    it "tries to connect" do
+      expect(connection).to receive(:client)
 
-        subject.test("foo")
-      end
+      subject.test
     end
 
     describe "success" do
       it "returns success" do
-        expect(subject.test("foo")).to match(/successful/)
+        expect(subject.test).to match(/successful/)
       end
     end
 
@@ -35,7 +35,7 @@ describe Imap::Backup::Setup::ConnectionTester do
         end
 
         it "returns error" do
-          expect(subject.test("foo")).to match(/no response/i)
+          expect(subject.test).to match(/no response/i)
         end
       end
 
@@ -43,7 +43,7 @@ describe Imap::Backup::Setup::ConnectionTester do
         let(:error) { "Error" }
 
         it "returns error" do
-          expect(subject.test("foo")).to match(/unexpected error/i)
+          expect(subject.test).to match(/unexpected error/i)
         end
       end
     end
