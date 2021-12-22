@@ -6,7 +6,32 @@ describe Imap::Backup::Configuration::Account do
 
   subject { described_class.new(store, account, highline) }
 
-  let(:account) { ACCOUNT }
+  let(:account) do
+    instance_double(
+      Imap::Backup::Account,
+      username: existing_email,
+      password: existing_password,
+      server: current_server,
+      connection_options: nil,
+      local_path: "/backup/path",
+      folders: [{name: "my_folder"}]
+    )
+  end
+  let(:account1) do
+    instance_double(
+      Imap::Backup::Account,
+      username: other_email,
+      local_path: other_existing_path
+    )
+  end
+  let(:accounts) { [account, account1] }
+  let(:existing_email) { "user@example.com" }
+  let(:new_email) { "foo@example.com" }
+  let(:current_server) { "imap.example.com" }
+  let(:existing_password) { "password" }
+  let(:other_email) { "other@example.com" }
+  let(:other_existing_path) { "/other/existing/path" }
+
   let(:highline) { HIGHLINE }
   let(:store) { STORE }
 
@@ -43,28 +68,6 @@ describe Imap::Backup::Configuration::Account do
     let(:store) do
       instance_double(Imap::Backup::Configuration::Store, accounts: accounts)
     end
-    let(:accounts) { [account, account1] }
-    let(:account) do
-      {
-        username: existing_email,
-        server: current_server,
-        local_path: "/backup/path",
-        folders: [{name: "my_folder"}],
-        password: existing_password
-      }
-    end
-    let(:account1) do
-      {
-        username: other_email,
-        local_path: other_existing_path
-      }
-    end
-    let(:existing_email) { "user@example.com" }
-    let(:new_email) { "foo@example.com" }
-    let(:current_server) { "imap.example.com" }
-    let(:existing_password) { "password" }
-    let(:other_email) { "other@example.com" }
-    let(:other_existing_path) { "/other/existing/path" }
 
     before do
       allow(Kernel).to receive(:system)
@@ -139,6 +142,8 @@ describe Imap::Backup::Configuration::Account do
 
     describe "choosing 'modify email'" do
       before do
+        allow(account).to receive(:"username=")
+        allow(account).to receive(:"server=")
         allow(Imap::Backup::Configuration::Asker).
           to receive(:email) { new_email }
         subject.run
@@ -158,7 +163,7 @@ describe Imap::Backup::Configuration::Account do
               let(:current_server) { nil }
 
               it "sets a default server" do
-                expect(account[:server]).to eq(expected)
+                expect(account).to have_received(:"server=").with(expected)
               end
             end
 
@@ -166,7 +171,7 @@ describe Imap::Backup::Configuration::Account do
               let(:current_server) { "" }
 
               it "sets a default server" do
-                expect(account[:server]).to eq(expected)
+                expect(account).to have_received(:"server=").with(expected)
               end
             end
           end
@@ -183,17 +188,15 @@ describe Imap::Backup::Configuration::Account do
           end
 
           it "does not set a default server" do
-            expect(account[:server]).to be_nil
+            expect(account).to_not have_received(:"server=")
           end
         end
       end
 
       context "when the email is new" do
         it "modifies the email address" do
-          expect(account[:username]).to eq(new_email)
+          expect(account).to have_received(:"username=").with(new_email)
         end
-
-        include_examples "it flags the account as modified"
       end
 
       context "when the email already exists" do
@@ -205,10 +208,8 @@ describe Imap::Backup::Configuration::Account do
         end
 
         it "doesn't set the email" do
-          expect(account[:username]).to eq(existing_email)
+          expect(account.username).to eq(existing_email)
         end
-
-        include_examples "it doesn't flag the account as modified"
       end
     end
 
@@ -216,6 +217,7 @@ describe Imap::Backup::Configuration::Account do
       let(:new_password) { "new_password" }
 
       before do
+        allow(account).to receive(:"password=")
         allow(Imap::Backup::Configuration::Asker).
           to receive(:password) { new_password }
         subject.run
@@ -224,20 +226,16 @@ describe Imap::Backup::Configuration::Account do
 
       context "when the user enters a password" do
         it "updates the password" do
-          expect(account[:password]).to eq(new_password)
+          expect(account).to have_received(:"password=").with(new_password)
         end
-
-        include_examples "it flags the account as modified"
       end
 
       context "when the user cancels" do
         let(:new_password) { nil }
 
         it "does nothing" do
-          expect(account[:password]).to eq(existing_password)
+          expect(account.password).to eq(existing_password)
         end
-
-        include_examples "it doesn't flag the account as modified"
       end
     end
 
@@ -245,6 +243,7 @@ describe Imap::Backup::Configuration::Account do
       let(:server) { "server" }
 
       before do
+        allow(account).to receive(:"server=")
         allow(highline).to receive(:ask).with("server: ") { server }
 
         subject.run
@@ -253,16 +252,15 @@ describe Imap::Backup::Configuration::Account do
       end
 
       it "updates the server" do
-        expect(account[:server]).to eq(server)
+        expect(account).to have_received(:"server=").with(server)
       end
-
-      include_examples "it flags the account as modified"
     end
 
     describe "choosing 'modify backup path'" do
       let(:new_backup_path) { "/new/path" }
 
       before do
+        allow(account).to receive(:"local_path=")
         @validator = nil
         allow(
           Imap::Backup::Configuration::Asker
@@ -275,7 +273,7 @@ describe Imap::Backup::Configuration::Account do
       end
 
       it "updates the path" do
-        expect(account[:local_path]).to eq(new_backup_path)
+        expect(account).to have_received(:"local_path=").with(new_backup_path)
       end
 
       context "when the path is not used by other backups" do
@@ -293,8 +291,6 @@ describe Imap::Backup::Configuration::Account do
           # rubocop:enable RSpec/InstanceVariable
         end
       end
-
-      include_examples "it flags the account as modified"
     end
 
     describe "choosing 'choose backup folders'" do
@@ -333,6 +329,7 @@ describe Imap::Backup::Configuration::Account do
       let(:confirmed) { true }
 
       before do
+        allow(account).to receive(:mark_for_deletion!)
         allow(highline).to receive(:agree) { confirmed }
         subject.run
         catch :done do
@@ -345,13 +342,17 @@ describe Imap::Backup::Configuration::Account do
       end
 
       context "when the user confirms deletion" do
-        include_examples "it flags the account to be deleted"
+        it "flags the account to be deleted" do
+          expect(account).to have_received(:mark_for_deletion!)
+        end
       end
 
       context "without confirmation" do
         let(:confirmed) { false }
 
-        include_examples "it doesn't flag the account to be deleted"
+        it "doesn't flag the account to be deleted" do
+          expect(account).to_not have_received(:mark_for_deletion!)
+        end
       end
     end
   end

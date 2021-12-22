@@ -8,10 +8,12 @@ describe Imap::Backup::Configuration::Store do
   let(:file_path) { File.join(directory, "/config.json") }
   let(:file_exists) { true }
   let(:directory_exists) { true }
-  let(:data) { {debug: debug, accounts: accounts} }
   let(:debug) { true }
-  let(:accounts) { [] }
   let(:configuration) { data.to_json }
+  let(:data) { {debug: debug, accounts: accounts.map(&:to_h)} }
+  let(:accounts) { [account1, account2] }
+  let(:account1) { Imap::Backup::Account.new({username: "username1"}) }
+  let(:account2) { Imap::Backup::Account.new({username: "username2"}) }
 
   before do
     stub_const(
@@ -48,8 +50,8 @@ describe Imap::Backup::Configuration::Store do
   end
 
   describe "#modified?" do
-    context "with accounts flagged 'modified'" do
-      let(:accounts) { [{name: "foo", modified: true}] }
+    context "with modified accounts" do
+      before { subject.accounts[0].username = "changed" }
 
       it "is true" do
         expect(subject.modified?).to be_truthy
@@ -57,7 +59,7 @@ describe Imap::Backup::Configuration::Store do
     end
 
     context "with accounts flagged 'delete'" do
-      let(:accounts) { [{name: "foo", delete: true}] }
+      before { subject.accounts[0].mark_for_deletion! }
 
       it "is true" do
         expect(subject.modified?).to be_truthy
@@ -65,8 +67,6 @@ describe Imap::Backup::Configuration::Store do
     end
 
     context "without accounts flagged 'modified'" do
-      let(:accounts) { [{name: "foo"}] }
-
       it "is false" do
         expect(subject.modified?).to be_falsey
       end
@@ -156,19 +156,14 @@ describe Imap::Backup::Configuration::Store do
       subject.save
     end
 
-    context "when accounts are modified" do
-      let(:accounts) { [{name: "foo", modified: true}] }
+    it "uses the Account#to_h method" do
+      allow(subject.accounts[0]).to receive(:to_h) { "Account1" }
+      allow(subject.accounts[1]).to receive(:to_h) { "Account2" }
 
-      before { subject.save }
+      expect(JSON).to receive(:pretty_generate).
+        with(hash_including({accounts: ["Account1", "Account2"]}))
 
-      it "skips the 'modified' flag" do
-        expected = Marshal.load(Marshal.dump(data))
-        expected[:accounts][0].delete(:modified)
-
-        expect(JSON).to receive(:pretty_generate).with(expected)
-
-        subject.save
-      end
+      subject.save
     end
 
     context "when accounts are to be deleted" do
@@ -179,11 +174,15 @@ describe Imap::Backup::Configuration::Store do
         ]
       end
 
-      it "does not save them" do
-        expected = Marshal.load(Marshal.dump(data))
-        expected[:accounts].pop
+      before do
+        allow(subject.accounts[0]).to receive(:to_h) { "Account1" }
+        allow(subject.accounts[1]).to receive(:to_h) { "Account2" }
+        subject.accounts[0].mark_for_deletion!
+      end
 
-        expect(JSON).to receive(:pretty_generate).with(expected)
+      it "does not save them" do
+        expect(JSON).to receive(:pretty_generate).
+          with(hash_including({accounts: ["Account2"]}))
 
         subject.save
       end

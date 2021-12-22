@@ -1,9 +1,9 @@
 module Imap::Backup
   describe CLI::Utils do
     let(:list) do
-      instance_double(Configuration::List, accounts: accounts)
+      instance_double(Configuration::List, accounts: [account])
     end
-    let(:accounts) { [{username: email}] }
+    let(:account) { instance_double(Account, username: email) }
     let(:connection) do
       instance_double(
         Account::Connection,

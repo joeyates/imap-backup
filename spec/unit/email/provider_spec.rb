@@ -17,10 +17,10 @@ describe Email::Provider do
     end
 
     context "with unknown providers" do
-      it "returns a default provider" do
+      it "returns the Unknown provider" do
         result = described_class.for_address("foo@unknown.com")
 
-        expect(result).to be_a(Email::Provider::Default)
+        expect(result).to be_a(Email::Provider::Unknown)
       end
     end
   end

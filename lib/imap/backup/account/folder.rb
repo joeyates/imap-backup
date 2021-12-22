@@ -3,7 +3,7 @@ require "forwardable"
 require "retry_on_error"
 
 module Imap::Backup
-  module Account; end
+  class Account; end
 
   class FolderNotFound < StandardError; end
 

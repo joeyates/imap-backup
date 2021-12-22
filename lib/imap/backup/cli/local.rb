@@ -6,7 +6,7 @@ module Imap::Backup
     desc "accounts", "List locally backed-up accounts"
     def accounts
       connections = Imap::Backup::Configuration::List.new
-      connections.accounts.each { |a| Kernel.puts a[:username] }
+      connections.accounts.each { |a| Kernel.puts a.username }
     end
 
     desc "folders EMAIL", "List account folders"
