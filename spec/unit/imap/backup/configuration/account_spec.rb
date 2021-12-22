@@ -14,7 +14,8 @@ describe Imap::Backup::Configuration::Account do
       server: current_server,
       connection_options: nil,
       local_path: "/backup/path",
-      folders: [{name: "my_folder"}]
+      folders: [{name: "my_folder"}],
+      modified?: false
     )
   end
   let(:account1) do
@@ -116,11 +117,11 @@ describe Imap::Backup::Configuration::Account do
 
     describe "account details" do
       [
-        ["email", /email:\s+user@example.com/],
-        ["server", /server:\s+imap.example.com/],
-        ["password", /password:\s+x+/],
-        ["path", %r(path:\s+/backup/path)],
-        ["folders", /folders:\s+my_folder/]
+        ["email", /email\s+user@example.com/],
+        ["password", /password\s+x+/],
+        ["path", %r(path\s+/backup/path)],
+        ["folders", /folders\s+my_folder/],
+        ["server", /server\s+imap.example.com/]
       ].each do |attribute, value|
         before { subject.run }
 
@@ -135,7 +136,7 @@ describe Imap::Backup::Configuration::Account do
         before { subject.run }
 
         it "indicates that a password is not set" do
-          expect(menu.header).to include("password: (unset)")
+          expect(menu.header).to include("password   (unset)")
         end
       end
     end

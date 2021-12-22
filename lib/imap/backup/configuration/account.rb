@@ -34,6 +34,7 @@ module Imap::Backup
     end
 
     def header(menu)
+      modified = account.modified? ? "*" : ""
       connection_options =
         if account.connection_options
           escaped =
@@ -41,13 +42,16 @@ module Imap::Backup
             gsub('"', '\"')
           "\n  connection options: #{escaped}"
         end
-      menu.header = <<~HEADER
-        Account:
-          email:    #{account.username}
-          password: #{masked_password}
-          path:     #{account.local_path}
-          folders:  #{folders.map { |f| f[:name] }.join(', ')}
-          server:   #{account.server}#{connection_options}
+      menu.header = <<~HEADER.chomp
+        Account#{modified}
+
+        email      #{account.username}
+        password   #{masked_password}
+        path       #{account.local_path}
+        folders    #{folders.map { |f| f[:name] }.join(', ')}
+        server     #{account.server}#{connection_options}
+
+        Choose an action
       HEADER
     end
 
