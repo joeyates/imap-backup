@@ -28,7 +28,7 @@ module Imap::Backup
         modify_connection_options menu
         test_connection menu
         delete_account menu
-        menu.choice("return to main menu") { throw :done }
+        menu.choice("(q) return to main menu") { throw :done }
         menu.hidden("quit") { throw :done }
       end
     end

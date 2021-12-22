@@ -38,7 +38,7 @@ module Imap::Backup
         menu.header = "Add/remove folders"
         menu.index = :number
         add_folders menu
-        menu.choice("return to the account menu") { throw :done }
+        menu.choice("(q) return to the account menu") { throw :done }
         menu.hidden("quit") { throw :done }
       end
     end

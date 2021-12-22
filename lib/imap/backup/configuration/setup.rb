@@ -25,16 +25,22 @@ module Imap::Backup
 
     def show_menu
       self.class.highline.choose do |menu|
-        menu.header = "Choose an action"
+        menu.header = <<~MENU.chomp
+          Main Menu
+
+          Choose an action
+        MENU
         account_items menu
         add_account_item menu
         toggle_logging_item menu
-        menu.choice("save and exit") do
-          config.save
-          throw :done
-        end
-        menu.choice("exit without saving changes") do
-          throw :done
+        if config.modified?
+          menu.choice("save and exit") do
+            config.save
+            throw :done
+          end
+          menu.choice("exit without saving changes")  { throw :done }
+        else
+          menu.choice("quit") { throw :done }
         end
       end
     end

@@ -103,7 +103,7 @@ describe Imap::Backup::Configuration::Account do
         "choose backup folders",
         "test connection",
         "delete",
-        "return to main menu",
+        "(q) return to main menu",
         "quit" # TODO: quit is hidden
       ].each do |item|
         before { subject.run }
