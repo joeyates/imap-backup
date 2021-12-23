@@ -11,7 +11,6 @@ module Imap::Backup
     self.highline = HighLine.new
 
     def run
-      Imap::Backup::Logger.setup_logging
       catch :done do
         loop do
           Kernel.system("clear")

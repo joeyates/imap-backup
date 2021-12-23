@@ -96,12 +96,6 @@ describe Imap::Backup::Setup do
       subject.run
     end
 
-    it "updates logging status" do
-      expect(Imap::Backup::Logger).to receive(:setup_logging)
-
-      subject.run
-    end
-
     describe "listing" do
       let(:accounts) { [normal_account, modified_account, deleted_account] }
 
@@ -225,7 +219,7 @@ describe Imap::Backup::Setup do
           end
 
           it "updates logging status" do
-            expect(Imap::Backup::Logger).to receive(:setup_logging).twice
+            expect(Imap::Backup::Logger).to receive(:setup_logging)
 
             subject.run
           end
@@ -258,7 +252,7 @@ describe Imap::Backup::Setup do
           end
 
           it "updates logging status" do
-            expect(Imap::Backup::Logger).to receive(:setup_logging).twice
+            expect(Imap::Backup::Logger).to receive(:setup_logging)
 
             subject.run
           end
