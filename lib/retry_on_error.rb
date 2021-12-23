@@ -5,7 +5,7 @@ module RetryOnError
   rescue *errors => e
     if tries < limit
       message = "#{e}, attempt #{tries} of #{limit}"
-      Imap::Backup.logger.debug message
+      Imap::Backup::Logger.logger.debug message
       tries += 1
       retry
     end

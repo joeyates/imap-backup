@@ -57,7 +57,7 @@ describe Imap::Backup::Setup do
   describe "#run" do
     before do
       allow(Imap::Backup::Configuration::Store).to receive(:new) { store }
-      allow(Imap::Backup).to receive(:setup_logging)
+      allow(Imap::Backup::Logger).to receive(:setup_logging)
       allow(input).to receive(:eof?) { false }
       allow(input).to receive(:gets) { "q\n" }
       allow(Kernel).to receive(:system)
@@ -92,12 +92,6 @@ describe Imap::Backup::Setup do
 
     it "clears the screen" do
       expect(Kernel).to receive(:system).with("clear")
-
-      subject.run
-    end
-
-    it "updates logging status" do
-      expect(Imap::Backup).to receive(:setup_logging)
 
       subject.run
     end
@@ -225,7 +219,7 @@ describe Imap::Backup::Setup do
           end
 
           it "updates logging status" do
-            expect(Imap::Backup).to receive(:setup_logging).twice
+            expect(Imap::Backup::Logger).to receive(:setup_logging)
 
             subject.run
           end
@@ -258,7 +252,7 @@ describe Imap::Backup::Setup do
           end
 
           it "updates logging status" do
-            expect(Imap::Backup).to receive(:setup_logging).twice
+            expect(Imap::Backup::Logger).to receive(:setup_logging)
 
             subject.run
           end

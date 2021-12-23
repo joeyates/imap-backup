@@ -8,13 +8,6 @@ module Imap::Backup
       @required_accounts = required_accounts
     end
 
-    def setup_logging
-      return if !config_exists?
-
-      Imap::Backup.setup_logging config
-      Net::IMAP.debug = config.debug?
-    end
-
     def each_connection
       accounts.each do |account|
         connection = Account::Connection.new(account)

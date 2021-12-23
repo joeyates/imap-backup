@@ -35,33 +35,6 @@ describe Imap::Backup::Configuration::List do
       to receive(:new).with(accounts[1]) { connection2 }
   end
 
-  describe "#setup_logging" do
-    let(:config_exists) { true }
-
-    before do
-      allow(Imap::Backup::Configuration::Store).
-        to receive(:exist?) { config_exists }
-      allow(Imap::Backup).to receive(:setup_logging)
-      allow(store).to receive(:debug?)
-    end
-
-    it "sets global logging level" do
-      expect(Imap::Backup).to receive(:setup_logging).with(store)
-
-      subject.setup_logging
-    end
-
-    context "without a config" do
-      let(:config_exists) { false }
-
-      it "does nothing" do
-        expect(Imap::Backup).to_not receive(:setup_logging).with(store)
-
-        subject.setup_logging
-      end
-    end
-  end
-
   describe "#each_connection" do
     specify "calls the block with each account's connection" do
       connections = []

@@ -12,13 +12,13 @@ module Imap::Backup
 
     def run
       if connection.nil?
-        Imap::Backup.logger.warn "Connection failed"
+        Imap::Backup::Logger.logger.warn "Connection failed"
         highline.ask "Press a key "
         return
       end
 
       if imap_folders.nil?
-        Imap::Backup.logger.warn "Unable to get folder list"
+        Imap::Backup::Logger.logger.warn "Unable to get folder list"
         highline.ask "Press a key "
         return
       end
