@@ -20,42 +20,18 @@ describe Imap::Backup::CLI::Accounts do
     instance_double(Imap::Backup::Configuration, accounts: accounts)
   end
   let(:exists) { true }
-  let(:connection1) do
-    instance_double(Imap::Backup::Account::Connection, disconnect: nil)
-  end
-  let(:connection2) do
-    instance_double(Imap::Backup::Account::Connection, disconnect: nil)
-  end
 
   before do
     allow(Imap::Backup::Configuration).to receive(:new) { store }
     allow(Imap::Backup::Configuration).
       to receive(:exist?) { exists }
-    allow(Imap::Backup::Account::Connection).
-      to receive(:new).with(accounts[0]) { connection1 }
-    allow(Imap::Backup::Account::Connection).
-      to receive(:new).with(accounts[1]) { connection2 }
   end
 
-  describe "#each_connection" do
-    specify "calls the block with each account's connection" do
-      connections = []
+  describe "#each" do
+    specify "calls the block with each account" do
+      result = subject.map { |a| a }
 
-      subject.each_connection { |a| connections << a }
-
-      expect(connections).to eq([connection1, connection2])
-    end
-
-    context "with account parameter" do
-      subject { described_class.new(["a2@example.com"]) }
-
-      it "only creates requested accounts" do
-        connections = []
-
-        subject.each_connection { |a| connections << a }
-
-        expect(connections).to eq([connection2])
-      end
+      expect(result).to eq(accounts)
     end
 
     context "when the configuration file is missing" do
@@ -63,7 +39,7 @@ describe Imap::Backup::CLI::Accounts do
 
       it "fails" do
         expect do
-          subject.each_connection {}
+          subject.each {}
         end.to raise_error(Imap::Backup::ConfigurationNotFound, /not found/)
       end
     end

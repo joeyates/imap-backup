@@ -20,6 +20,10 @@ module Imap::Backup
       @marked_for_deletion = false
     end
 
+    def connection
+      Account::Connection.new(self)
+    end
+
     def valid?
       username && password
     end

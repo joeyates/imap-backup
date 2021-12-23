@@ -16,14 +16,6 @@ module Imap::Backup
       accounts.each(&block)
     end
 
-    def each_connection
-      accounts.each do |account|
-        connection = Account::Connection.new(account)
-        yield connection
-        connection.disconnect
-      end
-    end
-
     private
 
     def accounts

@@ -21,14 +21,12 @@ module Imap::Backup::CLI::Helpers
   end
 
   def each_connection(names)
-    begin
-      accounts = Imap::Backup::CLI::Accounts.new(names)
-    rescue Imap::Backup::ConfigurationNotFound
-      raise "imap-backup is not configured. Run `imap-backup setup`"
-    end
+    accounts = Imap::Backup::CLI::Accounts.new(names)
 
-    accounts.each_connection do |connection|
-      yield connection
+    accounts.each do |account|
+      yield account.connection
     end
+  rescue Imap::Backup::ConfigurationNotFound
+    raise "imap-backup is not configured. Run `imap-backup setup`"
   end
 end
