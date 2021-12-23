@@ -29,7 +29,7 @@ module Imap::Backup
           config.accounts
         else
           config.accounts.select do |account|
-            required_accounts.include?(account[:username])
+            required_accounts.include?(account.username)
           end
         end
     end

@@ -1,11 +1,18 @@
 describe Imap::Backup::Configuration::List do
   subject { described_class.new }
 
-  let(:accounts) do
-    [
-      {username: "a1@example.com"},
-      {username: "a2@example.com"}
-    ]
+  let(:accounts) { [account1, account2] }
+  let(:account1) do
+    instance_double(
+      Imap::Backup::Account,
+      username: "a1@example.com"
+    )
+  end
+  let(:account2) do
+    instance_double(
+      Imap::Backup::Account,
+      username: "a2@example.com"
+    )
   end
   let(:store) do
     instance_double(Imap::Backup::Configuration::Store, accounts: accounts)
