@@ -7,7 +7,7 @@ class Imap::Backup::CLI::Setup < Thor
 
   no_commands do
     def run
-      Imap::Backup::Configuration::Setup.new.run
+      Imap::Backup::Setup.new.run
     end
   end
 end

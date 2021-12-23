@@ -1,7 +1,9 @@
-module Imap::Backup
-  module Configuration; end
+require "imap/backup/setup/helpers"
 
-  Configuration::Account = Struct.new(:store, :account, :highline) do
+module Imap::Backup
+  class Setup; end
+
+  Setup::Account = Struct.new(:store, :account, :highline) do
     def initialize(store, account, highline)
       super
     end
@@ -28,32 +30,36 @@ module Imap::Backup
         modify_connection_options menu
         test_connection menu
         delete_account menu
-        menu.choice("return to main menu") { throw :done }
+        menu.choice("(q) return to main menu") { throw :done }
         menu.hidden("quit") { throw :done }
       end
     end
 
     def header(menu)
+      modified = account.modified? ? "*" : ""
       connection_options =
         if account.connection_options
           escaped =
             JSON.generate(account.connection_options).
             gsub('"', '\"')
-          "\n  connection options: #{escaped}"
+          "\n  connection options #{escaped}"
         end
-      menu.header = <<~HEADER
-        Account:
-          email:    #{account.username}
-          password: #{masked_password}
-          path:     #{account.local_path}
-          folders:  #{folders.map { |f| f[:name] }.join(', ')}
-          server:   #{account.server}#{connection_options}
+      menu.header = <<~HEADER.chomp
+        #{helpers.title_prefix} Account#{modified}
+
+        email      #{account.username}
+        password   #{masked_password}
+        path       #{account.local_path}
+        folders    #{folders.map { |f| f[:name] }.join(', ')}
+        server     #{account.server}#{connection_options}
+
+        Choose an action
       HEADER
     end
 
     def modify_email(menu)
       menu.choice("modify email") do
-        username = Configuration::Asker.email(username)
+        username = Setup::Asker.email(username)
         Kernel.puts "username: #{username}"
         other_accounts = store.accounts.reject { |a| a == account }
         others = other_accounts.map { |a| a.username }
@@ -76,7 +82,7 @@ module Imap::Backup
 
     def modify_password(menu)
       menu.choice("modify password") do
-        password = Configuration::Asker.password
+        password = Setup::Asker.password
 
         account.password = password if !password.nil?
       end
@@ -112,7 +118,7 @@ module Imap::Backup
     def modify_backup_path(menu)
       menu.choice("modify backup path") do
         existing = account.local_path.clone
-        account.local_path = Configuration::Asker.backup_path(
+        account.local_path = Setup::Asker.backup_path(
           account.local_path, ->(path) { path_modification_validator(path) }
         )
       end
@@ -120,13 +126,13 @@ module Imap::Backup
 
     def choose_folders(menu)
       menu.choice("choose backup folders") do
-        Configuration::FolderChooser.new(account).run
+        Setup::FolderChooser.new(account).run
       end
     end
 
     def test_connection(menu)
       menu.choice("test connection") do
-        result = Configuration::ConnectionTester.test(account)
+        result = Setup::ConnectionTester.new(account).test
         Kernel.puts result
         highline.ask "Press a key "
       end
@@ -162,6 +168,10 @@ module Imap::Backup
       end
 
       provider.host
+    end
+
+    def helpers
+      Setup::Helpers.new
     end
   end
 end

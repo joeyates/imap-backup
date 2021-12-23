@@ -1,4 +1,4 @@
-describe Imap::Backup::Configuration::FolderChooser do
+describe Imap::Backup::Setup::FolderChooser do
   include HighLineTestHelpers
 
   describe "#run" do
@@ -108,12 +108,12 @@ describe Imap::Backup::Configuration::FolderChooser do
       let(:connection_folders) { nil }
 
       before do
-        allow(Imap::Backup::Configuration::Setup.highline).
+        allow(Imap::Backup::Setup.highline).
           to receive(:ask) { "q" }
       end
 
       it "asks to press a key" do
-        expect(Imap::Backup::Configuration::Setup.highline).
+        expect(Imap::Backup::Setup.highline).
           to receive(:ask).with("Press a key ")
 
         subject.run
@@ -124,7 +124,7 @@ describe Imap::Backup::Configuration::FolderChooser do
       before do
         allow(Imap::Backup::Account::Connection).
           to receive(:new).with(account).and_raise("error")
-        allow(Imap::Backup::Configuration::Setup.highline).
+        allow(Imap::Backup::Setup.highline).
           to receive(:ask) { "q" }
       end
 
@@ -136,7 +136,7 @@ describe Imap::Backup::Configuration::FolderChooser do
       end
 
       it "asks to continue" do
-        expect(Imap::Backup::Configuration::Setup.highline).
+        expect(Imap::Backup::Setup.highline).
           to receive(:ask).with("Press a key ")
 
         subject.run

@@ -1,4 +1,4 @@
-describe Imap::Backup::Configuration::Setup do
+describe Imap::Backup::Setup do
   include HighLineTestHelpers
 
   subject { described_class.new }
@@ -36,11 +36,11 @@ describe Imap::Backup::Configuration::Setup do
       "save": nil,
       "debug?": debug,
       "debug=": nil,
-      "modified?": modified
+      "modified?": config_modified
     )
   end
   let(:debug) { false }
-  let(:modified) { false }
+  let(:config_modified) { false }
   let!(:highline_streams) { prepare_highline }
   let(:input) { highline_streams[0] }
   let(:output) { highline_streams[1] }
@@ -59,16 +59,33 @@ describe Imap::Backup::Configuration::Setup do
       allow(Imap::Backup::Configuration::Store).to receive(:new) { store }
       allow(Imap::Backup).to receive(:setup_logging)
       allow(input).to receive(:eof?) { false }
-      allow(input).to receive(:gets) { "exit\n" }
+      allow(input).to receive(:gets) { "q\n" }
       allow(Kernel).to receive(:system)
     end
 
     describe "main menu" do
-      before { subject.run }
+      context "when changes have not been made" do
+        before { subject.run }
 
-      ["add account", "save and exit", "exit without saving"].each do |choice|
-        it "includes #{choice}" do
-          expect(output.string).to include(choice)
+        ["add account", "quit"].each do |choice|
+          it "includes #{choice}" do
+            expect(output.string).to include(choice)
+          end
+        end
+      end
+
+      context "when changes have been made" do
+        let(:config_modified) { true }
+
+        before do
+          allow(input).to receive(:gets) { "exit\n" }
+          subject.run
+        end
+
+        ["save and exit", "exit without saving"].each do |choice|
+          it "includes '#{choice}'" do
+            expect(output.string).to include(choice)
+          end
         end
       end
     end
@@ -111,14 +128,15 @@ describe Imap::Backup::Configuration::Setup do
 
     context "when editing accounts" do
       let(:account) do
-        instance_double(Imap::Backup::Configuration::Account, run: nil)
+        instance_double(Imap::Backup::Setup::Account, run: nil)
       end
+      let(:config_modified) { true }
 
       before do
         allow(input).to receive(:gets).and_return("1\n", "exit\n")
-        allow(Imap::Backup::Configuration::Asker).to receive(:email).
+        allow(Imap::Backup::Setup::Asker).to receive(:email).
           with(no_args) { "new@example.com" }
-        allow(Imap::Backup::Configuration::Account).to receive(:new).
+        allow(Imap::Backup::Setup::Account).to receive(:new).
           with(store, normal_account, anything) { account }
       end
 
@@ -139,16 +157,17 @@ describe Imap::Backup::Configuration::Setup do
         }
       end
       let(:account) do
-        instance_double(Imap::Backup::Configuration::Account, run: nil)
+        instance_double(Imap::Backup::Setup::Account, run: nil)
       end
+      let(:config_modified) { true }
       let(:added_email) { "new@example.com" }
       let(:local_path) { "/base/path/new_example.com" }
 
       before do
         allow(input).to receive(:gets).and_return("add\n", "exit\n")
-        allow(Imap::Backup::Configuration::Asker).to receive(:email).
+        allow(Imap::Backup::Setup::Asker).to receive(:email).
           with(no_args) { added_email }
-        allow(Imap::Backup::Configuration::Account).to receive(:new).
+        allow(Imap::Backup::Setup::Account).to receive(:new).
           with(store, anything, anything) { account }
 
         subject.run
@@ -186,6 +205,8 @@ describe Imap::Backup::Configuration::Setup do
 
     describe "logging" do
       context "when debug logging is disabled" do
+        let(:config_modified) { true }
+
         before do
           allow(input).to receive(:gets).and_return("start\n", "exit\n")
         end
@@ -213,6 +234,7 @@ describe Imap::Backup::Configuration::Setup do
 
       context "when debug logging is enabled" do
         let(:debug) { true }
+        let(:config_modified) { true }
 
         before do
           allow(input).to receive(:gets).and_return("stop\n", "exit\n")
@@ -245,6 +267,8 @@ describe Imap::Backup::Configuration::Setup do
     end
 
     context "when 'save' is selected" do
+      let(:config_modified) { true }
+
       before do
         allow(input).to receive(:gets) { "save\n" }
       end
@@ -262,6 +286,8 @@ describe Imap::Backup::Configuration::Setup do
     end
 
     context "when 'exit without saving' is selected" do
+      let(:config_modified) { true }
+
       before do
         allow(input).to receive(:gets) { "exit\n" }
       end
@@ -271,22 +297,10 @@ describe Imap::Backup::Configuration::Setup do
         subject.run
       end
 
-      context "when the configuration is modified" do
-        let(:modified) { true }
+      it "doesn't save the configuration" do
+        expect(store).to_not receive(:save)
 
-        it "doesn't save the configuration" do
-          expect(store).to_not receive(:save)
-
-          subject.run
-        end
-      end
-
-      context "when the configuration isn't modified" do
-        it "doesn't save the configuration" do
-          expect(store).to_not receive(:save)
-
-          subject.run
-        end
+        subject.run
       end
     end
   end

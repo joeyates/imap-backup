@@ -1,11 +1,10 @@
 require "highline"
 
 require "imap/backup/account"
+require "imap/backup/setup/helpers"
 
 module Imap::Backup
-  module Configuration; end
-
-  class Configuration::Setup
+  class Setup
     class << self
       attr_accessor :highline
     end
@@ -25,16 +24,22 @@ module Imap::Backup
 
     def show_menu
       self.class.highline.choose do |menu|
-        menu.header = "Choose an action"
+        menu.header = <<~MENU.chomp
+          #{helpers.title_prefix} Main Menu
+
+          Choose an action
+        MENU
         account_items menu
         add_account_item menu
         toggle_logging_item menu
-        menu.choice("save and exit") do
-          config.save
-          throw :done
-        end
-        menu.choice("exit without saving changes") do
-          throw :done
+        if config.modified?
+          menu.choice("save and exit") do
+            config.save
+            throw :done
+          end
+          menu.choice("exit without saving changes")  { throw :done }
+        else
+          menu.choice("quit") { throw :done }
         end
       end
     end
@@ -53,7 +58,7 @@ module Imap::Backup
 
     def add_account_item(menu)
       menu.choice("add account") do
-        username = Configuration::Asker.email
+        username = Asker.email
         edit_account username
       end
     end
@@ -89,9 +94,11 @@ module Imap::Backup
         account = default_account_config(username)
         config.accounts << account
       end
-      Configuration::Account.new(
-        config, account, Configuration::Setup.highline
-      ).run
+      Account.new(config, account, Setup.highline).run
+    end
+
+    def helpers
+      Helpers.new
     end
   end
 end
