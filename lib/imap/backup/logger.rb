@@ -2,6 +2,7 @@ require "logger"
 require "singleton"
 
 require "imap/backup/configuration/store"
+require "imap/backup/sanitizer"
 
 module Imap::Backup
   class Logger
@@ -19,6 +20,16 @@ module Imap::Backup
           ::Logger::Severity::ERROR
         end
       Net::IMAP.debug = config.debug?
+    end
+
+    def self.sanitize_stderr
+      sanitizer = Sanitizer.new($stdout)
+      previous_stderr = $stderr
+      $stderr = sanitizer
+      yield
+    ensure
+      sanitizer.flush
+      $stderr = previous_stderr
     end
 
     attr_reader :logger

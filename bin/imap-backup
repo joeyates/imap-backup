@@ -6,4 +6,6 @@ require "imap/backup/logger"
 
 Imap::Backup::Logger.setup_logging
 
-Imap::Backup::CLI.start(ARGV)
+Imap::Backup::Logger.sanitize_stderr do
+  Imap::Backup::CLI.start(ARGV)
+end
