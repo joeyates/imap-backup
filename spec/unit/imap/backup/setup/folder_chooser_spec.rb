@@ -25,7 +25,7 @@ describe Imap::Backup::Setup::FolderChooser do
     before do
       allow(Imap::Backup::Account::Connection).to receive(:new) { connection }
       allow(Kernel).to receive(:system)
-      allow(Imap::Backup.logger).to receive(:warn)
+      allow(Imap::Backup::Logger.logger).to receive(:warn)
     end
 
     describe "display" do
@@ -129,7 +129,7 @@ describe Imap::Backup::Setup::FolderChooser do
       end
 
       it "prints an error message" do
-        expect(Imap::Backup.logger).
+        expect(Imap::Backup::Logger.logger).
           to receive(:warn).with("Connection failed")
 
         subject.run

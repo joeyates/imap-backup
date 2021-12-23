@@ -11,7 +11,7 @@ module Imap::Backup
     self.highline = HighLine.new
 
     def run
-      Imap::Backup.setup_logging config
+      Imap::Backup::Logger.setup_logging
       catch :done do
         loop do
           Kernel.system("clear")
@@ -68,7 +68,7 @@ module Imap::Backup
       new_setting = !config.debug?
       menu.choice(menu_item) do
         config.debug = new_setting
-        Imap::Backup.setup_logging config
+        Imap::Backup::Logger.setup_logging(config)
       end
     end
 

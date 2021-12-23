@@ -46,7 +46,7 @@ module Imap::Backup
 
       uid = uid.to_i
       if uids.include?(uid)
-        Imap::Backup.logger.debug(
+        Imap::Backup::Logger.logger.debug(
           "[#{folder}] message #{uid} already downloaded - skipping"
         )
         return
@@ -65,7 +65,7 @@ module Imap::Backup
           #{body}. #{e}:
           #{e.backtrace.join("\n")}"
         ERROR
-        Imap::Backup.logger.warn message
+        Imap::Backup::Logger.logger.warn message
       ensure
         mbox&.close
       end

@@ -26,7 +26,7 @@ module Imap::Backup
 
           if folders.empty?
             message = "Unable to get folder list for account #{account.username}"
-            Imap::Backup.logger.info message
+            Imap::Backup::Logger.logger.info message
             raise message
           end
 
@@ -43,13 +43,13 @@ module Imap::Backup
     end
 
     def run_backup
-      Imap::Backup.logger.debug "Running backup of account: #{account.username}"
+      Imap::Backup::Logger.logger.debug "Running backup of account: #{account.username}"
       # start the connection so we get logging messages in the right order
       client
       each_folder do |folder, serializer|
         next if !folder.exist?
 
-        Imap::Backup.logger.debug "[#{folder.name}] running backup"
+        Imap::Backup::Logger.logger.debug "[#{folder.name}] running backup"
         serializer.apply_uid_validity(folder.uid_validity)
         begin
           Downloader.new(folder, serializer).run
@@ -92,7 +92,7 @@ module Imap::Backup
       @client ||=
         retry_on_error(errors: LOGIN_RETRY_CLASSES) do
           options = provider_options
-          Imap::Backup.logger.debug(
+          Imap::Backup::Logger.logger.debug(
             "Creating IMAP instance: #{server}, options: #{options.inspect}"
           )
           client =
@@ -101,9 +101,9 @@ module Imap::Backup
             else
               Client::Default.new(server, options)
             end
-          Imap::Backup.logger.debug "Logging in: #{account.username}/#{masked_password}"
+          Imap::Backup::Logger.logger.debug "Logging in: #{account.username}/#{masked_password}"
           client.login(account.username, account.password)
-          Imap::Backup.logger.debug "Login complete"
+          Imap::Backup::Logger.logger.debug "Login complete"
           client
         end
     end
@@ -125,13 +125,13 @@ module Imap::Backup
     def restore_folder(serializer, folder)
       existing_uids = folder.uids
       if existing_uids.any?
-        Imap::Backup.logger.debug(
+        Imap::Backup::Logger.logger.debug(
           "There's already a '#{folder.name}' folder with emails"
         )
         new_name = serializer.apply_uid_validity(folder.uid_validity)
         old_name = serializer.folder
         if new_name
-          Imap::Backup.logger.debug(
+          Imap::Backup::Logger.logger.debug(
             "Backup '#{old_name}' renamed and restored to '#{new_name}'"
           )
           new_serializer = Serializer::Mbox.new(account.local_path, new_name)
