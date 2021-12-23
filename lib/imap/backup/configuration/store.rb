@@ -22,6 +22,7 @@ module Imap::Backup
 
     def initialize(pathname = self.class.default_pathname)
       @pathname = pathname
+      @saved_debug = nil
       @debug = nil
     end
 
@@ -42,6 +43,7 @@ module Imap::Backup
       }
       File.open(pathname, "w") { |f| f.write(JSON.pretty_generate(save_data)) }
       FileUtils.chmod(0o600, pathname) if !windows?
+      @data = nil
     end
 
     def accounts
@@ -53,6 +55,8 @@ module Imap::Backup
 
     def modified?
       ensure_loaded!
+      return true if @saved_debug != @debug
+
       accounts.any? { |a| a.modified? || a.marked_for_deletion? }
     end
 
@@ -73,6 +77,7 @@ module Imap::Backup
 
       data
       @debug = data.key?(:debug) ? data[:debug] == true : false
+      @saved_debug = @debug
       true
     end
 
