@@ -1,3 +1,5 @@
+require "imap/backup/cli/accounts"
+
 module Imap::Backup
   class CLI::Local < Thor
     include Thor::Actions
@@ -5,8 +7,8 @@ module Imap::Backup
 
     desc "accounts", "List locally backed-up accounts"
     def accounts
-      connections = Imap::Backup::Configuration::List.new
-      connections.accounts.each { |a| Kernel.puts a.username }
+      accounts = CLI::Accounts.new
+      accounts.each { |a| Kernel.puts a.username }
     end
 
     desc "folders EMAIL", "List account folders"

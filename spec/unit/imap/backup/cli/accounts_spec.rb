@@ -1,4 +1,6 @@
-describe Imap::Backup::Configuration::List do
+require "imap/backup/cli/accounts"
+
+describe Imap::Backup::CLI::Accounts do
   subject { described_class.new }
 
   let(:accounts) { [account1, account2] }

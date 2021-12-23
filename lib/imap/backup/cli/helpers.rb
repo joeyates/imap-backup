@@ -1,4 +1,5 @@
 require "imap/backup"
+require "imap/backup/cli/accounts"
 
 module Imap::Backup::CLI::Helpers
   def symbolized(options)
@@ -6,8 +7,8 @@ module Imap::Backup::CLI::Helpers
   end
 
   def account(email)
-    connections = Imap::Backup::Configuration::List.new
-    account = connections.accounts.find { |a| a.username == email }
+    accounts = Imap::Backup::CLI::Accounts.new
+    account = accounts.find { |a| a.username == email }
     raise "#{email} is not a configured account" if !account
 
     account
@@ -21,12 +22,12 @@ module Imap::Backup::CLI::Helpers
 
   def each_connection(names)
     begin
-      connections = Imap::Backup::Configuration::List.new(names)
+      accounts = Imap::Backup::CLI::Accounts.new(names)
     rescue Imap::Backup::ConfigurationNotFound
       raise "imap-backup is not configured. Run `imap-backup setup`"
     end
 
-    connections.each_connection do |connection|
+    accounts.each_connection do |connection|
       yield connection
     end
   end

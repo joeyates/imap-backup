@@ -1,11 +1,19 @@
 module Imap::Backup
-  class Configuration; end
+  class CLI; end
 
-  class Configuration::List
+  class CLI::Accounts
+    include Enumerable
+
     attr_reader :required_accounts
 
     def initialize(required_accounts = [])
       @required_accounts = required_accounts
+    end
+
+    def each(&block)
+      return enum_for(:each) if !block
+
+      accounts.each(&block)
     end
 
     def each_connection
@@ -15,6 +23,8 @@ module Imap::Backup
         connection.disconnect
       end
     end
+
+    private
 
     def accounts
       @accounts ||=
@@ -26,8 +36,6 @@ module Imap::Backup
           end
         end
     end
-
-    private
 
     def config
       @config ||= begin

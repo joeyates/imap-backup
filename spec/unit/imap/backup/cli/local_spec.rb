@@ -1,6 +1,9 @@
 describe Imap::Backup::CLI::Local do
-  let(:list) do
-    instance_double(Imap::Backup::Configuration::List, accounts: [account])
+  let(:accounts) do
+    instance_double(
+      Imap::Backup::CLI::Accounts,
+      find: ->(&block) { [account].find { |a| block.call(a) } }
+    )
   end
   let(:account) do
     instance_double(
@@ -38,9 +41,10 @@ describe Imap::Backup::CLI::Local do
 
   before do
     allow(Kernel).to receive(:puts)
-    allow(Imap::Backup::Configuration::List).to receive(:new) { list }
+    allow(Imap::Backup::CLI::Accounts).to receive(:new) { accounts }
     allow(Imap::Backup::Account::Connection).to receive(:new) { connection }
     allow(Mail).to receive(:new) { mail }
+    allow(accounts).to receive(:each).and_yield(account)
   end
 
   describe "accounts" do

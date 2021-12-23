@@ -1,7 +1,10 @@
 module Imap::Backup
   describe CLI::Utils do
-    let(:list) do
-      instance_double(Configuration::List, accounts: [account])
+    let(:accounts) do
+      instance_double(
+        CLI::Accounts,
+        find: ->(&block) { [account].find { |a| block.call(a) } }
+      )
     end
     let(:account) { instance_double(Account, username: email) }
     let(:connection) do
@@ -31,7 +34,7 @@ module Imap::Backup
     let(:email) { "foo@example.com" }
 
     before do
-      allow(Configuration::List).to receive(:new) { list }
+      allow(CLI::Accounts).to receive(:new) { accounts }
       allow(Account::Connection).to receive(:new) { connection }
     end
 
