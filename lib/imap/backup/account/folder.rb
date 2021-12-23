@@ -84,6 +84,26 @@ module Imap::Backup
       nil
     end
 
+    def fetch_multi(uids)
+      examine
+      fetch_data_items =
+        retry_on_error(errors: UID_FETCH_RETRY_CLASSES) do
+          client.uid_fetch(uids, [BODY_ATTRIBUTE])
+        end
+      return nil if fetch_data_items.nil?
+
+      fetch_data_items.map do |item|
+        attributes = item.attr
+
+        {
+          uid: attributes["UID"],
+          body: attributes[BODY_ATTRIBUTE]
+        }
+      end
+    rescue FolderNotFound
+      nil
+    end
+
     def append(message)
       body = message.imap_body
       date = message.date&.to_time

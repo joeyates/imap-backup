@@ -6,6 +6,7 @@ require "imap/backup/account"
 module Imap::Backup
   class Configuration
     CONFIGURATION_DIRECTORY = File.expand_path("~/.imap-backup")
+    DEFAULT_DOWNLOAD_BLOCK_SIZE = 1
     VERSION = "2.0"
 
     attr_reader :pathname
@@ -48,6 +49,15 @@ module Imap::Backup
       @accounts ||= begin
         ensure_loaded!
         data[:accounts].map { |data| Account.new(data) }
+      end
+    end
+
+    def download_block_size
+      size = ENV["DOWNLOAD_BLOCK_SIZE"].to_i
+      if size > 0
+        size
+      else
+        DEFAULT_DOWNLOAD_BLOCK_SIZE
       end
     end
 

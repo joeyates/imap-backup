@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [4.0.8] - 2021-12-23
 
+### Added
+
+* Experimental: Improved backup speed via multi fetches configurable
+  via the Environment variable DOWNLOAD_BLOCK_SIZE.
+  The default is still to fetch one message at a time.
+
 ### Changed
 
 * Setup menus

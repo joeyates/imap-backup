@@ -6,7 +6,7 @@ describe Imap::Backup::Downloader do
     let(:folder) do
       instance_double(
         Imap::Backup::Account::Folder,
-        fetch: body,
+        fetch_multi: [{uid: "111", body: body}],
         name: "folder",
         uids: folder_uids
       )

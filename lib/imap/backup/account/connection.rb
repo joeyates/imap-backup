@@ -52,7 +52,9 @@ module Imap::Backup
         Imap::Backup::Logger.logger.debug "[#{folder.name}] running backup"
         serializer.apply_uid_validity(folder.uid_validity)
         begin
-          Downloader.new(folder, serializer).run
+          Downloader.new(
+            folder, serializer, block_size: config.download_block_size
+          ).run
         rescue Net::IMAP::ByeResponseError
           reconnect
           retry
@@ -178,6 +180,10 @@ module Imap::Backup
 
     def provider_options
       provider.options.merge(account.connection_options || {})
+    end
+
+    def config
+      @config ||= Configuration.new
     end
   end
 end

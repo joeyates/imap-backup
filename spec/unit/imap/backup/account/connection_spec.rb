@@ -150,7 +150,7 @@ describe Imap::Backup::Account::Connection do
 
     before do
       allow(Imap::Backup::Downloader).
-        to receive(:new).with(folder, serializer) { downloader }
+        to receive(:new).with(folder, serializer, anything) { downloader }
       allow(Imap::Backup::Account::Folder).to receive(:new).
         with(subject, BACKUP_FOLDER) { folder }
       allow(Imap::Backup::Serializer::Mbox).to receive(:new).
