@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [4.0.8] - 2021-12-23
+
+### Changed
+
+* Setup menus
+  * add titles,
+  * indicate when data has been modified,
+  * add 'q' shortcut for quick menu exit,
+* Debug output to hide passwords printed by the Net::IMAP gem.
+
 ## [4.0.4] - 2021-12-21
 
 ### Changed
