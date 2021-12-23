@@ -15,7 +15,7 @@ describe Imap::Backup::Configuration::List do
     )
   end
   let(:store) do
-    instance_double(Imap::Backup::Configuration::Store, accounts: accounts)
+    instance_double(Imap::Backup::Configuration, accounts: accounts)
   end
   let(:exists) { true }
   let(:connection1) do
@@ -26,8 +26,8 @@ describe Imap::Backup::Configuration::List do
   end
 
   before do
-    allow(Imap::Backup::Configuration::Store).to receive(:new) { store }
-    allow(Imap::Backup::Configuration::Store).
+    allow(Imap::Backup::Configuration).to receive(:new) { store }
+    allow(Imap::Backup::Configuration).
       to receive(:exist?) { exists }
     allow(Imap::Backup::Account::Connection).
       to receive(:new).with(accounts[0]) { connection1 }

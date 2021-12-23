@@ -3,8 +3,8 @@ require "imap/backup/setup/helpers"
 module Imap::Backup
   class Setup; end
 
-  Setup::Account = Struct.new(:store, :account, :highline) do
-    def initialize(store, account, highline)
+  Setup::Account = Struct.new(:config, :account, :highline) do
+    def initialize(config, account, highline)
       super
     end
 
@@ -61,7 +61,7 @@ module Imap::Backup
       menu.choice("modify email") do
         username = Setup::Asker.email(username)
         Kernel.puts "username: #{username}"
-        other_accounts = store.accounts.reject { |a| a == account }
+        other_accounts = config.accounts.reject { |a| a == account }
         others = other_accounts.map { |a| a.username }
         Kernel.puts "others: #{others.inspect}"
         if others.include?(username)
@@ -103,7 +103,7 @@ module Imap::Backup
     end
 
     def path_modification_validator(path)
-      same = store.accounts.find do |a|
+      same = config.accounts.find do |a|
         a.username != account.username && a.local_path == path
       end
       if same

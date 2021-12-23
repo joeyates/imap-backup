@@ -30,7 +30,7 @@ describe Imap::Backup::Setup do
   let(:accounts) { [normal_account] }
   let(:store) do
     instance_double(
-      Imap::Backup::Configuration::Store,
+      Imap::Backup::Configuration,
       "accounts": accounts,
       "path": "/base/path",
       "save": nil,
@@ -56,7 +56,7 @@ describe Imap::Backup::Setup do
 
   describe "#run" do
     before do
-      allow(Imap::Backup::Configuration::Store).to receive(:new) { store }
+      allow(Imap::Backup::Configuration).to receive(:new) { store }
       allow(Imap::Backup::Logger).to receive(:setup_logging)
       allow(input).to receive(:eof?) { false }
       allow(input).to receive(:gets) { "q\n" }

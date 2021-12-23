@@ -2,9 +2,9 @@ describe Imap::Backup::Setup::Account do
   ACCOUNT = "account".freeze
   GMAIL_IMAP_SERVER = "imap.gmail.com".freeze
   HIGHLINE = "highline".freeze
-  STORE = "store".freeze
+  CONFIG = "config".freeze
 
-  subject { described_class.new(store, account, highline) }
+  subject { described_class.new(config, account, highline) }
 
   let(:account) do
     instance_double(
@@ -34,10 +34,10 @@ describe Imap::Backup::Setup::Account do
   let(:other_existing_path) { "/other/existing/path" }
 
   let(:highline) { HIGHLINE }
-  let(:store) { STORE }
+  let(:config) { CONFIG }
 
   describe "#initialize" do
-    [:store, :account, :highline].each do |param|
+    [:config, :account, :highline].each do |param|
       it "expects #{param}" do
         expect(subject.send(param)).to eq(send(param))
       end
@@ -66,8 +66,8 @@ describe Imap::Backup::Setup::Account do
 
     let(:highline) { instance_double(HighLine) }
     let(:menu) { highline_menu_class.new }
-    let(:store) do
-      instance_double(Imap::Backup::Configuration::Store, accounts: accounts)
+    let(:config) do
+      instance_double(Imap::Backup::Configuration, accounts: accounts)
     end
 
     before do

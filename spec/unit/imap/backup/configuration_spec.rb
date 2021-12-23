@@ -3,7 +3,7 @@ require "os"
 
 # rubocop:disable RSpec/PredicateMatcher
 
-describe Imap::Backup::Configuration::Store do
+describe Imap::Backup::Configuration do
   let(:directory) { "/base/path" }
   let(:file_path) { File.join(directory, "/config.json") }
   let(:file_exists) { true }
@@ -17,7 +17,7 @@ describe Imap::Backup::Configuration::Store do
 
   before do
     stub_const(
-      "Imap::Backup::Configuration::Store::CONFIGURATION_DIRECTORY", directory
+      "Imap::Backup::Configuration::CONFIGURATION_DIRECTORY", directory
     )
     allow(File).to receive(:directory?).with(directory) { directory_exists }
     allow(File).to receive(:exist?).and_call_original

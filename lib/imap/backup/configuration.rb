@@ -4,9 +4,7 @@ require "os"
 require "imap/backup/account"
 
 module Imap::Backup
-  module Configuration; end
-
-  class Configuration::Store
+  class Configuration
     CONFIGURATION_DIRECTORY = File.expand_path("~/.imap-backup")
     VERSION = "2.0"
 

@@ -72,7 +72,7 @@ module Imap::Backup
     end
 
     def config
-      @config ||= Configuration::Store.new
+      @config ||= Configuration.new
     end
 
     def default_account_config(username)

@@ -3,7 +3,7 @@ require "net/imap"
 module Imap::Backup
   describe Logger do
     describe ".setup_logging" do
-      let(:config) { instance_double(Configuration::Store, debug?: debug) }
+      let(:config) { instance_double(Configuration, debug?: debug) }
 
       around do |example|
         logger_previous = described_class.logger.level
@@ -16,7 +16,7 @@ module Imap::Backup
       end
 
       before do
-        allow(Configuration::Store).to receive(:new) { config }
+        allow(Configuration).to receive(:new) { config }
         described_class.setup_logging
       end
 

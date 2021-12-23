@@ -1,7 +1,7 @@
 require "logger"
 require "singleton"
 
-require "imap/backup/configuration/store"
+require "imap/backup/configuration"
 require "imap/backup/sanitizer"
 
 module Imap::Backup
@@ -12,7 +12,7 @@ module Imap::Backup
       Logger.instance.logger
     end
 
-    def self.setup_logging(config = Configuration::Store.new)
+    def self.setup_logging(config = Configuration.new)
       logger.level =
         if config.debug?
           ::Logger::Severity::DEBUG

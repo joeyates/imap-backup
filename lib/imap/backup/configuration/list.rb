@@ -1,5 +1,5 @@
 module Imap::Backup
-  module Configuration; end
+  class Configuration; end
 
   class Configuration::List
     attr_reader :required_accounts
@@ -30,17 +30,14 @@ module Imap::Backup
     private
 
     def config
-      return @config if @config
-
-      if !config_exists?
-        path = Configuration::Store.default_pathname
-        raise ConfigurationNotFound, "Configuration file '#{path}' not found"
+      @config ||= begin
+        exists = Configuration.exist?
+        if !exists
+          path = Configuration.default_pathname
+          raise ConfigurationNotFound, "Configuration file '#{path}' not found"
+        end
+        Configuration.new
       end
-      @config = Configuration::Store.new
-    end
-
-    def config_exists?
-      Configuration::Store.exist?
     end
   end
 end
