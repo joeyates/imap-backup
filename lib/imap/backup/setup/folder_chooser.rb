@@ -105,7 +105,7 @@ module Imap::Backup
     end
 
     def imap_folders
-      @imap_folders ||= connection.folders
+      @imap_folders ||= connection.folder_names
     end
 
     def highline

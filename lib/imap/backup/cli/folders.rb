@@ -14,7 +14,9 @@ module Imap::Backup
       def run
         each_connection(account_names) do |connection|
           puts connection.username
-          folders = connection.folders
+          # TODO: Make folder_names private once this command
+          # has been removed.
+          folders = connection.folder_names
           if folders.nil?
             warn "Unable to list account folders"
             return false

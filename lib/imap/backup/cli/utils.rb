@@ -11,9 +11,10 @@ module Imap::Backup
     def ignore_history(email)
       connection = connection(email)
 
-      connection.local_folders.each do |serializer, folder|
+      connection.backup_folders.each do |folder|
         next if !folder.exist?
 
+        serializer = Serializer::Mbox.new(connection.account.local_path, folder.name)
         do_ignore_folder_history(folder, serializer)
       end
     end

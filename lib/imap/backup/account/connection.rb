@@ -15,30 +15,47 @@ module Imap::Backup
 
     def initialize(account)
       @account = account
-      @folders = nil
+      @folder_names = nil
       create_account_folder
     end
 
-    def folders
-      @folders ||=
+    # TODO: Make this private once the 'folders' command
+    # has been removed.
+    def folder_names
+      @folder_names ||=
         begin
-          folders = client.list
+          folder_names = client.list
 
-          if folders.empty?
+          if folder_names.empty?
             message = "Unable to get folder list for account #{account.username}"
             Imap::Backup::Logger.logger.info message
             raise message
           end
 
-          folders
+          folder_names
+        end
+    end
+
+    def backup_folders
+      @backup_folders ||=
+        begin
+          names =
+            if account.folders&.any?
+              account.folders.map { |af| af[:name] }
+            else
+              folder_names
+            end
+
+          names.map do |name|
+            Account::Folder.new(self, name)
+          end
         end
     end
 
     def status
-      backup_folders.map do |backup_folder|
-        f = Account::Folder.new(self, backup_folder[:name])
-        s = Serializer::Mbox.new(account.local_path, backup_folder[:name])
-        {name: backup_folder[:name], local: s.uids, remote: f.uids}
+      backup_folders.map do |folder|
+        s = Serializer::Mbox.new(account.local_path, folder.name)
+        {name: folder.name, local: s.uids, remote: folder.uids}
       end
     end
 
@@ -117,9 +134,8 @@ module Imap::Backup
     private
 
     def each_folder
-      backup_folders.each do |backup_folder|
-        folder = Account::Folder.new(self, backup_folder[:name])
-        serializer = Serializer::Mbox.new(account.local_path, backup_folder[:name])
+      backup_folders.each do |folder|
+        serializer = Serializer::Mbox.new(account.local_path, folder.name)
         yield folder, serializer
       end
     end
@@ -161,17 +177,6 @@ module Imap::Backup
 
     def masked_password
       account.password.gsub(/./, "x")
-    end
-
-    def backup_folders
-      @backup_folders ||=
-        begin
-          if account.folders&.any?
-            account.folders
-          else
-            folders.map { |name| {name: name} }
-          end
-        end
     end
 
     def provider

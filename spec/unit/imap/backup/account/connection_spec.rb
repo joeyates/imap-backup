@@ -5,6 +5,7 @@ describe Imap::Backup::Account::Connection do
   FOLDER_CONFIG = {name: BACKUP_FOLDER}.freeze
   FOLDER_NAME = "my_folder".freeze
   GMAIL_IMAP_SERVER = "imap.gmail.com".freeze
+  IMAP_FOLDER = "imap_folder".freeze
   LOCAL_PATH = "local_path".freeze
   LOCAL_UID = "local_uid".freeze
   PASSWORD = "secret".freeze
@@ -101,19 +102,23 @@ describe Imap::Backup::Account::Connection do
     end
   end
 
-  describe "#folders" do
+  describe "#folder_names" do
     let(:imap_folders) do
-      [BACKUP_FOLDER]
+      [IMAP_FOLDER]
     end
 
     it "returns the list of folders" do
-      expect(subject.folders).to eq([BACKUP_FOLDER])
+      expect(subject.folder_names).to eq([IMAP_FOLDER])
     end
   end
 
   describe "#status" do
     let(:folder) do
-      instance_double(Imap::Backup::Account::Folder, uids: [remote_uid])
+      instance_double(
+        Imap::Backup::Account::Folder,
+        uids: [remote_uid],
+        name: IMAP_FOLDER
+      )
     end
     let(:remote_uid) { "remote_uid" }
 
@@ -123,7 +128,7 @@ describe Imap::Backup::Account::Connection do
     end
 
     it "returns the names of folders" do
-      expect(subject.status[0][:name]).to eq(BACKUP_FOLDER)
+      expect(subject.status[0][:name]).to eq(IMAP_FOLDER)
     end
 
     it "returns local message uids" do
@@ -139,7 +144,7 @@ describe Imap::Backup::Account::Connection do
     let(:folder) do
       instance_double(
         Imap::Backup::Account::Folder,
-        name: "folder",
+        name: IMAP_FOLDER,
         exist?: exists,
         uid_validity: uid_validity
       )
@@ -154,7 +159,7 @@ describe Imap::Backup::Account::Connection do
       allow(Imap::Backup::Account::Folder).to receive(:new).
         with(subject, BACKUP_FOLDER) { folder }
       allow(Imap::Backup::Serializer::Mbox).to receive(:new).
-        with(LOCAL_PATH, BACKUP_FOLDER) { serializer }
+        with(LOCAL_PATH, IMAP_FOLDER) { serializer }
     end
 
     context "with supplied config_folders" do
@@ -248,7 +253,7 @@ describe Imap::Backup::Account::Connection do
         Imap::Backup::Account::Folder,
         create: nil,
         uids: uids,
-        name: FOLDER_NAME,
+        name: IMAP_FOLDER,
         uid_validity: uid_validity
       )
     end
