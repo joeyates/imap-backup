@@ -10,10 +10,16 @@ module Imap::Backup
     let(:connection) do
       instance_double(
         Account::Connection,
-        local_folders: local_folders
+        account: account,
+        backup_folders: [folder]
       )
     end
-    let(:local_folders) { [[serializer, folder]] }
+    let(:account) do
+      instance_double(
+        Account,
+        local_path: "path"
+      )
+    end
     let(:folder) do
       instance_double(
         Account::Folder,
@@ -36,6 +42,7 @@ module Imap::Backup
     before do
       allow(CLI::Accounts).to receive(:new) { accounts }
       allow(Account::Connection).to receive(:new) { connection }
+      allow(Serializer::Mbox).to receive(:new) { serializer }
     end
 
     describe "ignore_history" do
