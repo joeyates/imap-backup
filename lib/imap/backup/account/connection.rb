@@ -36,6 +36,17 @@ module Imap::Backup
         end
     end
 
+    def backup_folders
+      @backup_folders ||=
+        begin
+          if account.folders&.any?
+            account.folders
+          else
+            folders.map { |name| {name: name} }
+          end
+        end
+    end
+
     def status
       backup_folders.map do |backup_folder|
         f = Account::Folder.new(self, backup_folder[:name])
@@ -163,17 +174,6 @@ module Imap::Backup
 
     def masked_password
       account.password.gsub(/./, "x")
-    end
-
-    def backup_folders
-      @backup_folders ||=
-        begin
-          if account.folders&.any?
-            account.folders
-          else
-            folders.map { |name| {name: name} }
-          end
-        end
     end
 
     def provider
