@@ -5,6 +5,7 @@ describe Imap::Backup::Account::Connection do
   FOLDER_CONFIG = {name: BACKUP_FOLDER}.freeze
   FOLDER_NAME = "my_folder".freeze
   GMAIL_IMAP_SERVER = "imap.gmail.com".freeze
+  IMAP_FOLDER = "imap_folder".freeze
   LOCAL_PATH = "local_path".freeze
   LOCAL_UID = "local_uid".freeze
   PASSWORD = "secret".freeze
@@ -101,13 +102,13 @@ describe Imap::Backup::Account::Connection do
     end
   end
 
-  describe "#folders" do
+  describe "#folder_names" do
     let(:imap_folders) do
-      [BACKUP_FOLDER]
+      [IMAP_FOLDER]
     end
 
     it "returns the list of folders" do
-      expect(subject.folders).to eq([BACKUP_FOLDER])
+      expect(subject.folder_names).to eq([IMAP_FOLDER])
     end
   end
 

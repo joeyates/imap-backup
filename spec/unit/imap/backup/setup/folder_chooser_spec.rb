@@ -6,7 +6,7 @@ describe Imap::Backup::Setup::FolderChooser do
 
     let(:connection) do
       instance_double(
-        Imap::Backup::Account::Connection, folders: connection_folders
+        Imap::Backup::Account::Connection, folder_names: connection_folders
       )
     end
     let(:account) do

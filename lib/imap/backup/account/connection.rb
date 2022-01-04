@@ -15,22 +15,24 @@ module Imap::Backup
 
     def initialize(account)
       @account = account
-      @folders = nil
+      @folder_names = nil
       create_account_folder
     end
 
-    def folders
-      @folders ||=
+    # TODO: Make this private once the 'folders' command
+    # has been removed.
+    def folder_names
+      @folder_names ||=
         begin
-          folders = client.list
+          folder_names = client.list
 
-          if folders.empty?
+          if folder_names.empty?
             message = "Unable to get folder list for account #{account.username}"
             Imap::Backup::Logger.logger.info message
             raise message
           end
 
-          folders
+          folder_names
         end
     end
 
