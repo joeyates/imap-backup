@@ -63,9 +63,12 @@ module EmailServerHelpers
   end
 
   def server_folders
-    root_info = imap.list("", "")[0]
-    root = root_info.name
     imap.list(root, "*")
+  end
+
+  def root
+    root_info = imap.list("", "")[0]
+    root_info.name
   end
 
   def server_create_folder(folder)
