@@ -15,7 +15,7 @@ module Imap::Backup
 
     def initialize(account)
       @account = account
-      @folder_names = nil
+      reset
       create_account_folder
     end
 
@@ -100,11 +100,20 @@ module Imap::Backup
 
     def disconnect
       client.disconnect if @client
+      reset
     end
 
     def reconnect
       disconnect
+    end
+
+    def reset
+      @backup_folders = nil
       @client = nil
+      @config = nil
+      @folder_names = nil
+      @provider = nil
+      @server = nil
     end
 
     def client

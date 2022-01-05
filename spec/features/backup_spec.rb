@@ -58,6 +58,7 @@ RSpec.describe "backup", type: :feature, docker: true do
         email3
         original_folder_uid_validity
         connection.run_backup
+        connection.disconnect
         server_rename_folder folder, new_name
       end
       let(:renamed_folder) { "#{folder}.#{original_folder_uid_validity}" }
