@@ -77,9 +77,6 @@ class Thunderbird::Subdirectory
 
   def check
     case
-    when placeholder.exists? && !exists?
-      Kernel.puts "Can't set up folder '#{folder_path}': '#{placeholder.path}' exists, but '#{full_path}' is missing"
-      false
     when exists? && !placeholder.exists?
       Kernel.puts "Can't set up folder '#{folder_path}': '#{full_path}' exists, but '#{placeholder.path}' is missing"
       false
