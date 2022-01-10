@@ -10,7 +10,7 @@ module Email::Mboxrd
 
     attr_reader :supplied_body
 
-    def self.from_serialized(serialized)
+    def self.clean_serialized(serialized)
       cleaned = serialized.gsub(/^>(>*From)/, "\\1")
       # Serialized messages in this format *should* start with a line
       #   From xxx yy zz
@@ -19,7 +19,11 @@ module Email::Mboxrd
         cleaned = cleaned.sub(/^From .*[\r\n]*/, "")
       end
       # rubocop:enable Style/IfUnlessModifier
-      new(cleaned)
+      cleaned
+    end
+
+    def self.from_serialized(serialized)
+      new(clean_serialized(serialized))
     end
 
     def initialize(supplied_body)

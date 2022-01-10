@@ -40,7 +40,16 @@ module Imap::Backup
         end
       end
 
-      FileUtils.cp serializer.mbox_pathname, local_folder.full_path
+      File.open(local_folder.full_path, "w") do |f|
+        enumerator = Serializer::MboxEnumerator.new(serializer.mbox_pathname)
+        enumerator.each.with_index do |raw, i|
+          clean = Email::Mboxrd::Message.clean_serialized(raw)
+          timestamp = Time.now.strftime("%a %b %d %H:%M:%S %Y")
+          thunderbird_fom_line = "From - #{timestamp}"
+          output = "#{thunderbird_fom_line}\n#{clean}\n"
+          f.write output
+        end
+      end
 
       true
     end
