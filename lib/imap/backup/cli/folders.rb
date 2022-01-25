@@ -13,7 +13,7 @@ module Imap::Backup
     no_commands do
       def run
         each_connection(account_names) do |connection|
-          puts connection.username
+          puts connection.account.username
           # TODO: Make folder_names private once this command
           # has been removed.
           folders = connection.folder_names
