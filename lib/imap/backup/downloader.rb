@@ -13,16 +13,16 @@ module Imap::Backup
     def run
       uids = folder.uids - serializer.uids
       count = uids.count
-      Imap::Backup::Logger.logger.debug "[#{folder.name}] #{count} new messages"
+      debug "#{count} new messages"
       uids.each_slice(block_size).with_index do |block, i|
         uids_and_bodies = folder.fetch_multi(block)
         if uids_and_bodies.nil?
           if block_size > 1
-            Imap::Backup::Logger.logger.debug("[#{folder.name}] Multi fetch failed for UIDs #{block.join(", ")}, switching to single fetches")
+            debug("Multi fetch failed for UIDs #{block.join(", ")}, switching to single fetches")
             @block_size = 1
             redo
           else
-            Imap::Backup::Logger.logger.debug("[#{folder.name}] Fetch failed for UID #{block[0]} - skipping")
+            debug("Fetch failed for UID #{block[0]} - skipping")
             next
           end
         end
@@ -31,13 +31,16 @@ module Imap::Backup
         uids_and_bodies.each.with_index do |uid_and_body, j|
           uid = uid_and_body[:uid]
           body = uid_and_body[:body]
-          Imap::Backup::Logger.logger.debug(
-            "[#{folder.name}] uid: #{uid} (#{offset + j}/#{count}) - " \
-              "#{body.size} bytes"
-          )
+          debug("uid: #{uid} (#{offset + j}/#{count}) - #{body.size} bytes")
           serializer.save(uid, body)
         end
       end
+    end
+
+    private
+
+    def debug(message)
+      Imap::Backup::Logger.logger.debug("[#{folder.name}] #{message}")
     end
   end
 end
