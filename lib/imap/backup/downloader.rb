@@ -15,7 +15,6 @@ module Imap::Backup
       count = uids.count
       Imap::Backup::Logger.logger.debug "[#{folder.name}] #{count} new messages"
       uids.each_slice(block_size).with_index do |block, i|
-        offset = i * block_size + 1
         uids_and_bodies = folder.fetch_multi(block)
         if uids_and_bodies.nil?
           if block_size > 1
@@ -28,6 +27,7 @@ module Imap::Backup
           end
         end
 
+        offset = i * block_size + 1
         uids_and_bodies.each.with_index do |uid_and_body, j|
           uid = uid_and_body[:uid]
           body = uid_and_body[:body]
