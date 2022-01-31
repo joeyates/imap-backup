@@ -32,7 +32,7 @@ module Imap::Backup
           uid = uid_and_body[:uid]
           body = uid_and_body[:body]
           Imap::Backup::Logger.logger.debug(
-            "[#{folder.name}] uid: #{uid} (#{offset +j}/#{count}) - " \
+            "[#{folder.name}] uid: #{uid} (#{offset + j}/#{count}) - " \
               "#{body.size} bytes"
           )
           serializer.save(uid, body)
