@@ -6,6 +6,7 @@ module Imap::Backup
 
     attr_reader :output
 
+    delegate puts: :output
     delegate write: :output
 
     def initialize(output)
