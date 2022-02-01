@@ -22,4 +22,12 @@ end
 
 RSpec.configure do |config|
   config.include ConfigurationHelpers, type: :aruba
+
+  config.before(:suite) do
+    FileUtils.rm_rf "./tmp/home"
+  end
+
+  config.after do
+    FileUtils.rm_rf "./tmp/home"
+  end
 end
