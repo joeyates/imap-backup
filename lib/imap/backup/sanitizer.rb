@@ -1,14 +1,16 @@
+require "forwardable"
+
 module Imap::Backup
   class Sanitizer
+    extend Forwardable
+
     attr_reader :output
+
+    delegate write: :output
 
     def initialize(output)
       @output = output
       @current = ""
-    end
-
-    def write(*args)
-      output.write(*args)
     end
 
     def print(*args)
