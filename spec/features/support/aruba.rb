@@ -23,13 +23,29 @@ module ConfigurationHelpers
 end
 
 module StoreHelpers
-  def store_email(email:, folder:, uid: 1, body: "body")
+  def store_email(
+    email:, folder:,
+    uid: 1,
+    from: "sender@example.com",
+    subject: "The Subject",
+    body: "body"
+  )
     account = config.accounts.find { |a| a.username == email }
     raise "Account not found" if !account
     FileUtils.mkdir_p account.local_path
     store = Imap::Backup::Serializer::MboxStore.new(account.local_path, folder)
     store.uid_validity = "42" if !store.uid_validity
-    store.add(uid, body)
+    serialized = to_serialized(from: from, subject: subject, body: body)
+    store.add(uid, serialized)
+  end
+
+  def to_serialized(from:, subject:, body:)
+    body_and_headers = <<~BODY
+      From: #{from}
+      Subject: #{subject}
+
+      #{body}
+    BODY
   end
 
   def config
