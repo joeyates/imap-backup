@@ -5,8 +5,11 @@ Aruba.configure do |config|
 end
 
 module ConfigurationHelpers
+  def config_path
+    File.expand_path("~/.imap-backup")
+  end
+
   def create_config(accounts:, debug: false)
-    config_path = File.expand_path("~/.imap-backup")
     pathname = File.join(config_path, "config.json")
     save_data = {
       version: Imap::Backup::Configuration::VERSION,
@@ -17,11 +20,28 @@ module ConfigurationHelpers
     File.open(pathname, "w") { |f| f.write(JSON.pretty_generate(save_data)) }
     FileUtils.chmod(0o600, pathname)
   end
+end
 
+module StoreHelpers
+  def store_email(email:, folder:, uid: 1, body: "body")
+    account = config.accounts.find { |a| a.username == email }
+    raise "Account not found" if !account
+    FileUtils.mkdir_p account.local_path
+    store = Imap::Backup::Serializer::MboxStore.new(account.local_path, folder)
+    store.uid_validity = "42" if !store.uid_validity
+    store.add(uid, body)
+  end
+
+  def config
+    Imap::Backup::Configuration.new(
+      File.expand_path("~/.imap-backup/config.json")
+    )
+  end
 end
 
 RSpec.configure do |config|
   config.include ConfigurationHelpers, type: :aruba
+  config.include StoreHelpers, type: :aruba
 
   config.before(:suite) do
     FileUtils.rm_rf "./tmp/home"
