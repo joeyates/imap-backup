@@ -18,8 +18,6 @@ module Imap::Backup
       reset
     end
 
-    # TODO: Make this private once the 'folders' command
-    # has been removed.
     def folder_names
       @folder_names ||=
         begin
