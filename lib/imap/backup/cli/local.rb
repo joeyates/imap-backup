@@ -11,7 +11,7 @@ module Imap::Backup
       accounts.each { |a| Kernel.puts a.username }
     end
 
-    desc "folders EMAIL", "List account folders"
+    desc "folders EMAIL", "List backed up folders"
     def folders(email)
       connection = connection(email)
 

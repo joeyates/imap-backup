@@ -89,6 +89,9 @@ module Imap::Backup
     desc "local SUBCOMMAND [OPTIONS]", "View local info"
     subcommand "local", Local
 
+    desc "remote SUBCOMMAND [OPTIONS]", "View info about online accounts"
+    subcommand "remote", Remote
+
     desc "utils SUBCOMMAND [OPTIONS]", "Various utilities"
     subcommand "utils", Utils
   end
