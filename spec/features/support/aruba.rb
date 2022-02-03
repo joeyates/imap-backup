@@ -67,6 +67,10 @@ RSpec.configure do |config|
     FileUtils.rm_rf "./tmp/home"
   end
 
+  config.before(:example, type: :aruba) do
+    set_environment_variable("COVERAGE", "aruba")
+  end
+
   config.after do
     FileUtils.rm_rf "./tmp/home"
   end

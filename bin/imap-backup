@@ -1,6 +1,10 @@
 #!/usr/bin/env ruby
 
 $LOAD_PATH.unshift(File.expand_path("../lib/", __dir__))
+
+require "cli_coverage"
+CliCoverage.conditionally_activate
+
 require "imap/backup/cli"
 require "imap/backup/logger"
 
