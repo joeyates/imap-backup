@@ -12,8 +12,7 @@ RSpec.describe "Listing account folders", type: :aruba do
   before do
     create_config(accounts: [account])
     store_email(email: email, folder: "my_folder", body: "Hi")
-    run_command("imap-backup local folders #{email}")
-    last_command_started.stop
+    run_command_and_stop("imap-backup local folders #{email}")
   end
 
   it "lists folders that have been backed up" do
