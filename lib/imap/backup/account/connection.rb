@@ -16,7 +16,6 @@ module Imap::Backup
     def initialize(account)
       @account = account
       reset
-      create_account_folder
     end
 
     # TODO: Make this private once the 'folders' command
@@ -53,6 +52,7 @@ module Imap::Backup
     end
 
     def status
+      ensure_account_folder
       backup_folders.map do |folder|
         s = Serializer::Mbox.new(account.local_path, folder.name)
         {name: folder.name, local: s.uids, remote: folder.uids}
@@ -63,6 +63,7 @@ module Imap::Backup
       Imap::Backup::Logger.logger.debug "Running backup of account: #{account.username}"
       # start the connection so we get logging messages in the right order
       client
+      ensure_account_folder
       each_folder do |folder, serializer|
         next if !folder.exist?
 
@@ -82,6 +83,7 @@ module Imap::Backup
     def local_folders
       return enum_for(:local_folders) if !block_given?
 
+      ensure_account_folder
       glob = File.join(account.local_path, "**", "*.imap")
       base = Pathname.new(account.local_path)
       Pathname.glob(glob) do |path|
@@ -176,7 +178,7 @@ module Imap::Backup
       end
     end
 
-    def create_account_folder
+    def ensure_account_folder
       Utils.make_folder(
         File.dirname(account.local_path),
         File.basename(account.local_path),

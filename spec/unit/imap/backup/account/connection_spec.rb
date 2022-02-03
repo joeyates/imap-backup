@@ -61,14 +61,6 @@ describe Imap::Backup::Account::Connection do
     end
   end
 
-  describe "#initialize" do
-    it "creates the path" do
-      expect(Imap::Backup::Utils).to receive(:make_folder)
-
-      subject
-    end
-  end
-
   describe "#client" do
     let(:result) { subject.client }
 
@@ -125,6 +117,12 @@ describe Imap::Backup::Account::Connection do
     before do
       allow(Imap::Backup::Account::Folder).to receive(:new) { folder }
       allow(Imap::Backup::Serializer::Mbox).to receive(:new) { serializer }
+    end
+
+    it "creates the path" do
+      expect(Imap::Backup::Utils).to receive(:make_folder)
+
+      subject.status
     end
 
     it "returns the names of folders" do
