@@ -27,7 +27,7 @@ module Imap::Backup
       method_option(
         "accounts",
         type: :string,
-        banner: "a comma-separated list of accounts (defaults to all configured accounts)",
+        desc: "a comma-separated list of accounts (defaults to all configured accounts)",
         aliases: ["-a"]
       )
     end
