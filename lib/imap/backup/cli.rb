@@ -57,6 +57,12 @@ module Imap::Backup
       Folders.new(symbolized(options)).run
     end
 
+    desc "local SUBCOMMAND [OPTIONS]", "View local info"
+    subcommand "local", Local
+
+    desc "remote SUBCOMMAND [OPTIONS]", "View info about online accounts"
+    subcommand "remote", Remote
+
     desc "restore [OPTIONS]", "This command is deprecated, use `imap-backup restore ACCOUNT`"
     long_desc <<~DESC
       By default, restores all local emails to their respective servers.
@@ -85,12 +91,6 @@ module Imap::Backup
     def status
       Status.new(symbolized(options)).run
     end
-
-    desc "local SUBCOMMAND [OPTIONS]", "View local info"
-    subcommand "local", Local
-
-    desc "remote SUBCOMMAND [OPTIONS]", "View info about online accounts"
-    subcommand "remote", Remote
 
     desc "utils SUBCOMMAND [OPTIONS]", "Various utilities"
     subcommand "utils", Utils
