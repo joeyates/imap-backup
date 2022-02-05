@@ -3,7 +3,10 @@ require "imap/backup/cli/accounts"
 
 module Imap::Backup::CLI::Helpers
   def symbolized(options)
-    options.each.with_object({}) { |(k, v), acc| acc[k.intern] = v }
+    options.each.with_object({}) do |(k, v), acc|
+      key = k.gsub("-", "_").intern
+      acc[key] = v
+    end
   end
 
   def account(email)
