@@ -111,6 +111,14 @@ module Imap::Backup
       extract_uid(response)
     end
 
+    def clear
+      existing = uids
+      # Use read-write access, via `select`
+      client.select(utf7_encoded_name)
+      client.uid_store(existing, "+FLAGS", [:Deleted])
+      client.expunge
+    end
+
     private
 
     def examine

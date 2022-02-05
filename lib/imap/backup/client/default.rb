@@ -7,8 +7,8 @@ module Imap::Backup
   class Client::Default
     extend Forwardable
     def_delegators :imap, *%i(
-      append authenticate create disconnect examine
-      login responses uid_fetch uid_search
+      append authenticate create disconnect examine expunge
+      login responses select uid_fetch uid_search uid_store
     )
 
     attr_reader :args
