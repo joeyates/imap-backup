@@ -106,5 +106,6 @@ module EmailServerHelpers
 end
 
 RSpec.configure do |config|
+  config.include EmailServerHelpers, type: :aruba
   config.include EmailServerHelpers, type: :feature
 end

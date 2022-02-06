@@ -12,7 +12,10 @@ describe Imap::Backup::Account::Folder do
       append: append_response,
       create: nil,
       examine: nil,
-      responses: responses
+      expunge: nil,
+      responses: responses,
+      select: nil,
+      uid_store: nil
     )
   end
   let(:connection) do
@@ -27,12 +30,11 @@ describe Imap::Backup::Account::Folder do
   end
   let(:responses) { [] }
   let(:append_response) { nil }
+  let(:uids) { [5678, 123] }
+
+  before { allow(client).to receive(:uid_search) { uids } }
 
   describe "#uids" do
-    let(:uids) { [5678, 123] }
-
-    before { allow(client).to receive(:uid_search) { uids } }
-
     it "lists available messages" do
       expect(subject.uids).to eq(uids.reverse)
     end
@@ -231,6 +233,25 @@ describe Imap::Backup::Account::Folder do
       subject.append(message)
 
       expect(subject.uid_validity).to eq(1)
+    end
+  end
+
+  describe "#clear" do
+    before do
+      subject.clear
+    end
+
+    it "uses select to have read-write access" do
+      expect(client).to have_received(:select)
+    end
+
+    it "marks all emails as deleted" do
+      expect(client).
+        to have_received(:uid_store).with(uids.sort, "+FLAGS", [:Deleted])
+    end
+
+    it "deletes marked emails" do
+      expect(client).to have_received(:expunge)
     end
   end
 end

@@ -9,6 +9,7 @@ module Imap::Backup
     autoload :Backup, "imap/backup/cli/backup"
     autoload :Folders, "imap/backup/cli/folders"
     autoload :Local, "imap/backup/cli/local"
+    autoload :Migrate, "imap/backup/cli/migrate"
     autoload :Remote, "imap/backup/cli/remote"
     autoload :Restore, "imap/backup/cli/restore"
     autoload :Setup, "imap/backup/cli/setup"
@@ -27,7 +28,7 @@ module Imap::Backup
       method_option(
         "accounts",
         type: :string,
-        banner: "a comma-separated list of accounts (defaults to all configured accounts)",
+        desc: "a comma-separated list of accounts (defaults to all configured accounts)",
         aliases: ["-a"]
       )
     end
@@ -57,6 +58,54 @@ module Imap::Backup
       Folders.new(symbolized(options)).run
     end
 
+    desc "local SUBCOMMAND [OPTIONS]", "View local info"
+    subcommand "local", Local
+
+    desc "migrate SOURCE_EMAIL DESTINATION_EMAIL [OPTIONS]",
+      "[Experimental] Uploads backed-up emails from account SOURCE_EMAIL to account DESTINATION_EMAIL"
+    long_desc <<~DESC
+      All emails which have been backed up for the "source account" (SOURCE_EMAIL) are
+      uploaded to the "destination account" (DESTINATION_EMAIL).
+
+      When one or other account has namespaces (i.e. prefixes like "INBOX."),
+      use the `--source-prefix=` and/or `--destination-prefix=` options.
+
+      Usually, you should migrate to an account with empty folders.
+
+      Before migrating each folder, `imap-backup` checks if the destination
+      folder is empty.
+
+      If it finds a non-empty destination folder, it halts with an error.
+
+      If you are sure that these destination emails can be deleted,
+      use the `--reset` option. In this case, all existing emails are
+      deleted before uploading the migrated emails.
+    DESC
+    method_option(
+      "destination-prefix",
+      type: :string,
+      desc: "the prefix (namespace) to add to destination folder names",
+      aliases: ["-d"]
+    )
+    method_option(
+      "reset",
+      type: :boolean,
+      desc: "DANGER! This option deletes all messages from destination folders before uploading",
+      aliases: ["-r"]
+    )
+    method_option(
+      "source-prefix",
+      type: :string,
+      desc: "the prefix (namespace) to strip from source folder names",
+      aliases: ["-s"]
+    )
+    def migrate(source_email, destination_email)
+      Migrate.new(source_email, destination_email, symbolized(options)).run
+    end
+
+    desc "remote SUBCOMMAND [OPTIONS]", "View info about online accounts"
+    subcommand "remote", Remote
+
     desc "restore [OPTIONS]", "This command is deprecated, use `imap-backup restore ACCOUNT`"
     long_desc <<~DESC
       By default, restores all local emails to their respective servers.
@@ -85,12 +134,6 @@ module Imap::Backup
     def status
       Status.new(symbolized(options)).run
     end
-
-    desc "local SUBCOMMAND [OPTIONS]", "View local info"
-    subcommand "local", Local
-
-    desc "remote SUBCOMMAND [OPTIONS]", "View info about online accounts"
-    subcommand "remote", Remote
 
     desc "utils SUBCOMMAND [OPTIONS]", "Various utilities"
     subcommand "utils", Utils
