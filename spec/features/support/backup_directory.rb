@@ -41,7 +41,3 @@ module BackupDirectoryHelpers
     JSON.parse(imap_content(name), symbolize_names: true)
   end
 end
-
-RSpec.configure do |config|
-  config.include BackupDirectoryHelpers, type: :feature
-end

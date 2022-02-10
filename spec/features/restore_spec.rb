@@ -1,9 +1,11 @@
 require "features/helper"
 
-RSpec.describe "restore", type: :feature, docker: true do
+RSpec.describe "restore", type: :aruba, docker: true do
   include_context "imap-backup connection"
   include_context "message-fixtures"
 
+  let(:local_backup_path) { File.expand_path("~/backup") }
+  let(:folder) { "my-stuff" }
   let(:messages_as_mbox) do
     message_as_mbox_entry(msg1) + message_as_mbox_entry(msg2)
   end
@@ -12,19 +14,19 @@ RSpec.describe "restore", type: :feature, docker: true do
   end
   let(:message_uids) { [msg1[:uid], msg2[:uid]] }
   let(:existing_imap_content) { imap_data(uid_validity, message_uids).to_json }
-  let(:folder) { "my-stuff" }
   let(:uid_validity) { 1234 }
 
   let!(:pre) {}
   let!(:setup) do
+    create_directory local_backup_path
     File.write(imap_path(folder), existing_imap_content)
     File.write(mbox_path(folder), messages_as_mbox)
-    connection.restore
+    create_config(accounts: [account.to_h])
+
+    run_command_and_stop("imap-backup restore --accounts #{account.username}")
   end
   let(:cleanup) do
-    FileUtils.rm_rf local_backup_path
     server_delete_folder folder
-    connection.disconnect
   end
 
   after { cleanup }
