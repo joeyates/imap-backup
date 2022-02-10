@@ -3,10 +3,9 @@ require "rspec"
 
 CodeClimate::TestReporter.start
 
-spec_path = File.dirname(__FILE__)
-$LOAD_PATH << File.expand_path("../lib", spec_path)
+$LOAD_PATH << File.expand_path("../lib", __dir__)
 
-support_glob = File.join(spec_path, "support", "**", "*.rb")
+support_glob = File.join(__dir__, "support", "**", "*.rb")
 Dir[support_glob].sort.each { |f| require f }
 
 require "simplecov"
