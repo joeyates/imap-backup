@@ -1,7 +1,10 @@
 require "aruba/rspec"
 
+require_relative "backup_directory"
+
 Aruba.configure do |config|
   config.home_directory = File.expand_path("./tmp/home")
+  config.allow_absolute_paths = true
 end
 
 module ConfigurationHelpers
@@ -58,6 +61,7 @@ end
 RSpec.configure do |config|
   config.include ConfigurationHelpers, type: :aruba
   config.include StoreHelpers, type: :aruba
+  config.include BackupDirectoryHelpers, type: :aruba
 
   config.before(:suite) do
     FileUtils.rm_rf "./tmp/home"

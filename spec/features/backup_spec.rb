@@ -1,28 +1,28 @@
 require "features/helper"
 
-RSpec.describe "backup", type: :feature, docker: true do
+RSpec.describe "backup", type: :aruba, docker: true do
   include_context "imap-backup connection"
   include_context "message-fixtures"
 
+  let(:local_backup_path) { File.expand_path("~/backup") }
+  let(:backup_folders) { [{name: folder}] }
+  let(:folder) { "my-stuff" }
   let(:messages_as_mbox) do
     message_as_mbox_entry(msg1) + message_as_mbox_entry(msg2)
   end
-  let(:folder) { "my-stuff" }
-  let(:email1) { send_email folder, msg1 }
-  let(:email2) { send_email folder, msg2 }
+
   let!(:pre) {}
   let!(:setup) do
     server_create_folder folder
-    email1
-    email2
-    connection.run_backup
+    send_email folder, msg1
+    send_email folder, msg2
+    create_config(accounts: [account.to_h])
+
+    run_command_and_stop("imap-backup backup")
   end
 
   after do
-    FileUtils.rm_rf local_backup_path
-    delete_emails folder
     server_delete_folder folder
-    connection.disconnect
   end
 
   it "downloads messages" do
@@ -51,11 +51,10 @@ RSpec.describe "backup", type: :feature, docker: true do
 
     context "when uid_validity does not match" do
       let(:new_name) { "NEWNAME" }
-      let(:email3) { send_email folder, msg3 }
       let(:original_folder_uid_validity) { server_uid_validity(folder) }
       let!(:pre) do
         server_create_folder folder
-        email3
+        send_email folder, msg3
         original_folder_uid_validity
         connection.run_backup
         connection.disconnect
@@ -78,6 +77,7 @@ RSpec.describe "backup", type: :feature, docker: true do
       context "when a renamed local backup exists" do
         let!(:pre) do
           super()
+          create_directory local_backup_path
           File.write(imap_path(renamed_folder), "existing imap")
           File.write(mbox_path(renamed_folder), "existing mbox")
         end
@@ -91,6 +91,7 @@ RSpec.describe "backup", type: :feature, docker: true do
 
     context "when an unversioned .imap file is found" do
       let!(:pre) do
+        create_directory local_backup_path
         File.open(imap_path(folder), "w") { |f| f.write "old format imap" }
         File.open(mbox_path(folder), "w") { |f| f.write "old format emails" }
       end
