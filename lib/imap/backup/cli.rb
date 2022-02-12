@@ -106,15 +106,14 @@ module Imap::Backup
     desc "remote SUBCOMMAND [OPTIONS]", "View info about online accounts"
     subcommand "remote", Remote
 
-    desc "restore [OPTIONS]", "This command is deprecated, use `imap-backup restore ACCOUNT`"
+    desc "restore EMAIL", "Restores a single account"
     long_desc <<~DESC
-      By default, restores all local emails to their respective servers.
-      This command is deprecated.
-      Instead, use `imap-backup restore ACCOUNT` to restore a single account.
+      Restores all backed-up emails for the supplied account to
+      their original server.
     DESC
     accounts_option
-    def restore
-      Restore.new(symbolized(options)).run
+    def restore(email = nil)
+      Restore.new(email, symbolized(options)).run
     end
 
     desc "setup", "Configure imap-backup"

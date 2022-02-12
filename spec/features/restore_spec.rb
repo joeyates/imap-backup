@@ -23,7 +23,7 @@ RSpec.describe "restore", type: :aruba, docker: true do
     File.write(mbox_path(folder), messages_as_mbox)
     create_config(accounts: [account.to_h])
 
-    run_command_and_stop("imap-backup restore --accounts #{account.username}")
+    run_command_and_stop("imap-backup restore #{account.username}")
   end
   let(:cleanup) do
     server_delete_folder folder
