@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [5.1.0] - 2022-02-12
+
+## Changed
+
+* The restore command now takes a single argument:
+  the email to restore. The previous (deprecated) invocation
+  which restores all accounts by default, or those indicated
+  by the --accounts parameter, is still supported.
+
 ## [5.0.0] - 2022-02-06
 
 ### Added
