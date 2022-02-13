@@ -1,0 +1,41 @@
+name: Ruby
+
+on:
+  push:
+    branches:
+      - main
+
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Ruby ${{ matrix.ruby }}
+    strategy:
+      matrix:
+        ruby:
+          - '2.5'
+          - '2.6'
+          - '2.7'
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: ${{ matrix.ruby }}
+        bundler-cache: true
+    - name: Run the default task
+      run: bundle exec rake
+
+    services:
+      imap:
+        image: antespi/docker-imap-devel:latest
+        ports:
+        - "8025:25"
+        - "8143:143"
+        - "8993:993"
+        env:
+          MAILNAME: example.org
+          MAIL_ADDRESS: address@example.org
+          MAIL_PASS: pass

@@ -5,6 +5,7 @@ inherit_from:
 AllCops:
   Exclude:
     - "bin/stubs/*"
+    - "vendor/**/*"
   DisplayCopNames:
     Enabled: true
 
