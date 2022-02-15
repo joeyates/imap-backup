@@ -100,7 +100,7 @@ module Imap::Backup
       aliases: ["-s"]
     )
     def migrate(source_email, destination_email)
-      Migrate.new(source_email, destination_email, symbolized(options)).run
+      Migrate.new(source_email, destination_email, **symbolized(options)).run
     end
 
     desc "remote SUBCOMMAND [OPTIONS]", "View info about online accounts"
