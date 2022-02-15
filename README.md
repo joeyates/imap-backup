@@ -1,7 +1,3 @@
-[![Build Status](https://circleci.com/gh/joeyates/imap-backup.svg?style=svg)][Continuous Integration]
-[![Source Analysis](https://codeclimate.com/github/joeyates/imap-backup/badges/gpa.svg)](https://codeclimate.com/github/joeyates/imap-backup)
-[![Test Coverage](https://codeclimate.com/github/joeyates/imap-backup/badges/coverage.svg)](https://codeclimate.com/github/joeyates/imap-backup/coverage)
-
 # imap-backup
 
 *Backup GMail (or other IMAP) accounts to disk*
@@ -14,7 +10,6 @@
 [Source Code]: https://github.com/joeyates/imap-backup "Source code at GitHub"
 [API documentation]: http://rubydoc.info/gems/imap-backup/frames "RDoc API Documentation at Rubydoc.info"
 [Rubygem]: http://rubygems.org/gems/imap-backup "Ruby gem at rubygems.org"
-[Continuous Integration]: https://circleci.com/gh/joeyates/imap-backup "Build status by CirceCI"
 
 # Installation
 
