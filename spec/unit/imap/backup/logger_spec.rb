@@ -39,7 +39,7 @@ module Imap::Backup
           expect(described_class.logger.level).to eq(::Logger::Severity::ERROR)
         end
 
-        it "sets the Net::IMAP debug flag" do
+        it "doesn't set the Net::IMAP debug flag" do
           expect(Net::IMAP.debug).to be_a(FalseClass)
         end
       end
