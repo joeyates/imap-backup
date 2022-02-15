@@ -5,7 +5,6 @@
   * [Source Code]
   * [API documentation]
   * [Rubygem]
-  * [Continuous Integration]
 
 [Source Code]: https://github.com/joeyates/imap-backup "Source code at GitHub"
 [API documentation]: http://rubydoc.info/gems/imap-backup/frames "RDoc API Documentation at Rubydoc.info"
