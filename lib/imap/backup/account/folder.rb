@@ -68,22 +68,6 @@ module Imap::Backup
       []
     end
 
-    def fetch(uid)
-      examine
-      fetch_data_items =
-        retry_on_error(errors: UID_FETCH_RETRY_CLASSES) do
-          client.uid_fetch([uid.to_i], [BODY_ATTRIBUTE])
-        end
-      return nil if fetch_data_items.nil?
-
-      fetch_data_item = fetch_data_items[0]
-      attributes = fetch_data_item.attr
-
-      attributes[BODY_ATTRIBUTE]
-    rescue FolderNotFound
-      nil
-    end
-
     def fetch_multi(uids)
       examine
       fetch_data_items =

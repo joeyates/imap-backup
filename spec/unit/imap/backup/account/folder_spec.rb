@@ -66,24 +66,24 @@ describe Imap::Backup::Account::Folder do
     end
   end
 
-  describe "#fetch" do
+  describe "#fetch_multi" do
     let(:message_body) { instance_double(String, force_encoding: nil) }
-    let(:attributes) { {"BODY[]" => message_body, "other" => "xxx"} }
+    let(:attributes) { {"UID" => "uid", "BODY[]" => message_body, "other" => "xxx"} }
     let(:fetch_data_item) do
       instance_double(Net::IMAP::FetchData, attr: attributes)
     end
 
     before { allow(client).to receive(:uid_fetch) { [fetch_data_item] } }
 
-    it "returns the message" do
-      expect(subject.fetch(123)).to eq(message_body)
+    it "returns the uid and message" do
+      expect(subject.fetch_multi([123])).to eq([{uid: "uid", body: message_body}])
     end
 
     context "when the server responds with nothing" do
       before { allow(client).to receive(:uid_fetch) { nil } }
 
       it "is nil" do
-        expect(subject.fetch(123)).to be_nil
+        expect(subject.fetch_multi([123])).to be_nil
       end
     end
 
@@ -94,15 +94,7 @@ describe Imap::Backup::Account::Folder do
       end
 
       it "is nil" do
-        expect(subject.fetch(123)).to be_nil
-      end
-    end
-
-    context "when the response doesn't include 'BODY[]'" do
-      let(:attributes) { {} }
-
-      it "is nil" do
-        expect(subject.fetch(123)).to be_nil
+        expect(subject.fetch_multi([123])).to be_nil
       end
     end
 
@@ -113,13 +105,13 @@ describe Imap::Backup::Account::Folder do
       end
 
       it "retries" do
-        subject.fetch(123)
+        subject.fetch_multi([123])
 
         expect(client).to have_received(:uid_fetch).twice
       end
 
       it "succeeds" do
-        subject.fetch(123)
+        subject.fetch_multi([123])
       end
     end
   end
