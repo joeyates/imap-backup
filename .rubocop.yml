@@ -8,6 +8,7 @@ AllCops:
     - "vendor/**/*"
   DisplayCopNames:
     Enabled: true
+  TargetRubyVersion: 2.5
 
 RSpec/ContextWording:
   Exclude:
