@@ -21,11 +21,10 @@ module Imap::Backup
         )
       end
 
-      if !OS.windows?
-        if Utils.mode(full_path) != DIRECTORY_PERMISSIONS
-          FileUtils.chmod DIRECTORY_PERMISSIONS, full_path
-        end
-      end
+      return if OS.windows?
+      return if Utils.mode(full_path) == DIRECTORY_PERMISSIONS
+
+      FileUtils.chmod DIRECTORY_PERMISSIONS, full_path
     end
 
     private

@@ -35,8 +35,9 @@ module Imap::Backup
         @folder_path = new_path
       end
     end
+
     def rewind(length)
-      File.open(pathname, File::RDWR | File::CREAT, 0644) do |f|
+      File.open(pathname, File::RDWR | File::CREAT, 0o644) do |f|
         f.truncate(length)
       end
     end

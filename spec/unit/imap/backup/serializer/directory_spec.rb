@@ -8,7 +8,7 @@ module Imap::Backup
       allow(File).to receive(:directory?) { false }
       allow(Utils).to receive(:make_folder)
       allow(OS).to receive(:windows?) { windows }
-      allow(Utils).to receive(:mode) { 0600 }
+      allow(Utils).to receive(:mode) { 0o600 }
       allow(FileUtils).to receive(:chmod)
 
       subject.ensure_exists

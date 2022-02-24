@@ -87,7 +87,7 @@ module Imap::Backup
     describe "#rewind" do
       before do
         allow(File).to receive(:open).
-          with(pathname, File::RDWR | File::CREAT, 0644).
+          with(pathname, File::RDWR | File::CREAT, 0o644).
           and_yield(file)
       end
 

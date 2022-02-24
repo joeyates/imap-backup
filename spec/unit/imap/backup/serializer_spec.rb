@@ -83,25 +83,25 @@ module Imap::Backup
 
         context "when the default rename is not possible" do
           let(:imap_test_exists) { true }
-          let(:imap_test_1) { instance_double(Serializer::Imap, exist?: false) }
-          let(:test_folder_path_1) do
+          let(:imap_test1) { instance_double(Serializer::Imap, exist?: false) }
+          let(:test_folder_path1) do
             File.expand_path(File.join("path", "folder/sub-#{existing_uid_validity}-1"))
           end
 
           before do
-            allow(Serializer::Imap).to receive(:new).with(test_folder_path_1) { imap_test_1 }
+            allow(Serializer::Imap).to receive(:new).with(test_folder_path1) { imap_test1 }
           end
 
           it "renames the mailbox, appending a numeral" do
             result
 
-            expect(mbox).to have_received(:rename).with(test_folder_path_1)
+            expect(mbox).to have_received(:rename).with(test_folder_path1)
           end
 
           it "renames the metadata file, appending a numeral" do
             result
 
-            expect(imap).to have_received(:rename).with(test_folder_path_1)
+            expect(imap).to have_received(:rename).with(test_folder_path1)
           end
         end
       end
