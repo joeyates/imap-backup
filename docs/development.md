@@ -26,6 +26,12 @@ or
 $ rspec --tag ~docker
 ```
 
+### Debugging
+
+The feature specs are run 'out of process' via the Aruba gem.
+In order to see debugging output from the process,
+use `last_command_started.output`.
+
 ## Access Docker imap server
 
 ```ruby
