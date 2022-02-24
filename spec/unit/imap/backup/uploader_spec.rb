@@ -8,7 +8,7 @@ describe Imap::Backup::Uploader do
   end
   let(:serializer) do
     instance_double(
-      Imap::Backup::Serializer::Mbox,
+      Imap::Backup::Serializer,
       uids: [1, 2],
       update_uid: nil
     )

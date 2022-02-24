@@ -1,5 +1,6 @@
 require "imap/backup/client/apple_mail"
 require "imap/backup/client/default"
+require "imap/backup/serializer/directory"
 
 require "retry_on_error"
 
@@ -52,7 +53,7 @@ module Imap::Backup
     def status
       ensure_account_folder
       backup_folders.map do |folder|
-        s = Serializer::Mbox.new(account.local_path, folder.name)
+        s = Serializer.new(account.local_path, folder.name)
         {name: folder.name, local: s.uids, remote: folder.uids}
       end
     end
@@ -86,7 +87,7 @@ module Imap::Backup
       base = Pathname.new(account.local_path)
       Pathname.glob(glob) do |path|
         name = path.relative_path_from(base).to_s[0..-6]
-        serializer = Serializer::Mbox.new(account.local_path, name)
+        serializer = Serializer.new(account.local_path, name)
         folder = Account::Folder.new(self, name)
         yield serializer, folder
       end
@@ -144,7 +145,7 @@ module Imap::Backup
 
     def each_folder
       backup_folders.each do |folder|
-        serializer = Serializer::Mbox.new(account.local_path, folder.name)
+        serializer = Serializer.new(account.local_path, folder.name)
         yield folder, serializer
       end
     end
@@ -161,7 +162,7 @@ module Imap::Backup
           Imap::Backup::Logger.logger.debug(
             "Backup '#{old_name}' renamed and restored to '#{new_name}'"
           )
-          new_serializer = Serializer::Mbox.new(account.local_path, new_name)
+          new_serializer = Serializer.new(account.local_path, new_name)
           new_folder = Account::Folder.new(self, new_name)
           new_folder.create
           new_serializer.force_uid_validity(new_folder.uid_validity)
@@ -180,7 +181,7 @@ module Imap::Backup
       Utils.make_folder(
         File.dirname(account.local_path),
         File.basename(account.local_path),
-        Serializer::DIRECTORY_PERMISSIONS
+        Serializer::Directory::DIRECTORY_PERMISSIONS
       )
     end
 

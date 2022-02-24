@@ -1,4 +1,6 @@
 module Imap::Backup
+  class Serializer; end
+
   class Serializer::MboxEnumerator
     attr_reader :mbox_pathname
 

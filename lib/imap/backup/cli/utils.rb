@@ -14,7 +14,7 @@ module Imap::Backup
       connection.backup_folders.each do |folder|
         next if !folder.exist?
 
-        serializer = Serializer::Mbox.new(connection.account.local_path, folder.name)
+        serializer = Serializer.new(connection.account.local_path, folder.name)
         do_ignore_folder_history(folder, serializer)
       end
     end
