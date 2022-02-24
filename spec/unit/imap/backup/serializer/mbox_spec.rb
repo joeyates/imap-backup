@@ -132,13 +132,13 @@ describe Imap::Backup::Serializer::Mbox do
 
       context "when adding the uid validity does not cause a name clash" do
         it "renames the store, adding the existing uid validity" do
-          expect(store).to receive(:rename).with("folder.bbb")
+          expect(store).to receive(:rename).with("folder-bbb")
 
           subject.apply_uid_validity("aaa")
         end
 
         it "returns the new name" do
-          expect(subject.apply_uid_validity("aaa")).to eq("folder.bbb")
+          expect(subject.apply_uid_validity("aaa")).to eq("folder-bbb")
         end
       end
 
@@ -146,13 +146,13 @@ describe Imap::Backup::Serializer::Mbox do
         let(:exists) { true }
 
         it "renames the store, adding the existing uid validity and a digit" do
-          expect(store).to receive(:rename).with("folder.bbb.1")
+          expect(store).to receive(:rename).with("folder-bbb-1")
 
           subject.apply_uid_validity("aaa")
         end
 
         it "returns the new name" do
-          expect(subject.apply_uid_validity("aaa")).to eq("folder.bbb.1")
+          expect(subject.apply_uid_validity("aaa")).to eq("folder-bbb-1")
         end
       end
     end

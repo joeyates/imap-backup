@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [5.2.0] - 2022-02-24
+
+## Changed
+
+* During backup and/or restore, when there is a clash in a
+  folder's uid_validity between the local copy and the server's
+  copy, the local folder is now renamed using '-' as a
+  separator (previously it was '.'). This should reduce
+  compatibility problems with certain IMAP servers.
+
 ## [5.1.0] - 2022-02-12
 
 ## Changed

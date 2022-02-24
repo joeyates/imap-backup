@@ -71,8 +71,8 @@ module Imap::Backup
       digit = 0
       new_name = nil
       loop do
-        extra = digit.zero? ? "" : ".#{digit}"
-        new_name = "#{folder}.#{store.uid_validity}#{extra}"
+        extra = digit.zero? ? "" : "-#{digit}"
+        new_name = "#{folder}-#{store.uid_validity}#{extra}"
         test_store = Serializer::MboxStore.new(path, new_name)
         break if !test_store.exist?
 

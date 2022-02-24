@@ -94,7 +94,7 @@ RSpec.describe "restore", type: :aruba, docker: true do
       end
 
       context "when the folder has content" do
-        let(:new_folder) { "#{folder}.#{uid_validity}" }
+        let(:new_folder) { "#{folder}-#{uid_validity}" }
         let(:cleanup) do
           server_delete_folder new_folder
           super()
