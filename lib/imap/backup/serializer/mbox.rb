@@ -44,8 +44,8 @@ module Imap::Backup
       store.each_message(uids)
     end
 
-    def save(uid, message)
-      store.add(uid, message)
+    def append(uid, message)
+      store.append(uid, message)
     end
 
     def rename(new_name)

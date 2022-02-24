@@ -114,7 +114,7 @@ describe Imap::Backup::Serializer::MboxStore do
     end
   end
 
-  describe "#add" do
+  describe "#append" do
     let(:mbox_formatted_message) { "message in mbox format" }
     let(:message_uid) { "999" }
     let(:message) do
@@ -139,13 +139,13 @@ describe Imap::Backup::Serializer::MboxStore do
     it "saves the message to the mbox" do
       expect(mbox_file).to receive(:write).with(mbox_formatted_message)
 
-      subject.add(message_uid, "The\nemail\n")
+      subject.append(message_uid, "The\nemail\n")
     end
 
     it "saves the uid to the imap file" do
       expect(imap_file).to receive(:write).with(updated_imap_content)
 
-      subject.add(message_uid, "The\nemail\n")
+      subject.append(message_uid, "The\nemail\n")
     end
 
     context "when the message is already downloaded" do
@@ -154,7 +154,7 @@ describe Imap::Backup::Serializer::MboxStore do
       it "skips the message" do
         expect(mbox_file).to_not receive(:write)
 
-        subject.add(message_uid, "The\nemail\n")
+        subject.append(message_uid, "The\nemail\n")
       end
     end
 
@@ -166,12 +166,12 @@ describe Imap::Backup::Serializer::MboxStore do
       it "skips the message" do
         expect(mbox_file).to_not receive(:write)
 
-        subject.add(message_uid, "The\nemail\n")
+        subject.append(message_uid, "The\nemail\n")
       end
 
       it "does not fail" do
         expect do
-          subject.add(message_uid, "The\nemail\n")
+          subject.append(message_uid, "The\nemail\n")
         end.to_not raise_error
       end
     end

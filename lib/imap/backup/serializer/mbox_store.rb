@@ -40,7 +40,7 @@ module Imap::Backup
       @uids || []
     end
 
-    def add(uid, body)
+    def append(uid, body)
       do_load if !loaded
       raise "Can't add messages without uid_validity" if !uid_validity
 

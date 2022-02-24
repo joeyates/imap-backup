@@ -38,7 +38,7 @@ module Imap::Backup
             info("Fetch returned empty UID - skipping")
           else
             debug("uid: #{uid} (#{offset + j}/#{count}) - #{body.size} bytes")
-            serializer.save(uid, body)
+            serializer.append uid, body
           end
         end
       end

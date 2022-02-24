@@ -5,7 +5,7 @@ describe Imap::Backup::Serializer::Mbox do
   let(:store) do
     instance_double(
       Imap::Backup::Serializer::MboxStore,
-      add: nil,
+      append: nil,
       rename: nil,
       uids: nil,
       uid_validity: existing_uid_validity,
@@ -192,7 +192,7 @@ describe Imap::Backup::Serializer::Mbox do
 
   describe "#save" do
     it "calls the store" do
-      expect(store).to receive(:add).with("foo", "bar")
+      expect(store).to receive(:append).with("foo", "bar")
 
       subject.save("foo", "bar")
     end

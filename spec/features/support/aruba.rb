@@ -39,7 +39,7 @@ module StoreHelpers
     store = Imap::Backup::Serializer::MboxStore.new(account.local_path, folder)
     store.uid_validity = "42" if !store.uid_validity
     serialized = to_serialized(from: from, subject: subject, body: body)
-    store.add(uid, serialized)
+    store.append uid, serialized
   end
 
   def to_serialized(from:, subject:, body:)
