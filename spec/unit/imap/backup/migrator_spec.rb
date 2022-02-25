@@ -4,7 +4,7 @@ module Imap::Backup
   RSpec.describe Migrator do
     subject { described_class.new(serializer, folder, reset: reset) }
 
-    let(:serializer) { instance_double(Serializer::MboxStore, uids: [1]) }
+    let(:serializer) { instance_double(Serializer, uids: [1]) }
     let(:folder) do
       instance_double(
         Account::Folder,

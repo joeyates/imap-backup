@@ -38,7 +38,7 @@ describe Imap::Backup::Account::Connection do
   end
   let(:serializer) do
     instance_double(
-      Imap::Backup::Serializer::Mbox,
+      Imap::Backup::Serializer,
       folder: serialized_folder,
       force_uid_validity: nil,
       apply_uid_validity: new_uid_validity,
@@ -116,7 +116,7 @@ describe Imap::Backup::Account::Connection do
 
     before do
       allow(Imap::Backup::Account::Folder).to receive(:new) { folder }
-      allow(Imap::Backup::Serializer::Mbox).to receive(:new) { serializer }
+      allow(Imap::Backup::Serializer).to receive(:new) { serializer }
     end
 
     it "creates the path" do
@@ -156,7 +156,7 @@ describe Imap::Backup::Account::Connection do
         to receive(:new).with(folder, serializer, anything) { downloader }
       allow(Imap::Backup::Account::Folder).to receive(:new).
         with(subject, BACKUP_FOLDER) { folder }
-      allow(Imap::Backup::Serializer::Mbox).to receive(:new).
+      allow(Imap::Backup::Serializer).to receive(:new).
         with(LOCAL_PATH, IMAP_FOLDER) { serializer }
     end
 
@@ -184,7 +184,7 @@ describe Imap::Backup::Account::Connection do
       before do
         allow(Imap::Backup::Account::Folder).to receive(:new).
           with(subject, ROOT_NAME) { folder }
-        allow(Imap::Backup::Serializer::Mbox).to receive(:new).
+        allow(Imap::Backup::Serializer).to receive(:new).
           with(LOCAL_PATH, ROOT_NAME) { serializer }
       end
 
@@ -273,18 +273,18 @@ describe Imap::Backup::Account::Connection do
     end
     let(:updated_serializer) do
       instance_double(
-        Imap::Backup::Serializer::Mbox, force_uid_validity: nil
+        Imap::Backup::Serializer, force_uid_validity: nil
       )
     end
 
     before do
       allow(Imap::Backup::Account::Folder).to receive(:new).
         with(subject, FOLDER_NAME) { folder }
-      allow(Imap::Backup::Serializer::Mbox).to receive(:new).
+      allow(Imap::Backup::Serializer).to receive(:new).
         with(anything, FOLDER_NAME) { serializer }
       allow(Imap::Backup::Account::Folder).to receive(:new).
         with(subject, "new name") { updated_folder }
-      allow(Imap::Backup::Serializer::Mbox).to receive(:new).
+      allow(Imap::Backup::Serializer).to receive(:new).
         with(anything, "new name") { updated_serializer }
       allow(Imap::Backup::Uploader).to receive(:new).
         with(folder, serializer) { uploader }

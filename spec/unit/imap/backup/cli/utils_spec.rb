@@ -31,10 +31,10 @@ module Imap::Backup
     end
     let(:serializer) do
       instance_double(
-        Serializer::Mbox,
+        Serializer,
         uids: %w(123 789),
         apply_uid_validity: nil,
-        save: nil
+        append: nil
       )
     end
     let(:email) { "foo@example.com" }
@@ -42,7 +42,7 @@ module Imap::Backup
     before do
       allow(CLI::Accounts).to receive(:new) { accounts }
       allow(Account::Connection).to receive(:new) { connection }
-      allow(Serializer::Mbox).to receive(:new) { serializer }
+      allow(Serializer).to receive(:new) { serializer }
     end
 
     describe "ignore_history" do
@@ -55,7 +55,7 @@ module Imap::Backup
       it "fills the local folder with fake emails" do
         subject.ignore_history(email)
 
-        expect(serializer).to have_received(:save).with("456", /From: fake@email.com/)
+        expect(serializer).to have_received(:append).with("456", /From: fake@email.com/)
       end
     end
   end

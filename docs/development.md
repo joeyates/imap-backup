@@ -1,10 +1,10 @@
 # Testing
 
-## Integration Tests
+## Feature Specs
 
-Integration tests (feature specs) are run against a local IMAP server
-controlled by Docker Compose, which needs to be started
-before running the test suite.
+Specs under `specs/features` are integration specs run against a local IMAP server
+controlled by Docker Compose.
+Before running the test suite, it needs to be started:
 
 ```sh
 $ docker-compose up -d
@@ -25,6 +25,12 @@ or
 ```sh
 $ rspec --tag ~docker
 ```
+
+### Debugging
+
+The feature specs are run 'out of process' via the Aruba gem.
+In order to see debugging output from the process,
+use `last_command_started.output`.
 
 ## Access Docker imap server
 

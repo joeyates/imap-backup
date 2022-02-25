@@ -23,7 +23,7 @@ describe Imap::Backup::CLI::Local do
   let(:folder) { instance_double(Imap::Backup::Account::Folder, name: "bar") }
   let(:serializer) do
     instance_double(
-      Imap::Backup::Serializer::Mbox,
+      Imap::Backup::Serializer,
       uids: uids,
       each_message: [[123, message]]
     )

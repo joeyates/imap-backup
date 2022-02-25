@@ -1,6 +1,7 @@
 require "aruba/rspec"
 
 require_relative "backup_directory"
+require "imap/backup/serializer/mbox"
 
 Aruba.configure do |config|
   config.home_directory = File.expand_path("./tmp/home")
@@ -36,10 +37,10 @@ module StoreHelpers
     account = config.accounts.find { |a| a.username == email }
     raise "Account not found" if !account
     FileUtils.mkdir_p account.local_path
-    store = Imap::Backup::Serializer::MboxStore.new(account.local_path, folder)
-    store.uid_validity = "42" if !store.uid_validity
+    serializer = Imap::Backup::Serializer.new(account.local_path, folder)
+    serializer.force_uid_validity("42") if !serializer.uid_validity
     serialized = to_serialized(from: from, subject: subject, body: body)
-    store.add(uid, serialized)
+    serializer.append uid, serialized
   end
 
   def to_serialized(from:, subject:, body:)

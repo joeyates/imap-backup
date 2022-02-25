@@ -70,8 +70,16 @@ RSpec.describe "backup", type: :aruba, docker: true do
         expect(mbox_content(renamed_folder)).to eq(message_as_mbox_entry(msg3))
       end
 
+      it "renames the old metadata file" do
+        expect(imap_parsed(renamed_folder)).to be_a Hash
+      end
+
       it "downloads messages" do
         expect(mbox_content(folder)).to eq(messages_as_mbox)
+      end
+
+      it "creates a metadata file" do
+        expect(imap_parsed(folder)).to be_a Hash
       end
 
       context "when a renamed local backup exists" do
@@ -86,22 +94,6 @@ RSpec.describe "backup", type: :aruba, docker: true do
           renamed = "#{folder}-#{original_folder_uid_validity}-1"
           expect(mbox_content(renamed)).to eq(message_as_mbox_entry(msg3))
         end
-      end
-    end
-
-    context "when an unversioned .imap file is found" do
-      let!(:pre) do
-        create_directory local_backup_path
-        File.open(imap_path(folder), "w") { |f| f.write "old format imap" }
-        File.open(mbox_path(folder), "w") { |f| f.write "old format emails" }
-      end
-
-      it "replaces the .imap file with a versioned JSON file" do
-        expect(imap_metadata[:uids]).to eq(folder_uids)
-      end
-
-      it "does the download" do
-        expect(mbox_content(folder)).to eq(messages_as_mbox)
       end
     end
   end

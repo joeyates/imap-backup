@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [6.0.0.rc1] - 2022-02-25
+
+## Changed
+
+* Refactored serialization code to simplify successive
+  modifications to metadata serialization.
+
 ## [5.2.0] - 2022-02-24
 
 ## Changed

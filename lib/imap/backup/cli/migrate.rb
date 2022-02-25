@@ -61,7 +61,7 @@ module Imap::Backup
         glob = File.join(source_local_path, "**", "*.imap")
         Pathname.glob(glob) do |path|
           name = source_folder_name(path)
-          serializer = Serializer::Mbox.new(source_local_path, name)
+          serializer = Serializer.new(source_local_path, name)
           folder = folder_for(name)
           yield serializer, folder
         end
