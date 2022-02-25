@@ -19,7 +19,7 @@ module Imap::Backup
 
     def run
       local_folder_ok = local_folder.set_up
-      return if !local_folder_ok
+      return false if !local_folder_ok
 
       if local_folder.msf_exists?
         if force

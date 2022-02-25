@@ -9,6 +9,7 @@ module Imap::Backup
   class Serializer
     extend Forwardable
 
+    def_delegator :mbox, :pathname, :mbox_pathname
     def_delegators :imap, :uid_validity, :uids, :update_uid
 
     attr_reader :folder

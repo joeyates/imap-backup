@@ -25,11 +25,13 @@ module Imap::Backup
     end
     let(:folder_path) { File.expand_path(File.join("path", "folder/sub")) }
     let(:existing_uid_validity) { nil }
+    let(:enumerator) { instance_double(Serializer::MboxEnumerator) }
 
     before do
       allow(Serializer::Directory).to receive(:new) { directory }
       allow(Serializer::Imap).to receive(:new).with(folder_path) { imap }
       allow(Serializer::Mbox).to receive(:new) { mbox }
+      allow(Serializer::MboxEnumerator).to receive(:new) { enumerator }
     end
 
     describe "#apply_uid_validity" do
@@ -201,12 +203,10 @@ module Imap::Backup
     describe "#load" do
       let(:uid) { 999 }
       let(:imap_index) { 0 }
-      let(:enumerator) { instance_double(Serializer::MboxEnumerator) }
       let(:result) { subject.load(uid) }
 
       before do
         allow(imap).to receive(:index).with(999) { imap_index }
-        allow(Serializer::MboxEnumerator).to receive(:new) { enumerator }
         allow(enumerator).to receive(:each) { ["message"].enum_for(:each) }
       end
 
@@ -237,11 +237,9 @@ module Imap::Backup
 
     describe "#load_nth" do
       let(:imap_index) { 0 }
-      let(:enumerator) { instance_double(Serializer::MboxEnumerator) }
       let(:result) { subject.load_nth(imap_index) }
 
       before do
-        allow(Serializer::MboxEnumerator).to receive(:new) { enumerator }
         allow(enumerator).to receive(:each) { ["message"].enum_for(:each) }
       end
 
@@ -263,13 +261,11 @@ module Imap::Backup
     end
 
     describe "#each_message" do
-      let(:enumerator) { instance_double(Serializer::MboxEnumerator) }
       let(:good_uid) { 999 }
 
       before do
         allow(imap).to receive(:index) { nil }
         allow(imap).to receive(:index).with(good_uid) { 0 }
-        allow(Serializer::MboxEnumerator).to receive(:new) { enumerator }
         allow(enumerator).to receive(:each) { ["message"].enum_for(:each) }
       end
 
