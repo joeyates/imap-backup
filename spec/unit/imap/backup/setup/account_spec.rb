@@ -12,7 +12,7 @@ describe Imap::Backup::Setup::Account do
       username: existing_email,
       password: existing_password,
       server: current_server,
-      connection_options: nil,
+      connection_options: connection_options,
       local_path: "/backup/path",
       folders: [{name: "my_folder"}],
       modified?: false
@@ -32,6 +32,7 @@ describe Imap::Backup::Setup::Account do
   let(:existing_password) { "password" }
   let(:other_email) { "other@example.com" }
   let(:other_existing_path) { "/other/existing/path" }
+  let(:connection_options) { nil }
 
   let(:highline) { HIGHLINE }
   let(:config) { CONFIG }
@@ -136,7 +137,15 @@ describe Imap::Backup::Setup::Account do
         before { subject.run }
 
         it "indicates that a password is not set" do
-          expect(menu.header).to include("password   (unset)")
+          expect(menu.header).to match(/^password\s+\(unset\)/)
+        end
+      end
+
+      context "with connection_options" do
+        let(:connection_options) { {some: "option"} }
+
+        it "shows the options" do
+          expect(menu.header).to match(/^connection options\s+'{"some":"option"}'/)
         end
       end
     end
