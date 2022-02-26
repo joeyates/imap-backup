@@ -103,7 +103,14 @@ module Imap::Backup
     def modify_connection_options(menu)
       menu.choice("modify connection options") do
         connection_options = highline.ask("connections options (as JSON): ")
-        account.connection_options = connection_options if !connection_options.nil?
+        if !connection_options.nil?
+          begin
+            account.connection_options = connection_options
+          rescue JSON::ParserError
+            Kernel.puts "Malformed JSON, please try again"
+            highline.ask "Press a key "
+          end
+        end
       end
     end
 

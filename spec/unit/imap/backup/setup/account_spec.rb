@@ -266,6 +266,46 @@ describe Imap::Backup::Setup::Account do
       end
     end
 
+    describe "choosing 'modify connection options'" do
+      context "when the JSON is well formed" do
+        let(:json) { "{}" }
+
+        before do
+          allow(highline).to receive(:ask).with("connections options (as JSON): ") { json }
+          allow(account).to receive(:"connection_options=")
+
+          subject.run
+
+          menu.choices["modify connection options"].call
+        end
+
+        it "updates the connection options" do
+          expect(account).to have_received(:"connection_options=").with(json)
+        end
+      end
+
+      context "when the JSON is malformed" do
+        before do
+          allow(highline).to receive(:ask).with("connections options (as JSON): ") { "xx" }
+          allow(account).to receive(:"connection_options=").and_raise(JSON::ParserError)
+          allow(highline).to receive(:ask).with("Press a key ")
+
+          subject.run
+
+          menu.choices["modify connection options"].call
+        end
+
+        it "does not fail" do
+          subject.run
+        end
+
+        it "reports the problem" do
+          expect(Kernel).to have_received(:puts).
+            with(/Malformed/)
+        end
+      end
+    end
+
     describe "choosing 'modify backup path'" do
       let(:new_backup_path) { "/new/path" }
 
