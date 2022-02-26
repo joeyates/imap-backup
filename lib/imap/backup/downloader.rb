@@ -1,4 +1,6 @@
 module Imap::Backup
+  class MultiFetchFailedError < StandardError; end
+
   class Downloader
     attr_reader :folder
     attr_reader :serializer
@@ -19,8 +21,7 @@ module Imap::Backup
         if uids_and_bodies.nil?
           if block_size > 1
             debug("Multi fetch failed for UIDs #{block.join(", ")}, switching to single fetches")
-            @block_size = 1
-            redo
+            raise MultiFetchFailedError
           else
             debug("Fetch failed for UID #{block[0]} - skipping")
             next
@@ -42,6 +43,9 @@ module Imap::Backup
           end
         end
       end
+    rescue MultiFetchFailedError
+      @block_size = 1
+      retry
     end
 
     private
