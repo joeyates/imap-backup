@@ -7,7 +7,6 @@ module Imap::Backup
     attr_reader :server
     attr_reader :connection_options
     attr_reader :changes
-    attr_reader :marked_for_deletion
 
     def initialize(options)
       @username = options[:username]
@@ -25,18 +24,18 @@ module Imap::Backup
     end
 
     def valid?
-      username && password
+      username && password ? true : false
     end
 
     def modified?
       changes.any?
     end
 
-    def clear_changes!
+    def clear_changes
       @changes = {}
     end
 
-    def mark_for_deletion!
+    def mark_for_deletion
       @marked_for_deletion = true
     end
 
@@ -85,17 +84,19 @@ module Imap::Backup
     private
 
     def update(field, value)
+      key = :"@#{field}"
       if changes[field]
         change = changes[field]
-        changes.delete(field) if change[:from] == value
+        if change[:from] == value
+          changes.delete(field)
+        else
+          change[:to] = value
+        end
+      else
+        current = instance_variable_get(key)
+        changes[field] = {from: current, to: value}
       end
-      set_field!(field, value)
-    end
 
-    def set_field!(field, value)
-      key = :"@#{field}"
-      current = instance_variable_get(key)
-      changes[field] = {from: current, to: value}
       instance_variable_set(key, value)
     end
   end

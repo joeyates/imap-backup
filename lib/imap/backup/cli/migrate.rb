@@ -39,11 +39,11 @@ module Imap::Backup
         end
 
         if !destination_account
-          raise "Account #{destination_email} does not exist"
+          raise "Account '#{destination_email}' does not exist"
         end
 
         if !source_account
-          raise "Account #{source_email} does not exist"
+          raise "Account '#{source_email}' does not exist"
         end
       end
 

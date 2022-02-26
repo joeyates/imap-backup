@@ -141,7 +141,7 @@ module Imap::Backup
     def delete_account(menu)
       menu.choice("delete") do
         if highline.agree("Are you sure? (y/n) ")
-          account.mark_for_deletion!
+          account.mark_for_deletion
           throw :done
         end
       end

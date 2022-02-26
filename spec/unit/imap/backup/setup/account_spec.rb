@@ -336,7 +336,7 @@ describe Imap::Backup::Setup::Account do
       let(:confirmed) { true }
 
       before do
-        allow(account).to receive(:mark_for_deletion!)
+        allow(account).to receive(:mark_for_deletion)
         allow(highline).to receive(:agree) { confirmed }
         subject.run
         catch :done do
@@ -350,7 +350,7 @@ describe Imap::Backup::Setup::Account do
 
       context "when the user confirms deletion" do
         it "flags the account to be deleted" do
-          expect(account).to have_received(:mark_for_deletion!)
+          expect(account).to have_received(:mark_for_deletion)
         end
       end
 
@@ -358,7 +358,7 @@ describe Imap::Backup::Setup::Account do
         let(:confirmed) { false }
 
         it "doesn't flag the account to be deleted" do
-          expect(account).to_not have_received(:mark_for_deletion!)
+          expect(account).to_not have_received(:mark_for_deletion)
         end
       end
     end

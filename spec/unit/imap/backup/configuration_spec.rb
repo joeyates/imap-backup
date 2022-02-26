@@ -59,7 +59,7 @@ describe Imap::Backup::Configuration do
     end
 
     context "with accounts flagged 'delete'" do
-      before { subject.accounts[0].mark_for_deletion! }
+      before { subject.accounts[0].mark_for_deletion }
 
       it "is true" do
         expect(subject.modified?).to be_truthy
@@ -177,7 +177,7 @@ describe Imap::Backup::Configuration do
       before do
         allow(subject.accounts[0]).to receive(:to_h) { "Account1" }
         allow(subject.accounts[1]).to receive(:to_h) { "Account2" }
-        subject.accounts[0].mark_for_deletion!
+        subject.accounts[0].mark_for_deletion
       end
 
       it "does not save them" do
