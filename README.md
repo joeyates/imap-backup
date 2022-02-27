@@ -1,3 +1,5 @@
+[![Build Status](https://github.com/joeyates/imap-backup/actions/workflows/main.yml/badge.svg)][CI Status]
+
 # imap-backup
 
 *Backup GMail (or other IMAP) accounts to disk*
@@ -5,10 +7,12 @@
   * [Source Code]
   * [API documentation]
   * [Rubygem]
+  * [CI Status]
 
 [Source Code]: https://github.com/joeyates/imap-backup "Source code at GitHub"
 [API documentation]: http://rubydoc.info/gems/imap-backup/frames "RDoc API Documentation at Rubydoc.info"
 [Rubygem]: http://rubygems.org/gems/imap-backup "Ruby gem at rubygems.org"
+[CI Status]: https://github.com/joeyates/imap-backup/actions/workflows/main.yml
 
 # Installation
 
