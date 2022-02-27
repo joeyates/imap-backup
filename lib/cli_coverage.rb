@@ -4,7 +4,7 @@ class CliCoverage
       require "simplecov"
 
       # Collect coverage separately
-      SimpleCov.command_name "#{ENV['COVERAGE']} coverage"
+      SimpleCov.command_name "#{ENV['COVERAGE']} #{ARGV.join(" ")} coverage"
 
       # Silence output
       SimpleCov.formatter = SimpleCov::Formatter::SimpleFormatter
