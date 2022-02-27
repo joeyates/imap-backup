@@ -37,21 +37,26 @@ module Imap::Backup
 
     def header(menu)
       modified = account.modified? ? "*" : ""
-      connection_options =
-        if account.connection_options
-          escaped =
-            JSON.generate(account.connection_options).
-            gsub('"', '\"')
-          "\n  connection options #{escaped}"
-        end
+
+      if account.connection_options
+        escaped =
+          JSON.generate(account.connection_options)
+        connection_options =
+          "\nconnection options  '#{escaped}'"
+        space = " " * 12
+      else
+        connection_options = nil
+        space = " " * 4
+      end
+
       menu.header = <<~HEADER.chomp
         #{helpers.title_prefix} Account#{modified}
 
-        email      #{account.username}
-        password   #{masked_password}
-        path       #{account.local_path}
-        folders    #{folders.map { |f| f[:name] }.join(', ')}
-        server     #{account.server}#{connection_options}
+        email   #{space}#{account.username}
+        password#{space}#{masked_password}
+        path    #{space}#{account.local_path}
+        folders #{space}#{folders.map { |f| f[:name] }.join(', ')}
+        server  #{space}#{account.server}#{connection_options}
 
         Choose an action
       HEADER
@@ -98,7 +103,14 @@ module Imap::Backup
     def modify_connection_options(menu)
       menu.choice("modify connection options") do
         connection_options = highline.ask("connections options (as JSON): ")
-        account.connection_options = connection_options if !connection_options.nil?
+        if !connection_options.nil?
+          begin
+            account.connection_options = connection_options
+          rescue JSON::ParserError
+            Kernel.puts "Malformed JSON, please try again"
+            highline.ask "Press a key "
+          end
+        end
       end
     end
 
@@ -141,7 +153,7 @@ module Imap::Backup
     def delete_account(menu)
       menu.choice("delete") do
         if highline.agree("Are you sure? (y/n) ")
-          account.mark_for_deletion!
+          account.mark_for_deletion
           throw :done
         end
       end

@@ -9,7 +9,7 @@ module Imap::Backup
     end
 
     def version
-      Version::VERSION
+      VERSION
     end
   end
 end

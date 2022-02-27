@@ -49,6 +49,31 @@ describe Imap::Backup::Configuration do
     end
   end
 
+  describe "#download_block_size" do
+    context "when DOWNLOAD_BLOCK_SIZE is set" do
+      around do |example|
+        previous = ENV["DOWNLOAD_BLOCK_SIZE"]
+        ENV["DOWNLOAD_BLOCK_SIZE"] = "42"
+        example.run
+        if previous
+          ENV["DOWNLOAD_BLOCK_SIZE"] = previous
+        else
+          ENV.delete("DOWNLOAD_BLOCK_SIZE")
+        end
+      end
+
+      it "is that value" do
+        expect(subject.download_block_size).to eq(42)
+      end
+    end
+
+    context "when DOWNLOAD_BLOCK_SIZE is not set" do
+      it "is 1" do
+        expect(subject.download_block_size).to eq(1)
+      end
+    end
+  end
+
   describe "#modified?" do
     context "with modified accounts" do
       before { subject.accounts[0].username = "changed" }
@@ -59,7 +84,7 @@ describe Imap::Backup::Configuration do
     end
 
     context "with accounts flagged 'delete'" do
-      before { subject.accounts[0].mark_for_deletion! }
+      before { subject.accounts[0].mark_for_deletion }
 
       it "is true" do
         expect(subject.modified?).to be_truthy
@@ -177,7 +202,7 @@ describe Imap::Backup::Configuration do
       before do
         allow(subject.accounts[0]).to receive(:to_h) { "Account1" }
         allow(subject.accounts[1]).to receive(:to_h) { "Account2" }
-        subject.accounts[0].mark_for_deletion!
+        subject.accounts[0].mark_for_deletion
       end
 
       it "does not save them" do

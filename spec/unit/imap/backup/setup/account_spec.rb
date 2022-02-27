@@ -12,7 +12,7 @@ describe Imap::Backup::Setup::Account do
       username: existing_email,
       password: existing_password,
       server: current_server,
-      connection_options: nil,
+      connection_options: connection_options,
       local_path: "/backup/path",
       folders: [{name: "my_folder"}],
       modified?: false
@@ -32,6 +32,7 @@ describe Imap::Backup::Setup::Account do
   let(:existing_password) { "password" }
   let(:other_email) { "other@example.com" }
   let(:other_existing_path) { "/other/existing/path" }
+  let(:connection_options) { nil }
 
   let(:highline) { HIGHLINE }
   let(:config) { CONFIG }
@@ -136,7 +137,15 @@ describe Imap::Backup::Setup::Account do
         before { subject.run }
 
         it "indicates that a password is not set" do
-          expect(menu.header).to include("password   (unset)")
+          expect(menu.header).to match(/^password\s+\(unset\)/)
+        end
+      end
+
+      context "with connection_options" do
+        let(:connection_options) { {some: "option"} }
+
+        it "shows the options" do
+          expect(menu.header).to match(/^connection options\s+'{"some":"option"}'/)
         end
       end
     end
@@ -257,6 +266,46 @@ describe Imap::Backup::Setup::Account do
       end
     end
 
+    describe "choosing 'modify connection options'" do
+      context "when the JSON is well formed" do
+        let(:json) { "{}" }
+
+        before do
+          allow(highline).to receive(:ask).with("connections options (as JSON): ") { json }
+          allow(account).to receive(:"connection_options=")
+
+          subject.run
+
+          menu.choices["modify connection options"].call
+        end
+
+        it "updates the connection options" do
+          expect(account).to have_received(:"connection_options=").with(json)
+        end
+      end
+
+      context "when the JSON is malformed" do
+        before do
+          allow(highline).to receive(:ask).with("connections options (as JSON): ") { "xx" }
+          allow(account).to receive(:"connection_options=").and_raise(JSON::ParserError)
+          allow(highline).to receive(:ask).with("Press a key ")
+
+          subject.run
+
+          menu.choices["modify connection options"].call
+        end
+
+        it "does not fail" do
+          subject.run
+        end
+
+        it "reports the problem" do
+          expect(Kernel).to have_received(:puts).
+            with(/Malformed/)
+        end
+      end
+    end
+
     describe "choosing 'modify backup path'" do
       let(:new_backup_path) { "/new/path" }
 
@@ -336,7 +385,7 @@ describe Imap::Backup::Setup::Account do
       let(:confirmed) { true }
 
       before do
-        allow(account).to receive(:mark_for_deletion!)
+        allow(account).to receive(:mark_for_deletion)
         allow(highline).to receive(:agree) { confirmed }
         subject.run
         catch :done do
@@ -350,7 +399,7 @@ describe Imap::Backup::Setup::Account do
 
       context "when the user confirms deletion" do
         it "flags the account to be deleted" do
-          expect(account).to have_received(:mark_for_deletion!)
+          expect(account).to have_received(:mark_for_deletion)
         end
       end
 
@@ -358,7 +407,7 @@ describe Imap::Backup::Setup::Account do
         let(:confirmed) { false }
 
         it "doesn't flag the account to be deleted" do
-          expect(account).to_not have_received(:mark_for_deletion!)
+          expect(account).to_not have_received(:mark_for_deletion)
         end
       end
     end

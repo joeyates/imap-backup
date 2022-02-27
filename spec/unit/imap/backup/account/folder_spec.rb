@@ -64,6 +64,16 @@ describe Imap::Backup::Account::Folder do
         expect(subject.uids).to eq([])
       end
     end
+
+    context "when the UID search fails" do
+      before do
+        allow(client).to receive(:uid_search).and_raise(NoMethodError)
+      end
+
+      it "returns an empty array" do
+        expect(subject.uids).to eq([])
+      end
+    end
   end
 
   describe "#fetch_multi" do

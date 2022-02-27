@@ -103,7 +103,7 @@ module Imap::Backup
     end
 
     def remove_modified_flags
-      accounts.each { |a| a.clear_changes! }
+      accounts.each { |a| a.clear_changes }
     end
 
     def remove_deleted_accounts
