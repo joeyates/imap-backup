@@ -25,18 +25,20 @@ describe Imap::Backup::CLI::Local do
     instance_double(
       Imap::Backup::Serializer,
       uids: uids,
-      each_message: [[123, message]]
+      each_message: each_message
     )
   end
   let(:uids) { ["123"] }
+  let(:each_message) { [[123, message]] }
   let(:message) do
     instance_double(
       Email::Mboxrd::Message,
       date: Date.today,
-      subject: "Ciao",
+      subject: message_subject,
       supplied_body: "Supplied"
     )
   end
+  let(:message_subject) { "Ciao" }
   let(:email) { "foo@example.com" }
 
   before do
@@ -64,18 +66,35 @@ describe Imap::Backup::CLI::Local do
   end
 
   describe "list" do
-    it "lists downloaded emails" do
-      subject.list(email, "bar")
+    before { subject.list(email, "bar") }
 
+    it "lists downloaded emails" do
       expect(Kernel).to have_received(:puts).with(/Ciao/)
+    end
+
+    context "when the subject line is too long" do
+      let(:message_subject) { "A" * 70 }
+
+      it "is shortened" do
+        expect(Kernel).to have_received(:puts).with(/\sA{57}\.\.\./)
+      end
     end
   end
 
   describe "show" do
-    it "prints a downloaded email" do
-      subject.show(email, "bar", "123")
+    before { subject.show(email, "bar", uids.join(",")) }
 
+    it "prints a downloaded email" do
       expect(Kernel).to have_received(:puts).with("Supplied")
+    end
+
+    context "when more than one email is requested" do
+      let(:uids) { %w(123 456) }
+      let(:each_message) { [[123, message], [456, message]] }
+
+      it "prints a header" do
+        expect(Kernel).to have_received(:puts).with(/\| UID: 123 /)
+      end
     end
   end
 end

@@ -146,7 +146,7 @@ module Imap::Backup
       [:local_path, "local_path", "local_path"],
       [:server, "server", "server"],
       [:folders, ["folder"], ["folder"]],
-      [:connection_options, %q({"some": "option"}), {"some" => "option"}]
+      [:connection_options, '{"some": "option"}', {"some" => "option"}]
     ].each do |attribute, value, expected|
       describe "##{attribute}=" do
         let(:options) { {} }

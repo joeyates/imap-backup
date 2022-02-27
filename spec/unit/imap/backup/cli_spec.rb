@@ -1,7 +1,7 @@
 module Imap::Backup
   RSpec.describe CLI do
     describe ".exit_on_failure?" do
-      it "it true" do
+      it "is true" do
         expect(described_class.exit_on_failure?).to be true
       end
     end

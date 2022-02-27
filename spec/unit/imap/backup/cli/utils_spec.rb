@@ -50,8 +50,9 @@ module Imap::Backup
     describe "#export_to_thunderbird" do
       let(:command) { subject.export_to_thunderbird(email) }
       let(:options) { {} }
-      let(:profiles) { instance_double(Thunderbird::Profiles, installs: [install], profile: named_profile) }
-      let(:install) { instance_double(Thunderbird::Install, default: default_install) }
+      let(:profiles) { instance_double(Thunderbird::Profiles, installs: installs, profile: named_profile) }
+      let(:installs) { [install1] }
+      let(:install1) { instance_double(Thunderbird::Install, default: default_install) }
       let(:default_install) { "default" }
       let(:named_profile) { "named" }
 
@@ -63,24 +64,40 @@ module Imap::Backup
         # rubocop:enable RSpec/SubjectStub
       end
 
-      context "when no default Thunderbird profile is found" do
-        let(:default_install) { nil }
+      context "when no profile_name is supplied" do
+        context "when no default Thunderbird profile is found" do
+          let(:default_install) { nil }
 
-        it "fails" do
-          expect do
-            command
-          end.to raise_error(RuntimeError, /Default .*? not found/)
+          it "fails" do
+            expect do
+              command
+            end.to raise_error(RuntimeError, /Default .*? not found/)
+          end
+        end
+
+        context "when there is more than one install" do
+          let(:installs) { [install1, install2] }
+          let(:install2) { instance_double(Thunderbird::Install, default: default_install) }
+
+          it "fails" do
+            expect do
+              command
+            end.to raise_error(RuntimeError, /multiple installs.*?supply a profile name/m)
+          end
         end
       end
 
-      context "when the supplied profile_name is not found" do
+      context "when a profile_name is supplied" do
         let(:options) { {"profile" => "profile"} }
-        let(:named_profile) { nil }
 
-        it "fails" do
-          expect do
-            command
-          end.to raise_error(RuntimeError, /profile 'profile' not found/)
+        context "when the supplied profile_name is not found" do
+          let(:named_profile) { nil }
+
+          it "fails" do
+            expect do
+              command
+            end.to raise_error(RuntimeError, /profile 'profile' not found/)
+          end
         end
       end
 

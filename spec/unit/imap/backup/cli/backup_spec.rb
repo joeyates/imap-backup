@@ -5,7 +5,9 @@ module Imap::Backup
     let(:connection) { instance_double(Account::Connection, run_backup: nil) }
 
     before do
+      # rubocop:disable RSpec/SubjectStub
       allow(subject).to receive(:each_connection).with([]).and_yield(connection)
+      # rubocop:enable RSpec/SubjectStub
     end
 
     it "runs the backup for each connection" do

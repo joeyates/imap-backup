@@ -24,7 +24,7 @@ describe Imap::Backup::Account::Connection do
   let(:account) do
     instance_double(
       Imap::Backup::Account,
-      username: USERNAME,
+      username: username,
       password: PASSWORD,
       local_path: LOCAL_PATH,
       folders: config_folders,
@@ -32,6 +32,7 @@ describe Imap::Backup::Account::Connection do
       connection_options: nil
     )
   end
+  let(:username) { USERNAME }
   let(:config_folders) { [FOLDER_CONFIG] }
   let(:root_info) do
     instance_double(Net::IMAP::MailboxList, name: ROOT_NAME)
@@ -84,6 +85,23 @@ describe Imap::Backup::Account::Connection do
         subject.client
 
         expect(client).to have_received(:login).twice
+      end
+    end
+
+    context "when the provider is Apple" do
+      let(:username) { "user@mac.com" }
+      let(:apple_client) do
+        instance_double(
+          Imap::Backup::Client::AppleMail, login: nil
+        )
+      end
+
+      before do
+        allow(Imap::Backup::Client::AppleMail).to receive(:new) { apple_client }
+      end
+
+      it "returns the Apple client" do
+        expect(result).to eq(apple_client)
       end
     end
 

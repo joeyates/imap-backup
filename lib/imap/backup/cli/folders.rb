@@ -13,15 +13,15 @@ module Imap::Backup
     no_commands do
       def run
         each_connection(account_names) do |connection|
-          puts connection.account.username
+          Kernel.puts connection.account.username
           # TODO: Make folder_names private once this command
           # has been removed.
           folders = connection.folder_names
           if folders.nil?
-            warn "Unable to list account folders"
+            Kernel.warn "Unable to list account folders"
             return false
           end
-          folders.each { |f| puts "\t#{f}" }
+          folders.each { |f| Kernel.puts "\t#{f}" }
         end
       end
     end
