@@ -31,7 +31,7 @@ jobs:
       run: bundle exec rake
     - name: Read Coverage
       run: |
-        echo "::set-env name=COVERAGE::$(cat coverage/coverage_percent.txt)"
+        echo "COVERAGE=$(cat coverage/coverage_percent.txt)%" >> $GITHUB_ENV
     - name: Create Comments-Badge
       uses: schneegans/dynamic-badges-action@v1.0.0
       with:
