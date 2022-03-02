@@ -52,7 +52,7 @@ module Imap::Backup
       end
     end
 
-    def download_block_size
+    def multi_fetch_size
       size = ENV["DOWNLOAD_BLOCK_SIZE"].to_i
       if size > 0
         size

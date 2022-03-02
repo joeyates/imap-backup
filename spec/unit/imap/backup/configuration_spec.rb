@@ -49,7 +49,7 @@ describe Imap::Backup::Configuration do
     end
   end
 
-  describe "#download_block_size" do
+  describe "#multi_fetch_size" do
     context "when DOWNLOAD_BLOCK_SIZE is set" do
       around do |example|
         previous = ENV["DOWNLOAD_BLOCK_SIZE"]
@@ -63,13 +63,13 @@ describe Imap::Backup::Configuration do
       end
 
       it "is that value" do
-        expect(subject.download_block_size).to eq(42)
+        expect(subject.multi_fetch_size).to eq(42)
       end
     end
 
     context "when DOWNLOAD_BLOCK_SIZE is not set" do
       it "is 1" do
-        expect(subject.download_block_size).to eq(1)
+        expect(subject.multi_fetch_size).to eq(1)
       end
     end
   end
