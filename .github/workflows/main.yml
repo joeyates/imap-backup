@@ -41,7 +41,7 @@ jobs:
         filename: coverage.json
         label: Coverage
         message: ${{ env.COVERAGE }}
-        color: green
+        color: brightgreen
 
     services:
       imap:
