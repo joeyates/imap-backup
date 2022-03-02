@@ -32,7 +32,7 @@ jobs:
     - name: Read Coverage
       run: |
         echo "COVERAGE=$(cat coverage/coverage_percent.txt)%" >> $GITHUB_ENV
-    - name: Create Comments-Badge
+    - name: Create Coverage Badge
       if: ${{ github.ref == 'refs/heads/main' && matrix.ruby == '3.0' }}
       uses: schneegans/dynamic-badges-action@v1.0.0
       with:
