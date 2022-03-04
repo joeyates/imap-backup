@@ -70,7 +70,7 @@ module Imap::Backup
         serializer.apply_uid_validity(folder.uid_validity)
         begin
           Downloader.new(
-            folder, serializer, block_size: config.multi_fetch_size
+            folder, serializer, multi_fetch_size: config.multi_fetch_size
           ).run
         rescue Net::IMAP::ByeResponseError
           reconnect
