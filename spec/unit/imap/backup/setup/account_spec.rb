@@ -11,10 +11,10 @@ describe Imap::Backup::Setup::Account do
       Imap::Backup::Account,
       username: existing_email,
       password: existing_password,
-      server: current_server,
-      connection_options: connection_options,
       local_path: "/backup/path",
       folders: [{name: "my_folder"}],
+      server: current_server,
+      connection_options: connection_options,
       modified?: false
     )
   end
@@ -28,10 +28,11 @@ describe Imap::Backup::Setup::Account do
   let(:accounts) { [account, account1] }
   let(:existing_email) { "user@example.com" }
   let(:new_email) { "foo@example.com" }
-  let(:current_server) { "imap.example.com" }
   let(:existing_password) { "password" }
   let(:other_email) { "other@example.com" }
   let(:other_existing_path) { "/other/existing/path" }
+  let(:multi_fetch_size) { 1 }
+  let(:current_server) { "imap.example.com" }
   let(:connection_options) { nil }
 
   let(:highline) { HIGHLINE }
@@ -100,9 +101,9 @@ describe Imap::Backup::Setup::Account do
       [
         "modify email",
         "modify password",
-        "modify server",
         "modify backup path",
         "choose backup folders",
+        "modify server",
         "test connection",
         "delete",
         "(q) return to main menu",
@@ -249,6 +250,60 @@ describe Imap::Backup::Setup::Account do
       end
     end
 
+    describe "choosing 'modify backup path'" do
+      let(:new_backup_path) { "/new/path" }
+
+      before do
+        allow(account).to receive(:"local_path=")
+        @validator = nil
+        allow(
+          Imap::Backup::Setup::Asker
+        ).to receive(:backup_path) do |_path, validator|
+          @validator = validator
+          new_backup_path
+        end
+        subject.run
+        menu.choices["modify backup path"].call
+      end
+
+      it "updates the path" do
+        expect(account).to have_received(:"local_path=").with(new_backup_path)
+      end
+
+      context "when the path is not used by other backups" do
+        it "is accepts it" do
+          # rubocop:disable RSpec/InstanceVariable
+          expect(@validator.call("/unknown/path")).to be_truthy
+          # rubocop:enable RSpec/InstanceVariable
+        end
+      end
+
+      context "when the path is used by other backups" do
+        it "fails validation" do
+          # rubocop:disable RSpec/InstanceVariable
+          expect(@validator.call(other_existing_path)).to be_falsey
+          # rubocop:enable RSpec/InstanceVariable
+        end
+      end
+    end
+
+    describe "choosing 'choose backup folders'" do
+      let(:chooser) do
+        instance_double(Imap::Backup::Setup::FolderChooser, run: nil)
+      end
+
+      before do
+        allow(Imap::Backup::Setup::FolderChooser).
+          to receive(:new) { chooser }
+        subject.run
+        menu.choices["choose backup folders"].call
+      end
+
+      it "edits folders" do
+        expect(chooser).to have_received(:run)
+      end
+    end
+
     describe "choosing 'modify server'" do
       let(:server) { "server" }
 
@@ -303,60 +358,6 @@ describe Imap::Backup::Setup::Account do
           expect(Kernel).to have_received(:puts).
             with(/Malformed/)
         end
-      end
-    end
-
-    describe "choosing 'modify backup path'" do
-      let(:new_backup_path) { "/new/path" }
-
-      before do
-        allow(account).to receive(:"local_path=")
-        @validator = nil
-        allow(
-          Imap::Backup::Setup::Asker
-        ).to receive(:backup_path) do |_path, validator|
-          @validator = validator
-          new_backup_path
-        end
-        subject.run
-        menu.choices["modify backup path"].call
-      end
-
-      it "updates the path" do
-        expect(account).to have_received(:"local_path=").with(new_backup_path)
-      end
-
-      context "when the path is not used by other backups" do
-        it "is accepts it" do
-          # rubocop:disable RSpec/InstanceVariable
-          expect(@validator.call("/unknown/path")).to be_truthy
-          # rubocop:enable RSpec/InstanceVariable
-        end
-      end
-
-      context "when the path is used by other backups" do
-        it "fails validation" do
-          # rubocop:disable RSpec/InstanceVariable
-          expect(@validator.call(other_existing_path)).to be_falsey
-          # rubocop:enable RSpec/InstanceVariable
-        end
-      end
-    end
-
-    describe "choosing 'choose backup folders'" do
-      let(:chooser) do
-        instance_double(Imap::Backup::Setup::FolderChooser, run: nil)
-      end
-
-      before do
-        allow(Imap::Backup::Setup::FolderChooser).
-          to receive(:new) { chooser }
-        subject.run
-        menu.choices["choose backup folders"].call
-      end
-
-      it "edits folders" do
-        expect(chooser).to have_received(:run)
       end
     end
 

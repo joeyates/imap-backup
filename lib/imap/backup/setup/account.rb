@@ -93,27 +93,6 @@ module Imap::Backup
       end
     end
 
-    def modify_server(menu)
-      menu.choice("modify server") do
-        server = highline.ask("server: ")
-        account.server = server if !server.nil?
-      end
-    end
-
-    def modify_connection_options(menu)
-      menu.choice("modify connection options") do
-        connection_options = highline.ask("connections options (as JSON): ")
-        if !connection_options.nil?
-          begin
-            account.connection_options = connection_options
-          rescue JSON::ParserError
-            Kernel.puts "Malformed JSON, please try again"
-            highline.ask "Press a key "
-          end
-        end
-      end
-    end
-
     def path_modification_validator(path)
       same = config.accounts.find do |a|
         a.username != account.username && a.local_path == path
@@ -139,6 +118,27 @@ module Imap::Backup
     def choose_folders(menu)
       menu.choice("choose backup folders") do
         Setup::FolderChooser.new(account).run
+      end
+    end
+
+    def modify_server(menu)
+      menu.choice("modify server") do
+        server = highline.ask("server: ")
+        account.server = server if !server.nil?
+      end
+    end
+
+    def modify_connection_options(menu)
+      menu.choice("modify connection options") do
+        connection_options = highline.ask("connections options (as JSON): ")
+        if !connection_options.nil?
+          begin
+            account.connection_options = connection_options
+          rescue JSON::ParserError
+            Kernel.puts "Malformed JSON, please try again"
+            highline.ask "Press a key "
+          end
+        end
       end
     end
 
