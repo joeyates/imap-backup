@@ -1,11 +1,14 @@
 module Imap::Backup
   class Account
+    DEFAULT_MULTI_FETCH_SIZE = 1
+
     attr_reader :username
     attr_reader :password
     attr_reader :local_path
     attr_reader :folders
     attr_reader :server
     attr_reader :connection_options
+    attr_reader :multi_fetch_size
     attr_reader :changes
 
     def initialize(options)
@@ -15,6 +18,7 @@ module Imap::Backup
       @folders = options[:folders]
       @server = options[:server]
       @connection_options = options[:connection_options]
+      @multi_fetch_size = options[:multi_fetch_size]
       @changes = {}
       @marked_for_deletion = false
     end
@@ -52,6 +56,7 @@ module Imap::Backup
       h[:folders] = @folders if @folders
       h[:server] = @server if @server
       h[:connection_options] = @connection_options if @connection_options
+      h[:multi_fetch_size] = multi_fetch_size if @multi_fetch_size
       h
     end
 
@@ -79,6 +84,21 @@ module Imap::Backup
     def connection_options=(value)
       parsed = JSON.parse(value)
       update(:connection_options, parsed)
+    end
+
+    def multi_fetch_size
+      int = @multi_fetch_size.to_i
+      if int.positive?
+        int
+      else
+        DEFAULT_MULTI_FETCH_SIZE
+      end
+    end
+
+    def multi_fetch_size=(value)
+      parsed = value.to_i
+      parsed = DEFAULT_MULTI_FETCH_SIZE if !parsed.positive?
+      update(:multi_fetch_size, parsed)
     end
 
     private
