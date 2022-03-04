@@ -11,10 +11,11 @@ describe Imap::Backup::Setup::Account do
       Imap::Backup::Account,
       username: existing_email,
       password: existing_password,
-      server: current_server,
-      connection_options: connection_options,
       local_path: "/backup/path",
       folders: [{name: "my_folder"}],
+      multi_fetch_size: multi_fetch_size,
+      server: current_server,
+      connection_options: connection_options,
       modified?: false
     )
   end
@@ -28,10 +29,11 @@ describe Imap::Backup::Setup::Account do
   let(:accounts) { [account, account1] }
   let(:existing_email) { "user@example.com" }
   let(:new_email) { "foo@example.com" }
-  let(:current_server) { "imap.example.com" }
   let(:existing_password) { "password" }
   let(:other_email) { "other@example.com" }
   let(:other_existing_path) { "/other/existing/path" }
+  let(:multi_fetch_size) { 1 }
+  let(:current_server) { "imap.example.com" }
   let(:connection_options) { nil }
 
   let(:highline) { HIGHLINE }
@@ -100,9 +102,11 @@ describe Imap::Backup::Setup::Account do
       [
         "modify email",
         "modify password",
-        "modify server",
         "modify backup path",
         "choose backup folders",
+        "modify multi-fetch size (number of emails to fetch at a time)",
+        "modify server",
+        "modify connection options",
         "test connection",
         "delete",
         "(q) return to main menu",
@@ -138,6 +142,14 @@ describe Imap::Backup::Setup::Account do
 
         it "indicates that a password is not set" do
           expect(menu.header).to match(/^password\s+\(unset\)/)
+        end
+      end
+
+      context "with multi_fetch_size" do
+        let(:multi_fetch_size) { 4 }
+
+        it "shows the size" do
+          expect(menu.header).to match(/^multi-fetch\s+4/)
         end
       end
 
@@ -249,6 +261,94 @@ describe Imap::Backup::Setup::Account do
       end
     end
 
+    describe "choosing 'modify backup path'" do
+      let(:new_backup_path) { "/new/path" }
+
+      before do
+        allow(account).to receive(:"local_path=")
+        @validator = nil
+        allow(
+          Imap::Backup::Setup::Asker
+        ).to receive(:backup_path) do |_path, validator|
+          @validator = validator
+          new_backup_path
+        end
+        subject.run
+        menu.choices["modify backup path"].call
+      end
+
+      it "updates the path" do
+        expect(account).to have_received(:"local_path=").with(new_backup_path)
+      end
+
+      context "when the path is not used by other backups" do
+        it "is accepts it" do
+          # rubocop:disable RSpec/InstanceVariable
+          expect(@validator.call("/unknown/path")).to be_truthy
+          # rubocop:enable RSpec/InstanceVariable
+        end
+      end
+
+      context "when the path is used by other backups" do
+        it "fails validation" do
+          # rubocop:disable RSpec/InstanceVariable
+          expect(@validator.call(other_existing_path)).to be_falsey
+          # rubocop:enable RSpec/InstanceVariable
+        end
+      end
+    end
+
+    describe "choosing 'choose backup folders'" do
+      let(:chooser) do
+        instance_double(Imap::Backup::Setup::FolderChooser, run: nil)
+      end
+
+      before do
+        allow(Imap::Backup::Setup::FolderChooser).
+          to receive(:new) { chooser }
+        subject.run
+        menu.choices["choose backup folders"].call
+      end
+
+      it "edits folders" do
+        expect(chooser).to have_received(:run)
+      end
+    end
+
+    describe "choosing 'modify multi-fetch size'" do
+      let(:supplied) { "10" }
+
+      before do
+        allow(account).to receive(:multi_fetch_size=)
+        allow(highline).to receive(:ask).with("size: ") { supplied }
+
+        subject.run
+        menu.choices[
+          "modify multi-fetch size (number of emails to fetch at a time)"
+        ].call
+      end
+
+      it "sets the multi-fetch size" do
+        expect(account).to have_received(:multi_fetch_size=).with(10)
+      end
+
+      context "when the supplied value is not a number" do
+        let(:supplied) { "wrong!" }
+
+        it "does nothing" do
+          expect(account).to_not have_received(:multi_fetch_size=)
+        end
+      end
+
+      context "when the supplied value is not a positive number" do
+        let(:supplied) { "0" }
+
+        it "does nothing" do
+          expect(account).to_not have_received(:multi_fetch_size=)
+        end
+      end
+    end
+
     describe "choosing 'modify server'" do
       let(:server) { "server" }
 
@@ -303,60 +403,6 @@ describe Imap::Backup::Setup::Account do
           expect(Kernel).to have_received(:puts).
             with(/Malformed/)
         end
-      end
-    end
-
-    describe "choosing 'modify backup path'" do
-      let(:new_backup_path) { "/new/path" }
-
-      before do
-        allow(account).to receive(:"local_path=")
-        @validator = nil
-        allow(
-          Imap::Backup::Setup::Asker
-        ).to receive(:backup_path) do |_path, validator|
-          @validator = validator
-          new_backup_path
-        end
-        subject.run
-        menu.choices["modify backup path"].call
-      end
-
-      it "updates the path" do
-        expect(account).to have_received(:"local_path=").with(new_backup_path)
-      end
-
-      context "when the path is not used by other backups" do
-        it "is accepts it" do
-          # rubocop:disable RSpec/InstanceVariable
-          expect(@validator.call("/unknown/path")).to be_truthy
-          # rubocop:enable RSpec/InstanceVariable
-        end
-      end
-
-      context "when the path is used by other backups" do
-        it "fails validation" do
-          # rubocop:disable RSpec/InstanceVariable
-          expect(@validator.call(other_existing_path)).to be_falsey
-          # rubocop:enable RSpec/InstanceVariable
-        end
-      end
-    end
-
-    describe "choosing 'choose backup folders'" do
-      let(:chooser) do
-        instance_double(Imap::Backup::Setup::FolderChooser, run: nil)
-      end
-
-      before do
-        allow(Imap::Backup::Setup::FolderChooser).
-          to receive(:new) { chooser }
-        subject.run
-        menu.choices["choose backup folders"].call
-      end
-
-      it "edits folders" do
-        expect(chooser).to have_received(:run)
       end
     end
 

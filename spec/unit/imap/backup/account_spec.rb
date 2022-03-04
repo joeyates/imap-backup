@@ -123,6 +123,14 @@ module Imap::Backup
         end
       end
 
+      context "when multi_fetch_size is set" do
+        let(:options) { {username: "user", password: "pwd", multi_fetch_size: "3"} }
+
+        it "includes multi_fetch_size" do
+          expect(subject.to_h).to include({multi_fetch_size: 3})
+        end
+      end
+
       context "when server is set" do
         let(:options) { {username: "user", password: "pwd", server: "server"} }
 
@@ -140,10 +148,44 @@ module Imap::Backup
       end
     end
 
+    describe "#multi_fetch_size" do
+      let(:options) { {username: "user", password: "pwd", multi_fetch_size: multi_fetch_size} }
+      let(:multi_fetch_size) { 10 }
+
+      it "returns the initialized value" do
+        expect(subject.multi_fetch_size).to eq(10)
+      end
+
+      context "when the initialized value is a string representation of a positive number" do
+        let(:multi_fetch_size) { "10" }
+
+        it "returns one" do
+          expect(subject.multi_fetch_size).to eq(10)
+        end
+      end
+
+      context "when the initialized value is not a number" do
+        let(:multi_fetch_size) { "ciao" }
+
+        it "returns one" do
+          expect(subject.multi_fetch_size).to eq(1)
+        end
+      end
+
+      context "when the initialized value is not a positive number" do
+        let(:multi_fetch_size) { "-99" }
+
+        it "returns one" do
+          expect(subject.multi_fetch_size).to eq(1)
+        end
+      end
+    end
+
     [
       [:username, "username", "username"],
       [:password, "password", "password"],
       [:local_path, "local_path", "local_path"],
+      [:multi_fetch_size, "2", 2],
       [:server, "server", "server"],
       [:folders, ["folder"], ["folder"]],
       [:connection_options, '{"some": "option"}', {"some" => "option"}]
@@ -167,6 +209,24 @@ module Imap::Backup
               expect do
                 subject.folders = "aaa"
               end.to raise_error(RuntimeError, /must be an Array/)
+            end
+          end
+        end
+
+        if attribute == :multi_fetch_size
+          context "when the supplied value is not a number" do
+            before { subject.multi_fetch_size = "ciao" }
+
+            it "sets multi_fetch_size to one" do
+              expect(subject.multi_fetch_size).to eq(1)
+            end
+          end
+
+          context "when the supplied value is not a positive number" do
+            before { subject.multi_fetch_size = "-1" }
+
+            it "sets multi_fetch_size to one" do
+              expect(subject.multi_fetch_size).to eq(1)
             end
           end
         end

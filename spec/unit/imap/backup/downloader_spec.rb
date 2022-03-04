@@ -46,7 +46,7 @@ describe Imap::Backup::Downloader do
     context "when the block size is greater than one" do
       let(:remote_uids) { %w(111 999) }
       let(:local_uids) { [] }
-      let(:options) { {block_size: 2} }
+      let(:options) { {multi_fetch_size: 2} }
 
       context "when the first fetch fails" do
         before do

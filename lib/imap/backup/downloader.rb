@@ -4,22 +4,22 @@ module Imap::Backup
   class Downloader
     attr_reader :folder
     attr_reader :serializer
-    attr_reader :block_size
+    attr_reader :multi_fetch_size
 
-    def initialize(folder, serializer, block_size: 1)
+    def initialize(folder, serializer, multi_fetch_size: 1)
       @folder = folder
       @serializer = serializer
-      @block_size = block_size
+      @multi_fetch_size = multi_fetch_size
     end
 
     def run
       uids = folder.uids - serializer.uids
       count = uids.count
       debug "#{count} new messages"
-      uids.each_slice(block_size).with_index do |block, i|
+      uids.each_slice(multi_fetch_size).with_index do |block, i|
         uids_and_bodies = folder.fetch_multi(block)
         if uids_and_bodies.nil?
-          if block_size > 1
+          if multi_fetch_size > 1
             debug("Multi fetch failed for UIDs #{block.join(", ")}, switching to single fetches")
             raise MultiFetchFailedError
           else
@@ -28,7 +28,7 @@ module Imap::Backup
           end
         end
 
-        offset = i * block_size + 1
+        offset = i * multi_fetch_size + 1
         uids_and_bodies.each.with_index do |uid_and_body, j|
           uid = uid_and_body[:uid]
           body = uid_and_body[:body]
@@ -44,7 +44,7 @@ module Imap::Backup
         end
       end
     rescue MultiFetchFailedError
-      @block_size = 1
+      @multi_fetch_size = 1
       retry
     end
 

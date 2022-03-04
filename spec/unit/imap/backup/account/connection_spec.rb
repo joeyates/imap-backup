@@ -28,12 +28,14 @@ describe Imap::Backup::Account::Connection do
       password: PASSWORD,
       local_path: LOCAL_PATH,
       folders: config_folders,
+      multi_fetch_size: multi_fetch_size,
       server: server,
       connection_options: nil
     )
   end
   let(:username) { USERNAME }
   let(:config_folders) { [FOLDER_CONFIG] }
+  let(:multi_fetch_size) { 1 }
   let(:root_info) do
     instance_double(Net::IMAP::MailboxList, name: ROOT_NAME)
   end
@@ -168,6 +170,7 @@ describe Imap::Backup::Account::Connection do
     let(:exists) { true }
     let(:uid_validity) { 123 }
     let(:downloader) { instance_double(Imap::Backup::Downloader, run: nil) }
+    let(:multi_fetch_size) { 10 }
 
     before do
       allow(Imap::Backup::Downloader).
@@ -176,6 +179,13 @@ describe Imap::Backup::Account::Connection do
         with(subject, BACKUP_FOLDER) { folder }
       allow(Imap::Backup::Serializer).to receive(:new).
         with(LOCAL_PATH, IMAP_FOLDER) { serializer }
+    end
+
+    it "passes the multi_fetch_size" do
+      subject.run_backup
+
+      expect(Imap::Backup::Downloader).to have_received(:new).
+        with(anything, anything, {multi_fetch_size: 10})
     end
 
     context "with supplied config_folders" do
