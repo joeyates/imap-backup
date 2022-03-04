@@ -39,10 +39,9 @@ module Imap::Backup
     def header(menu)
       modified = account.modified? ? "*" : ""
 
-      multi_fetch_size =
-        if account.multi_fetch_size > 1
-          "\nmulti-fetch #{account.multi_fetch_size}"
-        end
+      if account.multi_fetch_size > 1
+        multi_fetch_size = "\nmulti-fetch #{account.multi_fetch_size}"
+      end
 
       if account.connection_options
         escaped =
@@ -81,12 +80,10 @@ module Imap::Backup
           )
         else
           account.username = username
-          # rubocop:disable Style/IfUnlessModifier
           default = default_server(username)
           if default && (account.server.nil? || (account.server == ""))
             account.server = default
           end
-          # rubocop:enable Style/IfUnlessModifier
         end
       end
     end

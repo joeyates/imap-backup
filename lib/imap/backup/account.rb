@@ -8,7 +8,6 @@ module Imap::Backup
     attr_reader :folders
     attr_reader :server
     attr_reader :connection_options
-    attr_reader :multi_fetch_size
     attr_reader :changes
 
     def initialize(options)
