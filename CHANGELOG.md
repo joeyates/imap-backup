@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [6.0.0.rc2] - 2022-04-03
+
+## Changed
+
+* Substituted the use of the Environment variable DOWNLOAD_BLOCK_SIZE
+  with an account-level setting: `multi_fetch_size`.
+
 ## [6.0.0.rc1] - 2022-02-25
 
 ## Changed

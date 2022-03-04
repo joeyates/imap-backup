@@ -4,6 +4,6 @@ module Imap::Backup
   MAJOR    = 6
   MINOR    = 0
   REVISION = 0
-  PRE      = "rc1".freeze
+  PRE      = "rc2".freeze
   VERSION  = [MAJOR, MINOR, REVISION, PRE].compact.map(&:to_s).join(".")
 end
