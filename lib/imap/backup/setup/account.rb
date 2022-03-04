@@ -26,6 +26,7 @@ module Imap::Backup
         modify_password menu
         modify_backup_path menu
         choose_folders menu
+        modify_multi_fetch_size menu
         modify_server menu
         modify_connection_options menu
         test_connection menu
@@ -37,6 +38,11 @@ module Imap::Backup
 
     def header(menu)
       modified = account.modified? ? "*" : ""
+
+      multi_fetch_size =
+        if account.multi_fetch_size > 1
+          "\nmulti-fetch #{account.multi_fetch_size}"
+        end
 
       if account.connection_options
         escaped =
@@ -55,7 +61,7 @@ module Imap::Backup
         email   #{space}#{account.username}
         password#{space}#{masked_password}
         path    #{space}#{account.local_path}
-        folders #{space}#{folders.map { |f| f[:name] }.join(', ')}
+        folders #{space}#{folders.map { |f| f[:name] }.join(', ')}#{multi_fetch_size}
         server  #{space}#{account.server}#{connection_options}
 
         Choose an action
@@ -118,6 +124,14 @@ module Imap::Backup
     def choose_folders(menu)
       menu.choice("choose backup folders") do
         Setup::FolderChooser.new(account).run
+      end
+    end
+
+    def modify_multi_fetch_size(menu)
+      menu.choice("modify multi-fetch size (number of emails to fetch at a time)") do
+        size = highline.ask("size: ")
+        int = size.to_i
+        account.multi_fetch_size = int if int.positive?
       end
     end
 

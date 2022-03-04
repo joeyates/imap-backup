@@ -13,6 +13,7 @@ describe Imap::Backup::Setup::Account do
       password: existing_password,
       local_path: "/backup/path",
       folders: [{name: "my_folder"}],
+      multi_fetch_size: multi_fetch_size,
       server: current_server,
       connection_options: connection_options,
       modified?: false
@@ -103,6 +104,7 @@ describe Imap::Backup::Setup::Account do
         "modify password",
         "modify backup path",
         "choose backup folders",
+        "modify multi-fetch size (number of emails to fetch at a time)",
         "modify server",
         "test connection",
         "delete",
@@ -139,6 +141,14 @@ describe Imap::Backup::Setup::Account do
 
         it "indicates that a password is not set" do
           expect(menu.header).to match(/^password\s+\(unset\)/)
+        end
+      end
+
+      context "with multi_fetch_size" do
+        let(:multi_fetch_size) { 4 }
+
+        it "shows the size" do
+          expect(menu.header).to match(/^multi-fetch\s+4/)
         end
       end
 
@@ -301,6 +311,40 @@ describe Imap::Backup::Setup::Account do
 
       it "edits folders" do
         expect(chooser).to have_received(:run)
+      end
+    end
+
+    describe "choosing 'modify multi-fetch size'" do
+      let(:supplied) { "10" }
+
+      before do
+        allow(account).to receive(:multi_fetch_size=)
+        allow(highline).to receive(:ask).with("size: ") { supplied }
+
+        subject.run
+        menu.choices[
+          "modify multi-fetch size (number of emails to fetch at a time)"
+        ].call
+      end
+
+      it "sets the multi-fetch size" do
+        expect(account).to have_received(:multi_fetch_size=).with(10)
+      end
+
+      context "when the supplied value is not a number" do
+        let(:supplied) { "wrong!" }
+
+        it "does nothing" do
+          expect(account).to_not have_received(:multi_fetch_size=)
+        end
+      end
+
+      context "when the supplied value is not a positive number" do
+        let(:supplied) { "0" }
+
+        it "does nothing" do
+          expect(account).to_not have_received(:multi_fetch_size=)
+        end
       end
     end
 
