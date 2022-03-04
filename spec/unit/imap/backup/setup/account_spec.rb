@@ -106,6 +106,7 @@ describe Imap::Backup::Setup::Account do
         "choose backup folders",
         "modify multi-fetch size (number of emails to fetch at a time)",
         "modify server",
+        "modify connection options",
         "test connection",
         "delete",
         "(q) return to main menu",
