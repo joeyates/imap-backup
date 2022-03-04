@@ -111,7 +111,6 @@ module Imap::Backup
     def reset
       @backup_folders = nil
       @client = nil
-      @config = nil
       @folder_names = nil
       @provider = nil
       @server = nil
@@ -195,10 +194,6 @@ module Imap::Backup
 
     def provider_options
       provider.options.merge(account.connection_options || {})
-    end
-
-    def config
-      @config ||= Configuration.new
     end
   end
 end

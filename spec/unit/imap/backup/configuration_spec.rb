@@ -49,31 +49,6 @@ describe Imap::Backup::Configuration do
     end
   end
 
-  describe "#multi_fetch_size" do
-    context "when DOWNLOAD_BLOCK_SIZE is set" do
-      around do |example|
-        previous = ENV["DOWNLOAD_BLOCK_SIZE"]
-        ENV["DOWNLOAD_BLOCK_SIZE"] = "42"
-        example.run
-        if previous
-          ENV["DOWNLOAD_BLOCK_SIZE"] = previous
-        else
-          ENV.delete("DOWNLOAD_BLOCK_SIZE")
-        end
-      end
-
-      it "is that value" do
-        expect(subject.multi_fetch_size).to eq(42)
-      end
-    end
-
-    context "when DOWNLOAD_BLOCK_SIZE is not set" do
-      it "is 1" do
-        expect(subject.multi_fetch_size).to eq(1)
-      end
-    end
-  end
-
   describe "#modified?" do
     context "with modified accounts" do
       before { subject.accounts[0].username = "changed" }
