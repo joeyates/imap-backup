@@ -3,9 +3,15 @@ require "imap/backup/setup/helpers"
 module Imap::Backup
   class Setup; end
 
-  Setup::Account = Struct.new(:config, :account, :highline) do
+  class Setup::Account
+    attr_reader :account
+    attr_reader :config
+    attr_reader :highline
+
     def initialize(config, account, highline)
-      super
+      @account = account
+      @config = config
+      @highline = highline
     end
 
     def run
