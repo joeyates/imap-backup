@@ -108,9 +108,26 @@ module Imap::Backup
         end
       end
 
-      context "when the first fetch_uid attempts fail" do
+      context "when the first fetch_uid attempts fail with EOF" do
         before do
           outcomes = [-> { raise EOFError }, -> { [fetch_data_item] }]
+          allow(client).to receive(:uid_fetch) { outcomes.shift.call }
+        end
+
+        it "retries" do
+          subject.fetch_multi([123])
+
+          expect(client).to have_received(:uid_fetch).twice
+        end
+
+        it "succeeds" do
+          subject.fetch_multi([123])
+        end
+      end
+
+      context "when the first fetch_uid attempts fail with Errno::ECONNRESET" do
+        before do
+          outcomes = [-> { raise Errno::ECONNRESET }, -> { [fetch_data_item] }]
           allow(client).to receive(:uid_fetch) { outcomes.shift.call }
         end
 
