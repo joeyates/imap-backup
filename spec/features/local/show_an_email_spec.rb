@@ -26,7 +26,7 @@ RSpec.describe "Show an email", type: :aruba do
     expected = <<~BODY
       From: me@example.com
       Subject: Hello
-      
+
       How're things?
     BODY
     expect(last_command_started).to have_output(expected)

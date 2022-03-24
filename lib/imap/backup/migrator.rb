@@ -42,9 +42,9 @@ module Imap::Backup
       return if folder.uids.empty?
 
       raise <<~ERROR
-      The destination folder '#{folder.name}' is not empty.
-      Pass the --reset flag if you want to clear existing emails from destination
-      folders before uploading.
+        The destination folder '#{folder.name}' is not empty.
+        Pass the --reset flag if you want to clear existing emails from destination
+        folders before uploading.
       ERROR
     end
   end
