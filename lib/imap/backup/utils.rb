@@ -11,7 +11,7 @@ module Imap::Backup
 
       message = format(
         "Permissions on '%<filename>s' " \
-          "should be 0%<limit>o, not 0%<actual>o",
+        "should be 0%<limit>o, not 0%<actual>o",
         filename: filename, limit: limit, actual: actual
       )
       raise message

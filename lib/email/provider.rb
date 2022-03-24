@@ -7,6 +7,7 @@ module Email; end
 
 class Email::Provider
   def self.for_address(address)
+    # rubocop:disable Lint/DuplicateBranch
     case
     when address.end_with?("@fastmail.com")
       Email::Provider::Fastmail.new
@@ -23,5 +24,6 @@ class Email::Provider
     else
       Email::Provider::Unknown.new
     end
+    # rubocop:enable Lint/DuplicateBranch
   end
 end

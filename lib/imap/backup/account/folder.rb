@@ -113,7 +113,7 @@ module Imap::Backup
     end
 
     def extract_uid(response)
-      @uid_validity, uid = response.data.code.data.split(" ").map(&:to_i)
+      @uid_validity, uid = response.data.code.data.split.map(&:to_i)
       uid
     end
 

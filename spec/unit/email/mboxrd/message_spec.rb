@@ -125,7 +125,7 @@ describe Email::Mboxrd::Message do
     end
 
     context "when original message 'from' is nil and " \
-      "'envelope from' is nil and 'return path' is available" do
+            "'envelope from' is nil and 'return path' is available" do
       let(:message_body) { msg_no_from_but_return_path }
 
       it "'return path' is used as 'from'" do

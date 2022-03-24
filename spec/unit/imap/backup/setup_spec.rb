@@ -31,12 +31,12 @@ describe Imap::Backup::Setup do
   let(:store) do
     instance_double(
       Imap::Backup::Configuration,
-      "accounts": accounts,
-      "path": "/base/path",
-      "save": nil,
-      "debug?": debug,
+      accounts: accounts,
+      path: "/base/path",
+      save: nil,
+      debug?: debug,
       "debug=": nil,
-      "modified?": config_modified
+      modified?: config_modified
     )
   end
   let(:debug) { false }

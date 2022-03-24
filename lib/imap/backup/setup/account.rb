@@ -108,7 +108,7 @@ module Imap::Backup
       end
       if same
         Kernel.puts "The path '#{path}' is used to backup " \
-          "the account '#{same.username}'"
+                    "the account '#{same.username}'"
         false
       else
         true

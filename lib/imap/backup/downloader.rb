@@ -28,7 +28,7 @@ module Imap::Backup
           end
         end
 
-        offset = i * multi_fetch_size + 1
+        offset = (i * multi_fetch_size) + 1
         uids_and_bodies.each.with_index do |uid_and_body, j|
           uid = uid_and_body[:uid]
           body = uid_and_body[:body]
