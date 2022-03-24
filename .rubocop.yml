@@ -42,6 +42,12 @@ Lint/AmbiguousRange:
   Enabled: true
 Lint/BinaryOperatorWithIdenticalOperands:
   Enabled: true
+Lint/ConstantDefinitionInBlock: # TODO
+  Enabled: true
+  Exclude:
+    - "spec/unit/imap/backup/account/connection_spec.rb"
+    - "spec/unit/imap/backup/account/folder_spec.rb"
+    - "spec/unit/imap/backup/setup/account_spec.rb"
 Lint/DeprecatedConstants:
   Enabled: true
 Lint/DeprecatedOpenSSLConstant:
@@ -143,7 +149,11 @@ RSpec/MessageSpies:
 RSpec/MultipleExpectations:
   Exclude:
     - spec/features/**/*
+RSpec/MultipleMemoizedHelpers: # TODO
+  Enabled: false
 RSpec/NamedSubject:
+  Enabled: false
+RSpec/NestedGroups: # TODO
   Enabled: false
 RSpec/NotToNot:
   Enabled: false
