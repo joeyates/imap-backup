@@ -7,6 +7,7 @@ module Imap::Backup
     attr_reader :account_names
 
     def initialize(email = nil, options)
+      super([])
       @email = email
       @account_names = options[:accounts].split(",") if options.key?(:accounts)
     end
