@@ -45,7 +45,7 @@ module StoreHelpers
   end
 
   def to_serialized(from:, subject:, body:)
-    body_and_headers = <<~BODY
+    <<~BODY
       From: #{from}
       Subject: #{subject}
 

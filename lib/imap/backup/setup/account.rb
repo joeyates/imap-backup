@@ -117,7 +117,6 @@ module Imap::Backup
 
     def modify_backup_path(menu)
       menu.choice("modify backup path") do
-        existing = account.local_path.clone
         account.local_path = Setup::Asker.backup_path(
           account.local_path, ->(path) { path_modification_validator(path) }
         )
