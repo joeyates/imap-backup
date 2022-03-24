@@ -20,7 +20,8 @@ module Imap::Backup
         uids_and_bodies = folder.fetch_multi(block)
         if uids_and_bodies.nil?
           if multi_fetch_size > 1
-            debug("Multi fetch failed for UIDs #{block.join(", ")}, switching to single fetches")
+            uids = block.join(", ")
+            debug("Multi fetch failed for UIDs #{uids}, switching to single fetches")
             raise MultiFetchFailedError
           else
             debug("Fetch failed for UID #{block[0]} - skipping")
