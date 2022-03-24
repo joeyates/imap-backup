@@ -81,14 +81,12 @@ module Imap::Backup
 
     def data
       @data ||=
-        begin
-          if File.exist?(pathname)
-            Utils.check_permissions(pathname, 0o600) if !windows?
-            contents = File.read(pathname)
-            JSON.parse(contents, symbolize_names: true)
-          else
-            {accounts: []}
-          end
+        if File.exist?(pathname)
+          Utils.check_permissions(pathname, 0o600) if !windows?
+          contents = File.read(pathname)
+          JSON.parse(contents, symbolize_names: true)
+        else
+          {accounts: []}
         end
     end
 
