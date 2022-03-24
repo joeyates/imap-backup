@@ -87,6 +87,7 @@ module EmailServerHelpers
     imap.delete folder
     imap.disconnect
   rescue StandardError
+    # Ignore failures
   ensure
     @imap = nil
   end
