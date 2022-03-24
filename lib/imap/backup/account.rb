@@ -73,6 +73,7 @@ module Imap::Backup
 
     def folders=(value)
       raise "folders must be an Array" if !value.is_a?(Array)
+
       update(:folders, value)
     end
 

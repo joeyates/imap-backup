@@ -43,7 +43,7 @@ describe Imap::Backup::Setup::FolderChooser do
     end
 
     describe "folder listing" do
-      let(:account_folders) { [{name: "my_folder"}]}
+      let(:account_folders) { [{name: "my_folder"}] }
       let(:connection_folders) do
         # N.B. my_folder is already backed up
         %w(my_folder another_folder)

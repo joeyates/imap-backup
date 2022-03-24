@@ -19,6 +19,7 @@ module Imap::Backup
       loop do
         line, newline, rest = @current.partition("\n")
         break if newline != "\n"
+
         clean = sanitize(line)
         output.puts clean
         @current = rest

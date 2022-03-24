@@ -33,7 +33,7 @@ module Imap::Backup
       end
 
       context "when keys have hyphens" do
-        let(:arguments) { {"some-option"=> 3} }
+        let(:arguments) { {"some-option" => 3} }
 
         it "replaces them with underscores" do
           expect(result.keys).to eq([:some_option])
@@ -48,6 +48,7 @@ module Imap::Backup
 
       context "when no match is found" do
         let(:items) { [account2] }
+
         it "fails" do
           expect do
             subject.account(email)

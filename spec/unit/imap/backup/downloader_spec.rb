@@ -50,7 +50,7 @@ describe Imap::Backup::Downloader do
 
       context "when the first fetch fails" do
         before do
-          allow(folder).to receive(:fetch_multi).with(["111", "999"]) { nil }
+          allow(folder).to receive(:fetch_multi).with(%w[111 999]) { nil }
           allow(folder).to receive(:fetch_multi).with(["111"]).
             and_return([{uid: "111", body: body}]).
             and_return([{uid: "999", body: body}])
