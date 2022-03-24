@@ -16,6 +16,6 @@ RSpec.describe "Listing account folders", type: :aruba do
   end
 
   it "lists folders that have been backed up" do
-    expect(last_command_started).to have_output(%q("my_folder"))
+    expect(last_command_started).to have_output('"my_folder"')
   end
 end
