@@ -26,7 +26,10 @@ module Imap::Backup
           Kernel.puts "Deleting '#{local_folder.msf_path}' as --force option was supplied"
           File.unlink local_folder.msf_path
         else
-          Kernel.puts "Skipping export of '#{serializer.folder}' as '#{local_folder.msf_path}' exists"
+          Kernel.puts(
+            "Skipping export of '#{serializer.folder}' " \
+            "as '#{local_folder.msf_path}' exists"
+          )
           return false
         end
       end

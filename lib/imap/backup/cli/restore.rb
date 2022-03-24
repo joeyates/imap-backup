@@ -8,10 +8,7 @@ module Imap::Backup
 
     def initialize(email = nil, options)
       @email = email
-      @account_names =
-        if options.key?(:accounts)
-          options[:accounts].split(",")
-        end
+      @account_names = options[:accounts].split(",") if options.key?(:accounts)
     end
 
     no_commands do
@@ -26,7 +23,10 @@ module Imap::Backup
         when email && account_names.any?
           raise "Pass either an email or the --accounts option, not both"
         when account_names.any?
-          Logger.logger.info "Calling restore with the --account option is deprected, please pass a single EMAIL argument"
+          Logger.logger.info(
+            "Calling restore with the --account option is deprected, " \
+            "please pass a single EMAIL argument"
+          )
           each_connection(account_names) { |connection| connection.restore }
         end
       end

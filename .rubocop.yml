@@ -26,6 +26,9 @@ Layout/EmptyLinesAroundAttributeAccessor:
    Enabled: true
 Layout/LineEndStringConcatenationIndentation:
   Enabled: true
+Layout/LineLength:
+  Enabled: true
+  Max: 100
 Layout/SpaceAroundMethodCallOperator:
    Enabled: true
 Layout/SpaceBeforeBrackets:
