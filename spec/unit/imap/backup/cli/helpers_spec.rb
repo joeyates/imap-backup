@@ -57,9 +57,15 @@ module Imap::Backup
     end
 
     describe ".connection" do
+      it "returns a connection" do
+        result = subject.connection(email)
+
+        expect(result).to be_a(Account::Connection)
+      end
+
       it "returns the connection for any account with a matching username" do
         result = subject.connection(email)
-        expect(result).to be_a(Account::Connection)
+
         expect(result.account).to eq(account1)
       end
     end
