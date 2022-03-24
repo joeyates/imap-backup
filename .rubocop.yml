@@ -1,6 +1,7 @@
 inherit_from:
-  - https://raw.githubusercontent.com/leanpanda-com/rubocop/0.89.1/rubocop-rspec.yml
   - .rubocop_todo.yml
+
+require: rubocop-rspec
 
 AllCops:
   Exclude:
@@ -10,16 +11,138 @@ AllCops:
     Enabled: true
   TargetRubyVersion: 2.5
 
+Layout/ParameterAlignment:
+  EnforcedStyle: with_fixed_indentation
+Layout/DotPosition:
+  EnforcedStyle: trailing
+Layout/SpaceInsideHashLiteralBraces:
+  EnforcedStyle: no_space
+Layout/EmptyLinesAroundAttributeAccessor:
+   Enabled: true
+Layout/SpaceAroundMethodCallOperator:
+   Enabled: true
+
+Lint/BinaryOperatorWithIdenticalOperands:
+   Enabled: true
+Lint/DeprecatedOpenSSLConstant:
+   Enabled: true
+Lint/DuplicateElsifCondition:
+   Enabled: true
+Lint/DuplicateRescueException:
+   Enabled: true
+Lint/FloatComparison:
+   Enabled: true
+Lint/MissingSuper:
+   Enabled: true
+Lint/MixedRegexpCaptureTypes:
+   Enabled: true
+Lint/RaiseException:
+   Enabled: true
+Lint/SelfAssignment:
+   Enabled: true
+Lint/StructNewOverride:
+   Enabled: true
+Lint/UnreachableLoop:
+   Enabled: true
+Lint/EmptyConditionalBody:
+  Enabled: true
+Lint/OutOfRangeRegexpRef:
+  Enabled: true
+Lint/TopLevelReturnWithArgument:
+  Enabled: true
+
+Metrics/BlockLength:
+  ExcludedMethods:
+    - context
+    - describe
+    - feature
+    - shared_examples
+    - shared_examples_for
+
 RSpec/ContextWording:
   Exclude:
     - "spec/features/**/*"
+RSpec/DescribeClass:
+  Exclude:
+    - spec/*
+    - spec/features/**/*
+    - spec/requests/**/*
 RSpec/LeakyConstantDeclaration:
+  Enabled: false
+RSpec/LetSetup:
   Enabled: false
 RSpec/MessageSpies:
   Enabled: false
+RSpec/MultipleExpectations:
+  Exclude:
+    - spec/features/**/*
+RSpec/NamedSubject:
+  Enabled: false
+RSpec/NotToNot:
+  Enabled: false
 RSpec/ReturnFromStub:
+  Enabled: false
+
+Style/AccessorGrouping:
+  Enabled: true
+  EnforcedStyle: separated
+Style/ArrayCoercion:
+  Enabled: true
+Style/ClassAndModuleChildren:
+  Enabled: false
+Style/Documentation:
   Enabled: false
 Style/EmptyCaseCondition:
   Enabled: false
-Style/ClassAndModuleChildren:
+Style/EmptyMethod:
+  EnforcedStyle: expanded
+Style/FrozenStringLiteralComment:
   Enabled: false
+Style/Lambda:
+  EnforcedStyle: literal
+Style/NegatedIf:
+  Enabled: false
+Style/PercentLiteralDelimiters:
+  Enabled: false
+Style/StringLiterals:
+  EnforcedStyle: double_quotes
+Style/SymbolArray:
+  Enabled: false
+Style/CaseLikeIf:
+  Enabled: true
+Style/ExplicitBlockArgument:
+  Enabled: true
+Style/ExponentialNotation:
+  Enabled: true
+Style/HashAsLastArrayItem:
+  Enabled: true
+Style/HashEachMethods:
+  Enabled: true
+Style/HashLikeCase:
+  Enabled: true
+Style/HashTransformValues:
+  Enabled: true
+Style/OptionalBooleanParameter:
+  Enabled: true
+Style/RedundantAssignment:
+  Enabled: true
+Style/RedundantFileExtensionInRequire:
+  Enabled: true
+Style/RedundantRegexpCharacterClass:
+  Enabled: true
+Style/RedundantRegexpEscape:
+  Enabled: true
+Style/SlicingWithRange:
+  Enabled: true
+Style/StringConcatenation:
+  Enabled: true
+Style/BisectedAttrAccessor:
+  Enabled: true
+Style/GlobalStdStream:
+  Enabled: true
+Style/HashTransformKeys:
+  Enabled: true
+Style/RedundantFetchBlock:
+  Enabled: true
+Style/SingleArgumentDig:
+  Enabled: true
