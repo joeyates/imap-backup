@@ -8,18 +8,10 @@ RSpec.describe "folders", type: :feature, docker: true do
     {accounts: "address@example.org"}
   end
   let(:folder) { "my-stuff" }
-  let(:output) { StringIO.new }
 
   before do
     allow(Imap::Backup::CLI::Accounts).to receive(:new) { [account] }
     server_create_folder folder
-  end
-
-  around do |example|
-    stdout = $stdout
-    $stdout = output
-    example.run
-    $stdout = stdout
   end
 
   after do
@@ -29,8 +21,8 @@ RSpec.describe "folders", type: :feature, docker: true do
   end
 
   it "lists account folders" do
-    Imap::Backup::CLI::Folders.new(options).run
-
-    expect(output.string).to match(/^\tmy-stuff\n/)
+    expect do
+      Imap::Backup::CLI::Folders.new(options).run
+    end.to output(/^\tmy-stuff\n/).to_stdout
   end
 end

@@ -6,6 +6,7 @@ describe Imap::Backup::Utils do
 
   before do
     allow(File).to receive(:stat) { stat }
+    allow(File).to receive(:exist?).and_call_original
     allow(File).to receive(:exist?).with(filename) { exists }
   end
 

@@ -3,9 +3,15 @@ require "imap/backup/setup/helpers"
 module Imap::Backup
   class Setup; end
 
-  Setup::Account = Struct.new(:config, :account, :highline) do
+  class Setup::Account
+    attr_reader :account
+    attr_reader :config
+    attr_reader :highline
+
     def initialize(config, account, highline)
-      super
+      @account = account
+      @config = config
+      @highline = highline
     end
 
     def run
@@ -39,9 +45,7 @@ module Imap::Backup
     def header(menu)
       modified = account.modified? ? "*" : ""
 
-      if account.multi_fetch_size > 1
-        multi_fetch_size = "\nmulti-fetch #{account.multi_fetch_size}"
-      end
+      multi_fetch_size = "\nmulti-fetch #{account.multi_fetch_size}" if account.multi_fetch_size > 1
 
       if account.connection_options
         escaped =
@@ -72,7 +76,7 @@ module Imap::Backup
         username = Setup::Asker.email(username)
         Kernel.puts "username: #{username}"
         other_accounts = config.accounts.reject { |a| a == account }
-        others = other_accounts.map { |a| a.username }
+        others = other_accounts.map(&:username)
         Kernel.puts "others: #{others.inspect}"
         if others.include?(username)
           Kernel.puts(
@@ -81,9 +85,7 @@ module Imap::Backup
         else
           account.username = username
           default = default_server(username)
-          if default && (account.server.nil? || (account.server == ""))
-            account.server = default
-          end
+          account.server = default if default && (account.server.nil? || (account.server == ""))
         end
       end
     end
@@ -102,7 +104,7 @@ module Imap::Backup
       end
       if same
         Kernel.puts "The path '#{path}' is used to backup " \
-          "the account '#{same.username}'"
+                    "the account '#{same.username}'"
         false
       else
         true
@@ -111,7 +113,6 @@ module Imap::Backup
 
     def modify_backup_path(menu)
       menu.choice("modify backup path") do
-        existing = account.local_path.clone
         account.local_path = Setup::Asker.backup_path(
           account.local_path, ->(path) { path_modification_validator(path) }
         )

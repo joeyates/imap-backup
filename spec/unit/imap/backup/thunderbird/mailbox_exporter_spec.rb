@@ -32,7 +32,7 @@ module Imap::Backup
       allow(File).to receive(:unlink)
       allow(Thunderbird::LocalFolder).to receive(:new) { local_folder }
       allow(Serializer::MboxEnumerator).to receive(:new) { enumerator }
-      allow(enumerator).to receive(:each) { ["message"].enum_for(:each) }
+      allow(enumerator).to receive(:each).and_yield("message")
       allow(Email::Mboxrd::Message).to receive(:clean_serialized) { "cleaned" }
       allow(Kernel).to receive(:puts)
     end

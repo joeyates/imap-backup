@@ -34,4 +34,5 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency "rspec", ">= 3.0.0"
   gem.add_development_dependency "rubocop-rspec"
   gem.add_development_dependency "simplecov"
+  gem.add_development_dependency "yard"
 end

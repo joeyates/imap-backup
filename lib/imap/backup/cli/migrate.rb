@@ -38,13 +38,9 @@ module Imap::Backup
           raise "Source and destination accounts cannot be the same!"
         end
 
-        if !destination_account
-          raise "Account '#{destination_email}' does not exist"
-        end
+        raise "Account '#{destination_email}' does not exist" if !destination_account
 
-        if !source_account
-          raise "Account '#{source_email}' does not exist"
-        end
+        raise "Account '#{source_email}' does not exist" if !source_account
       end
 
       def config
@@ -69,16 +65,14 @@ module Imap::Backup
 
       def folder_for(source_folder)
         no_source_prefix =
-          if source_prefix != "" &&
-              source_folder.start_with?(source_prefix)
+          if source_prefix != "" && source_folder.start_with?(source_prefix)
             source_folder.delete_prefix(source_prefix)
           else
             source_folder.to_s
           end
 
         with_destination_prefix =
-          if destination_prefix &&
-              destination_prefix != ""
+          if destination_prefix && destination_prefix != ""
             destination_prefix + no_source_prefix
           else
             no_source_prefix

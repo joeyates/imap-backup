@@ -90,7 +90,7 @@ module Imap::Backup
 
     def toggle_selection(folder_name)
       if selected?(folder_name)
-        new_list = account.folders.select { |f| f[:name] != folder_name }
+        new_list = account.folders.reject { |f| f[:name] == folder_name }
         account.folders = new_list
       else
         existing = account.folders || []

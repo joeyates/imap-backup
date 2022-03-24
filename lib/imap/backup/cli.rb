@@ -61,8 +61,11 @@ module Imap::Backup
     desc "local SUBCOMMAND [OPTIONS]", "View local info"
     subcommand "local", Local
 
-    desc "migrate SOURCE_EMAIL DESTINATION_EMAIL [OPTIONS]",
-      "[Experimental] Uploads backed-up emails from account SOURCE_EMAIL to account DESTINATION_EMAIL"
+    desc(
+      "migrate SOURCE_EMAIL DESTINATION_EMAIL [OPTIONS]",
+      "[Experimental] " \
+      "Uploads backed-up emails from account SOURCE_EMAIL to account DESTINATION_EMAIL"
+    )
     long_desc <<~DESC
       All emails which have been backed up for the "source account" (SOURCE_EMAIL) are
       uploaded to the "destination account" (DESTINATION_EMAIL).

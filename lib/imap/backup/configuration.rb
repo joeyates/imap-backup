@@ -6,7 +6,7 @@ require "imap/backup/account"
 module Imap::Backup
   class Configuration
     CONFIGURATION_DIRECTORY = File.expand_path("~/.imap-backup")
-    VERSION = "2.0"
+    VERSION = "2.0".freeze
 
     attr_reader :pathname
 
@@ -81,23 +81,21 @@ module Imap::Backup
 
     def data
       @data ||=
-        begin
-          if File.exist?(pathname)
-            Utils.check_permissions(pathname, 0o600) if !windows?
-            contents = File.read(pathname)
-            JSON.parse(contents, symbolize_names: true)
-          else
-            {accounts: []}
-          end
+        if File.exist?(pathname)
+          Utils.check_permissions(pathname, 0o600) if !windows?
+          contents = File.read(pathname)
+          JSON.parse(contents, symbolize_names: true)
+        else
+          {accounts: []}
         end
     end
 
     def remove_modified_flags
-      accounts.each { |a| a.clear_changes }
+      accounts.each(&:clear_changes)
     end
 
     def remove_deleted_accounts
-      accounts.reject! { |a| a.marked_for_deletion? }
+      accounts.reject!(&:marked_for_deletion?)
     end
 
     def make_private(path)

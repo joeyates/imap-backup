@@ -161,7 +161,7 @@ describe Imap::Backup::Configuration do
       allow(subject.accounts[1]).to receive(:to_h) { "Account2" }
 
       expect(JSON).to receive(:pretty_generate).
-        with(hash_including({accounts: ["Account1", "Account2"]}))
+        with(hash_including({accounts: %w[Account1 Account2]}))
 
       subject.save
     end

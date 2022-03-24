@@ -47,11 +47,9 @@ module Imap::Backup
       profile = thunderbird_profile(profile_name)
 
       if !profile
-        if profile_name
-          raise "Thunderbird profile '#{profile_name}' not found"
-        else
-          raise "Default Thunderbird profile not found"
-        end
+        raise "Thunderbird profile '#{profile_name}' not found" if profile_name
+
+        raise "Default Thunderbird profile not found"
       end
 
       connection.local_folders.each do |serializer, _folder|

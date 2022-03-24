@@ -6,19 +6,19 @@ module Imap::Backup
         find: ->(&block) { [account].find { |a| block.call(a) } }
       )
     end
-    let(:account) { instance_double(Account, username: email) }
+    let(:account) do
+      instance_double(
+        Account,
+        username: email,
+        local_path: "path"
+      )
+    end
     let(:connection) do
       instance_double(
         Account::Connection,
         account: account,
         backup_folders: [folder],
         local_folders: ["folder"]
-      )
-    end
-    let(:account) do
-      instance_double(
-        Account,
-        local_path: "path"
       )
     end
     let(:folder) do
@@ -50,7 +50,9 @@ module Imap::Backup
     describe "#export_to_thunderbird" do
       let(:command) { subject.export_to_thunderbird(email) }
       let(:options) { {} }
-      let(:profiles) { instance_double(Thunderbird::Profiles, installs: installs, profile: named_profile) }
+      let(:profiles) do
+        instance_double(Thunderbird::Profiles, installs: installs, profile: named_profile)
+      end
       let(:installs) { [install1] }
       let(:install1) { instance_double(Thunderbird::Install, default: default_install) }
       let(:default_install) { "default" }

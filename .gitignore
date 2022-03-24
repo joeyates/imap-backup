@@ -6,3 +6,4 @@ pkg
 .rbenv-version
 vendor
 /tmp
+/.yardoc/

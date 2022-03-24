@@ -9,7 +9,7 @@ module Imap::Backup
         "default=": nil,
         "readline=": nil,
         "validate=": nil,
-        "responses": {},
+        responses: {},
         "echo=": nil
       )
     end

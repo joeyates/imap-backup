@@ -1,3 +1,4 @@
+# rubocop:disable RSpec/FilePath
 describe Email::Provider::GMail do
   describe "#host" do
     it "returns host" do
@@ -5,3 +6,4 @@ describe Email::Provider::GMail do
     end
   end
 end
+# rubocop:enable RSpec/FilePath
