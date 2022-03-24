@@ -47,10 +47,7 @@ module Imap::Backup
     end
 
     def to_h
-      h = {
-        username: @username,
-        password: @password,
-      }
+      h = {username: @username, password: @password}
       h[:local_path] = @local_path if @local_path
       h[:folders] = @folders if @folders
       h[:server] = @server if @server
