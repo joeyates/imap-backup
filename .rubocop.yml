@@ -12,8 +12,8 @@ AllCops:
 
 Gemspec/DateAssignment:
   Enabled: true
-Gemspec/RequireMFA: # TODO
-  Enabled: false
+Gemspec/RequireMFA:
+  Enabled: true
 
 Layout/ParameterAlignment:
   EnforcedStyle: with_fixed_indentation
