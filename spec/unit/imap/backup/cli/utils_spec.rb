@@ -6,19 +6,19 @@ module Imap::Backup
         find: ->(&block) { [account].find { |a| block.call(a) } }
       )
     end
-    let(:account) { instance_double(Account, username: email) }
+    let(:account) do
+      instance_double(
+        Account,
+        username: email,
+        local_path: "path"
+      )
+    end
     let(:connection) do
       instance_double(
         Account::Connection,
         account: account,
         backup_folders: [folder],
         local_folders: ["folder"]
-      )
-    end
-    let(:account) do
-      instance_double(
-        Account,
-        local_path: "path"
       )
     end
     let(:folder) do
