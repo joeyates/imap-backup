@@ -6,6 +6,8 @@ class Email::Provider::Unknown < Email::Provider::Base
   end
 
   def options
+    # rubocop:disable Naming/VariableNumber
     {port: 993, ssl: {ssl_version: :TLSv1_2}}
+    # rubocop:enable Naming/VariableNumber
   end
 end

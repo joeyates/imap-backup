@@ -193,7 +193,9 @@ describe Imap::Backup::Setup do
       end
 
       it "doesn't flag the unedited account as modified" do
+        # rubocop:disable RSpec/PredicateMatcher
         expect(accounts[1].modified?).to be_falsey
+        # rubocop:enable RSpec/PredicateMatcher
       end
     end
 

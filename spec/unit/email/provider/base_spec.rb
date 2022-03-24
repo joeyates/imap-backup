@@ -5,7 +5,9 @@ describe Email::Provider::Base do
     end
 
     it "forces TLSv1_2" do
+      # rubocop:disable Naming/VariableNumber
       expect(subject.options[:ssl][:ssl_version]).to eq(:TLSv1_2)
+      # rubocop:enable Naming/VariableNumber
     end
   end
 end
