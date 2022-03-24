@@ -76,7 +76,7 @@ module Imap::Backup
         username = Setup::Asker.email(username)
         Kernel.puts "username: #{username}"
         other_accounts = config.accounts.reject { |a| a == account }
-        others = other_accounts.map { |a| a.username }
+        others = other_accounts.map(&:username)
         Kernel.puts "others: #{others.inspect}"
         if others.include?(username)
           Kernel.puts(

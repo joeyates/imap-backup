@@ -93,11 +93,11 @@ module Imap::Backup
     end
 
     def remove_modified_flags
-      accounts.each { |a| a.clear_changes }
+      accounts.each(&:clear_changes)
     end
 
     def remove_deleted_accounts
-      accounts.reject! { |a| a.marked_for_deletion? }
+      accounts.reject!(&:marked_for_deletion?)
     end
 
     def make_private(path)

@@ -12,9 +12,7 @@ module Imap::Backup
 
     no_commands do
       def run
-        each_connection(account_names) do |connection|
-          connection.run_backup
-        end
+        each_connection(account_names, &:run_backup)
       end
     end
   end

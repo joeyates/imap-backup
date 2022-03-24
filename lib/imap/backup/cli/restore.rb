@@ -19,7 +19,7 @@ module Imap::Backup
           connection.restore
         when !email && !account_names
           Logger.logger.info "Calling restore without an EMAIL parameter is deprecated"
-          each_connection([]) { |connection| connection.restore }
+          each_connection([], &:restore)
         when email && account_names.any?
           raise "Pass either an email or the --accounts option, not both"
         when account_names.any?
@@ -27,7 +27,7 @@ module Imap::Backup
             "Calling restore with the --account option is deprected, " \
             "please pass a single EMAIL argument"
           )
-          each_connection(account_names) { |connection| connection.restore }
+          each_connection(account_names, &:restore)
         end
       end
     end
