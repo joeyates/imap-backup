@@ -6,7 +6,7 @@ require "imap/backup/account"
 module Imap::Backup
   class Configuration
     CONFIGURATION_DIRECTORY = File.expand_path("~/.imap-backup")
-    VERSION = "2.0"
+    VERSION = "2.0".freeze
 
     attr_reader :pathname
 
