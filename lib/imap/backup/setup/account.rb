@@ -74,10 +74,8 @@ module Imap::Backup
     def modify_email(menu)
       menu.choice("modify email") do
         username = Setup::Asker.email(username)
-        Kernel.puts "username: #{username}"
         other_accounts = config.accounts.reject { |a| a == account }
         others = other_accounts.map(&:username)
-        Kernel.puts "others: #{others.inspect}"
         if others.include?(username)
           Kernel.puts(
             "There is already an account set up with that email address"
