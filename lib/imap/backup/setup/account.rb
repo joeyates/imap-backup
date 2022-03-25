@@ -1,3 +1,4 @@
+require "imap/backup/setup/backup_path"
 require "imap/backup/setup/email"
 require "imap/backup/setup/helpers"
 
@@ -86,24 +87,9 @@ module Imap::Backup
       end
     end
 
-    def path_modification_validator(path)
-      same = config.accounts.find do |a|
-        a.username != account.username && a.local_path == path
-      end
-      if same
-        Kernel.puts "The path '#{path}' is used to backup " \
-                    "the account '#{same.username}'"
-        false
-      else
-        true
-      end
-    end
-
     def modify_backup_path(menu)
       menu.choice("modify backup path") do
-        account.local_path = Setup::Asker.backup_path(
-          account.local_path, ->(path) { path_modification_validator(path) }
-        )
+        Setup::BackupPath.new(account: account, config: config).run
       end
     end
 

@@ -15,18 +15,11 @@ module Imap::Backup
         modified?: false
       )
     end
-    let(:account1) do
-      instance_double(
-        Account,
-        username: other_email,
-        local_path: other_existing_path
-      )
-    end
+    let(:account1) { instance_double(Account) }
     let(:accounts) { [account, account1] }
     let(:existing_email) { "user@example.com" }
     let(:existing_password) { "password" }
     let(:other_email) { "other@example.com" }
-    let(:other_existing_path) { "/other/existing/path" }
     let(:multi_fetch_size) { 1 }
     let(:connection_options) { nil }
     let(:highline) { instance_double(HighLine) }
@@ -192,39 +185,16 @@ module Imap::Backup
       end
 
       describe "choosing 'modify backup path'" do
-        let(:new_backup_path) { "/new/path" }
+        let(:backup_path) { instance_double(Setup::BackupPath, run: nil) }
 
         before do
-          allow(account).to receive(:"local_path=")
-          @validator = nil
-          allow(
-            Setup::Asker
-          ).to receive(:backup_path) do |_path, validator|
-            @validator = validator
-            new_backup_path
-          end
+          allow(Setup::BackupPath).to receive(:new) { backup_path }
           subject.run
           menu.choices["modify backup path"].call
         end
 
-        it "updates the path" do
-          expect(account).to have_received(:"local_path=").with(new_backup_path)
-        end
-
-        context "when the path is not used by other backups" do
-          it "is accepts it" do
-            # rubocop:disable RSpec/InstanceVariable
-            expect(@validator.call("/unknown/path")).to be_truthy
-            # rubocop:enable RSpec/InstanceVariable
-          end
-        end
-
-        context "when the path is used by other backups" do
-          it "fails validation" do
-            # rubocop:disable RSpec/InstanceVariable
-            expect(@validator.call(other_existing_path)).to be_falsey
-            # rubocop:enable RSpec/InstanceVariable
-          end
+        it "runs Setup::BackupPath" do
+          expect(backup_path).to have_received(:run)
         end
       end
 
