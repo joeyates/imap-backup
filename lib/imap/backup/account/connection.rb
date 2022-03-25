@@ -1,6 +1,7 @@
 require "email/provider"
 require "imap/backup/client/apple_mail"
 require "imap/backup/client/default"
+require "imap/backup/account/connection/backup_folders"
 require "imap/backup/account/connection/folder_names"
 require "imap/backup/serializer/directory"
 
@@ -27,18 +28,7 @@ module Imap::Backup
 
     def backup_folders
       @backup_folders ||=
-        begin
-          names =
-            if account.folders&.any?
-              account.folders.map { |af| af[:name] }
-            else
-              folder_names
-            end
-
-          names.map do |name|
-            Account::Folder.new(self, name)
-          end
-        end
+        Account::Connection::BackupFolders.new(client: client, account: account).run
     end
 
     def status

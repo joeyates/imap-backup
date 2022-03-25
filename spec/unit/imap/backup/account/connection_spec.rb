@@ -3,7 +3,6 @@ require "ostruct"
 module Imap::Backup
   describe Account::Connection do
     BACKUP_FOLDER = "backup_folder".freeze
-    FOLDER_CONFIG = {name: BACKUP_FOLDER}.freeze
     FOLDER_NAME = "my_folder".freeze
     LOCAL_PATH = "local_path".freeze
     LOCAL_UID = "local_uid".freeze
@@ -19,21 +18,19 @@ module Imap::Backup
         Client::Default, authenticate: nil, login: nil, disconnect: nil
       )
     end
-    let(:imap_folders) { [] }
+    let(:imap_folders) { ["backup_folder"] }
     let(:account) do
       instance_double(
         Account,
         username: username,
         password: PASSWORD,
         local_path: LOCAL_PATH,
-        folders: config_folders,
         multi_fetch_size: multi_fetch_size,
         server: server,
         connection_options: nil
       )
     end
     let(:username) { USERNAME }
-    let(:config_folders) { [FOLDER_CONFIG] }
     let(:multi_fetch_size) { 1 }
     let(:root_info) do
       instance_double(Net::IMAP::MailboxList, name: ROOT_NAME)
@@ -51,10 +48,12 @@ module Imap::Backup
     let(:server) { SERVER }
     let(:new_uid_validity) { nil }
     let(:imap_folder) { "imap_folder" }
+    let(:backup_folders) { instance_double(Account::Connection::BackupFolders, run: [folder]) }
+    let(:folder) { instance_double(Account::Folder, name: imap_folder) }
 
     before do
       allow(Client::Default).to receive(:new) { client }
-      allow(client).to receive(:list) { imap_folders }
+      allow(Account::Connection::BackupFolders).to receive(:new) { backup_folders }
       allow(Utils).to receive(:make_folder)
     end
 
@@ -126,6 +125,18 @@ module Imap::Backup
       end
     end
 
+    describe "#backup_folders" do
+      let(:backup_folders) { instance_double(Account::Connection::BackupFolders, run: "result") }
+
+      before do
+        allow(Account::Connection::BackupFolders).to receive(:new) { backup_folders }
+      end
+
+      it "returns the list of folders" do
+        expect(subject.backup_folders).to eq("result")
+      end
+    end
+
     describe "#status" do
       let(:folder) do
         instance_double(
@@ -176,9 +187,7 @@ module Imap::Backup
 
       before do
         allow(Downloader).
-          to receive(:new).with(folder, serializer, anything) { downloader }
-        allow(Account::Folder).to receive(:new).
-          with(subject, BACKUP_FOLDER) { folder }
+          to receive(:new).with(anything, serializer, anything) { downloader }
         allow(Serializer).to receive(:new).
           with(LOCAL_PATH, imap_folder) { serializer }
       end
@@ -212,8 +221,6 @@ module Imap::Backup
         let(:imap_folders) { [ROOT_NAME] }
 
         before do
-          allow(Account::Folder).to receive(:new).
-            with(subject, ROOT_NAME) { folder }
           allow(Serializer).to receive(:new).
             with(LOCAL_PATH, ROOT_NAME) { serializer }
         end
@@ -235,17 +242,6 @@ module Imap::Backup
             expect(downloader).to receive(:run).exactly(:once)
 
             subject.run_backup
-          end
-        end
-
-        context "when the imap server doesn't return folders" do
-          let(:config_folders) { nil }
-          let(:imap_folders) { [] }
-
-          it "fails" do
-            expect do
-              subject.run_backup
-            end.to raise_error(RuntimeError, /Unable to get folder list/)
           end
         end
       end
