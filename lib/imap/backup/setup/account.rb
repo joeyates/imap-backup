@@ -1,4 +1,4 @@
-require "email/provider"
+require "imap/backup/setup/email"
 require "imap/backup/setup/helpers"
 
 module Imap::Backup
@@ -74,20 +74,7 @@ module Imap::Backup
 
     def modify_email(menu)
       menu.choice("modify email") do
-        username = Setup::Asker.email(account.username)
-        other_accounts = config.accounts.reject { |a| a == account }
-        others = other_accounts.map(&:username)
-        if others.include?(username)
-          Kernel.puts(
-            "There is already an account set up with that email address"
-          )
-        else
-          account.username = username
-          if account.server.nil? || (account.server == "")
-            default = default_server(username)
-            account.server = default if default
-          end
-        end
+        Setup::Email.new(account: account, config: config).run
       end
     end
 
@@ -182,17 +169,6 @@ module Imap::Backup
       else
         account.password.gsub(/./, "x")
       end
-    end
-
-    def default_server(username)
-      provider = Email::Provider.for_address(username)
-
-      if provider.is_a?(Email::Provider::Unknown)
-        Kernel.puts "Can't decide provider for email address '#{username}'"
-        return nil
-      end
-
-      provider.host
     end
 
     def helpers
