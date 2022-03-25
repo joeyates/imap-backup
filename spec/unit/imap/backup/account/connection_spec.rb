@@ -5,7 +5,6 @@ module Imap::Backup
     BACKUP_FOLDER = "backup_folder".freeze
     FOLDER_CONFIG = {name: BACKUP_FOLDER}.freeze
     FOLDER_NAME = "my_folder".freeze
-    GMAIL_IMAP_SERVER = "imap.gmail.com".freeze
     IMAP_FOLDER = "imap_folder".freeze
     LOCAL_PATH = "local_path".freeze
     LOCAL_UID = "local_uid".freeze
