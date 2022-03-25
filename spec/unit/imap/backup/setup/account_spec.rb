@@ -2,24 +2,10 @@ module Imap::Backup
   describe Setup::Account do
     subject { described_class.new(config, account, highline) }
 
-    let(:account) do
-      instance_double(
-        Account,
-        username: existing_email,
-        password: existing_password,
-        local_path: "/backup/path",
-        folders: [{name: "my_folder"}],
-        multi_fetch_size: multi_fetch_size,
-        server: "imap.example.com",
-        connection_options: connection_options,
-        modified?: false
-      )
-    end
+    let(:account) { instance_double(Account, password: existing_password) }
     let(:account1) { instance_double(Account) }
     let(:accounts) { [account, account1] }
-    let(:existing_email) { "user@example.com" }
     let(:existing_password) { "password" }
-    let(:other_email) { "other@example.com" }
     let(:multi_fetch_size) { 1 }
     let(:connection_options) { nil }
     let(:highline) { instance_double(HighLine) }
@@ -37,7 +23,6 @@ module Imap::Backup
       let(:highline_menu_class) do
         Class.new do
           attr_reader :choices
-          attr_accessor :header
 
           def initialize
             @choices = {}
@@ -54,9 +39,11 @@ module Imap::Backup
       end
 
       let(:menu) { highline_menu_class.new }
+      let(:header) { instance_double(Setup::Account::Header, run: nil) }
 
       before do
         allow(Kernel).to receive(:system)
+        allow(Setup::Account::Header).to receive(:new) { header }
         allow(highline).to receive(:choose) do |&block|
           block.call(menu)
           throw :done
@@ -66,6 +53,12 @@ module Imap::Backup
       describe "preparation" do
         it "clears the screen" do
           expect(Kernel).to receive(:system).with("clear")
+
+          subject.run
+        end
+
+        it "shows the header" do
+          expect(header).to receive(:run)
 
           subject.run
         end
@@ -97,48 +90,6 @@ module Imap::Backup
 
           it "has a '#{item}' item" do
             expect(menu.choices).to include(item)
-          end
-        end
-      end
-
-      describe "account details" do
-        [
-          ["email", /email\s+user@example.com/],
-          ["password", /password\s+x+/],
-          ["path", %r(path\s+/backup/path)],
-          ["folders", /folders\s+my_folder/],
-          ["server", /server\s+imap.example.com/]
-        ].each do |attribute, value|
-          before { subject.run }
-
-          it "shows the #{attribute}" do
-            expect(menu.header).to match(value)
-          end
-        end
-
-        context "with no password" do
-          let(:existing_password) { "" }
-
-          before { subject.run }
-
-          it "indicates that a password is not set" do
-            expect(menu.header).to match(/^password\s+\(unset\)/)
-          end
-        end
-
-        context "with multi_fetch_size" do
-          let(:multi_fetch_size) { 4 }
-
-          it "shows the size" do
-            expect(menu.header).to match(/^multi-fetch\s+4/)
-          end
-        end
-
-        context "with connection_options" do
-          let(:connection_options) { {some: "option"} }
-
-          it "shows the options" do
-            expect(menu.header).to match(/^connection options\s+'{"some":"option"}'/)
           end
         end
       end

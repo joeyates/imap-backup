@@ -1,6 +1,6 @@
+require "imap/backup/setup/account/header"
 require "imap/backup/setup/backup_path"
 require "imap/backup/setup/email"
-require "imap/backup/setup/helpers"
 
 module Imap::Backup
   class Setup; end
@@ -45,32 +45,7 @@ module Imap::Backup
     end
 
     def header(menu)
-      modified = account.modified? ? "*" : ""
-
-      multi_fetch_size = "\nmulti-fetch #{account.multi_fetch_size}" if account.multi_fetch_size > 1
-
-      if account.connection_options
-        escaped =
-          JSON.generate(account.connection_options)
-        connection_options =
-          "\nconnection options  '#{escaped}'"
-        space = " " * 12
-      else
-        connection_options = nil
-        space = " " * 4
-      end
-
-      menu.header = <<~HEADER.chomp
-        #{helpers.title_prefix} Account#{modified}
-
-        email   #{space}#{account.username}
-        password#{space}#{masked_password}
-        path    #{space}#{account.local_path}
-        folders #{space}#{folders.map { |f| f[:name] }.join(', ')}#{multi_fetch_size}
-        server  #{space}#{account.server}#{connection_options}
-
-        Choose an action
-      HEADER
+      Setup::Account::Header.new(menu: menu, account: account).run
     end
 
     def modify_email(menu)
@@ -143,22 +118,6 @@ module Imap::Backup
           throw :done
         end
       end
-    end
-
-    def folders
-      account.folders || []
-    end
-
-    def masked_password
-      if (account.password == "") || account.password.nil?
-        "(unset)"
-      else
-        account.password.gsub(/./, "x")
-      end
-    end
-
-    def helpers
-      Setup::Helpers.new
     end
   end
 end
