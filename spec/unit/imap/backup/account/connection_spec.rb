@@ -6,13 +6,11 @@ module Imap::Backup
     FOLDER_NAME = "my_folder".freeze
     LOCAL_PATH = "local_path".freeze
     LOCAL_UID = "local_uid".freeze
-    PASSWORD = "secret".freeze
     ROOT_NAME = "foo".freeze
-    SERVER = "imap.example.com".freeze
-    USERNAME = "username@example.com".freeze
 
     subject { described_class.new(account) }
 
+    let(:client_factory) { instance_double(Account::Connection::ClientFactory, run: client) }
     let(:client) do
       instance_double(
         Client::Default, authenticate: nil, login: nil, disconnect: nil
@@ -22,15 +20,11 @@ module Imap::Backup
     let(:account) do
       instance_double(
         Account,
-        username: username,
-        password: PASSWORD,
+        username: "username",
         local_path: LOCAL_PATH,
-        multi_fetch_size: multi_fetch_size,
-        server: server,
-        connection_options: nil
+        multi_fetch_size: multi_fetch_size
       )
     end
-    let(:username) { USERNAME }
     let(:multi_fetch_size) { 1 }
     let(:root_info) do
       instance_double(Net::IMAP::MailboxList, name: ROOT_NAME)
@@ -52,64 +46,14 @@ module Imap::Backup
     let(:folder) { instance_double(Account::Folder, name: imap_folder) }
 
     before do
-      allow(Client::Default).to receive(:new) { client }
+      allow(Account::Connection::ClientFactory).to receive(:new) { client_factory }
       allow(Account::Connection::BackupFolders).to receive(:new) { backup_folders }
       allow(Utils).to receive(:make_folder)
     end
 
-    shared_examples "connects to IMAP" do
-      it "logs in to the imap server" do
-        expect(client).to have_received(:login)
-      end
-    end
-
     describe "#client" do
-      let(:result) { subject.client }
-
-      it "returns the IMAP connection" do
-        expect(result).to eq(client)
-      end
-
-      it "uses the password" do
-        result
-
-        expect(client).to have_received(:login).with(USERNAME, PASSWORD)
-      end
-
-      context "when the first login attempt fails" do
-        before do
-          outcomes = [-> { raise EOFError }, -> { true }]
-          allow(client).to receive(:login) { outcomes.shift.call }
-        end
-
-        it "retries" do
-          subject.client
-
-          expect(client).to have_received(:login).twice
-        end
-      end
-
-      context "when the provider is Apple" do
-        let(:username) { "user@mac.com" }
-        let(:apple_client) do
-          instance_double(
-            Client::AppleMail, login: nil
-          )
-        end
-
-        before do
-          allow(Client::AppleMail).to receive(:new) { apple_client }
-        end
-
-        it "returns the Apple client" do
-          expect(result).to eq(apple_client)
-        end
-      end
-
-      context "when run" do
-        before { subject.client }
-
-        include_examples "connects to IMAP"
+      it "calls ClientFactory" do
+        expect(subject.client).to eq(client)
       end
     end
 
@@ -263,12 +207,6 @@ module Imap::Backup
           subject.run_backup
         end
       end
-
-      context "when run" do
-        before { subject.run_backup }
-
-        include_examples "connects to IMAP"
-      end
     end
 
     describe "#restore" do
@@ -402,7 +340,7 @@ module Imap::Backup
       end
 
       it "causes reconnection on future access" do
-        expect(Client::Default).to receive(:new)
+        expect(client_factory).to receive(:run)
 
         subject.reconnect
         subject.client

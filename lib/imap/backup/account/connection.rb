@@ -2,19 +2,14 @@ require "email/provider"
 require "imap/backup/client/apple_mail"
 require "imap/backup/client/default"
 require "imap/backup/account/connection/backup_folders"
+require "imap/backup/account/connection/client_factory"
 require "imap/backup/account/connection/folder_names"
 require "imap/backup/serializer/directory"
-
-require "retry_on_error"
 
 module Imap::Backup
   class Account; end
 
   class Account::Connection
-    include RetryOnError
-
-    LOGIN_RETRY_CLASSES = [EOFError, Errno::ECONNRESET, SocketError].freeze
-
     attr_reader :account
 
     def initialize(account)
@@ -93,32 +88,11 @@ module Imap::Backup
       @backup_folders = nil
       @client = nil
       @folder_names = nil
-      @provider = nil
-      @server = nil
     end
 
+    # TODO: make this private
     def client
-      @client ||=
-        retry_on_error(errors: LOGIN_RETRY_CLASSES) do
-          options = provider_options
-          Logger.logger.debug(
-            "Creating IMAP instance: #{server}, options: #{options.inspect}"
-          )
-          client =
-            if provider.is_a?(Email::Provider::AppleMail)
-              Client::AppleMail.new(server, options)
-            else
-              Client::Default.new(server, options)
-            end
-          Logger.logger.debug "Logging in: #{account.username}/#{masked_password}"
-          client.login(account.username, account.password)
-          Logger.logger.debug "Login complete"
-          client
-        end
-    end
-
-    def server
-      @server ||= account.server || provider.host
+      @client ||= Account::Connection::ClientFactory.new(account: account).run
     end
 
     private
@@ -163,18 +137,6 @@ module Imap::Backup
         File.basename(account.local_path),
         Serializer::Directory::DIRECTORY_PERMISSIONS
       )
-    end
-
-    def masked_password
-      account.password.gsub(/./, "x")
-    end
-
-    def provider
-      @provider ||= Email::Provider.for_address(account.username)
-    end
-
-    def provider_options
-      provider.options.merge(account.connection_options || {})
     end
   end
 end
