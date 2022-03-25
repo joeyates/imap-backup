@@ -5,7 +5,6 @@ module Imap::Backup
     BACKUP_FOLDER = "backup_folder".freeze
     FOLDER_CONFIG = {name: BACKUP_FOLDER}.freeze
     FOLDER_NAME = "my_folder".freeze
-    IMAP_FOLDER = "imap_folder".freeze
     LOCAL_PATH = "local_path".freeze
     LOCAL_UID = "local_uid".freeze
     PASSWORD = "secret".freeze
@@ -51,6 +50,7 @@ module Imap::Backup
     let(:serialized_folder) { nil }
     let(:server) { SERVER }
     let(:new_uid_validity) { nil }
+    let(:imap_folder) { "imap_folder" }
 
     before do
       allow(Client::Default).to receive(:new) { client }
@@ -115,12 +115,14 @@ module Imap::Backup
     end
 
     describe "#folder_names" do
-      let(:imap_folders) do
-        [IMAP_FOLDER]
+      let(:folder_names) { instance_double(Account::Connection::FolderNames, run: "result") }
+
+      before do
+        allow(Account::Connection::FolderNames).to receive(:new) { folder_names }
       end
 
       it "returns the list of folders" do
-        expect(subject.folder_names).to eq([IMAP_FOLDER])
+        expect(subject.folder_names).to eq("result")
       end
     end
 
@@ -129,7 +131,7 @@ module Imap::Backup
         instance_double(
           Account::Folder,
           uids: [remote_uid],
-          name: IMAP_FOLDER
+          name: imap_folder
         )
       end
       let(:remote_uid) { "remote_uid" }
@@ -146,7 +148,7 @@ module Imap::Backup
       end
 
       it "returns the names of folders" do
-        expect(subject.status[0][:name]).to eq(IMAP_FOLDER)
+        expect(subject.status[0][:name]).to eq(imap_folder)
       end
 
       it "returns local message uids" do
@@ -162,7 +164,7 @@ module Imap::Backup
       let(:folder) do
         instance_double(
           Account::Folder,
-          name: IMAP_FOLDER,
+          name: imap_folder,
           exist?: exists,
           uid_validity: uid_validity
         )
@@ -178,7 +180,7 @@ module Imap::Backup
         allow(Account::Folder).to receive(:new).
           with(subject, BACKUP_FOLDER) { folder }
         allow(Serializer).to receive(:new).
-          with(LOCAL_PATH, IMAP_FOLDER) { serializer }
+          with(LOCAL_PATH, imap_folder) { serializer }
       end
 
       it "passes the multi_fetch_size" do
@@ -279,7 +281,7 @@ module Imap::Backup
           Account::Folder,
           create: nil,
           uids: uids,
-          name: IMAP_FOLDER,
+          name: imap_folder,
           uid_validity: uid_validity
         )
       end

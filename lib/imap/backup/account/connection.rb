@@ -1,6 +1,7 @@
 require "email/provider"
 require "imap/backup/client/apple_mail"
 require "imap/backup/client/default"
+require "imap/backup/account/connection/folder_names"
 require "imap/backup/serializer/directory"
 
 require "retry_on_error"
@@ -21,18 +22,7 @@ module Imap::Backup
     end
 
     def folder_names
-      @folder_names ||=
-        begin
-          folder_names = client.list
-
-          if folder_names.empty?
-            message = "Unable to get folder list for account #{account.username}"
-            Logger.logger.info message
-            raise message
-          end
-
-          folder_names
-        end
+      @folder_names ||= Account::Connection::FolderNames.new(client: client, account: account).run
     end
 
     def backup_folders
