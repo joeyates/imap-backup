@@ -1,7 +1,5 @@
 module Imap::Backup
   describe Setup::Account do
-    HIGHLINE = "highline".freeze
-
     subject { described_class.new(config, account, highline) }
 
     let(:account) do
@@ -31,8 +29,7 @@ module Imap::Backup
     let(:other_existing_path) { "/other/existing/path" }
     let(:multi_fetch_size) { 1 }
     let(:connection_options) { nil }
-
-    let(:highline) { HIGHLINE }
+    let(:highline) { instance_double(HighLine) }
     let(:config) { instance_double(Configuration, accounts: accounts) }
 
     describe "#initialize" do
@@ -63,7 +60,6 @@ module Imap::Backup
         end
       end
 
-      let(:highline) { instance_double(HighLine) }
       let(:menu) { highline_menu_class.new }
 
       before do
