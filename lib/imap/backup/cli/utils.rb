@@ -62,7 +62,7 @@ module Imap::Backup
     no_commands do
       def do_ignore_folder_history(folder, serializer)
         uids = folder.uids - serializer.uids
-        Imap::Backup::Logger.logger.info "Folder '#{folder.name}' - #{uids.length} messages"
+        Logger.logger.info "Folder '#{folder.name}' - #{uids.length} messages"
 
         serializer.apply_uid_validity(folder.uid_validity)
 

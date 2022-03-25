@@ -64,7 +64,7 @@ module Imap::Backup
         in `search_internal` in stdlib net/imap.rb.
         This is caused by `@responses["SEARCH"] being unset/undefined
       MESSAGE
-      Imap::Backup::Logger.logger.warn message
+      Logger.logger.warn message
       []
     end
 
@@ -108,7 +108,7 @@ module Imap::Backup
     def examine
       client.examine(utf7_encoded_name)
     rescue Net::IMAP::NoResponseError
-      Imap::Backup::Logger.logger.warn "Folder '#{name}' does not exist on server"
+      Logger.logger.warn "Folder '#{name}' does not exist on server"
       raise FolderNotFound, "Folder '#{name}' does not exist on server"
     end
 

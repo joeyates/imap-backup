@@ -52,11 +52,11 @@ module Imap::Backup
     private
 
     def info(message)
-      Imap::Backup::Logger.logger.info("[#{folder.name}] #{message}")
+      Logger.logger.info("[#{folder.name}] #{message}")
     end
 
     def debug(message)
-      Imap::Backup::Logger.logger.debug("[#{folder.name}] #{message}")
+      Logger.logger.debug("[#{folder.name}] #{message}")
     end
   end
 end

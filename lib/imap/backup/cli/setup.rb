@@ -1,13 +1,15 @@
-class Imap::Backup::CLI::Setup < Thor
-  include Thor::Actions
+module Imap::Backup
+  class CLI::Setup < Thor
+    include Thor::Actions
 
-  def initialize
-    super([])
-  end
+    def initialize
+      super([])
+    end
 
-  no_commands do
-    def run
-      Imap::Backup::Setup.new.run
+    no_commands do
+      def run
+        Setup.new.run
+      end
     end
   end
 end

@@ -15,12 +15,12 @@ module Imap::Backup
       folder.create
       ensure_destination_empty!
 
-      Imap::Backup::Logger.logger.debug "[#{folder.name}] #{count} to migrate"
+      Logger.logger.debug "[#{folder.name}] #{count} to migrate"
       serializer.each_message(serializer.uids).with_index do |(uid, message), i|
         next if message.nil?
 
         log_prefix = "[#{folder.name}] uid: #{uid} (#{i + 1}/#{count}) -"
-        Imap::Backup::Logger.logger.debug(
+        Logger.logger.debug(
           "#{log_prefix} #{message.supplied_body.size} bytes"
         )
 

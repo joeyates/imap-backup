@@ -67,7 +67,7 @@ module Imap::Backup
       new_setting = !config.debug?
       menu.choice(menu_item) do
         config.debug = new_setting
-        Imap::Backup::Logger.setup_logging(config)
+        Logger.setup_logging(config)
       end
     end
 
@@ -76,7 +76,7 @@ module Imap::Backup
     end
 
     def default_account_config(username)
-      ::Imap::Backup::Account.new(
+      Imap::Backup::Account.new(
         username: username,
         password: "",
         local_path: File.join(config.path, username.tr("@", "_")),

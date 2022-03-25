@@ -80,7 +80,7 @@ module Imap::Backup
       context "when there is no configuration" do
         before do
           allow(accounts).to receive(:each).
-            and_raise(Imap::Backup::ConfigurationNotFound)
+            and_raise(ConfigurationNotFound)
         end
 
         it "fails" do
