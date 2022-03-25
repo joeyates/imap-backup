@@ -84,8 +84,10 @@ module Imap::Backup
           )
         else
           account.username = username
-          default = default_server(username)
-          account.server = default if default && (account.server.nil? || (account.server == ""))
+          if account.server.nil? || (account.server == "")
+            default = default_server(username)
+            account.server = default if default
+          end
         end
       end
     end
