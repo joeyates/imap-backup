@@ -28,6 +28,14 @@ module Imap::Backup
           expect(subject.changes).to eq({})
         end
       end
+
+      context "when a value is set to it's initial value" do
+        it "ignores the change" do
+          subject.username = "user"
+
+          expect(subject.changes).to eq({})
+        end
+      end
     end
 
     describe "#connection" do

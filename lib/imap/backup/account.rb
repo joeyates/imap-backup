@@ -111,7 +111,7 @@ module Imap::Backup
         end
       else
         current = instance_variable_get(key)
-        changes[field] = {from: current, to: value}
+        changes[field] = {from: current, to: value} if value != current
       end
 
       instance_variable_set(key, value)
