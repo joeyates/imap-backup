@@ -1,3 +1,4 @@
+require "email/provider"
 require "imap/backup/client/apple_mail"
 require "imap/backup/client/default"
 require "imap/backup/serializer/directory"

@@ -1,3 +1,4 @@
+require "email/provider"
 require "imap/backup/setup/helpers"
 
 module Imap::Backup
