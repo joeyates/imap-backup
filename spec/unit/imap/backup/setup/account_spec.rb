@@ -173,6 +173,10 @@ module Imap::Backup
           menu.choices["modify email"].call
         end
 
+        it "shows the current email" do
+          expect(Setup::Asker).to have_received(:email).with(existing_email)
+        end
+
         context "when the server is blank" do
           [
             ["GMail", "foo@gmail.com", GMAIL_IMAP_SERVER],
