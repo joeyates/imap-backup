@@ -2,10 +2,7 @@
 
 module Imap::Backup
   describe Account::Folder do
-    FOLDER_NAME = "Gelöscht".freeze
-    ENCODED_FOLDER_NAME = "Gel&APY-scht".freeze
-
-    subject { described_class.new(connection, FOLDER_NAME) }
+    subject { described_class.new(connection, folder_name) }
 
     let(:client) do
       instance_double(
@@ -22,8 +19,10 @@ module Imap::Backup
     let(:connection) do
       instance_double(Account::Connection, client: client)
     end
+    let(:folder_name) { "Gelöscht" }
+    let(:encoded_folder_name) { "Gel&APY-scht" }
     let(:missing_mailbox_data) do
-      OpenStruct.new(text: "Unknown Mailbox: #{FOLDER_NAME}")
+      OpenStruct.new(text: "Unknown Mailbox: #{folder_name}")
     end
     let(:missing_mailbox_response) { OpenStruct.new(data: missing_mailbox_data) }
     let(:missing_mailbox_error) do
@@ -43,7 +42,7 @@ module Imap::Backup
       context "with missing mailboxes" do
         before do
           allow(client).to receive(:examine).
-            with(ENCODED_FOLDER_NAME).and_raise(missing_mailbox_error)
+            with(encoded_folder_name).and_raise(missing_mailbox_error)
         end
 
         it "returns an empty array" do
@@ -58,7 +57,7 @@ module Imap::Backup
 
         before do
           allow(client).to receive(:examine).
-            with(ENCODED_FOLDER_NAME).and_raise(missing_mailbox_error)
+            with(encoded_folder_name).and_raise(missing_mailbox_error)
         end
 
         it "returns an empty array" do
@@ -101,7 +100,7 @@ module Imap::Backup
       context "when the mailbox doesn't exist" do
         before do
           allow(client).to receive(:examine).
-            with(ENCODED_FOLDER_NAME).and_raise(missing_mailbox_error)
+            with(encoded_folder_name).and_raise(missing_mailbox_error)
         end
 
         it "is nil" do
@@ -129,7 +128,7 @@ module Imap::Backup
 
     describe "#folder" do
       it "is the name" do
-        expect(subject.folder).to eq(FOLDER_NAME)
+        expect(subject.folder).to eq(folder_name)
       end
     end
 
@@ -143,7 +142,7 @@ module Imap::Backup
       context "when the folder doesn't exist" do
         before do
           allow(client).to receive(:examine).
-            with(ENCODED_FOLDER_NAME).and_raise(missing_mailbox_error)
+            with(encoded_folder_name).and_raise(missing_mailbox_error)
         end
 
         it "is false" do
@@ -164,7 +163,7 @@ module Imap::Backup
       context "when the folder doesn't exist" do
         before do
           allow(client).to receive(:examine).
-            with(ENCODED_FOLDER_NAME).and_raise(missing_mailbox_error)
+            with(encoded_folder_name).and_raise(missing_mailbox_error)
         end
 
         it "creates the folder" do
@@ -174,7 +173,7 @@ module Imap::Backup
         end
 
         it "encodes the folder name" do
-          expect(client).to receive(:create).with(ENCODED_FOLDER_NAME)
+          expect(client).to receive(:create).with(encoded_folder_name)
 
           subject.create
         end
@@ -191,7 +190,7 @@ module Imap::Backup
       context "when the folder doesn't exist" do
         before do
           allow(client).to receive(:examine).
-            with(ENCODED_FOLDER_NAME).and_raise(missing_mailbox_error)
+            with(encoded_folder_name).and_raise(missing_mailbox_error)
         end
 
         it "raises an error" do

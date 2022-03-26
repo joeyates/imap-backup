@@ -2,11 +2,6 @@ require "ostruct"
 
 module Imap::Backup
   describe Account::Connection do
-    BACKUP_FOLDER = "backup_folder".freeze
-    FOLDER_NAME = "my_folder".freeze
-    LOCAL_UID = "local_uid".freeze
-    ROOT_NAME = "foo".freeze
-
     subject { described_class.new(account) }
 
     let(:client_factory) { instance_double(Account::Connection::ClientFactory, run: client) }
@@ -27,17 +22,19 @@ module Imap::Backup
     let(:local_path) { "local_path" }
     let(:multi_fetch_size) { 1 }
     let(:root_info) do
-      instance_double(Net::IMAP::MailboxList, name: ROOT_NAME)
+      instance_double(Net::IMAP::MailboxList, name: root_name)
     end
+    let(:root_name) { "foo" }
     let(:serializer) do
       instance_double(
         Serializer,
         folder: serialized_folder,
         force_uid_validity: nil,
         apply_uid_validity: new_uid_validity,
-        uids: [LOCAL_UID]
+        uids: [local_uid]
       )
     end
+    let(:local_uid) { "local_uid" }
     let(:serialized_folder) { nil }
     let(:server) { SERVER }
     let(:new_uid_validity) { nil }
@@ -107,7 +104,7 @@ module Imap::Backup
       end
 
       it "returns local message uids" do
-        expect(subject.status[0][:local]).to eq([LOCAL_UID])
+        expect(subject.status[0][:local]).to eq([local_uid])
       end
 
       it "retrieves the available uids" do
@@ -162,11 +159,11 @@ module Imap::Backup
       end
 
       context "without supplied config_folders" do
-        let(:imap_folders) { [ROOT_NAME] }
+        let(:imap_folders) { [root_name] }
 
         before do
           allow(Serializer).to receive(:new).
-            with(local_path, ROOT_NAME) { serializer }
+            with(local_path, root_name) { serializer }
         end
 
         context "when supplied config_folders is nil" do
@@ -211,15 +208,16 @@ module Imap::Backup
 
     describe "#restore" do
       let(:uploader) { instance_double(Uploader, run: nil) }
+      let(:folder_name) { "my_folder" }
 
       before do
         allow(Uploader).to receive(:new) { uploader }
         allow(Account::Folder).to receive(:new).
-          with(subject, FOLDER_NAME) { folder }
+          with(subject, folder_name) { folder }
         allow(Serializer).to receive(:new).
-          with(anything, FOLDER_NAME) { serializer }
+          with(anything, folder_name) { serializer }
         allow(Pathname).to receive(:glob).
-          and_yield(Pathname.new(File.join(local_path, "#{FOLDER_NAME}.imap")))
+          and_yield(Pathname.new(File.join(local_path, "#{folder_name}.imap")))
       end
 
       it "runs the uploader" do
