@@ -1,28 +1,17 @@
 require "features/helper"
 require "imap/backup/cli/folders"
 
-RSpec.describe "folders", type: :feature, docker: true do
-  include_context "imap-backup connection"
-
-  let(:options) do
-    {accounts: "address@example.org"}
-  end
-  let(:folder) { "my-stuff" }
+RSpec.describe "folders", type: :aruba, docker: true do
+  let(:account) { fixture("connection") }
+  let(:options) { {accounts: account[:username]} }
 
   before do
-    allow(Imap::Backup::CLI::Accounts).to receive(:new) { [account] }
-    server_create_folder folder
-  end
+    create_config(accounts: [account])
 
-  after do
-    FileUtils.rm_rf local_backup_path
-    server_delete_folder folder
-    connection.disconnect
+    run_command_and_stop("imap-backup folders")
   end
 
   it "lists account folders" do
-    expect do
-      Imap::Backup::CLI::Folders.new(options).run
-    end.to output(/^\tmy-stuff\n/).to_stdout
+    expect(last_command_started).to have_output(/^\tINBOX$/)
   end
 end
