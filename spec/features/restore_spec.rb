@@ -1,10 +1,9 @@
 require "features/helper"
 
 RSpec.describe "restore", type: :aruba, docker: true do
-  include_context "imap-backup connection"
+  include_context "account fixture"
   include_context "message-fixtures"
 
-  let(:local_backup_path) { File.expand_path("~/backup") }
   let(:folder) { "my-stuff" }
   let(:messages_as_mbox) do
     message_as_mbox_entry(msg1) + message_as_mbox_entry(msg2)

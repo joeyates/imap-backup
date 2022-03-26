@@ -1,10 +1,9 @@
 require "features/helper"
 
 RSpec.describe "backup", type: :aruba, docker: true do
-  include_context "imap-backup connection"
+  include_context "account fixture"
   include_context "message-fixtures"
 
-  let(:local_backup_path) { File.expand_path("~/backup") }
   let(:backup_folders) { [{name: folder}] }
   let(:folder) { "my-stuff" }
   let(:messages_as_mbox) do
@@ -52,6 +51,7 @@ RSpec.describe "backup", type: :aruba, docker: true do
     context "when uid_validity does not match" do
       let(:new_name) { "NEWNAME" }
       let(:original_folder_uid_validity) { server_uid_validity(folder) }
+      let(:connection) { Imap::Backup::Account::Connection.new(account) }
       let!(:pre) do
         server_create_folder folder
         send_email folder, msg3
