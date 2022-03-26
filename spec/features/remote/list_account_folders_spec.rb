@@ -1,12 +1,11 @@
 require "features/helper"
 
-RSpec.describe "List account folders", type: :aruba do
-  let(:account) do
-    fixture("connection")
-  end
+RSpec.describe "List account folders", type: :aruba, docker: true do
+  let(:account) { fixture("connection") }
 
   before do
     create_config(accounts: [account])
+
     run_command_and_stop("imap-backup remote folders #{account[:username]}")
   end
 

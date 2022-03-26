@@ -1,35 +1,30 @@
 require "features/helper"
 require "imap/backup/cli/status"
 
-RSpec.describe "status", type: :feature, docker: true do
-  include_context "imap-backup connection"
+RSpec.describe "status", type: :aruba, docker: true do
+  include_context "account fixture"
   include_context "message-fixtures"
 
+  let(:options) { {accounts: account.username} }
+
   context "when there are non-backed-up messages" do
-    let(:options) do
-      {accounts: "address@example.org"}
-    end
     let(:folder) { "my-stuff" }
-    let(:backup_folders) { [{name: folder}] }
-    let(:email1) { send_email folder, msg1 }
 
     before do
-      allow(Imap::Backup::CLI::Accounts).to receive(:new) { [account] }
+      create_config(accounts: [account.to_h])
       server_create_folder folder
-      email1
+      send_email folder, msg1
+
+      run_command_and_stop("imap-backup status")
     end
 
     after do
-      FileUtils.rm_rf local_backup_path
-      delete_emails folder
       server_delete_folder folder
-      connection.disconnect
+      disconnect_imap
     end
 
-    it "prints the number" do
-      expect do
-        Imap::Backup::CLI::Status.new(options).run
-      end.to output("address@example.org\nmy-stuff: 1\n").to_stdout
+    it "prints the count of messages to download" do
+      expect(last_command_started).to have_output(/^my-stuff: 1$/)
     end
   end
 end
