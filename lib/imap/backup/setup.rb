@@ -1,5 +1,6 @@
 require "highline"
 
+require "email/provider"
 require "imap/backup/account"
 require "imap/backup/setup/helpers"
 
@@ -82,7 +83,7 @@ module Imap::Backup
         local_path: File.join(config.path, username.tr("@", "_")),
         folders: []
       ).tap do |a|
-        server = Email::Provider.for_address(username)
+        server = ::Email::Provider.for_address(username)
         a.server = server.host if server.host
       end
     end

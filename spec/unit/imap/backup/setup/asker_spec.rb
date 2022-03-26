@@ -25,8 +25,7 @@ module Imap::Backup
 
     [
       [:email, [], "email address"],
-      [:password, [], "password"],
-      [:backup_path, %w(x y), "backup directory"]
+      [:password, [], "password"]
     ].each do |method, params, prompt|
       context ".#{method}" do
         it "asks for input" do
@@ -109,28 +108,6 @@ module Imap::Backup
 
           subject.password
         end
-      end
-    end
-
-    describe "#backup_path" do
-      let(:path) { "/path" }
-      let(:answer) { path }
-
-      before do
-        allow(highline).to receive(:ask) do |&b|
-          b.call query
-          path
-        end
-      end
-
-      it "asks for a directory" do
-        expect(highline).to receive(:ask).with(/directory/)
-
-        subject.backup_path("", //)
-      end
-
-      it "returns the path" do
-        expect(subject.backup_path("", //)).to eq(path)
       end
     end
   end

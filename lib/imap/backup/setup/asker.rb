@@ -32,25 +32,12 @@ module Imap::Backup
       password
     end
 
-    def backup_path(default, validator)
-      highline.ask("backup directory: ") do |q|
-        q.default  = default
-        q.readline = true
-        q.validate = validator
-        q.responses[:not_valid] = "Choose a different directory "
-      end
-    end
-
     def self.email(default = "")
       new(Setup.highline).email(default)
     end
 
     def self.password
       new(Setup.highline).password
-    end
-
-    def self.backup_path(default, validator)
-      new(Setup.highline).backup_path(default, validator)
     end
   end
 end

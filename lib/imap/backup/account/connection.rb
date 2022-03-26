@@ -1,17 +1,15 @@
+require "email/provider"
 require "imap/backup/client/apple_mail"
 require "imap/backup/client/default"
+require "imap/backup/account/connection/backup_folders"
+require "imap/backup/account/connection/client_factory"
+require "imap/backup/account/connection/folder_names"
 require "imap/backup/serializer/directory"
-
-require "retry_on_error"
 
 module Imap::Backup
   class Account; end
 
   class Account::Connection
-    include RetryOnError
-
-    LOGIN_RETRY_CLASSES = [EOFError, Errno::ECONNRESET, SocketError].freeze
-
     attr_reader :account
 
     def initialize(account)
@@ -20,34 +18,12 @@ module Imap::Backup
     end
 
     def folder_names
-      @folder_names ||=
-        begin
-          folder_names = client.list
-
-          if folder_names.empty?
-            message = "Unable to get folder list for account #{account.username}"
-            Logger.logger.info message
-            raise message
-          end
-
-          folder_names
-        end
+      @folder_names ||= Account::Connection::FolderNames.new(client: client, account: account).run
     end
 
     def backup_folders
       @backup_folders ||=
-        begin
-          names =
-            if account.folders&.any?
-              account.folders.map { |af| af[:name] }
-            else
-              folder_names
-            end
-
-          names.map do |name|
-            Account::Folder.new(self, name)
-          end
-        end
+        Account::Connection::BackupFolders.new(client: client, account: account).run
     end
 
     def status
@@ -95,7 +71,7 @@ module Imap::Backup
 
     def restore
       local_folders do |serializer, folder|
-        restore_folder serializer, folder
+        Uploader.new(folder, serializer).run
       end
     end
 
@@ -112,32 +88,11 @@ module Imap::Backup
       @backup_folders = nil
       @client = nil
       @folder_names = nil
-      @provider = nil
-      @server = nil
     end
 
+    # TODO: make this private
     def client
-      @client ||=
-        retry_on_error(errors: LOGIN_RETRY_CLASSES) do
-          options = provider_options
-          Logger.logger.debug(
-            "Creating IMAP instance: #{server}, options: #{options.inspect}"
-          )
-          client =
-            if provider.is_a?(Email::Provider::AppleMail)
-              Client::AppleMail.new(server, options)
-            else
-              Client::Default.new(server, options)
-            end
-          Logger.logger.debug "Logging in: #{account.username}/#{masked_password}"
-          client.login(account.username, account.password)
-          Logger.logger.debug "Login complete"
-          client
-        end
-    end
-
-    def server
-      @server ||= account.server || provider.host
+      @client ||= Account::Connection::ClientFactory.new(account: account).run
     end
 
     private
@@ -149,51 +104,12 @@ module Imap::Backup
       end
     end
 
-    def restore_folder(serializer, folder)
-      existing_uids = folder.uids
-      if existing_uids.any?
-        Logger.logger.debug(
-          "There's already a '#{folder.name}' folder with emails"
-        )
-        new_name = serializer.apply_uid_validity(folder.uid_validity)
-        old_name = serializer.folder
-        if new_name
-          Logger.logger.debug(
-            "Backup '#{old_name}' renamed and restored to '#{new_name}'"
-          )
-          new_serializer = Serializer.new(account.local_path, new_name)
-          new_folder = Account::Folder.new(self, new_name)
-          new_folder.create
-          new_serializer.force_uid_validity(new_folder.uid_validity)
-          Uploader.new(new_folder, new_serializer).run
-        else
-          Uploader.new(folder, serializer).run
-        end
-      else
-        folder.create
-        serializer.force_uid_validity(folder.uid_validity)
-        Uploader.new(folder, serializer).run
-      end
-    end
-
     def ensure_account_folder
       Utils.make_folder(
         File.dirname(account.local_path),
         File.basename(account.local_path),
         Serializer::Directory::DIRECTORY_PERMISSIONS
       )
-    end
-
-    def masked_password
-      account.password.gsub(/./, "x")
-    end
-
-    def provider
-      @provider ||= Email::Provider.for_address(account.username)
-    end
-
-    def provider_options
-      provider.options.merge(account.connection_options || {})
     end
   end
 end
