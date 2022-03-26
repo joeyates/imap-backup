@@ -4,7 +4,6 @@ module Imap::Backup
   describe Account::Connection do
     BACKUP_FOLDER = "backup_folder".freeze
     FOLDER_NAME = "my_folder".freeze
-    LOCAL_PATH = "local_path".freeze
     LOCAL_UID = "local_uid".freeze
     ROOT_NAME = "foo".freeze
 
@@ -21,10 +20,11 @@ module Imap::Backup
       instance_double(
         Account,
         username: "username",
-        local_path: LOCAL_PATH,
+        local_path: local_path,
         multi_fetch_size: multi_fetch_size
       )
     end
+    let(:local_path) { "local_path" }
     let(:multi_fetch_size) { 1 }
     let(:root_info) do
       instance_double(Net::IMAP::MailboxList, name: ROOT_NAME)
@@ -133,7 +133,7 @@ module Imap::Backup
         allow(Downloader).
           to receive(:new).with(anything, serializer, anything) { downloader }
         allow(Serializer).to receive(:new).
-          with(LOCAL_PATH, imap_folder) { serializer }
+          with(local_path, imap_folder) { serializer }
       end
 
       it "passes the multi_fetch_size" do
@@ -166,7 +166,7 @@ module Imap::Backup
 
         before do
           allow(Serializer).to receive(:new).
-            with(LOCAL_PATH, ROOT_NAME) { serializer }
+            with(local_path, ROOT_NAME) { serializer }
         end
 
         context "when supplied config_folders is nil" do
@@ -210,113 +210,22 @@ module Imap::Backup
     end
 
     describe "#restore" do
-      let(:folder) do
-        instance_double(
-          Account::Folder,
-          create: nil,
-          uids: uids,
-          name: imap_folder,
-          uid_validity: uid_validity
-        )
-      end
-      let(:uids) { [99] }
-      let(:uid_validity) { 123 }
-      let(:serialized_folder) { "old name" }
-      let(:uploader) do
-        instance_double(Uploader, run: false)
-      end
-      let(:updated_uploader) do
-        instance_double(Uploader, run: false)
-      end
-      let(:updated_folder) do
-        instance_double(
-          Account::Folder,
-          create: nil,
-          uid_validity: "new uid validity"
-        )
-      end
-      let(:updated_serializer) do
-        instance_double(
-          Serializer, force_uid_validity: nil
-        )
-      end
+      let(:uploader) { instance_double(Uploader, run: nil) }
 
       before do
+        allow(Uploader).to receive(:new) { uploader }
         allow(Account::Folder).to receive(:new).
           with(subject, FOLDER_NAME) { folder }
         allow(Serializer).to receive(:new).
           with(anything, FOLDER_NAME) { serializer }
-        allow(Account::Folder).to receive(:new).
-          with(subject, "new name") { updated_folder }
-        allow(Serializer).to receive(:new).
-          with(anything, "new name") { updated_serializer }
-        allow(Uploader).to receive(:new).
-          with(folder, serializer) { uploader }
-        allow(Uploader).to receive(:new).
-          with(updated_folder, updated_serializer) { updated_uploader }
         allow(Pathname).to receive(:glob).
-          and_yield(Pathname.new(File.join(LOCAL_PATH, "#{FOLDER_NAME}.imap")))
+          and_yield(Pathname.new(File.join(local_path, "#{FOLDER_NAME}.imap")))
       end
 
-      it "sets local uid validity" do
-        expect(serializer).to receive(:apply_uid_validity).with(uid_validity)
-
+      it "runs the uploader" do
         subject.restore
-      end
 
-      context "when folders exist with contents" do
-        context "when the local folder is renamed" do
-          let(:new_uid_validity) { "new name" }
-
-          it "creates the new folder" do
-            expect(updated_folder).to receive(:create)
-
-            subject.restore
-          end
-
-          it "sets the renamed folder's uid validity" do
-            expect(updated_serializer).
-              to receive(:force_uid_validity).with("new uid validity")
-
-            subject.restore
-          end
-
-          it "creates the uploader with updated folder and serializer" do
-            expect(updated_uploader).to receive(:run)
-
-            subject.restore
-          end
-        end
-
-        context "when the local folder is not renamed" do
-          it "runs the uploader" do
-            expect(uploader).to receive(:run)
-
-            subject.restore
-          end
-        end
-      end
-
-      context "when folders don't exist or are empty" do
-        let(:uids) { [] }
-
-        it "creates the folder" do
-          expect(folder).to receive(:create)
-
-          subject.restore
-        end
-
-        it "forces local uid validity" do
-          expect(serializer).to receive(:force_uid_validity).with(uid_validity)
-
-          subject.restore
-        end
-
-        it "runs the uploader" do
-          expect(uploader).to receive(:run)
-
-          subject.restore
-        end
+        expect(uploader).to have_received(:run)
       end
     end
 

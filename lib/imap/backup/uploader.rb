@@ -9,6 +9,14 @@ module Imap::Backup
     end
 
     def run
+      existing_uids = folder.uids
+      if existing_uids.any?
+        rename_serialized_folder
+      else
+        folder.create
+        serializer.force_uid_validity(folder.uid_validity)
+      end
+
       count = missing_uids.count
       return if count.zero?
 
@@ -30,6 +38,26 @@ module Imap::Backup
 
     def missing_uids
       serializer.uids - folder.uids
+    end
+
+    def rename_serialized_folder
+      Logger.logger.debug(
+        "There's already a '#{folder.name}' folder with emails"
+      )
+
+      # Rename the local folder to a unique name
+      new_name = serializer.apply_uid_validity(folder.uid_validity)
+
+      return if !new_name
+
+      # Restore the renamed folder
+      Logger.logger.debug(
+        "Backup '#{serializer.folder}' renamed and restored to '#{new_name}'"
+      )
+      @folder = Account::Folder.new(folder.connection, new_name)
+      folder.create
+      @serializer = Serializer.new(serializer.path, new_name)
+      serializer.force_uid_validity(@folder.uid_validity)
     end
   end
 end
