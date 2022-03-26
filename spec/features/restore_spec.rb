@@ -26,6 +26,7 @@ RSpec.describe "restore", type: :aruba, docker: true do
   end
   let(:cleanup) do
     server_delete_folder folder
+    disconnect_imap
   end
 
   after { cleanup }
@@ -94,14 +95,13 @@ RSpec.describe "restore", type: :aruba, docker: true do
 
       context "when the folder has content" do
         let(:new_folder) { "#{folder}-#{uid_validity}" }
-        let(:cleanup) do
-          server_delete_folder new_folder
-          super()
-        end
-
         let(:pre) do
           server_create_folder folder
           email3
+        end
+        let(:cleanup) do
+          server_delete_folder new_folder
+          super()
         end
 
         it "renames the backup" do

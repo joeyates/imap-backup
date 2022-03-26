@@ -41,7 +41,7 @@ module EmailServerHelpers
     fetch_data_item.attr
   end
 
-  def delete_emails(folder)
+  def server_empty_folder(folder)
     imap.select(folder)
     uids = imap.uid_search(["ALL"]).sort
     imap.store(1..uids.size, "+FLAGS", [:Deleted])
@@ -63,33 +63,38 @@ module EmailServerHelpers
   end
 
   def server_folders
-    imap.list(root, "*")
+    imap.list(server_root_folder, "*")
   end
 
-  def root
+  def server_root_folder
     root_info = imap.list("", "")[0]
     root_info.name
   end
 
+  def server_folder_exists?(folder)
+    examine(folder)
+    true
+  rescue StandardError
+    false
+  end
+
   def server_create_folder(folder)
+    return if server_folder_exists?(folder)
+
     imap.create(folder)
-    imap.disconnect
-    @imap = nil
   end
 
   def server_rename_folder(from, to)
     imap.rename(from, to)
-    imap.disconnect
-    @imap = nil
   end
 
   def server_delete_folder(folder)
+    # Reconnect if necessary to avoid '#<IOError: closed stream>'
+    disconnect_imap if imap.disconnected?
+
+    return if !server_folder_exists?(folder)
+
     imap.delete folder
-    imap.disconnect
-  rescue StandardError
-    # Ignore failures
-  ensure
-    @imap = nil
   end
 
   def imap
@@ -102,6 +107,11 @@ module EmailServerHelpers
         imap.login(connection[:username], connection[:password])
         imap
       end
+  end
+
+  def disconnect_imap
+    imap.disconnect if imap && !imap.disconnected?
+    @imap = nil
   end
 end
 

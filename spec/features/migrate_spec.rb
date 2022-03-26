@@ -18,7 +18,8 @@ RSpec.describe "Migration", type: :aruba, docker: true do
   end
 
   after do
-    delete_emails(folder)
+    server_delete_folder folder
+    disconnect_imap
   end
 
   it "copies email to the destination account" do

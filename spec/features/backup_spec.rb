@@ -22,6 +22,7 @@ RSpec.describe "backup", type: :aruba, docker: true do
 
   after do
     server_delete_folder folder
+    disconnect_imap
   end
 
   it "downloads messages" do
