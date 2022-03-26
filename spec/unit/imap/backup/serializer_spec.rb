@@ -15,12 +15,9 @@ module Imap::Backup
     let(:mbox) do
       instance_double(
         Serializer::Mbox,
-        append: nil,
         exist?: false,
-        length: 1,
         pathname: "aaa",
-        rename: nil,
-        rewind: nil
+        rename: nil
       )
     end
     let(:folder_path) { File.expand_path(File.join("path", "folder/sub")) }
@@ -118,85 +115,16 @@ module Imap::Backup
     end
 
     describe "#append" do
-      let(:existing_uid_validity) { "42" }
-      let(:mboxrd_message) do
-        instance_double(Email::Mboxrd::Message, to_serialized: "serialized")
-      end
-      let(:uid_found) { false }
-      let(:command) { subject.append(99, "Hi") }
+      let(:appender) { instance_double(Serializer::Appender, run: nil) }
 
       before do
-        allow(imap).to receive(:include?) { uid_found }
-        allow(imap).to receive(:append)
-        allow(Email::Mboxrd::Message).to receive(:new) { mboxrd_message }
+        allow(Serializer::Appender).to receive(:new) { appender }
       end
 
-      it "appends the message to the mailbox" do
-        command
+      it "runs the Appender" do
+        subject.append("uid", "message")
 
-        expect(mbox).to have_received(:append).with("serialized")
-      end
-
-      it "appends the UID to the metadata" do
-        command
-
-        expect(imap).to have_received(:append).with(99)
-      end
-
-      context "when appending to the mailbox causes an error" do
-        before do
-          allow(mbox).to receive(:append).and_throw(RuntimeError, "Boom")
-        end
-
-        it "does not fail" do
-          command
-        end
-
-        it "leaves the metadata file unchanged" do
-          command
-
-          expect(imap).to_not have_received(:append)
-        end
-      end
-
-      context "when appending to the metadata file causes an error" do
-        before do
-          allow(imap).to receive(:append).and_throw(RuntimeError, "Boom")
-        end
-
-        it "does not fail" do
-          command
-        end
-
-        it "reset the mailbox to the previous position" do
-          command
-
-          expect(mbox).to have_received(:rewind)
-        end
-      end
-
-      context "when the metadata uid_validity has not been set" do
-        let(:existing_uid_validity) { nil }
-
-        it "fails" do
-          expect { command }.to raise_error(RuntimeError, /without uid_validity/)
-        end
-      end
-
-      context "when the message has already been backed up" do
-        let(:uid_found) { true }
-
-        it "doesn't append to the mailbox file" do
-          command
-
-          expect(mbox).to_not have_received(:append)
-        end
-
-        it "doesn't append to the metadata file" do
-          command
-
-          expect(imap).to_not have_received(:append)
-        end
+        expect(appender).to have_received(:run)
       end
     end
 
