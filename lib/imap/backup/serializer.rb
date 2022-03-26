@@ -87,13 +87,10 @@ module Imap::Backup
     end
 
     def rename(new_name)
-      # Initialize so we get memoized instances with the correct folder_path
-      mbox
-      imap
-      @folder = new_name
-      ensure_containing_directory
-      mbox.rename folder_path
-      imap.rename folder_path
+      destination = folder_path_for(path, new_name)
+      ensure_containing_directory(new_name)
+      mbox.rename destination
+      imap.rename destination
     end
 
     private
@@ -121,7 +118,7 @@ module Imap::Backup
     def mbox
       @mbox ||=
         begin
-          ensure_containing_directory
+          ensure_containing_directory(folder)
           Serializer::Mbox.new(folder_path)
         end
     end
@@ -129,7 +126,7 @@ module Imap::Backup
     def imap
       @imap ||=
         begin
-          ensure_containing_directory
+          ensure_containing_directory(folder)
           Serializer::Imap.new(folder_path)
         end
     end
@@ -143,7 +140,7 @@ module Imap::Backup
       File.expand_path(relative)
     end
 
-    def ensure_containing_directory
+    def ensure_containing_directory(folder)
       relative = File.dirname(folder)
       directory = Serializer::Directory.new(path, relative)
       directory.ensure_exists
@@ -173,9 +170,7 @@ module Imap::Backup
         digit += 1
       end
 
-      previous = folder
-      rename(new_name)
-      @folder = previous
+      rename new_name
 
       new_name
     end
