@@ -9,32 +9,38 @@ module Imap::Backup
     end
 
     def run
-      existing_uids = folder.uids
-      if existing_uids.any?
+      if folder.uids.any?
         rename_serialized_folder
       else
         folder.create
         serializer.force_uid_validity(folder.uid_validity)
       end
 
-      count = missing_uids.count
       return if count.zero?
 
       Logger.logger.debug "[#{folder.name}] #{count} to restore"
       serializer.each_message(missing_uids).with_index do |(uid, message), i|
-        next if message.nil?
-
-        log_prefix = "[#{folder.name}] uid: #{uid} (#{i + 1}/#{count}) -"
-        Logger.logger.debug(
-          "#{log_prefix} #{message.supplied_body.size} bytes"
-        )
-
-        new_uid = folder.append(message)
-        serializer.update_uid(uid, new_uid)
+        upload_message uid, message, i + 1
       end
     end
 
     private
+
+    def upload_message(uid, message, index)
+      return if message.nil?
+
+      log_prefix = "[#{folder.name}] uid: #{uid} (#{index}/#{count}) -"
+      Logger.logger.debug(
+        "#{log_prefix} #{message.supplied_body.size} bytes"
+      )
+
+      new_uid = folder.append(message)
+      serializer.update_uid(uid, new_uid)
+    end
+
+    def count
+      @count ||= missing_uids.count
+    end
 
     def missing_uids
       serializer.uids - folder.uids
