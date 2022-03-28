@@ -21,28 +21,48 @@ module Imap::Backup
       local_folder_ok = local_folder.set_up
       return false if !local_folder_ok
 
-      if local_folder.msf_exists?
-        if force
-          Kernel.puts "Deleting '#{local_folder.msf_path}' as --force option was supplied"
-          File.unlink local_folder.msf_path
-        else
-          Kernel.puts(
-            "Skipping export of '#{serializer.folder}' " \
-            "as '#{local_folder.msf_path}' exists"
-          )
-          return false
-        end
+      skip_for_msf = check_msf
+      return false if skip_for_msf
+
+      skip_for_local_folder = check_local_folder
+      return false if skip_for_local_folder
+
+      copy_messages
+
+      true
+    end
+
+    private
+
+    def check_local_folder
+      return false if !local_folder.exists?
+
+      if force
+        Kernel.puts "Overwriting '#{local_folder.path}' as --force option was supplied"
+        return false
       end
 
-      if local_folder.exists?
-        if force
-          Kernel.puts "Overwriting '#{local_folder.path}' as --force option was supplied"
-        else
-          Kernel.puts "Skipping export of '#{serializer.folder}' as '#{local_folder.path}' exists"
-          return false
-        end
+      Kernel.puts "Skipping export of '#{serializer.folder}' as '#{local_folder.path}' exists"
+      true
+    end
+
+    def check_msf
+      return false if !local_folder.msf_exists?
+
+      if force
+        Kernel.puts "Deleting '#{local_folder.msf_path}' as --force option was supplied"
+        File.unlink local_folder.msf_path
+        return false
       end
 
+      Kernel.puts(
+        "Skipping export of '#{serializer.folder}' " \
+        "as '#{local_folder.msf_path}' exists"
+      )
+      true
+    end
+
+    def copy_messages
       File.open(local_folder.full_path, "w") do |f|
         enumerator = Serializer::MboxEnumerator.new(serializer.mbox_pathname)
         enumerator.each do |raw|
@@ -53,11 +73,7 @@ module Imap::Backup
           f.write output
         end
       end
-
-      true
     end
-
-    private
 
     def local_folder
       @local_folder ||= begin
