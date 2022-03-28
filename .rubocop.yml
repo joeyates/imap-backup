@@ -119,6 +119,9 @@ Metrics/BlockLength:
     - feature
     - shared_examples
     - shared_examples_for
+Metrics/ClassLength:
+  Enabled: true
+  CountAsOne: ["heredoc"]
 
 Naming/BlockForwarding:
   Enabled: true
