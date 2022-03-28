@@ -5,9 +5,16 @@ require "imap/backup/serializer/appender"
 require "imap/backup/serializer/imap"
 require "imap/backup/serializer/mbox"
 require "imap/backup/serializer/mbox_enumerator"
+require "imap/backup/serializer/message_enumerator"
+require "imap/backup/serializer/unused_name_finder"
 
 module Imap::Backup
   class Serializer
+    def self.folder_path_for(path:, folder:)
+      relative = File.join(path, folder)
+      File.expand_path(relative)
+    end
+
     extend Forwardable
 
     def_delegator :mbox, :pathname, :mbox_pathname
@@ -61,25 +68,15 @@ module Imap::Backup
       nil
     end
 
-    def each_message(required_uids)
-      return enum_for(:each_message, required_uids) if !block_given?
+    def each_message(required_uids, &block)
+      return enum_for(:each_message, required_uids) if !block
 
-      indexes = required_uids.each.with_object({}) do |uid_maybe_string, acc|
-        uid = uid_maybe_string.to_i
-        index = imap.index(uid)
-        acc[index] = uid if index
-      end
-      enumerator = Serializer::MboxEnumerator.new(mbox.pathname)
-      enumerator.each.with_index do |raw, i|
-        uid = indexes[i]
-        next if !uid
-
-        yield uid, Email::Mboxrd::Message.from_serialized(raw)
-      end
+      enumerator = Serializer::MessageEnumerator.new(imap: imap, mbox: mbox)
+      enumerator.run(uids: required_uids, &block)
     end
 
     def rename(new_name)
-      destination = folder_path_for(path, new_name)
+      destination = self.class.folder_path_for(path: path, folder: new_name)
       ensure_containing_directory(new_name)
       mbox.rename destination
       imap.rename destination
@@ -104,12 +101,7 @@ module Imap::Backup
     end
 
     def folder_path
-      folder_path_for(path, folder)
-    end
-
-    def folder_path_for(path, folder)
-      relative = File.join(path, folder)
-      File.expand_path(relative)
+      self.class.folder_path_for(path: path, folder: folder)
     end
 
     def ensure_containing_directory(folder)
@@ -129,21 +121,8 @@ module Imap::Backup
     end
 
     def rename_existing_folder
-      digit = 0
-      new_name = nil
-      loop do
-        extra = digit.zero? ? "" : "-#{digit}"
-        new_name = "#{folder}-#{imap.uid_validity}#{extra}"
-        new_folder_path = folder_path_for(path, new_name)
-        test_mbox = Serializer::Mbox.new(new_folder_path)
-        test_imap = Serializer::Imap.new(new_folder_path)
-        break if !test_mbox.exist? && !test_imap.exist?
-
-        digit += 1
-      end
-
+      new_name = Serializer::UnusedNameFinder.new(serializer: self).run
       rename new_name
-
       new_name
     end
   end
