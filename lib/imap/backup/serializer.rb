@@ -5,6 +5,7 @@ require "imap/backup/serializer/appender"
 require "imap/backup/serializer/imap"
 require "imap/backup/serializer/mbox"
 require "imap/backup/serializer/mbox_enumerator"
+require "imap/backup/serializer/message_enumerator"
 
 module Imap::Backup
   class Serializer
@@ -61,21 +62,11 @@ module Imap::Backup
       nil
     end
 
-    def each_message(required_uids)
-      return enum_for(:each_message, required_uids) if !block_given?
+    def each_message(required_uids, &block)
+      return enum_for(:each_message, required_uids) if !block
 
-      indexes = required_uids.each.with_object({}) do |uid_maybe_string, acc|
-        uid = uid_maybe_string.to_i
-        index = imap.index(uid)
-        acc[index] = uid if index
-      end
-      enumerator = Serializer::MboxEnumerator.new(mbox.pathname)
-      enumerator.each.with_index do |raw, i|
-        uid = indexes[i]
-        next if !uid
-
-        yield uid, Email::Mboxrd::Message.from_serialized(raw)
-      end
+      enumerator = Serializer::MessageEnumerator.new(imap: imap, mbox: mbox)
+      enumerator.run(uids: required_uids, &block)
     end
 
     def rename(new_name)

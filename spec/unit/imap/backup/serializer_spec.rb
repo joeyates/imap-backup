@@ -189,29 +189,16 @@ module Imap::Backup
     end
 
     describe "#each_message" do
-      let(:good_uid) { 999 }
+      let(:message_enumerator) { instance_double(Serializer::MessageEnumerator, run: nil) }
 
       before do
-        allow(imap).to receive(:index) { nil }
-        allow(imap).to receive(:index).with(good_uid) { 0 }
-        allow(enumerator).to receive(:each) { ["message"].enum_for(:each) }
+        allow(Serializer::MessageEnumerator).to receive(:new) { message_enumerator }
       end
 
-      it "yields matching UIDs" do
-        expect { |b| subject.each_message([good_uid], &b) }.
-          to yield_successive_args([good_uid, anything])
-      end
+      it "runs the MessageEnumerator" do
+        subject.each_message([]) {}
 
-      it "yields matching messages" do
-        messages = subject.each_message([good_uid]).map { |_uid, message| message }
-        expect(messages[0].supplied_body).to eq("message")
-      end
-
-      context "with UIDs that are not present" do
-        it "skips them" do
-          expect { |b| subject.each_message([good_uid, 1234], &b) }.
-            to yield_successive_args([good_uid, anything])
-        end
+        expect(message_enumerator).to have_received(:run)
       end
 
       context "when called without a block" do
