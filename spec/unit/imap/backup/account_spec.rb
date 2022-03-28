@@ -198,7 +198,7 @@ module Imap::Backup
       [:folders, ["folder"], ["folder"]],
       [:connection_options, '{"some": "option"}', {"some" => "option"}]
     ].each do |attribute, value, expected|
-      describe "##{attribute}=" do
+      describe "setting ##{attribute}=" do
         let(:options) { {} }
 
         before { subject.send(:"#{attribute}=", value) }
@@ -210,43 +210,43 @@ module Imap::Backup
         it "adds a change" do
           expect(subject.changes).to eq(attribute => {from: nil, to: expected})
         end
+      end
+    end
 
-        if attribute == :folders
-          context "when the supplied value is not an Array" do
-            it "fails" do
-              expect do
-                subject.folders = "aaa"
-              end.to raise_error(RuntimeError, /must be an Array/)
-            end
-          end
+    describe "#folders=" do
+      context "when the supplied value is not an Array" do
+        it "fails" do
+          expect do
+            subject.folders = "aaa"
+          end.to raise_error(RuntimeError, /must be an Array/)
         end
+      end
+    end
 
-        if attribute == :multi_fetch_size
-          context "when the supplied value is not a number" do
-            before { subject.multi_fetch_size = "ciao" }
+    describe "#multi_fetch_size=" do
+      context "when the supplied value is not a number" do
+        before { subject.multi_fetch_size = "ciao" }
 
-            it "sets multi_fetch_size to one" do
-              expect(subject.multi_fetch_size).to eq(1)
-            end
-          end
-
-          context "when the supplied value is not a positive number" do
-            before { subject.multi_fetch_size = "-1" }
-
-            it "sets multi_fetch_size to one" do
-              expect(subject.multi_fetch_size).to eq(1)
-            end
-          end
+        it "sets multi_fetch_size to one" do
+          expect(subject.multi_fetch_size).to eq(1)
         end
+      end
 
-        if attribute == :connection_options
-          context "when the supplied value is not valid JSON" do
-            it "fails" do
-              expect do
-                subject.connection_options = "NOT JSON"
-              end.to raise_error(JSON::ParserError)
-            end
-          end
+      context "when the supplied value is not a positive number" do
+        before { subject.multi_fetch_size = "-1" }
+
+        it "sets multi_fetch_size to one" do
+          expect(subject.multi_fetch_size).to eq(1)
+        end
+      end
+    end
+
+    describe "#connection_options=" do
+      context "when the supplied value is not valid JSON" do
+        it "fails" do
+          expect do
+            subject.connection_options = "NOT JSON"
+          end.to raise_error(JSON::ParserError)
         end
       end
     end
