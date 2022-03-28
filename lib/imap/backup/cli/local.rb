@@ -5,6 +5,8 @@ module Imap::Backup
     include Thor::Actions
     include CLI::Helpers
 
+    MAX_SUBJECT = 60
+
     desc "accounts", "List locally backed-up accounts"
     def accounts
       accounts = CLI::Accounts.new
@@ -29,26 +31,16 @@ module Imap::Backup
       end
       raise "Folder '#{folder_name}' not found" if !folder_serializer
 
-      max_subject = 60
       Kernel.puts format(
-        "%-10<uid>s  %-#{max_subject}<subject>s - %<date>s",
+        "%-10<uid>s  %-#{MAX_SUBJECT}<subject>s - %<date>s",
         {uid: "UID", subject: "Subject", date: "Date"}
       )
-      Kernel.puts "-" * (12 + max_subject + 28)
+      Kernel.puts "-" * (12 + MAX_SUBJECT + 28)
 
       uids = folder_serializer.uids
 
       folder_serializer.each_message(uids).map do |uid, message|
-        m = {
-          uid: uid,
-          date: message.date.to_s,
-          subject: message.subject || ""
-        }
-        if m[:subject].length > max_subject
-          Kernel.puts format("% 10<uid>u: %.#{max_subject - 3}<subject>s... - %<date>s", m)
-        else
-          Kernel.puts format("% 10<uid>u: %-#{max_subject}<subject>s - %<date>s", m)
-        end
+        list_message uid, message
       end
     end
 
@@ -76,6 +68,21 @@ module Imap::Backup
           HEADER
         end
         Kernel.puts message.supplied_body
+      end
+    end
+
+    no_commands do
+      def list_message(uid, message)
+        m = {
+          uid: uid,
+          date: message.date.to_s,
+          subject: message.subject || ""
+        }
+        if m[:subject].length > MAX_SUBJECT
+          Kernel.puts format("% 10<uid>u: %.#{MAX_SUBJECT - 3}<subject>s... - %<date>s", m)
+        else
+          Kernel.puts format("% 10<uid>u: %-#{MAX_SUBJECT}<subject>s - %<date>s", m)
+        end
       end
     end
   end
