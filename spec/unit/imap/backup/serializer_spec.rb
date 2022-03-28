@@ -32,16 +32,7 @@ module Imap::Backup
     end
 
     describe "#apply_uid_validity" do
-      let(:imap_test) { instance_double(Serializer::Imap, exist?: imap_test_exists) }
-      let(:imap_test_exists) { false }
-      let(:test_folder_path) do
-        File.expand_path(File.join("path", "folder/sub-#{existing_uid_validity}"))
-      end
       let(:result) { subject.apply_uid_validity("new") }
-
-      before do
-        allow(Serializer::Imap).to receive(:new).with(test_folder_path) { imap_test }
-      end
 
       context "when there is no existing uid_validity" do
         it "sets the metadata file's uid_validity" do
@@ -63,45 +54,27 @@ module Imap::Backup
 
       context "when the new value is different from the old value" do
         let(:existing_uid_validity) { "existing" }
+        let(:unused_name_finder) { instance_double(Serializer::UnusedNameFinder, run: "new_name") }
+        let(:new_folder_path) { File.expand_path(File.join("path/new_name")) }
+
+        before do
+          allow(Serializer::UnusedNameFinder).to receive(:new) { unused_name_finder }
+        end
 
         it "renames the existing mailbox" do
           result
 
-          expect(mbox).to have_received(:rename).with(test_folder_path)
+          expect(mbox).to have_received(:rename).with(new_folder_path)
         end
 
         it "renames the existing metadata file" do
           result
 
-          expect(imap).to have_received(:rename).with(test_folder_path)
+          expect(imap).to have_received(:rename).with(new_folder_path)
         end
 
         it "returns the new name for the old folder" do
-          expect(result).to eq("folder/sub-existing")
-        end
-
-        context "when the default rename is not possible" do
-          let(:imap_test_exists) { true }
-          let(:imap_test1) { instance_double(Serializer::Imap, exist?: false) }
-          let(:test_folder_path1) do
-            File.expand_path(File.join("path", "folder/sub-#{existing_uid_validity}-1"))
-          end
-
-          before do
-            allow(Serializer::Imap).to receive(:new).with(test_folder_path1) { imap_test1 }
-          end
-
-          it "renames the mailbox, appending a numeral" do
-            result
-
-            expect(mbox).to have_received(:rename).with(test_folder_path1)
-          end
-
-          it "renames the metadata file, appending a numeral" do
-            result
-
-            expect(imap).to have_received(:rename).with(test_folder_path1)
-          end
+          expect(result).to eq("new_name")
         end
       end
     end

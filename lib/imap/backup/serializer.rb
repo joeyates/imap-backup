@@ -6,9 +6,15 @@ require "imap/backup/serializer/imap"
 require "imap/backup/serializer/mbox"
 require "imap/backup/serializer/mbox_enumerator"
 require "imap/backup/serializer/message_enumerator"
+require "imap/backup/serializer/unused_name_finder"
 
 module Imap::Backup
   class Serializer
+    def self.folder_path_for(path:, folder:)
+      relative = File.join(path, folder)
+      File.expand_path(relative)
+    end
+
     extend Forwardable
 
     def_delegator :mbox, :pathname, :mbox_pathname
@@ -70,7 +76,7 @@ module Imap::Backup
     end
 
     def rename(new_name)
-      destination = folder_path_for(path, new_name)
+      destination = self.class.folder_path_for(path: path, folder: new_name)
       ensure_containing_directory(new_name)
       mbox.rename destination
       imap.rename destination
@@ -95,12 +101,7 @@ module Imap::Backup
     end
 
     def folder_path
-      folder_path_for(path, folder)
-    end
-
-    def folder_path_for(path, folder)
-      relative = File.join(path, folder)
-      File.expand_path(relative)
+      self.class.folder_path_for(path: path, folder: folder)
     end
 
     def ensure_containing_directory(folder)
@@ -120,21 +121,8 @@ module Imap::Backup
     end
 
     def rename_existing_folder
-      digit = 0
-      new_name = nil
-      loop do
-        extra = digit.zero? ? "" : "-#{digit}"
-        new_name = "#{folder}-#{imap.uid_validity}#{extra}"
-        new_folder_path = folder_path_for(path, new_name)
-        test_mbox = Serializer::Mbox.new(new_folder_path)
-        test_imap = Serializer::Imap.new(new_folder_path)
-        break if !test_mbox.exist? && !test_imap.exist?
-
-        digit += 1
-      end
-
+      new_name = Serializer::UnusedNameFinder.new(serializer: self).run
       rename new_name
-
       new_name
     end
   end
