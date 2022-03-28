@@ -122,6 +122,10 @@ Metrics/BlockLength:
 Metrics/ClassLength:
   Enabled: true
   CountAsOne: ["heredoc"]
+Metrics/ModuleLength:
+  Enabled: true
+  Exclude:
+    - "spec/**/*"
 
 Naming/BlockForwarding:
   Enabled: true
