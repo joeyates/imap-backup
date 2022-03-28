@@ -14,23 +14,8 @@ module Imap::Backup
     end
 
     def run
-      modified = account.modified? ? "*" : ""
-
-      multi_fetch_size = "\nmulti-fetch #{account.multi_fetch_size}" if account.multi_fetch_size > 1
-
-      if account.connection_options
-        escaped =
-          JSON.generate(account.connection_options)
-        connection_options =
-          "\nconnection options  '#{escaped}'"
-        space = " " * 12
-      else
-        connection_options = nil
-        space = " " * 4
-      end
-
       menu.header = <<~HEADER.chomp
-        #{helpers.title_prefix} Account#{modified}
+        #{helpers.title_prefix} Account#{modified_flag}
 
         email   #{space}#{account.username}
         password#{space}#{masked_password}
@@ -50,6 +35,25 @@ module Imap::Backup
 
     def helpers
       Setup::Helpers.new
+    end
+
+    def modified_flag
+      account.modified? ? "*" : ""
+    end
+
+    def multi_fetch_size
+      "\nmulti-fetch #{account.multi_fetch_size}" if account.multi_fetch_size > 1
+    end
+
+    def connection_options
+      return nil if !account.connection_options
+
+      escaped = JSON.generate(account.connection_options)
+      "\nconnection options  '#{escaped}'"
+    end
+
+    def space
+      account.connection_options ? " " * 12 : " " * 4
     end
 
     def masked_password
