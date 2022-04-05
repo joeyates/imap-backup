@@ -12,7 +12,7 @@ module Imap::Backup
     include RetryOnError
 
     BODY_ATTRIBUTE = "BODY[]".freeze
-    UID_FETCH_RETRY_CLASSES = [EOFError, Errno::ECONNRESET].freeze
+    UID_FETCH_RETRY_CLASSES = [EOFError, Errno::ECONNRESET, IOError].freeze
 
     attr_reader :connection
     attr_reader :name
