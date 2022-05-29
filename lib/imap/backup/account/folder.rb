@@ -91,8 +91,10 @@ module Imap::Backup
     def append(message)
       body = message.imap_body
       date = message.date&.to_time
-      response = client.append(utf7_encoded_name, body, nil, date)
-      extract_uid(response)
+      response = retry_on_error(errors: [Net::IMAP::BadResponseError], limit: 3) do
+        client.append(utf7_encoded_name, body, nil, date)
+      end
+      extract_uid(response) unless response.nil?
     end
 
     def clear

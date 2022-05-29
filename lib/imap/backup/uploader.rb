@@ -34,8 +34,14 @@ module Imap::Backup
         "#{log_prefix} #{message.supplied_body.size} bytes"
       )
 
-      new_uid = folder.append(message)
-      serializer.update_uid(uid, new_uid)
+      begin
+        new_uid = folder.append(message)
+        serializer.update_uid(uid, new_uid) unless new_uid.nil?
+      rescue => e
+        Logger.logger.warn(
+          "#{log_prefix} skipping due to: #{e.message}"
+        )
+      end
     end
 
     def count
