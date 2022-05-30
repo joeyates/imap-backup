@@ -13,6 +13,7 @@ module Imap::Backup
 
     BODY_ATTRIBUTE = "BODY[]".freeze
     UID_FETCH_RETRY_CLASSES = [EOFError, Errno::ECONNRESET, IOError].freeze
+    APPEND_RETRY_CLASSES = [Net::IMAP::BadResponseError].freeze
 
     attr_reader :connection
     attr_reader :name
@@ -91,8 +92,10 @@ module Imap::Backup
     def append(message)
       body = message.imap_body
       date = message.date&.to_time
-      response = client.append(utf7_encoded_name, body, nil, date)
-      extract_uid(response)
+      retry_on_error(errors: APPEND_RETRY_CLASSES, limit: 3) do
+        response = client.append(utf7_encoded_name, body, nil, date)
+        extract_uid(response)
+      end
     end
 
     def clear

@@ -248,10 +248,30 @@ module Imap::Backup
         expect(subject.append(message)).to eq(2)
       end
 
-      it "set the new uid validity" do
+      it "sets the new uid validity" do
         subject.append(message)
 
         expect(subject.uid_validity).to eq(1)
+      end
+
+      context "when the append fails with a BadResponseError" do
+        before do
+          outcomes = [
+            -> do
+              response_text = Net::IMAP::ResponseText.new(42, "BOOM")
+              response = Net::IMAP::TaggedResponse.new("BAD", "name", response_text, "BOOM")
+              raise Net::IMAP::BadResponseError, response
+            end,
+            -> { append_response }
+          ]
+          allow(client).to receive(:append) { outcomes.shift.call }
+        end
+
+        it "retries" do
+          subject.append(message)
+
+          expect(client).to have_received(:append).twice
+        end
       end
     end
 
