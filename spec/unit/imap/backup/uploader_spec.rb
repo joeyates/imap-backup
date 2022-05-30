@@ -55,6 +55,12 @@ module Imap::Backup
       expect(folder).to have_received(:append).with(missing_message)
     end
 
+    it "handles append failures" do
+      allow(folder).to receive(:append).and_raise(RuntimeError)
+
+      subject.run
+    end
+
     context "with messages that are present on server" do
       let(:existing_message) do
         instance_double(Email::Mboxrd::Message, supplied_body: "existing message")

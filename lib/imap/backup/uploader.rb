@@ -34,8 +34,12 @@ module Imap::Backup
         "#{log_prefix} #{message.supplied_body.size} bytes"
       )
 
-      new_uid = folder.append(message)
-      serializer.update_uid(uid, new_uid)
+      begin
+        new_uid = folder.append(message)
+        serializer.update_uid(uid, new_uid)
+      rescue StandardError => e
+        Logger.logger.warn "#{log_prefix} append error: #{e}"
+      end
     end
 
     def count
