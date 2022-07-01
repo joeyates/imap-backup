@@ -10,7 +10,7 @@ AllCops:
     Enabled: true
   TargetRubyVersion: 2.5
 
-Gemspec/DateAssignment:
+Gemspec/DeprecatedAttributeAssignment:
   Enabled: true
 Gemspec/RequireMFA:
   Enabled: true
