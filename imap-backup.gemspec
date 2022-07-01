@@ -18,7 +18,6 @@ Gem::Specification.new do |gem|
   gem.files         += %w[LICENSE README.md]
 
   gem.executables   = gem.files.grep(%r{^bin/}).map { |f| File.basename(f) }
-  gem.test_files    = Dir.glob("spec/**/*{.rb,.yml}")
   gem.require_paths = ["lib"]
   gem.required_ruby_version = ">= 2.5"
 
