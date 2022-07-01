@@ -69,7 +69,7 @@ module Imap::Backup
       let(:connection_options) { {some: "option"} }
 
       it "shows the options" do
-        expect(menu.header).to match(/^connection options\s+'{"some":"option"}'/)
+        expect(menu.header).to match(/^connection options\s+'{\\"some\\":\\"option\\"}'/)
       end
     end
   end

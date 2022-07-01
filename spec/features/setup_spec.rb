@@ -45,4 +45,22 @@ RSpec.describe "setup", type: :aruba do
       expect(last_command_started).to have_exit_status(0)
     end
   end
+
+  context "when the account's connection_options are set" do
+    let(:account) do
+      super().to_h.merge(connection_options: connection_options)
+    end
+    let(:connection_options) { {"port" => 600} }
+
+    it "shows them" do
+      last_command_started.write "1\n"
+      last_command_started.write "q\n"
+      last_command_started.write "q\n"
+      last_command_started.stop
+
+      expect(last_command_started).
+        to have_output(/connection options\s+'#{connection_options.to_json}'/)
+      expect(last_command_started).to have_exit_status(0)
+    end
+  end
 end

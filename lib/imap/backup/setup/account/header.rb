@@ -49,6 +49,7 @@ module Imap::Backup
       return nil if !account.connection_options
 
       escaped = JSON.generate(account.connection_options)
+      escaped.gsub!('"', '\"')
       "\nconnection options  '#{escaped}'"
     end
 
