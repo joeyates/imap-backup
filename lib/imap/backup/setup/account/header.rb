@@ -19,7 +19,7 @@ module Imap::Backup
 
         email   #{space}#{account.username}
         password#{space}#{masked_password}
-        path    #{space}#{account.local_path}
+        path    #{space}#{local_path}
         folders #{space}#{folders.map { |f| f[:name] }.join(', ')}#{multi_fetch_size}
         server  #{space}#{account.server}#{connection_options}
 
@@ -62,6 +62,13 @@ module Imap::Backup
       else
         account.password.gsub(/./, "x")
       end
+    end
+
+    def local_path
+      # In order to handle backslashes, as Highline effectively
+      # does an eval (!) on its templates, we need to doubly
+      # escape them
+      account.local_path.gsub("\\", "\\\\\\\\")
     end
   end
 end
