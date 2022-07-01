@@ -2,7 +2,7 @@ module Imap::Backup
   RSpec.describe Setup::Helpers do
     describe "#title_prefix" do
       it "is a string" do
-        expect(subject.title_prefix).to eq("imap-backup –")
+        expect(subject.title_prefix).to eq("imap-backup -")
       end
     end
 

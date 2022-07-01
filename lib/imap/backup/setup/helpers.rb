@@ -5,7 +5,7 @@ module Imap::Backup
 
   class Setup::Helpers
     def title_prefix
-      "imap-backup –"
+      "imap-backup -"
     end
 
     def version
