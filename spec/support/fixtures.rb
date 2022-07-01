@@ -7,5 +7,5 @@ def fixture(name)
   content = File.read(fixture_path)
   template = ERB.new(content)
   yaml = template.result(binding)
-  YAML.safe_load(yaml, [Symbol])
+  YAML.safe_load(yaml, permitted_classes: [Symbol])
 end
