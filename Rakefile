@@ -12,7 +12,14 @@ RSpec::Core::RakeTask.new("no-docker") do |t|
   t.rspec_opts = "--tag ~docker"
 end
 
-RuboCop::RakeTask.new
+RuboCop::RakeTask.new(:rubocop) do |task|
+  task.options =
+    if RUBY_VERSION.start_with?("2.5.")
+      ["--config", ".rubocop-2.6.yml"]
+    else
+      ["--config", ".rubocop.yml"]
+    end
+end
 
 task default: :spec
 task default: :rubocop

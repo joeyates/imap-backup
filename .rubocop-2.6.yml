@@ -1,0 +1,283 @@
+inherit_from: .rubocop_todo.yml
+
+require: rubocop-rspec
+
+AllCops:
+  Exclude:
+    - "bin/stubs/*"
+    - "vendor/**/*"
+  DisplayCopNames:
+    Enabled: true
+  TargetRubyVersion: 2.5
+
+Gemspec/DateAssignment:
+  Enabled: true
+Gemspec/RequireMFA:
+  Enabled: true
+
+Layout/ParameterAlignment:
+  EnforcedStyle: with_fixed_indentation
+Layout/DotPosition:
+  EnforcedStyle: trailing
+Layout/SpaceInsideHashLiteralBraces:
+  EnforcedStyle: no_space
+Layout/EmptyLinesAroundAttributeAccessor:
+   Enabled: true
+Layout/LineEndStringConcatenationIndentation:
+  Enabled: true
+Layout/LineLength:
+  Enabled: true
+  Max: 100
+Layout/SpaceAroundMethodCallOperator:
+   Enabled: true
+Layout/SpaceBeforeBrackets:
+  Enabled: true
+
+Lint/AmbiguousAssignment:
+  Enabled: true
+Lint/AmbiguousOperatorPrecedence:
+  Enabled: true
+Lint/AmbiguousRange:
+  Enabled: true
+Lint/BinaryOperatorWithIdenticalOperands:
+  Enabled: true
+Lint/ConstantDefinitionInBlock: # TODO
+  Enabled: true
+  Exclude:
+    - "spec/unit/imap/backup/account/connection_spec.rb"
+    - "spec/unit/imap/backup/account/folder_spec.rb"
+    - "spec/unit/imap/backup/setup/account_spec.rb"
+Lint/DeprecatedConstants:
+  Enabled: true
+Lint/DeprecatedOpenSSLConstant:
+  Enabled: true
+Lint/DuplicateBranch:
+  Enabled: true
+Lint/DuplicateElsifCondition:
+  Enabled: true
+Lint/DuplicateRegexpCharacterClassElement:
+  Enabled: true
+Lint/DuplicateRescueException:
+  Enabled: true
+Lint/EmptyBlock: # TODO
+  Enabled: false
+Lint/EmptyClass: # TODO
+  Enabled: false
+Lint/EmptyConditionalBody:
+  Enabled: true
+Lint/EmptyInPattern:
+  Enabled: true
+Lint/FloatComparison:
+  Enabled: true
+Lint/IncompatibleIoSelectWithFiberScheduler:
+  Enabled: true
+Lint/LambdaWithoutLiteralBlock:
+  Enabled: true
+Lint/MissingSuper:
+  Enabled: true
+Lint/MixedRegexpCaptureTypes:
+  Enabled: true
+Lint/NoReturnInBeginEndBlocks:
+  Enabled: true
+Lint/NumberedParameterAssignment:
+  Enabled: true
+Lint/OrAssignmentToConstant:
+  Enabled: true
+Lint/OutOfRangeRegexpRef:
+  Enabled: true
+Lint/RaiseException:
+  Enabled: true
+Lint/RedundantDirGlobSort:
+  Enabled: true
+Lint/RequireRelativeSelfPath:
+  Enabled: true
+Lint/SelfAssignment:
+  Enabled: true
+Lint/StructNewOverride:
+  Enabled: true
+Lint/SymbolConversion:
+  Enabled: true
+Lint/ToEnumArguments:
+  Enabled: true
+Lint/TopLevelReturnWithArgument:
+  Enabled: true
+Lint/TripleQuotes:
+  Enabled: true
+Lint/UnexpectedBlockArity:
+  Enabled: true
+Lint/UnmodifiedReduceAccumulator:
+  Enabled: true
+Lint/UnreachableLoop:
+  Enabled: true
+Lint/UselessRuby2Keywords:
+  Enabled: true
+
+Metrics/BlockLength:
+  IgnoredMethods:
+    - context
+    - describe
+    - feature
+    - no_commands
+    - shared_examples
+    - shared_examples_for
+Metrics/ClassLength:
+  Enabled: true
+  CountAsOne: ["heredoc"]
+Metrics/ModuleLength:
+  Enabled: true
+  Exclude:
+    - "spec/**/*"
+
+Naming/BlockForwarding:
+  Enabled: true
+
+RSpec/ContextWording:
+  Exclude:
+    - "spec/features/**/*"
+RSpec/DescribeClass:
+  Exclude:
+    - spec/*
+    - spec/features/**/*
+    - spec/requests/**/*
+RSpec/ExcessiveDocstringSpacing:
+  Enabled: true
+RSpec/FactoryBot/SyntaxMethods:
+  Enabled: true
+RSpec/IdenticalEqualityAssertion:
+  Enabled: true
+RSpec/SubjectDeclaration:
+  Enabled: true
+RSpec/LeakyConstantDeclaration:
+  Enabled: false
+RSpec/LetSetup:
+  Enabled: false
+RSpec/MessageSpies:
+  Enabled: false
+RSpec/MultipleExpectations:
+  Exclude:
+    - spec/features/**/*
+RSpec/MultipleMemoizedHelpers: # TODO
+  Enabled: false
+RSpec/NamedSubject:
+  Enabled: false
+RSpec/NestedGroups: # TODO
+  Enabled: false
+RSpec/NotToNot:
+  Enabled: false
+RSpec/Rails/AvoidSetupHook:
+  Enabled: true
+RSpec/ReturnFromStub:
+  Enabled: false
+
+Security/IoMethods:
+  Enabled: true
+
+Style/AccessorGrouping:
+  Enabled: true
+  EnforcedStyle: separated
+Style/ArgumentsForwarding:
+  Enabled: true
+Style/ArrayCoercion:
+  Enabled: true
+Style/BisectedAttrAccessor:
+  Enabled: true
+Style/CaseLikeIf:
+  Enabled: true
+Style/ClassAndModuleChildren:
+  Enabled: false
+Style/CollectionCompact:
+  Enabled: true
+Style/Documentation:
+  Enabled: false
+Style/DocumentDynamicEvalDefinition:
+  Enabled: true
+Style/EmptyCaseCondition:
+  Enabled: false
+Style/EmptyMethod:
+  EnforcedStyle: expanded
+Style/EndlessMethod:
+  Enabled: true
+Style/ExplicitBlockArgument:
+  Enabled: true
+Style/ExponentialNotation:
+  Enabled: true
+Style/FileRead:
+  Enabled: true
+Style/FileWrite: # TODO
+  Enabled: false
+Style/FrozenStringLiteralComment:
+  Enabled: false
+Style/GlobalStdStream:
+  Enabled: true
+Style/HashAsLastArrayItem:
+  Enabled: true
+Style/HashConversion:
+  Enabled: true
+Style/HashEachMethods:
+  Enabled: true
+Style/HashExcept:
+  Enabled: true
+Style/HashLikeCase:
+  Enabled: true
+Style/HashTransformKeys:
+  Enabled: true
+Style/HashTransformValues:
+  Enabled: true
+Style/IfWithBooleanLiteralBranches:
+  Enabled: true
+Style/InPatternThen:
+  Enabled: true
+Style/Lambda:
+  EnforcedStyle: literal
+Style/MapToHash:
+  Enabled: true
+Style/MultilineInPatternThen:
+  Enabled: true
+Style/NegatedIf:
+  Enabled: false
+Style/NegatedIfElseCondition:
+  Enabled: true
+Style/NilLambda: # TODO
+  Enabled: false
+Style/NumberedParameters:
+  Enabled: true
+Style/NumberedParametersLimit:
+  Enabled: true
+Style/PercentLiteralDelimiters:
+  Enabled: false
+Style/OpenStructUse: # TODO
+  Enabled: false
+Style/OptionalBooleanParameter:
+  Enabled: true
+Style/QuotedSymbols:
+  Enabled: true
+Style/RedundantArgument:
+  Enabled: true
+Style/RedundantAssignment:
+  Enabled: true
+Style/RedundantFetchBlock:
+  Enabled: true
+Style/RedundantFileExtensionInRequire:
+  Enabled: true
+Style/RedundantRegexpCharacterClass:
+  Enabled: true
+Style/RedundantRegexpEscape:
+  Enabled: true
+Style/RedundantSelfAssignmentBranch:
+  Enabled: true
+Style/SelectByRegexp:
+  Enabled: true
+Style/SingleArgumentDig:
+  Enabled: true
+Style/SlicingWithRange:
+  Enabled: true
+Style/StringConcatenation:
+  Enabled: true
+Style/StringChars:
+  Enabled: true
+Style/StringLiterals:
+  EnforcedStyle: double_quotes
+Style/SymbolArray:
+  Enabled: false
+Style/SwapValues:
+  Enabled: true
