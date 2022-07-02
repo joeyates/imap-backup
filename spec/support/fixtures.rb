@@ -8,7 +8,7 @@ def fixture(name)
   template = ERB.new(content)
   yaml = template.result(binding)
   parameters = YAML.method(:safe_load).parameters
-  has_permitted_classes = parameters.find { |(type, name)| name == :permitted_classes }
+  has_permitted_classes = parameters.find { |(_type, name)| name == :permitted_classes }
   if has_permitted_classes
     YAML.safe_load(yaml, permitted_classes: [Symbol])
   else
