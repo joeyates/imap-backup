@@ -13,6 +13,7 @@ module Imap::Backup
     autoload :Remote, "imap/backup/cli/remote"
     autoload :Restore, "imap/backup/cli/restore"
     autoload :Setup, "imap/backup/cli/setup"
+    autoload :Stats, "imap/backup/cli/stats"
     autoload :Status, "imap/backup/cli/status"
     autoload :Utils, "imap/backup/cli/utils"
 
@@ -126,6 +127,22 @@ module Imap::Backup
     DESC
     def setup
       Setup.new.run
+    end
+
+    desc "stats EMAIL [OPTIONS]", "Print stats for each account folder"
+    long_desc <<~DESC
+      For each account folder, lists emails that are yet to be downloaded "server",
+      are downloaded (exist on server and locally) "both" and those which
+      are only present in the backup (as they have been deleted on the server) "local".
+    DESC
+    method_option(
+      "format",
+      type: :string,
+      desc: "the output type, text (plain text) or json",
+      aliases: ["-f"]
+    )
+    def stats(email)
+      Stats.new(email, symbolized(options)).run
     end
 
     desc "status", "This command is deprecated, use `imap-backup stats ACCOUNT`"
