@@ -1,6 +1,6 @@
 require "features/helper"
 
-RSpec.describe "backup", type: :aruba, docker: true do
+RSpec.describe "stats", type: :aruba, docker: true do
   include_context "account fixture"
   include_context "message-fixtures"
 
