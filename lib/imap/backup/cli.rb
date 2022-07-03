@@ -128,9 +128,10 @@ module Imap::Backup
       Setup.new.run
     end
 
-    desc "status", "Show backup status"
+    desc "status", "This command is deprecated, use `imap-backup stats ACCOUNT`"
     long_desc <<~DESC
       For each configured account and folder, lists the number of emails yet to be downloaded.
+      This command is deprecated.
     DESC
     accounts_option
     def status
