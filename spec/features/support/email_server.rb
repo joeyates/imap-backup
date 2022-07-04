@@ -118,7 +118,12 @@ module EmailServerHelpers
   end
 
   def disconnect_imap
-    imap.disconnect if imap && !imap.disconnected?
+    return if !@imap
+
+    if !imap.disconnected?
+      imap.disconnect
+    end
+
     @imap = nil
   end
 end
