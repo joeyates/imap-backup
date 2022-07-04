@@ -10,7 +10,9 @@ RSpec.describe "backup", type: :aruba, docker: true do
     message_as_mbox_entry(msg1) + message_as_mbox_entry(msg2)
   end
 
-  let!(:pre) {}
+  let!(:pre) do
+    server_delete_folder folder
+  end
   let!(:setup) do
     server_create_folder folder
     send_email folder, msg1
@@ -54,6 +56,8 @@ RSpec.describe "backup", type: :aruba, docker: true do
       let(:original_folder_uid_validity) { server_uid_validity(folder) }
       let(:connection) { Imap::Backup::Account::Connection.new(account) }
       let!(:pre) do
+        super()
+        server_delete_folder new_name
         server_create_folder folder
         send_email folder, msg3
         original_folder_uid_validity
