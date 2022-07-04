@@ -11,6 +11,7 @@ RSpec.describe "stats", type: :aruba, docker: true do
     server_create_folder folder
     send_email folder, msg1
     create_config accounts: [account.to_h]
+    disconnect_imap
 
     run_command_and_stop "imap-backup #{command}"
   end
