@@ -90,10 +90,13 @@ module EmailServerHelpers
 
   def server_delete_folder(folder)
     # Reconnect if necessary to avoid '#<IOError: closed stream>'
-    disconnect_imap if imap.disconnected?
+    reconnect_imap
 
     return if !server_folder_exists?(folder)
 
+    # N.B. If we are deleting the currently selected folder
+    # (previously selected via "select" or "examine"),
+    # this command will cause a disconnect
     imap.delete folder
   end
 
@@ -109,8 +112,19 @@ module EmailServerHelpers
       end
   end
 
+  def reconnect_imap
+    disconnect_imap
+    imap
+  end
+
   def disconnect_imap
-    imap.disconnect if imap && !imap.disconnected?
+    return if !@imap
+
+    if !imap.disconnected?
+      imap.logout
+      imap.disconnect
+    end
+
     @imap = nil
   end
 end
