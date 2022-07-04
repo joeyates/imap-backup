@@ -4,11 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [NEXT] - 2022-06-03
+## [6.0.0] - 2022-06-04
 
 ## Changed
 
 * Deprecated the 'status' command, in favour of the new 'stats' command.
+* Added new 'stats' command, with optional JSON output.
+* Resolved long running CI problem with feature specs failing due to
+  too many active IMAP connections.
 
 ## [6.0.0.rc2] - 2022-04-03
 
