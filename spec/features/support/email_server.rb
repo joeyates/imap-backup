@@ -121,6 +121,7 @@ module EmailServerHelpers
     return if !@imap
 
     if !imap.disconnected?
+      imap.logout
       imap.disconnect
     end
 
