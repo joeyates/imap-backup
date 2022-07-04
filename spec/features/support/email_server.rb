@@ -94,6 +94,9 @@ module EmailServerHelpers
 
     return if !server_folder_exists?(folder)
 
+    # N.B. If we are deleting the currently selected folder
+    # (previously selected via "select" or "examine"),
+    # this command will cause a disconnect
     imap.delete folder
   end
 
