@@ -5,26 +5,23 @@ RSpec.describe "status", type: :aruba, docker: true do
   include_context "account fixture"
   include_context "message-fixtures"
 
-  let(:options) { {accounts: account.username} }
+  let(:folder) { "my-stuff" }
 
-  context "when there are non-backed-up messages" do
-    let(:folder) { "my-stuff" }
+  before do
+    create_config(accounts: [account.to_h])
+    server_create_folder folder
+    send_email folder, msg1
+    disconnect_imap
 
-    before do
-      create_config(accounts: [account.to_h])
-      server_create_folder folder
-      send_email folder, msg1
+    run_command_and_stop("imap-backup status")
+  end
 
-      run_command_and_stop("imap-backup status")
-    end
+  after do
+    server_delete_folder folder
+    disconnect_imap
+  end
 
-    after do
-      server_delete_folder folder
-      disconnect_imap
-    end
-
-    it "prints the count of messages to download" do
-      expect(last_command_started).to have_output(/^my-stuff: 1$/)
-    end
+  it "prints the count of messages to download" do
+    expect(last_command_started).to have_output(/^my-stuff: 1$/)
   end
 end
