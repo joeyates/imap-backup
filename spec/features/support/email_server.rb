@@ -90,7 +90,7 @@ module EmailServerHelpers
 
   def server_delete_folder(folder)
     # Reconnect if necessary to avoid '#<IOError: closed stream>'
-    disconnect_imap if imap.disconnected?
+    reconnect_imap
 
     return if !server_folder_exists?(folder)
 
@@ -107,6 +107,11 @@ module EmailServerHelpers
         imap.login(connection[:username], connection[:password])
         imap
       end
+  end
+
+  def reconnect_imap
+    disconnect_imap
+    imap
   end
 
   def disconnect_imap
