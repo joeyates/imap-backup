@@ -28,8 +28,10 @@ module Imap::Backup
       save
     end
 
-    def exist?
-      File.exist?(pathname)
+    def delete
+      return if !exist?
+
+      File.unlink(pathname)
     end
 
     def include?(uid)
@@ -75,10 +77,19 @@ module Imap::Backup
       save
     end
 
+    def version
+      ensure_loaded
+      @version
+    end
+
     private
 
     def pathname
       "#{folder_path}.imap"
+    end
+
+    def exist?
+      File.exist?(pathname)
     end
 
     def ensure_loaded

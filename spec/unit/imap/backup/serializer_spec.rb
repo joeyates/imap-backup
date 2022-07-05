@@ -1,3 +1,43 @@
+shared_examples "a method that resets invalid serialization" do
+  context do
+    let(:imap_valid) { true }
+    let(:mbox_valid) { true }
+
+    before do
+      allow(imap).to receive(:valid?) { imap_valid }
+      allow(imap).to receive(:delete)
+      allow(mbox).to receive(:valid?) { mbox_valid }
+      allow(mbox).to receive(:delete)
+
+      action.call()
+    end
+
+    context "when the imap file is not valid" do
+      let(:imap_valid) { false }
+
+      it "deletes the imap file" do
+        expect(imap).to have_received(:delete)
+      end
+
+      it "deletes the mbox file" do
+        expect(mbox).to have_received(:delete)
+      end
+    end
+
+    context "when the mbox file is not valid" do
+      let(:mbox_valid) { false }
+
+      it "deletes the imap file" do
+        expect(imap).to have_received(:delete)
+      end
+
+      it "deletes the mbox file" do
+        expect(mbox).to have_received(:delete)
+      end
+    end
+  end
+end
+
 module Imap::Backup
   describe Serializer do
     subject { described_class.new("path", "folder/sub") }
@@ -17,7 +57,8 @@ module Imap::Backup
         Serializer::Mbox,
         valid?: true,
         pathname: "aaa",
-        rename: nil
+        rename: nil,
+        touch: nil
       )
     end
     let(:folder_path) { File.expand_path(File.join("path", "folder/sub")) }
@@ -32,6 +73,10 @@ module Imap::Backup
     end
 
     describe "#apply_uid_validity" do
+      it_behaves_like "a method that resets invalid serialization" do
+        let(:action) { -> { result } }
+      end
+
       let(:result) { subject.apply_uid_validity("new") }
 
       context "when there is no existing uid_validity" do
@@ -80,6 +125,10 @@ module Imap::Backup
     end
 
     describe "#force_uid_validity" do
+      it_behaves_like "a method that resets invalid serialization" do
+        let(:action) { -> { subject.force_uid_validity("new") } }
+      end
+
       it "sets the metadata file's uid_validity" do
         subject.force_uid_validity("new")
 
@@ -88,6 +137,10 @@ module Imap::Backup
     end
 
     describe "#append" do
+      it_behaves_like "a method that resets invalid serialization" do
+        let(:action) { -> { subject.append("uid", "message") } }
+      end
+
       let(:appender) { instance_double(Serializer::Appender, run: nil) }
 
       before do
@@ -102,6 +155,10 @@ module Imap::Backup
     end
 
     describe "#load" do
+      it_behaves_like "a method that resets invalid serialization" do
+        let(:action) { -> { result } }
+      end
+
       let(:uid) { 999 }
       let(:imap_index) { 0 }
       let(:result) { subject.load(uid) }
@@ -137,6 +194,10 @@ module Imap::Backup
     end
 
     describe "#load_nth" do
+      it_behaves_like "a method that resets invalid serialization" do
+        let(:action) { -> { result } }
+      end
+
       let(:imap_index) { 0 }
       let(:result) { subject.load_nth(imap_index) }
 
@@ -162,6 +223,10 @@ module Imap::Backup
     end
 
     describe "#each_message" do
+      it_behaves_like "a method that resets invalid serialization" do
+        let(:action) { -> { subject.each_message([]) {}} }
+      end
+
       let(:message_enumerator) { instance_double(Serializer::MessageEnumerator, run: nil) }
 
       before do

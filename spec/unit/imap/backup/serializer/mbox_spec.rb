@@ -14,14 +14,6 @@ module Imap::Backup
       allow(File).to receive(:read).with(pathname) { existing.to_json }
     end
 
-    describe "#append" do
-      it "appends the message" do
-        subject.append("message")
-
-        expect(file).to have_received(:write).with("message")
-      end
-    end
-
     describe "#valid?" do
       context "when the mailbox exists" do
         it "is true" do
@@ -35,6 +27,14 @@ module Imap::Backup
         it "is false" do
           expect(subject.valid?).to be false
         end
+      end
+    end
+
+    describe "#append" do
+      it "appends the message" do
+        subject.append("message")
+
+        expect(file).to have_received(:write).with("message")
       end
     end
 

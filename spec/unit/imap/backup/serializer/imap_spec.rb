@@ -15,6 +15,8 @@ module Imap::Backup
       allow(File).to receive(:open).and_call_original
       allow(File).to receive(:open).with(pathname, "w").and_yield(file)
       allow(File).to receive(:read).with(pathname) { existing.to_json }
+      allow(File).to receive(:unlink).and_call_original
+      allow(File).to receive(:unlink).with(pathname)
     end
 
     describe "loading the metadata file" do
@@ -113,18 +115,22 @@ module Imap::Backup
       end
     end
 
-    describe "#exist?" do
-      context "when the metadata file exists" do
-        it "is true" do
-          expect(subject.exist?).to be true
+    describe "#delete" do
+      context "when the file exists" do
+        it "deletes the file" do
+          subject.delete
+
+          expect(File).to have_received(:unlink)
         end
       end
 
-      context "when the metadata file doesn't exist" do
+      context "when the file does not exist" do
         let(:exists) { false }
 
-        it "is false" do
-          expect(subject.exist?).to be false
+        it "does nothing" do
+          subject.delete
+
+          expect(File).to_not have_received(:unlink)
         end
       end
     end
@@ -186,7 +192,7 @@ module Imap::Backup
         end
       end
 
-      context "when the metadata file doesn't exist" do
+      context "when the metadata file isn't valid" do
         let(:exists) { false }
 
         it "sets the folder_path" do

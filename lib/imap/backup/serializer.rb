@@ -28,10 +28,25 @@ module Imap::Backup
       @folder = folder
     end
 
+    # Returns true if there are existing, valid files
+    # false otherwise (in which case any existing files are deleted)
+    def validate!
+      return true if imap.valid? && mbox.valid?
+
+      imap.delete
+      @imap = nil
+      mbox.delete
+      @mbox = nil
+
+      false
+    end
+
     def apply_uid_validity(value)
+      validate!
+
       case
       when uid_validity.nil?
-        imap.uid_validity = value
+        internal_force_uid_validity(value)
         nil
       when uid_validity == value
         # NOOP
@@ -42,38 +57,44 @@ module Imap::Backup
     end
 
     def force_uid_validity(value)
-      imap.uid_validity = value
+      validate!
+
+      internal_force_uid_validity(value)
     end
 
     def append(uid, message)
+      validate!
+
       appender = Serializer::Appender.new(folder: folder, imap: imap, mbox: mbox)
       appender.run(uid: uid, message: message)
     end
 
     def load(uid_maybe_string)
+      validate!
+
       uid = uid_maybe_string.to_i
       message_index = imap.index(uid)
       return nil if message_index.nil?
 
-      load_nth(message_index)
+      internal_load_nth(message_index)
     end
 
     def load_nth(index)
-      enumerator = Serializer::MboxEnumerator.new(mbox.pathname)
-      enumerator.each.with_index do |raw, i|
-        next if i != index
+      validate!
 
-        return Email::Mboxrd::Message.from_serialized(raw)
-      end
-      nil
+      internal_load_nth(index)
     end
 
     def each_message(required_uids, &block)
+      validate!
+
       return enum_for(:each_message, required_uids) if !block
 
       enumerator = Serializer::MessageEnumerator.new(imap: imap, mbox: mbox)
       enumerator.run(uids: required_uids, &block)
     end
+
+    private
 
     def rename(new_name)
       destination = self.class.folder_path_for(path: path, folder: new_name)
@@ -82,7 +103,20 @@ module Imap::Backup
       imap.rename destination
     end
 
-    private
+    def internal_force_uid_validity(value)
+      imap.uid_validity = value
+      mbox.touch
+    end
+
+    def internal_load_nth(index)
+      enumerator = Serializer::MboxEnumerator.new(mbox.pathname)
+      enumerator.each.with_index do |raw, i|
+        next if i != index
+
+        return Email::Mboxrd::Message.from_serialized(raw)
+      end
+      nil
+    end
 
     def mbox
       @mbox ||=
@@ -115,7 +149,7 @@ module Imap::Backup
       # Clear memoization so we get empty data
       @mbox = nil
       @imap = nil
-      imap.uid_validity = value
+      internal_force_uid_validity(value)
 
       new_name
     end
