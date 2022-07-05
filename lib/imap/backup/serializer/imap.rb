@@ -12,6 +12,15 @@ module Imap::Backup
       @loaded = false
       @uid_validity = nil
       @uids = nil
+      @version = nil
+    end
+
+    def valid?
+      return false if !exist?
+      return false if version != CURRENT_VERSION
+      return false if !uid_validity
+
+      true
     end
 
     def append(uid)
@@ -19,8 +28,10 @@ module Imap::Backup
       save
     end
 
-    def exist?
-      File.exist?(pathname)
+    def delete
+      return if !exist?
+
+      File.unlink(pathname)
     end
 
     def include?(uid)
@@ -66,10 +77,19 @@ module Imap::Backup
       save
     end
 
+    def version
+      ensure_loaded
+      @version
+    end
+
     private
 
     def pathname
       "#{folder_path}.imap"
+    end
+
+    def exist?
+      File.exist?(pathname)
     end
 
     def ensure_loaded
@@ -79,9 +99,11 @@ module Imap::Backup
       if data
         @uids = data[:uids].map(&:to_i)
         @uid_validity = data[:uid_validity]
+        @version = data[:version]
       else
         @uids = []
         @uid_validity = nil
+        @version = CURRENT_VERSION
       end
       @loaded = true
     end
@@ -97,6 +119,8 @@ module Imap::Backup
         return nil
       end
 
+      return nil if !data.key?(:version)
+      return nil if !data.key?(:uid_validity)
       return nil if !data.key?(:uids)
       return nil if !data[:uids].is_a?(Array)
 
@@ -109,7 +133,7 @@ module Imap::Backup
       raise "Cannot save metadata without a uid_validity" if !uid_validity
 
       data = {
-        version: CURRENT_VERSION,
+        version: @version,
         uid_validity: @uid_validity,
         uids: @uids
       }

@@ -91,11 +91,12 @@ RSpec.describe "backup", type: :aruba, docker: true do
         let!(:pre) do
           super()
           create_directory local_backup_path
-          File.write(imap_path(renamed_folder), "existing imap")
+          valid_imap_data = {version: 2, uid_validity: 1, uids: []}
+          File.write(imap_path(renamed_folder), valid_imap_data.to_json)
           File.write(mbox_path(renamed_folder), "existing mbox")
         end
 
-        it "moves the old backup to a uniquely named directory" do
+        it "renames the renamed backup to a uniquely name" do
           renamed = "#{folder}-#{original_folder_uid_validity}-1"
           expect(mbox_content(renamed)).to eq(message_as_mbox_entry(msg3))
         end

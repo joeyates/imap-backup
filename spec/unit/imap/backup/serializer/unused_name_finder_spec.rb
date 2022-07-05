@@ -5,14 +5,13 @@ module Imap::Backup
     let(:serializer) do
       instance_double(Serializer, folder: "folder", uid_validity: "uid_validity", path: "path")
     end
-    let(:imap_test) { instance_double(Serializer::Imap, exist?: imap_test_exists) }
-    let(:imap_test_exists) { false }
+    let(:test_serializer) { instance_double(Serializer, validate!: default_serializer_validates) }
+    let(:default_serializer_validates) { false }
     let(:new_name) { "folder-uid_validity" }
-    let(:test_folder_path) { File.expand_path(File.join("path", new_name)) }
     let(:result) { subject.run }
 
     before do
-      allow(Serializer::Imap).to receive(:new).with(test_folder_path) { imap_test }
+      allow(Serializer).to receive(:new).with("path", new_name) { test_serializer }
     end
 
     it "returns the folder name with the uid_validity appended" do
@@ -20,13 +19,12 @@ module Imap::Backup
     end
 
     context "when the default rename is not possible" do
-      let(:imap_test_exists) { true }
-      let(:imap_test1) { instance_double(Serializer::Imap, exist?: false) }
+      let(:default_serializer_validates) { true }
+      let(:test_serializer1) { instance_double(Serializer, validate!: false) }
       let(:new_name1) { "folder-uid_validity-1" }
-      let(:test_folder_path1) { File.expand_path(File.join("path", new_name1)) }
 
       before do
-        allow(Serializer::Imap).to receive(:new).with(test_folder_path1) { imap_test1 }
+        allow(Serializer).to receive(:new).with("path", new_name1) { test_serializer1 }
       end
 
       it "appends a numeral" do

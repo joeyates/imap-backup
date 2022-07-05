@@ -6,14 +6,20 @@ module Imap::Backup
       @folder_path = folder_path
     end
 
+    def valid?
+      exist?
+    end
+
     def append(message)
       File.open(pathname, "ab") do |file|
         file.write message
       end
     end
 
-    def exist?
-      File.exist?(pathname)
+    def delete
+      return if !exist?
+
+      File.unlink(pathname)
     end
 
     def length
@@ -40,6 +46,16 @@ module Imap::Backup
       File.open(pathname, File::RDWR | File::CREAT, 0o644) do |f|
         f.truncate(length)
       end
+    end
+
+    def touch
+      File.open(pathname, "a") {}
+    end
+
+    private
+
+    def exist?
+      File.exist?(pathname)
     end
   end
 end

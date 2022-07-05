@@ -5,7 +5,8 @@ module Imap::Backup
     let(:folder_path) { "folder_path" }
     let(:pathname) { "folder_path.imap" }
     let(:exists) { true }
-    let(:existing) { {uid_validity: 99, uids: [42]} }
+    let(:existing) { {version: version, uid_validity: 99, uids: [42]} }
+    let(:version) { 2 }
     let(:file) { instance_double(File, write: nil) }
 
     before do
@@ -14,6 +15,8 @@ module Imap::Backup
       allow(File).to receive(:open).and_call_original
       allow(File).to receive(:open).with(pathname, "w").and_yield(file)
       allow(File).to receive(:read).with(pathname) { existing.to_json }
+      allow(File).to receive(:unlink).and_call_original
+      allow(File).to receive(:unlink).with(pathname)
     end
 
     describe "loading the metadata file" do
@@ -26,6 +29,38 @@ module Imap::Backup
           subject.uid_validity
 
           expect(subject.uids).to eq([])
+        end
+      end
+    end
+
+    describe "#valid?" do
+      context "when the metadata file has the correct data" do
+        it "is true" do
+          expect(subject.valid?).to be true
+        end
+      end
+
+      context "when the metadata file doesn't exist" do
+        let(:exists) { false }
+
+        it "is false" do
+          expect(subject.valid?).to be false
+        end
+      end
+
+      context "when the version is wrong" do
+        let(:version) { 1 }
+
+        it "is false" do
+          expect(subject.valid?).to be false
+        end
+      end
+
+      context "when the uid_validity is missing" do
+        let(:existing) { {version: version, uids: [42]} }
+
+        it "is false" do
+          expect(subject.valid?).to be false
         end
       end
     end
@@ -48,7 +83,7 @@ module Imap::Backup
         end
       end
 
-      context "when the metadata file doesn't exist" do
+      context "when the metadata file isn't valid" do
         let(:exists) { false }
 
         context "when the uid_validity is set" do
@@ -80,18 +115,22 @@ module Imap::Backup
       end
     end
 
-    describe "#exist?" do
-      context "when the metadata file exists" do
-        it "is true" do
-          expect(subject.exist?).to be true
+    describe "#delete" do
+      context "when the file exists" do
+        it "deletes the file" do
+          subject.delete
+
+          expect(File).to have_received(:unlink)
         end
       end
 
-      context "when the metadata file doesn't exist" do
+      context "when the file does not exist" do
         let(:exists) { false }
 
-        it "is false" do
-          expect(subject.exist?).to be false
+        it "does nothing" do
+          subject.delete
+
+          expect(File).to_not have_received(:unlink)
         end
       end
     end
@@ -153,7 +192,7 @@ module Imap::Backup
         end
       end
 
-      context "when the metadata file doesn't exist" do
+      context "when the metadata file isn't valid" do
         let(:exists) { false }
 
         it "sets the folder_path" do
