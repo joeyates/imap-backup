@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [TBA] - ?
+
+## Changed
+
+* Introduced a new metadata format.
+* Included data about message offsets and lengths in the new metadata to
+  facilitate for future integrity checks.
+
 ## [6.2.1] - 2022-07-12
 
 ## Changed

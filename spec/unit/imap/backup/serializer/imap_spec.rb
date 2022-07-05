@@ -5,8 +5,10 @@ module Imap::Backup
     let(:folder_path) { "folder_path" }
     let(:pathname) { "folder_path.imap" }
     let(:exists) { true }
-    let(:existing) { {version: version, uid_validity: 99, uids: [42]} }
-    let(:version) { 2 }
+    let(:existing) do
+      {version: version, uid_validity: 99, messages: [{uid: 42, offset: 0, length: 12_345}]}
+    end
+    let(:version) { 3 }
     let(:file) { instance_double(File, write: nil) }
 
     before do
@@ -28,7 +30,7 @@ module Imap::Backup
         it "ignores the file" do
           subject.uid_validity
 
-          expect(subject.uids).to eq([])
+          expect(subject.messages).to eq([])
         end
       end
     end
@@ -67,19 +69,19 @@ module Imap::Backup
 
     describe "#append" do
       context "when the metadata file exists" do
-        before { subject.append(123) }
+        before { subject.append(123, 300) }
 
         it "loads the existing metadata" do
-          expect(subject.uids).to include(42)
+          expect(subject.messages).to include({length: 12_345, offset: 0, uid: 42})
         end
 
         it "appends the UID" do
-          expect(subject.uids).to include(123)
+          expect(subject.messages).to include({length: 300, offset: 12_345, uid: 123})
         end
 
         it "saves the file" do
           expect(file).to have_received(:write).
-            with(/"uids":\[42,123\]/)
+            with(/"version":3/)
         end
       end
 
@@ -89,26 +91,23 @@ module Imap::Backup
         context "when the uid_validity is set" do
           before do
             subject.uid_validity = 999
+
+            subject.append(123, 300)
           end
 
           it "appends the UID" do
-            subject.append(123)
-
-            expect(subject.uids).to include(123)
+            expect(subject.messages).to include({length: 300, offset: 0, uid: 123})
           end
 
           it "saves the file" do
-            subject.append(123)
-
-            expect(file).to have_received(:write).
-              with(/"uids":\[123\]/)
+            expect(file).to have_received(:write).twice.with(/"version":3/)
           end
         end
 
         context "when the uid_validity is not set" do
           it "fails" do
             expect do
-              subject.append(123)
+              subject.append(123, 300)
             end.to raise_error(RuntimeError, /without a uid_validity/)
           end
         end
@@ -226,9 +225,9 @@ module Imap::Backup
       context "when no metadata file exists" do
         let(:exists) { false }
 
-        it "saves an empty list of UIDs" do
+        it "saves an empty list of messages" do
           expect(file).to have_received(:write).
-            with(/"uids":\[\]/)
+            with(/"messages":\[\]/)
         end
       end
     end
@@ -237,16 +236,16 @@ module Imap::Backup
       before { subject.update_uid(42, 57) }
 
       it "sets the UID" do
-        expect(subject.uids).to eq([57])
+        expect(subject.messages).to eq([{length: 12_345, offset: 0, uid: 57}])
       end
 
       it "saves the file" do
         expect(file).to have_received(:write).
-          with(/"uids":\[57\]/)
+          with(/\{"uid":57,"offset":0,"length":12345\}/)
       end
 
       context "when the UID is not present" do
-        let(:existing) { {uid_validity: 99, uids: [2]} }
+        let(:existing) { {uid_validity: 99, messages: [{length: 10, offset: 0, uid: 33}]} }
 
         it "doesn't save the file" do
           expect(file).to_not have_received(:write)

@@ -11,16 +11,14 @@ RSpec.describe "restore", type: :aruba, docker: true do
   let(:messages_as_server_messages) do
     [message_as_server_message(msg1), message_as_server_message(msg2)]
   end
-  let(:message_uids) { [msg1[:uid], msg2[:uid]] }
-  let(:existing_imap_content) { imap_data(uid_validity, message_uids).to_json }
   let(:uid_validity) { 1234 }
 
   let!(:pre) {}
   let!(:setup) do
-    create_directory local_backup_path
-    File.write(imap_path(folder), existing_imap_content)
-    File.write(mbox_path(folder), messages_as_mbox)
-    create_config(accounts: [account.to_h])
+    create_config accounts: [account.to_h]
+    create_files email: account.username, folder: folder, uid_validity: uid_validity
+    store_email email: account.username, folder: folder, **msg1
+    store_email email: account.username, folder: folder, **msg2
 
     run_command_and_stop("imap-backup restore #{account.username}")
   end
@@ -39,7 +37,8 @@ RSpec.describe "restore", type: :aruba, docker: true do
 
     it "updates local uids to match the new server ones" do
       updated_imap_content = imap_parsed(folder)
-      expect(server_uids(folder)).to eq(updated_imap_content[:uids])
+      stored_uids = updated_imap_content[:messages].map { |m| m[:uid] }
+      expect(server_uids(folder)).to eq(stored_uids)
     end
 
     it "sets the backup uid_validity to match the new folder" do
@@ -136,24 +135,24 @@ RSpec.describe "restore", type: :aruba, docker: true do
   end
 
   context "when non-Unicode encodings are used" do
-    let(:server_message) do
-      message_as_server_message(msg_iso8859)
-    end
-    let(:messages_as_mbox) do
-      message_as_mbox_entry(msg_iso8859)
-    end
-    let(:message_uids) { [uid_iso8859] }
     let(:uid_validity) { server_uid_validity(folder) }
 
-    let(:pre) do
+    let(:setup) do
       server_create_folder folder
       uid_validity
+      create_config accounts: [account.to_h]
+      create_files email: account.username, folder: folder, uid_validity: uid_validity
+      store_email email: account.username, folder: folder, **msg_iso8859
+
+      run_command_and_stop("imap-backup restore #{account.username}")
     end
 
     it "maintains encodings" do
       message =
         server_messages(folder).
         first["BODY[]"]
+
+      server_message = message_as_server_message(msg_iso8859)
 
       expect(message).to eq(server_message)
     end

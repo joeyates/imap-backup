@@ -13,14 +13,6 @@ module BackupDirectoryHelpers
     "From #{from}\n#{body_and_headers}\n"
   end
 
-  def imap_data(uid_validity, uids)
-    {
-      version: 2,
-      uid_validity: uid_validity,
-      uids: uids
-    }
-  end
-
   def mbox_content(name)
     File.read(mbox_path(name))
   end

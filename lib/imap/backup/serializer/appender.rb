@@ -31,9 +31,10 @@ module Imap::Backup
       initial = mbox.length || 0
       mbox_appended = false
       begin
-        mbox.append mboxrd_message.to_serialized
+        serialized = mboxrd_message.to_serialized
+        mbox.append serialized
         mbox_appended = true
-        imap.append uid
+        imap.append uid, serialized.length
       rescue StandardError => e
         mbox.rewind(initial) if mbox_appended
 

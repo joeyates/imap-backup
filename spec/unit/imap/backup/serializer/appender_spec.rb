@@ -33,7 +33,13 @@ module Imap::Backup
     it "appends the UID to the metadata" do
       command
 
-      expect(imap).to have_received(:append).with(99)
+      expect(imap).to have_received(:append).with(99, anything)
+    end
+
+    it "appends the message length to the metadata" do
+      command
+
+      expect(imap).to have_received(:append).with(anything, "serialized".length)
     end
 
     context "when appending to the mailbox causes an error" do

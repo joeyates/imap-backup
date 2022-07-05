@@ -2,7 +2,7 @@ require "json"
 
 module Imap::Backup
   class Serializer::Imap
-    CURRENT_VERSION = 2
+    CURRENT_VERSION = 3
 
     attr_reader :folder_path
     attr_reader :loaded
@@ -11,7 +11,7 @@ module Imap::Backup
       @folder_path = folder_path
       @loaded = false
       @uid_validity = nil
-      @uids = nil
+      @messages = nil
       @version = nil
     end
 
@@ -23,8 +23,15 @@ module Imap::Backup
       true
     end
 
-    def append(uid)
-      uids << uid
+    def append(uid, length)
+      offset =
+        if messages.empty?
+          0
+        else
+          last_message = messages[-1]
+          last_message[:offset] + last_message[:length]
+        end
+      messages << {uid: uid, offset: offset, length: length}
       save
     end
 
@@ -60,20 +67,24 @@ module Imap::Backup
     def uid_validity=(value)
       ensure_loaded
       @uid_validity = value
-      @uids ||= []
       save
     end
 
-    def uids
+    def messages
       ensure_loaded
-      @uids || []
+      @messages
+    end
+
+    def uids
+      messages.map { |m| m[:uid] }
     end
 
     def update_uid(old, new)
-      index = uids.find_index(old.to_i)
+      index = messages.find_index { |m| m[:uid] == old }
       return if index.nil?
 
-      uids[index] = new.to_i
+      updated = messages[index].merge({uid: new})
+      messages[index] = updated
       save
     end
 
@@ -97,11 +108,11 @@ module Imap::Backup
 
       data = load
       if data
-        @uids = data[:uids].map(&:to_i)
+        @messages = data[:messages]
         @uid_validity = data[:uid_validity]
         @version = data[:version]
       else
-        @uids = []
+        @messages = []
         @uid_validity = nil
         @version = CURRENT_VERSION
       end
@@ -121,8 +132,8 @@ module Imap::Backup
 
       return nil if !data.key?(:version)
       return nil if !data.key?(:uid_validity)
-      return nil if !data.key?(:uids)
-      return nil if !data[:uids].is_a?(Array)
+      return nil if !data.key?(:messages)
+      return nil if !data[:messages].is_a?(Array)
 
       data
     end
@@ -135,7 +146,7 @@ module Imap::Backup
       data = {
         version: @version,
         uid_validity: @uid_validity,
-        uids: @uids
+        messages: @messages
       }
       content = data.to_json
       File.open(pathname, "w") { |f| f.write content }
