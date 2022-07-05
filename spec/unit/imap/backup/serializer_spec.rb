@@ -1,5 +1,5 @@
-shared_examples "a method that resets invalid serialization" do
-  context do
+shared_examples "a method that checks for invalid serialization" do
+  context "when either file is invalid" do
     let(:imap_valid) { true }
     let(:mbox_valid) { true }
 
@@ -9,7 +9,7 @@ shared_examples "a method that resets invalid serialization" do
       allow(mbox).to receive(:valid?) { mbox_valid }
       allow(mbox).to receive(:delete)
 
-      action.call()
+      action.call
     end
 
     context "when the imap file is not valid" do
@@ -73,7 +73,7 @@ module Imap::Backup
     end
 
     describe "#apply_uid_validity" do
-      it_behaves_like "a method that resets invalid serialization" do
+      it_behaves_like "a method that checks for invalid serialization" do
         let(:action) { -> { result } }
       end
 
@@ -125,7 +125,7 @@ module Imap::Backup
     end
 
     describe "#force_uid_validity" do
-      it_behaves_like "a method that resets invalid serialization" do
+      it_behaves_like "a method that checks for invalid serialization" do
         let(:action) { -> { subject.force_uid_validity("new") } }
       end
 
@@ -137,7 +137,7 @@ module Imap::Backup
     end
 
     describe "#append" do
-      it_behaves_like "a method that resets invalid serialization" do
+      it_behaves_like "a method that checks for invalid serialization" do
         let(:action) { -> { subject.append("uid", "message") } }
       end
 
@@ -155,7 +155,7 @@ module Imap::Backup
     end
 
     describe "#load" do
-      it_behaves_like "a method that resets invalid serialization" do
+      it_behaves_like "a method that checks for invalid serialization" do
         let(:action) { -> { result } }
       end
 
@@ -194,7 +194,7 @@ module Imap::Backup
     end
 
     describe "#load_nth" do
-      it_behaves_like "a method that resets invalid serialization" do
+      it_behaves_like "a method that checks for invalid serialization" do
         let(:action) { -> { result } }
       end
 
@@ -223,8 +223,8 @@ module Imap::Backup
     end
 
     describe "#each_message" do
-      it_behaves_like "a method that resets invalid serialization" do
-        let(:action) { -> { subject.each_message([]) {}} }
+      it_behaves_like "a method that checks for invalid serialization" do
+        let(:action) { -> { subject.each_message([]) {} } }
       end
 
       let(:message_enumerator) { instance_double(Serializer::MessageEnumerator, run: nil) }
