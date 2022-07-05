@@ -12,6 +12,8 @@ module Imap::Backup
       allow(File).to receive(:exist?).with(pathname) { exists }
       allow(File).to receive(:open).with(pathname, "ab").and_yield(file)
       allow(File).to receive(:read).with(pathname) { existing.to_json }
+      allow(File).to receive(:unlink).and_call_original
+      allow(File).to receive(:unlink).with(pathname)
     end
 
     describe "#valid?" do
@@ -35,6 +37,26 @@ module Imap::Backup
         subject.append("message")
 
         expect(file).to have_received(:write).with("message")
+      end
+    end
+
+    describe "#delete" do
+      context "when the file exists" do
+        it "deletes the file" do
+          subject.delete
+
+          expect(File).to have_received(:unlink)
+        end
+      end
+
+      context "when the file does not exist" do
+        let(:exists) { false }
+
+        it "does nothing" do
+          subject.delete
+
+          expect(File).to_not have_received(:unlink)
+        end
       end
     end
 
