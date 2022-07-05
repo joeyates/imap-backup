@@ -6,7 +6,7 @@ module Imap::Backup
     let(:imap) do
       instance_double(
         Serializer::Imap,
-        exist?: true,
+        valid?: true,
         rename: nil,
         uid_validity: existing_uid_validity,
         "uid_validity=": nil
@@ -15,7 +15,7 @@ module Imap::Backup
     let(:mbox) do
       instance_double(
         Serializer::Mbox,
-        exist?: false,
+        valid?: true,
         pathname: "aaa",
         rename: nil
       )

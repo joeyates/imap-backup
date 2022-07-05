@@ -6,6 +6,10 @@ module Imap::Backup
       @folder_path = folder_path
     end
 
+    def valid?
+      exist?
+    end
+
     def append(message)
       File.open(pathname, "ab") do |file|
         file.write message

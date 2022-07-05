@@ -22,10 +22,10 @@ module Imap::Backup
       end
     end
 
-    describe "#exist?" do
+    describe "#valid?" do
       context "when the mailbox exists" do
         it "is true" do
-          expect(subject.exist?).to be true
+          expect(subject.valid?).to be true
         end
       end
 
@@ -33,7 +33,7 @@ module Imap::Backup
         let(:exists) { false }
 
         it "is false" do
-          expect(subject.exist?).to be false
+          expect(subject.valid?).to be false
         end
       end
     end
