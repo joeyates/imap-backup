@@ -96,7 +96,7 @@ RSpec.describe "backup", type: :aruba, docker: true do
           File.write(mbox_path(renamed_folder), "existing mbox")
         end
 
-        it "moves the old backup to a uniquely named directory" do
+        it "renames the renamed backup to a uniquely name" do
           renamed = "#{folder}-#{original_folder_uid_validity}-1"
           expect(mbox_content(renamed)).to eq(message_as_mbox_entry(msg3))
         end
