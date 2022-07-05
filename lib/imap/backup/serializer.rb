@@ -6,6 +6,7 @@ require "imap/backup/serializer/imap"
 require "imap/backup/serializer/mbox"
 require "imap/backup/serializer/mbox_enumerator"
 require "imap/backup/serializer/message_enumerator"
+require "imap/backup/serializer/version2_migrator"
 require "imap/backup/serializer/unused_name_finder"
 
 module Imap::Backup
@@ -31,6 +32,8 @@ module Imap::Backup
     # Returns true if there are existing, valid files
     # false otherwise (in which case any existing files are deleted)
     def validate!
+      migrate2to3
+
       return true if imap.valid? && mbox.valid?
 
       imap.delete
@@ -132,6 +135,10 @@ module Imap::Backup
           ensure_containing_directory(folder)
           Serializer::Imap.new(folder_path)
         end
+    end
+
+    def migrate2to3
+      Version2Migrator.new(folder_path).run
     end
 
     def folder_path

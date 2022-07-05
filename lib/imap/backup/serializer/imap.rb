@@ -39,6 +39,10 @@ module Imap::Backup
       return if !exist?
 
       File.unlink(pathname)
+      @loaded = false
+      @messages = nil
+      @uid_validity = nil
+      @version = nil
     end
 
     def include?(uid)

@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 * Introduced a new metadata format.
 * Included data about message offsets and lengths in the new metadata to
   facilitate for future integrity checks.
+* Added a migrator to transform the old (version 2) metadata files
+  into the newer (version 3) files.
 
 ## [6.2.1] - 2022-07-12
 
