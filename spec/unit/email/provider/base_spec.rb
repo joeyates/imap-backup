@@ -10,4 +10,10 @@ describe Email::Provider::Base do
       # rubocop:enable Naming/VariableNumber
     end
   end
+
+  describe "#sets_seen_flags_on_fetch?" do
+    it "is false" do
+      expect(subject.sets_seen_flags_on_fetch?).to be false
+    end
+  end
 end
