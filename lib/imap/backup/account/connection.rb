@@ -46,7 +46,10 @@ module Imap::Backup
         serializer.apply_uid_validity(folder.uid_validity)
         begin
           Downloader.new(
-            folder, serializer, multi_fetch_size: account.multi_fetch_size
+            folder,
+            serializer,
+            multi_fetch_size: account.multi_fetch_size,
+            reset_seen_flags_after_fetch: provider.sets_seen_flags_on_fetch?
           ).run
         rescue Net::IMAP::ByeResponseError
           reconnect
@@ -112,6 +115,10 @@ module Imap::Backup
         File.basename(account.local_path),
         Serializer::Directory::DIRECTORY_PERMISSIONS
       )
+    end
+
+    def provider
+      @provider ||= Email::Provider.for_address(account.username)
     end
   end
 end

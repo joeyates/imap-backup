@@ -32,7 +32,7 @@ module Imap::Backup
     let(:append_response) { nil }
     let(:uids) { [5678, 123] }
 
-    before { allow(client).to receive(:uid_search) { uids } }
+    before { allow(client).to receive(:uid_search).with(["ALL"]) { uids } }
 
     describe "#uids" do
       it "lists available messages" do
@@ -288,6 +288,19 @@ module Imap::Backup
       end
     end
 
+    describe "#unset_flags" do
+      before { subject.unset_flags([99], [:Foo]) }
+
+      it "uses select to have read-write access" do
+        expect(client).to have_received(:select)
+      end
+
+      it "set the flag" do
+        expect(client).
+          to have_received(:uid_store).with([99], "-FLAGS", [:Foo])
+      end
+    end
+
     describe "#clear" do
       before { subject.clear }
 
@@ -302,6 +315,18 @@ module Imap::Backup
 
       it "deletes marked emails" do
         expect(client).to have_received(:expunge)
+      end
+    end
+
+    describe "#unseen" do
+      let(:result) { subject.unseen([42, 99]) }
+
+      before do
+        allow(client).to receive(:uid_search).with(["42,99", "UNSEEN"]) { [42] }
+      end
+
+      it "returns UIDs of unseen messages" do
+        expect(result).to eq([42])
       end
     end
   end

@@ -160,7 +160,7 @@ module Imap::Backup
         subject.run_backup
 
         expect(Downloader).to have_received(:new).
-          with(anything, anything, {multi_fetch_size: 10})
+          with(anything, anything, {multi_fetch_size: 10, reset_seen_flags_after_fetch: false})
       end
 
       context "with supplied config_folders" do
