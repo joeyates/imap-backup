@@ -275,10 +275,21 @@ module Imap::Backup
       end
     end
 
-    describe "#clear" do
-      before do
-        subject.clear
+    describe "#set_flags" do
+      before { subject.set_flags([99], [:Foo]) }
+
+      it "uses select to have read-write access" do
+        expect(client).to have_received(:select)
       end
+
+      it "set the flag" do
+        expect(client).
+          to have_received(:uid_store).with([99], "+FLAGS", [:Foo])
+      end
+    end
+
+    describe "#clear" do
+      before { subject.clear }
 
       it "uses select to have read-write access" do
         expect(client).to have_received(:select)

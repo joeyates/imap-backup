@@ -98,11 +98,14 @@ module Imap::Backup
       end
     end
 
-    def clear
-      existing = uids
+    def set_flags(uids, flags)
       # Use read-write access, via `select`
       client.select(utf7_encoded_name)
-      client.uid_store(existing, "+FLAGS", [:Deleted])
+      client.uid_store(uids, "+FLAGS", flags)
+    end
+
+    def clear
+      set_flags(uids, [:Deleted])
       client.expunge
     end
 
