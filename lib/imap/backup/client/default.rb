@@ -36,12 +36,16 @@ module Imap::Backup
     end
 
     def examine(mailbox)
+      return if state == [:examine, mailbox]
+
       result = imap.examine(mailbox)
       self.state = [:examine, mailbox]
       result
     end
 
     def select(mailbox)
+      return if state == [:select, mailbox]
+
       imap.select(mailbox)
       self.state = [:select, mailbox]
     end
