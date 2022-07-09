@@ -105,6 +105,8 @@ module Imap::Backup
     end
 
     def ensure_account_folder
+      raise "The backup path for #{account.username} is not set" if !account.local_path
+
       Utils.make_folder(
         File.dirname(account.local_path),
         File.basename(account.local_path),

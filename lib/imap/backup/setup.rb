@@ -80,7 +80,6 @@ module Imap::Backup
       Imap::Backup::Account.new(
         username: username,
         password: "",
-        local_path: File.join(config.path, username.tr("@", "_")),
         folders: []
       ).tap do |a|
         server = ::Email::Provider.for_address(username)

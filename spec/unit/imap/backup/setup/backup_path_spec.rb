@@ -10,38 +10,46 @@ module Imap::Backup
     let(:account) do
       instance_double(
         Account,
-        username: "account",
-        local_path: "/backup/path"
+        username: "username@example.com",
+        local_path: local_path
       )
     end
+    let(:local_path) { "/backup/path" }
     let(:account1) do
       instance_double(Account, username: "account1", local_path: other_existing_path)
     end
     let(:other_existing_path) { "/other/existing/path" }
     let(:accounts) { [account, account1] }
-    let(:config) { instance_double(Configuration, accounts: accounts) }
+    let(:config) { instance_double(Configuration, accounts: accounts, path: "/config/path") }
     let(:new_backup_path) { "/new/path" }
 
     before do
       allow(Kernel).to receive(:puts)
       allow(account).to receive(:"local_path=")
+      allow(Setup.highline).to receive(:get_response_line_mode) { new_backup_path }
     end
 
     context "with valid input" do
-      before do
-        allow(Setup.highline).to receive(:get_response_line_mode) { new_backup_path }
-      end
-
       it "asks for input" do
         subject.run
 
-        expect(stdout.string).to match(/backup directory: /)
+        expect(stdout.string).to match(%r(backup directory: \|/backup/path))
       end
 
       it "updates the path" do
         subject.run
 
         expect(account).to have_received(:"local_path=").with(new_backup_path)
+      end
+    end
+
+    context "when #local_path is not set" do
+      let(:local_path) { nil }
+
+      it "sets a default value" do
+        subject.run
+
+        expect(stdout.string).to match(%r(backup directory: \|/config/path/username_example.com))
       end
     end
 
