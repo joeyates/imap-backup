@@ -49,6 +49,16 @@ module Imap::Backup
       it "memoizes the connection" do
         expect(subject.connection).to be result
       end
+
+      context "when changes are made" do
+        it "re-memoizes" do
+          memoized = result
+
+          subject.username = "changed"
+
+          expect(subject.connection).to_not be memoized
+        end
+      end
     end
 
     describe "#valid?" do

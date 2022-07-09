@@ -115,6 +115,7 @@ module Imap::Backup
         changes[field] = {from: current, to: value} if value != current
       end
 
+      @connection = nil
       instance_variable_set(key, value)
     end
   end
