@@ -12,11 +12,15 @@ module Imap::Backup
 
     def run
       account.local_path = highline.ask("backup directory: ") do |q|
-        q.default  = account.local_path
+        q.default  = account.local_path || default
         q.readline = true
         q.validate = ->(path) { path_modification_validator(path) }
         q.responses[:not_valid] = "Choose a different directory "
       end
+    end
+
+    def default
+      File.join(config.path, account.username.tr("@", "_"))
     end
 
     private

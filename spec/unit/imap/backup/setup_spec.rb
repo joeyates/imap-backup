@@ -176,10 +176,6 @@ module Imap::Backup
           expect(accounts[1].password).to eq("")
         end
 
-        it "sets local_path" do
-          expect(accounts[1].local_path).to eq(local_path)
-        end
-
         it "sets folders" do
           expect(accounts[1].folders).to eq([])
         end
