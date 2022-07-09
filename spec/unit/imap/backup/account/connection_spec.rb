@@ -1,6 +1,28 @@
 require "ostruct"
 
 module Imap::Backup
+  shared_examples "ensures the backup directory exists" do
+    context "when local_path is not set" do
+      let(:local_path) { nil }
+
+      it "fails" do
+        expect { action.call }.to raise_error(RuntimeError, /backup path.*?not set/)
+      end
+    end
+
+    context "when the directory does not exist" do
+      before do
+        allow(Utils).to receive(:make_folder)
+
+        action.call
+      end
+
+      it "creates it" do
+        expect(Utils).to have_received(:make_folder)
+      end
+    end
+  end
+
   describe Account::Connection do
     subject { described_class.new(account) }
 
@@ -45,7 +67,6 @@ module Imap::Backup
     before do
       allow(Account::Connection::ClientFactory).to receive(:new) { client_factory }
       allow(Account::Connection::BackupFolders).to receive(:new) { backup_folders }
-      allow(Utils).to receive(:make_folder)
     end
 
     describe "#client" do
@@ -93,10 +114,8 @@ module Imap::Backup
         allow(Serializer).to receive(:new) { serializer }
       end
 
-      it "creates the path" do
-        expect(Utils).to receive(:make_folder)
-
-        subject.status
+      it_behaves_like "ensures the backup directory exists" do
+        let(:action) { -> { subject.status } }
       end
 
       it "returns the names of folders" do
@@ -131,6 +150,10 @@ module Imap::Backup
           to receive(:new).with(anything, serializer, anything) { downloader }
         allow(Serializer).to receive(:new).
           with(local_path, imap_folder) { serializer }
+      end
+
+      it_behaves_like "ensures the backup directory exists" do
+        let(:action) { -> { subject.run_backup } }
       end
 
       it "passes the multi_fetch_size" do
