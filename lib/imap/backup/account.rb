@@ -18,12 +18,13 @@ module Imap::Backup
       @server = options[:server]
       @connection_options = options[:connection_options]
       @multi_fetch_size = options[:multi_fetch_size]
+      @connection = nil
       @changes = {}
       @marked_for_deletion = false
     end
 
     def connection
-      Account::Connection.new(self)
+      @connection ||= Account::Connection.new(self)
     end
 
     def valid?
@@ -114,6 +115,7 @@ module Imap::Backup
         changes[field] = {from: current, to: value} if value != current
       end
 
+      @connection = nil
       instance_variable_set(key, value)
     end
   end
