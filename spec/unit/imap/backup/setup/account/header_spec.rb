@@ -13,13 +13,15 @@ module Imap::Backup
         server: "imap.example.com",
         connection_options: connection_options,
         modified?: modified,
-        multi_fetch_size: multi_fetch_size
+        multi_fetch_size: multi_fetch_size,
+        reset_seen_flags_after_fetch: reset_seen_flags_after_fetch
       )
     end
     let(:existing_password) { "password" }
     let(:connection_options) { nil }
     let(:modified) { false }
     let(:multi_fetch_size) { 2 }
+    let(:reset_seen_flags_after_fetch) { false }
 
     [
       ["email", /email\s+user@example.com/],
@@ -70,6 +72,14 @@ module Imap::Backup
 
       it "shows the options" do
         expect(menu.header).to match(/^connection options\s+'{\\"some\\":\\"option\\"}'/)
+      end
+    end
+
+    context "with reset_seen_flags_after_fetch" do
+      let(:reset_seen_flags_after_fetch) { true }
+
+      it "indicates the flag is set" do
+        expect(menu.header).to match(/^changes to unread flags will be reset/)
       end
     end
   end

@@ -37,6 +37,7 @@ module Imap::Backup
         modify_multi_fetch_size menu
         modify_server menu
         modify_connection_options menu
+        toggle_reset_seen_flags_after_fetch menu
         test_connection menu
         delete_account menu
         menu.choice("(q) return to main menu") { throw :done }
@@ -100,6 +101,19 @@ module Imap::Backup
             highline.ask "Press a key "
           end
         end
+      end
+    end
+
+    def toggle_reset_seen_flags_after_fetch(menu)
+      menu_item =
+        if account.reset_seen_flags_after_fetch
+          "don't fix changes to unread flags during download"
+        else
+          "fix changes to unread flags during download"
+        end
+      new_value = account.reset_seen_flags_after_fetch ? nil : true
+      menu.choice(menu_item) do
+        account.reset_seen_flags_after_fetch = new_value
       end
     end
 
