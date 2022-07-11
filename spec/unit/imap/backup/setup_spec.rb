@@ -189,6 +189,14 @@ module Imap::Backup
           end
         end
 
+        context "when the provider sets Seen flags on fetch" do
+          let(:added_email) { "new@me.com" }
+
+          it "sets the relevant flag" do
+            expect(accounts[1].reset_seen_flags_after_fetch).to be true
+          end
+        end
+
         it "doesn't flag the unedited account as modified" do
           # rubocop:disable RSpec/PredicateMatcher
           expect(accounts[1].modified?).to be_falsey
