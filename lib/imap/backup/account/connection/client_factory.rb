@@ -1,3 +1,4 @@
+require "email/provider"
 require "retry_on_error"
 
 module Imap::Backup

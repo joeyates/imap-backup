@@ -93,6 +93,21 @@ module Imap::Backup
           expect(serializer).to_not have_received(:append)
         end
       end
+
+      context "with reset_seen_flags_after_fetch" do
+        let(:options) { {reset_seen_flags_after_fetch: true} }
+
+        before do
+          allow(folder).to receive(:unseen).and_return([33], [])
+          allow(folder).to receive(:unset_flags)
+
+          subject.run
+        end
+
+        it "resets seen flags set during fetch" do
+          expect(folder).to have_received(:unset_flags).with([33], [:Seen])
+        end
+      end
     end
   end
 end

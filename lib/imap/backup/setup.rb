@@ -82,8 +82,9 @@ module Imap::Backup
         password: "",
         folders: []
       ).tap do |a|
-        server = ::Email::Provider.for_address(username)
-        a.server = server.host if server.host
+        provider = ::Email::Provider.for_address(username)
+        a.server = provider.host if provider.host
+        a.reset_seen_flags_after_fetch = true if provider.sets_seen_flags_on_fetch?
       end
     end
 

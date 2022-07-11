@@ -8,6 +8,7 @@ module Imap::Backup
     attr_reader :folders
     attr_reader :server
     attr_reader :connection_options
+    attr_reader :reset_seen_flags_after_fetch
     attr_reader :changes
 
     def initialize(options)
@@ -18,6 +19,7 @@ module Imap::Backup
       @server = options[:server]
       @connection_options = options[:connection_options]
       @multi_fetch_size = options[:multi_fetch_size]
+      @reset_seen_flags_after_fetch = options[:reset_seen_flags_after_fetch]
       @connection = nil
       @changes = {}
       @marked_for_deletion = false
@@ -54,6 +56,9 @@ module Imap::Backup
       h[:server] = @server if @server
       h[:connection_options] = @connection_options if @connection_options
       h[:multi_fetch_size] = multi_fetch_size if @multi_fetch_size
+      if @reset_seen_flags_after_fetch
+        h[:reset_seen_flags_after_fetch] = @reset_seen_flags_after_fetch
+      end
       h
     end
 
@@ -97,6 +102,10 @@ module Imap::Backup
       parsed = value.to_i
       parsed = DEFAULT_MULTI_FETCH_SIZE if !parsed.positive?
       update(:multi_fetch_size, parsed)
+    end
+
+    def reset_seen_flags_after_fetch=(value)
+      update(:reset_seen_flags_after_fetch, value)
     end
 
     private

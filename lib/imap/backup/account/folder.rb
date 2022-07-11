@@ -98,12 +98,31 @@ module Imap::Backup
       end
     end
 
-    def clear
-      existing = uids
+    def set_flags(uids, flags)
       # Use read-write access, via `select`
       client.select(utf7_encoded_name)
-      client.uid_store(existing, "+FLAGS", [:Deleted])
+      client.uid_store(uids, "+FLAGS", flags)
+    end
+
+    def unset_flags(uids, flags)
+      client.select(utf7_encoded_name)
+      client.uid_store(uids, "-FLAGS", flags)
+    end
+
+    def clear
+      set_flags(uids, [:Deleted])
       client.expunge
+    end
+
+    def unseen(uids)
+      messages = uids.map(&:to_s).join(",")
+      examine
+      client.uid_search([messages, "UNSEEN"])
+    rescue NoMethodError
+      # Apple Mail returns an empty response when searches have no results
+      []
+    rescue FolderNotFound
+      nil
     end
 
     private

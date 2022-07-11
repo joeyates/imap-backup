@@ -1,8 +1,8 @@
 require "email/provider/base"
 
-class Email::Provider::AppleMail < Email::Provider::Base
+class Email::Provider::Purelymail < Email::Provider::Base
   def host
-    "imap.mail.me.com"
+    "mailserver.purelymail.com"
   end
 
   def sets_seen_flags_on_fetch?

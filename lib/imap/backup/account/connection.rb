@@ -1,4 +1,3 @@
-require "email/provider"
 require "imap/backup/client/apple_mail"
 require "imap/backup/client/default"
 require "imap/backup/account/connection/backup_folders"
@@ -46,7 +45,10 @@ module Imap::Backup
         serializer.apply_uid_validity(folder.uid_validity)
         begin
           Downloader.new(
-            folder, serializer, multi_fetch_size: account.multi_fetch_size
+            folder,
+            serializer,
+            multi_fetch_size: account.multi_fetch_size,
+            reset_seen_flags_after_fetch: account.reset_seen_flags_after_fetch
           ).run
         rescue Net::IMAP::ByeResponseError
           reconnect

@@ -7,4 +7,8 @@ class Email::Provider::Base
     {port: 993, ssl: {ssl_version: :TLSv1_2}}
     # rubocop:enable Naming/VariableNumber
   end
+
+  def sets_seen_flags_on_fetch?
+    false
+  end
 end

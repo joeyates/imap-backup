@@ -7,7 +7,8 @@ describe Email::Provider do
         ["gmail.com", "GMail", Email::Provider::GMail],
         ["icloud.com", "Apple Mail icloud.com", Email::Provider::AppleMail],
         ["mac.com", "Apple Mail mac.com", Email::Provider::AppleMail],
-        ["me.com", "Apple Mail me.com", Email::Provider::AppleMail]
+        ["me.com", "Apple Mail me.com", Email::Provider::AppleMail],
+        ["purelymail.com", "Purelymail me.com", Email::Provider::Purelymail]
       ].each do |domain, name, klass|
         it "recognizes #{name} addresses" do
           address = "foo@#{domain}"

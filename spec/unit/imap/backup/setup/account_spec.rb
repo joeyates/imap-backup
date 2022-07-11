@@ -2,10 +2,17 @@ module Imap::Backup
   describe Setup::Account do
     subject { described_class.new(config, account, highline) }
 
-    let(:account) { instance_double(Account, password: existing_password) }
+    let(:account) do
+      instance_double(
+        Account,
+        password: existing_password,
+        reset_seen_flags_after_fetch: reset_seen_flags_after_fetch
+      )
+    end
     let(:account1) { instance_double(Account) }
     let(:accounts) { [account, account1] }
     let(:existing_password) { "password" }
+    let(:reset_seen_flags_after_fetch) { nil }
     let(:multi_fetch_size) { 1 }
     let(:connection_options) { nil }
     let(:highline) { instance_double(HighLine) }
@@ -81,6 +88,7 @@ module Imap::Backup
           "modify multi-fetch size (number of emails to fetch at a time)",
           "modify server",
           "modify connection options",
+          "fix changes to unread flags during download",
           "test connection",
           "delete",
           "(q) return to main menu",
@@ -90,6 +98,16 @@ module Imap::Backup
 
           it "has a '#{item}' item" do
             expect(menu.choices).to include(item)
+          end
+        end
+
+        context "when reset_seen_flags_after_fetch is set" do
+          let(:reset_seen_flags_after_fetch) { true }
+
+          before { subject.run }
+
+          it "has an entry to toggle the setting off" do
+            expect(menu.choices).to include("don't fix changes to unread flags during download")
           end
         end
       end
@@ -254,6 +272,36 @@ module Imap::Backup
           it "reports the problem" do
             expect(Kernel).to have_received(:puts).
               with(/Malformed/)
+          end
+        end
+      end
+
+      describe "toggling 'fix changes...'" do
+        context "when reset_seen_flags_after_fetch is not set" do
+          before do
+            allow(account).to receive(:reset_seen_flags_after_fetch=)
+
+            subject.run
+            menu.choices["fix changes to unread flags during download"].call
+          end
+
+          it "sets the flag" do
+            expect(account).to have_received(:reset_seen_flags_after_fetch=).with(true)
+          end
+        end
+
+        context "when reset_seen_flags_after_fetch is set" do
+          let(:reset_seen_flags_after_fetch) { true }
+
+          before do
+            allow(account).to receive(:reset_seen_flags_after_fetch=)
+
+            subject.run
+            menu.choices["don't fix changes to unread flags during download"].call
+          end
+
+          it "unsets the flag" do
+            expect(account).to have_received(:reset_seen_flags_after_fetch=).with(nil)
           end
         end
       end

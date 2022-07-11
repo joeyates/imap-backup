@@ -21,7 +21,7 @@ module Imap::Backup
         password#{space}#{masked_password}
         path    #{space}#{local_path}
         folders #{space}#{folders.map { |f| f[:name] }.join(', ')}#{multi_fetch_size}
-        server  #{space}#{account.server}#{connection_options}
+        server  #{space}#{account.server}#{connection_options}#{reset_seen_flags_after_fetch}
 
         Choose an action
       HEADER
@@ -51,6 +51,12 @@ module Imap::Backup
       escaped = JSON.generate(account.connection_options)
       escaped.gsub!('"', '\"')
       "\nconnection options  '#{escaped}'"
+    end
+
+    def reset_seen_flags_after_fetch
+      return nil if !account.reset_seen_flags_after_fetch
+
+      "\nchanges to unread flags will be reset during download"
     end
 
     def space
