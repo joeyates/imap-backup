@@ -328,6 +328,26 @@ module Imap::Backup
       it "returns UIDs of unseen messages" do
         expect(result).to eq([42])
       end
+
+      context "when the unseen search fails" do
+        before do
+          allow(client).to receive(:uid_search).with([anything, "UNSEEN"]).and_raise(NoMethodError)
+        end
+
+        it "returns an empty array" do
+          expect(result).to eq([])
+        end
+      end
+
+      context "when the folder doesn't exist" do
+        before do
+          allow(client).to receive(:uid_search).with([anything, "UNSEEN"]).and_raise(FolderNotFound)
+        end
+
+        it "returns an empty array" do
+          expect(result).to be nil
+        end
+      end
     end
   end
 end

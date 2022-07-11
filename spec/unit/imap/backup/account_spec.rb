@@ -168,6 +168,14 @@ module Imap::Backup
           expect(subject.to_h).to include({connection_options: "foo"})
         end
       end
+
+      context "when reset_seen_flags_after_fetch is set" do
+        let(:options) { {username: "user", password: "pwd", reset_seen_flags_after_fetch: true} }
+
+        it "includes connection_options" do
+          expect(subject.to_h).to include({reset_seen_flags_after_fetch: true})
+        end
+      end
     end
 
     describe "#multi_fetch_size" do
