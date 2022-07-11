@@ -1,4 +1,3 @@
-require "email/provider"
 require "imap/backup/client/apple_mail"
 require "imap/backup/client/default"
 require "imap/backup/account/connection/backup_folders"
@@ -49,7 +48,7 @@ module Imap::Backup
             folder,
             serializer,
             multi_fetch_size: account.multi_fetch_size,
-            reset_seen_flags_after_fetch: provider.sets_seen_flags_on_fetch?
+            reset_seen_flags_after_fetch: account.reset_seen_flags_after_fetch
           ).run
         rescue Net::IMAP::ByeResponseError
           reconnect
@@ -115,10 +114,6 @@ module Imap::Backup
         File.basename(account.local_path),
         Serializer::Directory::DIRECTORY_PERMISSIONS
       )
-    end
-
-    def provider
-      @provider ||= Email::Provider.for_address(account.username)
     end
   end
 end

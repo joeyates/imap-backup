@@ -38,11 +38,13 @@ module Imap::Backup
         Account,
         username: "username",
         local_path: local_path,
-        multi_fetch_size: multi_fetch_size
+        multi_fetch_size: multi_fetch_size,
+        reset_seen_flags_after_fetch: reset_seen_flags_after_fetch
       )
     end
     let(:local_path) { "local_path" }
     let(:multi_fetch_size) { 1 }
+    let(:reset_seen_flags_after_fetch) { nil }
     let(:root_info) do
       instance_double(Net::IMAP::MailboxList, name: root_name)
     end
@@ -160,7 +162,18 @@ module Imap::Backup
         subject.run_backup
 
         expect(Downloader).to have_received(:new).
-          with(anything, anything, {multi_fetch_size: 10, reset_seen_flags_after_fetch: false})
+          with(anything, anything, {multi_fetch_size: 10, reset_seen_flags_after_fetch: nil})
+      end
+
+      context "when reset_seen_flags_after_fetch is set" do
+        let(:reset_seen_flags_after_fetch) { true }
+
+        it "passes reset_seen_flags_after_fetch" do
+          subject.run_backup
+
+          expect(Downloader).to have_received(:new).
+            with(anything, anything, {multi_fetch_size: 10, reset_seen_flags_after_fetch: true})
+        end
       end
 
       context "with supplied config_folders" do
