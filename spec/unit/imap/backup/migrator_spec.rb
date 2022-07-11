@@ -54,5 +54,15 @@ module Imap::Backup
         end
       end
     end
+
+    context "when the upload fails" do
+      before do
+        allow(folder).to receive(:append).and_raise(RuntimeError)
+      end
+
+      it "continues to work" do
+        subject.run
+      end
+    end
   end
 end

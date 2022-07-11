@@ -24,7 +24,11 @@ module Imap::Backup
           "#{log_prefix} #{message.supplied_body.size} bytes"
         )
 
-        folder.append(message)
+        begin
+          folder.append(message)
+        rescue StandardError => e
+          Logger.logger.warn "#{log_prefix} append error: #{e}"
+        end
       end
     end
 
