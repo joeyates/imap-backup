@@ -4,12 +4,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Next] - ?
+## [6.2.0] - 2022-07-12
 
 ## Changed
 
 * Improved the speed of some operations by tracking mailbox selection
   to avoid repeated calls to select the same mailbox.
+* Added handling of append errors during migration.
 
 ## [6.1.0] - 2022-07-11
 
