@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Next] - ?
+
+## Changed
+
+* Improved the speed of some operations by tracking mailbox selection
+  to avoid repeated calls to select the same mailbox.
+
 ## [6.1.0] - 2022-07-11
 
 ## Changed
