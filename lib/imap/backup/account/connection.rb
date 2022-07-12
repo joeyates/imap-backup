@@ -39,7 +39,14 @@ module Imap::Backup
       client
       ensure_account_folder
       each_folder do |folder, serializer|
-        next if !folder.exist?
+        begin
+          next if !folder.exist?
+        rescue Encoding::UndefinedConversionError
+          message = "Skipping backup for '#{folder.name}' " \
+                    "as it is not UTF-7 encoded correctly"
+          Logger.logger.info message
+          next
+        end
 
         Logger.logger.debug "[#{folder.name}] running backup"
         serializer.apply_uid_validity(folder.uid_validity)

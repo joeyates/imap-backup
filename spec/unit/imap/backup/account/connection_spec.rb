@@ -240,6 +240,16 @@ module Imap::Backup
           subject.run_backup
         end
       end
+
+      context "when a folder name is badly encoded" do
+        it "skips the folder" do
+          allow(folder).to receive(:exist?).and_raise(Encoding::UndefinedConversionError)
+
+          subject.run_backup
+
+          expect(downloader).to_not have_received(:run)
+        end
+      end
     end
 
     describe "#restore" do
