@@ -20,5 +20,31 @@ module Imap::Backup
         end
       end
     end
+
+    describe "#examine" do
+      before do
+        allow(imap).to receive(:examine)
+        subject.examine("foo")
+      end
+
+      it "skips repeated calls on the same mailbox" do
+        subject.examine("foo")
+
+        expect(imap).to have_received(:examine).once
+      end
+    end
+
+    describe "#select" do
+      before do
+        allow(imap).to receive(:select)
+        subject.select("foo")
+      end
+
+      it "skips repeated calls on the same mailbox" do
+        subject.select("foo")
+
+        expect(imap).to have_received(:select).once
+      end
+    end
   end
 end
