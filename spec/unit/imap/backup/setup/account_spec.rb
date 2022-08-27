@@ -5,18 +5,21 @@ module Imap::Backup
     let(:account) do
       instance_double(
         Account,
+        username: "user@example.com",
         password: existing_password,
+        local_path: local_path,
         reset_seen_flags_after_fetch: reset_seen_flags_after_fetch
       )
     end
     let(:account1) { instance_double(Account) }
     let(:accounts) { [account, account1] }
     let(:existing_password) { "password" }
+    let(:local_path) { "some/path" }
     let(:reset_seen_flags_after_fetch) { nil }
     let(:multi_fetch_size) { 1 }
     let(:connection_options) { nil }
     let(:highline) { instance_double(HighLine) }
-    let(:config) { instance_double(Configuration, accounts: accounts) }
+    let(:config) { instance_double(Configuration, accounts: accounts, path: "config/path") }
 
     describe "#initialize" do
       [:config, :account, :highline].each do |param|
@@ -68,6 +71,19 @@ module Imap::Backup
           expect(header).to receive(:run)
 
           subject.run
+        end
+
+        context "when #local_path is not set" do
+          let(:local_path) { nil }
+
+          before do
+            allow(account).to receive(:"local_path=")
+            subject.run
+          end
+
+          it "sets a default value" do
+            expect(account).to have_received(:"local_path=").with("config/path/user_example.com")
+          end
         end
 
         describe "menu" do

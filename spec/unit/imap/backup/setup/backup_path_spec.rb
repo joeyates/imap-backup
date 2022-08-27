@@ -11,10 +11,9 @@ module Imap::Backup
       instance_double(
         Account,
         username: "username@example.com",
-        local_path: local_path
+        local_path: "/backup/path"
       )
     end
-    let(:local_path) { "/backup/path" }
     let(:account1) do
       instance_double(Account, username: "account1", local_path: other_existing_path)
     end
@@ -40,16 +39,6 @@ module Imap::Backup
         subject.run
 
         expect(account).to have_received(:"local_path=").with(new_backup_path)
-      end
-    end
-
-    context "when #local_path is not set" do
-      let(:local_path) { nil }
-
-      it "sets a default value" do
-        subject.run
-
-        expect(stdout.string).to match(%r(backup directory: \|/config/path/username_example.com))
       end
     end
 

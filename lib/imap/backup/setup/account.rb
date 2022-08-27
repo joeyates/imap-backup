@@ -17,6 +17,10 @@ module Imap::Backup
     end
 
     def run
+      if !account.local_path
+        account.local_path = File.join(config.path, account.username.tr("@", "_"))
+      end
+
       catch :done do
         loop do
           Kernel.system("clear")
