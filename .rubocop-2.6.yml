@@ -113,7 +113,7 @@ Lint/UselessRuby2Keywords:
   Enabled: true
 
 Metrics/BlockLength:
-  IgnoredMethods:
+  AllowedMethods:
     - context
     - describe
     - feature
