@@ -32,7 +32,7 @@ module Imap::Backup
     # Returns true if there are existing, valid files
     # false otherwise (in which case any existing files are deleted)
     def validate!
-      migrate2to3
+      optionally_migrate2to3
 
       return true if imap.valid? && mbox.valid?
 
@@ -137,8 +137,17 @@ module Imap::Backup
         end
     end
 
-    def migrate2to3
-      Version2Migrator.new(folder_path).run
+    def optionally_migrate2to3
+      migrator = Version2Migrator.new(folder_path)
+      return if !migrator.required?
+
+      Logger.logger.info <<~MESSAGE
+        Local metadata for folder '#{folder_path}' is currently stored in the version 2 format.
+
+        This will now be transformed into the version 3 format.
+      MESSAGE
+
+      migrator.run
     end
 
     def folder_path

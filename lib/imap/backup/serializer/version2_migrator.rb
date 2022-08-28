@@ -10,13 +10,19 @@ module Imap::Backup
       @folder_path = folder_path
     end
 
-    def run
+    def required?
       return false if !mbox_exists?
       return false if !imap_exists?
       return false if !data
       return false if data[:version] != 2
       return false if !data[:uid_validity]
       return false if !uids.is_a?(Array)
+
+      true
+    end
+
+    def run
+      return false if !required?
 
       messages = message_uids_and_lengths
 

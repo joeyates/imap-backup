@@ -3,7 +3,7 @@ shared_examples "a method that checks for invalid serialization" do
 
   context "with version 2 metadata files" do
     let(:version2_migrator) do
-      instance_double(Imap::Backup::Serializer::Version2Migrator, run: false)
+      instance_double(Imap::Backup::Serializer::Version2Migrator, required?: true, run: false)
     end
 
     before do
