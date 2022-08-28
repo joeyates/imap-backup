@@ -141,7 +141,7 @@ module Imap::Backup
       let(:file) { instance_double(File, write: nil) }
 
       before do
-        allow(FileUtils).to receive(:mkdir)
+        allow(FileUtils).to receive(:mkdir_p)
         allow(FileUtils).to receive(:chmod)
         allow(File).to receive(:open).and_call_original
         allow(File).to receive(:open).with(file_path, "w").and_yield(file)
@@ -149,7 +149,7 @@ module Imap::Backup
       end
 
       it "creates the config directory" do
-        expect(FileUtils).to receive(:mkdir).with(directory)
+        expect(FileUtils).to receive(:mkdir_p).with(directory)
 
         subject.save
       end

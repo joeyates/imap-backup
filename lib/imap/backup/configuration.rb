@@ -30,7 +30,7 @@ module Imap::Backup
 
     def save
       ensure_loaded!
-      FileUtils.mkdir(path) if !File.directory?(path)
+      FileUtils.mkdir_p(path) if !File.directory?(path)
       make_private(path) if !windows?
       remove_modified_flags
       remove_deleted_accounts
