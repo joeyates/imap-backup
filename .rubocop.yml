@@ -8,7 +8,7 @@ AllCops:
     - "vendor/**/*"
   DisplayCopNames:
     Enabled: true
-  TargetRubyVersion: 2.5
+  TargetRubyVersion: 2.6
 
 Gemspec/DeprecatedAttributeAssignment:
   Enabled: true
