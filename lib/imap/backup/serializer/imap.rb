@@ -23,7 +23,7 @@ module Imap::Backup
       true
     end
 
-    def append(uid, length)
+    def append(uid, length, flags = [])
       offset =
         if messages.empty?
           0
@@ -31,7 +31,7 @@ module Imap::Backup
           last_message = messages[-1]
           last_message[:offset] + last_message[:length]
         end
-      messages << {uid: uid, offset: offset, length: length}
+      messages << {uid: uid, offset: offset, length: length, flags: flags}
       save
     end
 
