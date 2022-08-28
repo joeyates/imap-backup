@@ -35,6 +35,10 @@ module Imap::Backup
       save
     end
 
+    def get(uid)
+      messages.find { |m| m[:uid] == uid }
+    end
+
     def delete
       return if !exist?
 
