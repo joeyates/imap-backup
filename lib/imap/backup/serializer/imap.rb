@@ -45,10 +45,12 @@ module Imap::Backup
       @version = nil
     end
 
+    # Deprecated
     def include?(uid)
       uids.include?(uid)
     end
 
+    # Deprecated
     def index(uid)
       uids.find_index(uid)
     end
@@ -74,11 +76,13 @@ module Imap::Backup
       save
     end
 
+    # Make private
     def messages
       ensure_loaded
       @messages
     end
 
+    # Deprecated
     def uids
       messages.map { |m| m[:uid] }
     end
