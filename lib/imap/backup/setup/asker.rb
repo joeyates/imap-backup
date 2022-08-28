@@ -13,7 +13,6 @@ module Imap::Backup
     def email(default = "")
       highline.ask("email address: ") do |q|
         q.default               = default
-        q.readline              = true
         q.validate              = EMAIL_MATCHER
         q.responses[:not_valid] = "Enter a valid email address "
       end
