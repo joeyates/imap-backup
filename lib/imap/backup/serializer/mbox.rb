@@ -16,6 +16,13 @@ module Imap::Backup
       end
     end
 
+    def read(offset, length)
+      File.open(pathname, "rb") do |f|
+        f.seek offset
+        f.read length
+      end
+    end
+
     def delete
       return if !exist?
 
