@@ -12,17 +12,16 @@ module Imap::Backup
     end
 
     def run(uids:)
-      indexes = uids.each.with_object({}) do |uid_maybe_string, acc|
+      uids.each do |uid_maybe_string|
         uid = uid_maybe_string.to_i
-        index = imap.index(uid)
-        acc[index] = uid if index
-      end
-      enumerator = Serializer::MboxEnumerator.new(mbox.pathname)
-      enumerator.each.with_index do |raw, i|
-        uid = indexes[i]
-        next if !uid
+        message = imap.get(uid)
 
-        yield uid, Email::Mboxrd::Message.from_serialized(raw)
+        next if !message
+
+        raw = mbox.read(message[:offset], message[:length])
+        body = Email::Mboxrd::Message.from_serialized(raw)
+
+        yield message[:uid], body, message[:flags]
       end
     end
   end

@@ -3,15 +3,14 @@ module Imap::Backup
     subject { described_class.new(imap: imap, mbox: mbox) }
 
     let(:imap) { instance_double(Serializer::Imap) }
-    let(:mbox) { instance_double(Serializer::Mbox, pathname: "aaa") }
-    let(:enumerator) { instance_double(Serializer::MboxEnumerator) }
+    let(:mbox) { instance_double(Serializer::Mbox, read: "message") }
     let(:good_uid) { 999 }
 
     before do
-      allow(imap).to receive(:index) { nil }
-      allow(imap).to receive(:index).with(good_uid) { 0 }
-      allow(Serializer::MboxEnumerator).to receive(:new) { enumerator }
-      allow(enumerator).to receive(:each) { ["message"].enum_for(:each) }
+      allow(imap).to receive(:get) { nil }
+      allow(imap).to receive(:get).with(good_uid) do
+        {uid: good_uid, offset: 0, length: 100, flags: [:MyFlag]}
+      end
     end
 
     it "yields matching UIDs" do
