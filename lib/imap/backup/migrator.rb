@@ -16,7 +16,7 @@ module Imap::Backup
       ensure_destination_empty!
 
       Logger.logger.debug "[#{folder.name}] #{count} to migrate"
-      serializer.each_message(serializer.uids).with_index do |(uid, message), i|
+      serializer.each_message(serializer.uids).with_index do |(uid, message, flags), i|
         next if message.nil?
 
         log_prefix = "[#{folder.name}] uid: #{uid} (#{i + 1}/#{count}) -"
@@ -25,7 +25,7 @@ module Imap::Backup
         )
 
         begin
-          folder.append(message)
+          folder.append(message, flags: flags)
         rescue StandardError => e
           Logger.logger.warn "#{log_prefix} append error: #{e}"
         end

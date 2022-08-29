@@ -13,7 +13,7 @@ module Imap::Backup
     end
     let(:folder_uids) { [] }
     let(:reset) { false }
-    let(:messages) { [[1, message]] }
+    let(:messages) { [[1, message, [:MyFlag]]] }
     let(:message) { instance_double(Email::Mboxrd::Message, supplied_body: body) }
     let(:body) { "body" }
 
@@ -32,7 +32,7 @@ module Imap::Backup
     it "uploads messages" do
       subject.run
 
-      expect(folder).to have_received(:append).with(message)
+      expect(folder).to have_received(:append).with(message, flags: [:MyFlag])
     end
 
     context "when the folder is not empty" do
