@@ -34,7 +34,7 @@ module Imap::Backup
     end
 
     def message_enumerator
-      yield [1, missing_message]
+      yield [1, missing_message, [:MyFlag]]
     end
 
     it "creates the folder" do
@@ -52,7 +52,7 @@ module Imap::Backup
     it "restores messages that are missing" do
       subject.run
 
-      expect(folder).to have_received(:append).with(missing_message)
+      expect(folder).to have_received(:append).with(missing_message, flags: [:MyFlag])
     end
 
     it "handles append failures" do

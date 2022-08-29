@@ -19,14 +19,14 @@ module Imap::Backup
       return if count.zero?
 
       Logger.logger.debug "[#{folder.name}] #{count} to restore"
-      serializer.each_message(missing_uids).with_index do |(uid, message), i|
-        upload_message uid, message, i + 1
+      serializer.each_message(missing_uids).with_index do |(uid, message, flags), i|
+        upload_message uid, message, flags, i + 1
       end
     end
 
     private
 
-    def upload_message(uid, message, index)
+    def upload_message(uid, message, flags, index)
       return if message.nil?
 
       log_prefix = "[#{folder.name}] uid: #{uid} (#{index}/#{count}) -"
@@ -35,7 +35,7 @@ module Imap::Backup
       )
 
       begin
-        new_uid = folder.append(message)
+        new_uid = folder.append(message, flags: flags)
         serializer.update_uid(uid, new_uid)
       rescue StandardError => e
         Logger.logger.warn "#{log_prefix} append error: #{e}"

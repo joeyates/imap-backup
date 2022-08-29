@@ -1,5 +1,6 @@
 module EmailServerHelpers
-  REQUESTED_ATTRIBUTES = ["BODY[]"].freeze
+  BODY_ATTRIBUTE = "BODY[]".freeze
+  REQUESTED_ATTRIBUTES = [BODY_ATTRIBUTE, "FLAGS"].freeze
   DEFAULT_EMAIL = "address@example.org".freeze
 
   def send_email(folder, options)
@@ -28,7 +29,7 @@ module EmailServerHelpers
   end
 
   def server_message_to_body(message)
-    message["BODY[]"]
+    message[BODY_ATTRIBUTE]
   end
 
   def server_fetch_email(folder, uid)

@@ -15,19 +15,25 @@ module Imap::Backup
 
     it "yields matching UIDs" do
       expect { |b| subject.run(uids: [good_uid], &b) }.
-        to yield_successive_args([good_uid, anything])
+        to yield_successive_args([good_uid, anything, anything])
     end
 
-    it "yields matching messages" do
-      subject.run(uids: [good_uid]) do |_uid, message|
+    it "yields messages" do
+      subject.run(uids: [good_uid]) do |_uid, message, _flags|
         expect(message.supplied_body).to eq("message")
+      end
+    end
+
+    it "yields flags" do
+      subject.run(uids: [good_uid]) do |_uid, _message, flags|
+        expect(flags).to eq([:MyFlag])
       end
     end
 
     context "with UIDs that are not present" do
       it "skips them" do
         expect { |b| subject.run(uids: [good_uid, 1234], &b) }.
-          to yield_successive_args([good_uid, anything])
+          to yield_successive_args([good_uid, anything, anything])
       end
     end
   end

@@ -17,8 +17,8 @@ RSpec.describe "restore", type: :aruba, docker: true do
   let!(:setup) do
     create_config accounts: [account.to_h]
     create_files email: account.username, folder: folder, uid_validity: uid_validity
-    store_email email: account.username, folder: folder, **msg1
-    store_email email: account.username, folder: folder, **msg2
+    store_email email: account.username, folder: folder, flags: [:Flagged], **msg1
+    store_email email: account.username, folder: folder, flags: [:Draft],**msg2
 
     run_command_and_stop("imap-backup restore #{account.username}")
   end
@@ -33,6 +33,13 @@ RSpec.describe "restore", type: :aruba, docker: true do
     it "restores messages" do
       messages = server_messages(folder).map { |m| server_message_to_body(m) }
       expect(messages).to eq(messages_as_server_messages)
+    end
+
+    it "restores flags" do
+      messages = server_messages(folder)
+      flags = messages.map { |m| m["FLAGS"] }
+
+      expect(flags[0]).to include(:Flagged)
     end
 
     it "updates local uids to match the new server ones" do
