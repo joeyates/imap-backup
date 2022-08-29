@@ -82,12 +82,6 @@ module Imap::Backup
       internal_load_nth(message_index)
     end
 
-    def load_nth(index)
-      validate!
-
-      internal_load_nth(index)
-    end
-
     def each_message(required_uids, &block)
       validate!
 

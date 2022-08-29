@@ -210,35 +210,6 @@ module Imap::Backup
       end
     end
 
-    describe "#load_nth" do
-      it_behaves_like "a method that checks for invalid serialization" do
-        let(:action) { -> { result } }
-      end
-
-      let(:imap_index) { 0 }
-      let(:result) { subject.load_nth(imap_index) }
-
-      before do
-        allow(enumerator).to receive(:each) { ["message"].enum_for(:each) }
-      end
-
-      it "returns an Email::Mboxrd::Message" do
-        expect(result).to be_a(Email::Mboxrd::Message)
-      end
-
-      it "returns the message" do
-        expect(result.supplied_body).to eq("message")
-      end
-
-      context "when the message is not found" do
-        let(:imap_index) { 1 }
-
-        it "returns nil" do
-          expect(result).to be nil
-        end
-      end
-    end
-
     describe "#each_message" do
       it_behaves_like "a method that checks for invalid serialization" do
         let(:action) { -> { subject.each_message([]) {} } }
