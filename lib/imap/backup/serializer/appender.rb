@@ -10,7 +10,7 @@ module Imap::Backup
       @mbox = mbox
     end
 
-    def run(uid:, message:)
+    def run(uid:, message:, flags:)
       raise "Can't add messages without uid_validity" if !imap.uid_validity
 
       uid = uid.to_i
@@ -21,12 +21,12 @@ module Imap::Backup
         return
       end
 
-      do_append uid, message
+      do_append uid, message, flags
     end
 
     private
 
-    def do_append(uid, message)
+    def do_append(uid, message, flags)
       mboxrd_message = Email::Mboxrd::Message.new(message)
       initial = mbox.length || 0
       mbox_appended = false
@@ -34,7 +34,7 @@ module Imap::Backup
         serialized = mboxrd_message.to_serialized
         mbox.append serialized
         mbox_appended = true
-        imap.append uid, serialized.length
+        imap.append uid, serialized.length, flags
       rescue StandardError => e
         mbox.rewind(initial) if mbox_appended
 

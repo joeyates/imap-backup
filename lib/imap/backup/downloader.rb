@@ -79,6 +79,7 @@ module Imap::Backup
     def handle_uid_and_body(uid_and_body, index)
       uid = uid_and_body[:uid]
       body = uid_and_body[:body]
+      flags = uid_and_body[:flags]
       case
       when !body
         info("Fetch returned empty body - skipping")
@@ -86,7 +87,7 @@ module Imap::Backup
         info("Fetch returned empty UID - skipping")
       else
         debug("uid: #{uid} (#{index}/#{uids.count}) - #{body.size} bytes")
-        serializer.append uid, body
+        serializer.append uid, body, flags
       end
     end
 

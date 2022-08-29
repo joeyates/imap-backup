@@ -50,7 +50,7 @@ module StoreHelpers
     serializer = Imap::Backup::Serializer.new(account.local_path, folder)
     serializer.force_uid_validity("42") if !serializer.uid_validity
     serialized = to_serialized(from: from, subject: subject, body: body)
-    serializer.append uid, serialized
+    serializer.append uid, serialized, []
   end
 
   def to_serialized(from:, subject:, body:)

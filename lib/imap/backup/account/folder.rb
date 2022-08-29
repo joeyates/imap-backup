@@ -73,7 +73,7 @@ module Imap::Backup
       examine
       fetch_data_items =
         retry_on_error(errors: UID_FETCH_RETRY_CLASSES) do
-          client.uid_fetch(uids, [BODY_ATTRIBUTE])
+          client.uid_fetch(uids, [BODY_ATTRIBUTE, "FLAGS"])
         end
       return nil if fetch_data_items.nil?
 
@@ -82,7 +82,8 @@ module Imap::Backup
 
         {
           uid: attributes["UID"],
-          body: attributes[BODY_ATTRIBUTE]
+          body: attributes[BODY_ATTRIBUTE],
+          flags: attributes["FLAGS"]
         }
       end
     rescue FolderNotFound

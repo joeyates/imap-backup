@@ -16,7 +16,7 @@ module Imap::Backup
       instance_double(Email::Mboxrd::Message, to_serialized: "serialized")
     end
     let(:uid_found) { false }
-    let(:command) { subject.run(uid: 99, message: "Hi") }
+    let(:command) { subject.run(uid: 99, message: "Hi", flags: [:MyFlag]) }
 
     before do
       allow(imap).to receive(:include?) { uid_found }
@@ -33,13 +33,19 @@ module Imap::Backup
     it "appends the UID to the metadata" do
       command
 
-      expect(imap).to have_received(:append).with(99, anything)
+      expect(imap).to have_received(:append).with(99, anything, anything)
     end
 
     it "appends the message length to the metadata" do
       command
 
-      expect(imap).to have_received(:append).with(anything, "serialized".length)
+      expect(imap).to have_received(:append).with(anything, "serialized".length, anything)
+    end
+
+    it "appends the message flags to the metadata" do
+      command
+
+      expect(imap).to have_received(:append).with(anything, anything, [:MyFlag])
     end
 
     context "when appending to the mailbox causes an error" do

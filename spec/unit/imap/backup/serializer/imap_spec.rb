@@ -6,7 +6,7 @@ module Imap::Backup
     let(:pathname) { "folder_path.imap" }
     let(:exists) { true }
     let(:existing) do
-      {version: version, uid_validity: 99, messages: [{uid: 42, offset: 0, length: 12_345}]}
+      {version: version, uid_validity: 99, messages: [{uid: 42, offset: 0, length: 12_345, flags: [:AFlag]}]}
     end
     let(:version) { 3 }
     let(:file) { instance_double(File, write: nil) }
@@ -69,14 +69,14 @@ module Imap::Backup
 
     describe "#append" do
       context "when the metadata file exists" do
-        before { subject.append(123, 300) }
+        before { subject.append(123, 300, [:MyFlag]) }
 
         it "loads the existing metadata" do
-          expect(subject.messages).to include({length: 12_345, offset: 0, uid: 42})
+          expect(subject.messages).to include({length: 12_345, offset: 0, uid: 42, flags: [:AFlag]})
         end
 
         it "appends the UID" do
-          expect(subject.messages).to include({length: 300, offset: 12_345, uid: 123})
+          expect(subject.messages).to include({length: 300, offset: 12_345, uid: 123, flags: [:MyFlag]})
         end
 
         it "saves the file" do
@@ -92,11 +92,11 @@ module Imap::Backup
           before do
             subject.uid_validity = 999
 
-            subject.append(123, 300)
+            subject.append(123, 300, [:MyFlag])
           end
 
           it "appends the UID" do
-            expect(subject.messages).to include({length: 300, offset: 0, uid: 123})
+            expect(subject.messages).to include({length: 300, offset: 0, uid: 123, flags: [:MyFlag]})
           end
 
           it "saves the file" do
@@ -236,12 +236,12 @@ module Imap::Backup
       before { subject.update_uid(42, 57) }
 
       it "sets the UID" do
-        expect(subject.messages).to eq([{length: 12_345, offset: 0, uid: 57}])
+        expect(subject.messages).to eq([{length: 12_345, offset: 0, uid: 57, flags: [:AFlag]}])
       end
 
       it "saves the file" do
         expect(file).to have_received(:write).
-          with(/\{"uid":57,"offset":0,"length":12345\}/)
+          with(/\{"uid":57,"offset":0,"length":12345,"flags":\["AFlag"\]\}/)
       end
 
       context "when the UID is not present" do

@@ -65,11 +65,11 @@ module Imap::Backup
       internal_force_uid_validity(value)
     end
 
-    def append(uid, message)
+    def append(uid, message, flags)
       validate!
 
       appender = Serializer::Appender.new(folder: folder, imap: imap, mbox: mbox)
-      appender.run(uid: uid, message: message)
+      appender.run(uid: uid, message: message, flags: flags)
     end
 
     def load(uid_maybe_string)

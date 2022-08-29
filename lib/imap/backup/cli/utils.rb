@@ -73,7 +73,7 @@ module Imap::Backup
             Skipped #{uid}
           MESSAGE
 
-          serializer.append uid, message
+          serializer.append uid, message, []
         end
       end
 

@@ -120,7 +120,7 @@ module Imap::Backup
       it "fills the local folder with fake emails" do
         subject.ignore_history(email)
 
-        expect(serializer).to have_received(:append).with("456", /From: fake@email.com/)
+        expect(serializer).to have_received(:append).with("456", /From: fake@email.com/, [])
       end
     end
   end

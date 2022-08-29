@@ -155,7 +155,7 @@ module Imap::Backup
 
     describe "#append" do
       it_behaves_like "a method that checks for invalid serialization" do
-        let(:action) { -> { subject.append("uid", "message") } }
+        let(:action) { -> { subject.append("uid", "message", []) } }
       end
 
       let(:appender) { instance_double(Serializer::Appender, run: nil) }
@@ -165,7 +165,7 @@ module Imap::Backup
       end
 
       it "runs the Appender" do
-        subject.append("uid", "message")
+        subject.append("uid", "message", [])
 
         expect(appender).to have_received(:run)
       end
