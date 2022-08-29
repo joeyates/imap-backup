@@ -147,6 +147,8 @@ module Imap::Backup
       return nil if !data.key?(:messages)
       return nil if !data[:messages].is_a?(Array)
 
+      data[:messages].each { |m| m[:flags] = m[:flags].map(&:to_sym) }
+
       data
     end
 
