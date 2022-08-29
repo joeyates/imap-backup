@@ -6,7 +6,11 @@ module Imap::Backup
     let(:pathname) { "folder_path.imap" }
     let(:exists) { true }
     let(:existing) do
-      {version: version, uid_validity: 99, messages: [{uid: 42, offset: 0, length: 12_345, flags: [:AFlag]}]}
+      {
+        version: version,
+        uid_validity: 99,
+        messages: [{uid: 42, offset: 0, length: 12_345, flags: [:AFlag]}]
+      }
     end
     let(:version) { 3 }
     let(:file) { instance_double(File, write: nil) }
@@ -76,7 +80,8 @@ module Imap::Backup
         end
 
         it "appends the UID" do
-          expect(subject.messages).to include({length: 300, offset: 12_345, uid: 123, flags: [:MyFlag]})
+          expect(subject.messages).
+            to include({length: 300, offset: 12_345, uid: 123, flags: [:MyFlag]})
         end
 
         it "saves the file" do
@@ -96,7 +101,8 @@ module Imap::Backup
           end
 
           it "appends the UID" do
-            expect(subject.messages).to include({length: 300, offset: 0, uid: 123, flags: [:MyFlag]})
+            expect(subject.messages).
+              to include({length: 300, offset: 0, uid: 123, flags: [:MyFlag]})
           end
 
           it "saves the file" do

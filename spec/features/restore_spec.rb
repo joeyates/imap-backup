@@ -18,7 +18,7 @@ RSpec.describe "restore", type: :aruba, docker: true do
     create_config accounts: [account.to_h]
     create_files email: account.username, folder: folder, uid_validity: uid_validity
     store_email email: account.username, folder: folder, flags: [:Flagged], **msg1
-    store_email email: account.username, folder: folder, flags: [:Draft],**msg2
+    store_email email: account.username, folder: folder, flags: [:Draft], **msg2
 
     run_command_and_stop("imap-backup restore #{account.username}")
   end

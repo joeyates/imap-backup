@@ -20,7 +20,9 @@ module Imap::Backup
 
       context "with fetched messages" do
         specify "are saved" do
-          allow(folder).to receive(:fetch_multi).with(["111"]) { [{uid: "111", body: body, flags: [:MyFlag]}] }
+          allow(folder).to receive(:fetch_multi).with(["111"]) do
+            [{uid: "111", body: body, flags: [:MyFlag]}]
+          end
 
           expect(serializer).to receive(:append).with("111", body, [:MyFlag])
 
@@ -30,7 +32,9 @@ module Imap::Backup
 
       context "with messages which are already present" do
         specify "are skipped" do
-          allow(folder).to receive(:fetch_multi).with(["111"]) { [{uid: "111", body: body, flags: [:MyFlag]}] }
+          allow(folder).to receive(:fetch_multi).with(["111"]) do
+            [{uid: "111", body: body, flags: [:MyFlag]}]
+          end
 
           expect(serializer).to_not receive(:append).with("222", anything, anything)
 
