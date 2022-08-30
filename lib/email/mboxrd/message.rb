@@ -5,9 +5,6 @@ module Email; end
 
 module Email::Mboxrd
   class Message
-    extend Forwardable
-    def_delegators :@parsed, :subject
-
     attr_reader :supplied_body
 
     def self.clean_serialized(serialized)
@@ -38,6 +35,10 @@ module Email::Mboxrd
       parsed.date
     rescue StandardError
       nil
+    end
+
+    def subject
+      parsed.subject
     end
 
     def imap_body

@@ -7,7 +7,13 @@ module Imap::Backup
       instance_double(
         Serializer,
         folder: "folder",
-        mbox_pathname: "mbox_pathname"
+        messages: [message]
+      )
+    end
+    let(:message) do
+      instance_double(
+        Serializer::Message,
+        body: "Ciao"
       )
     end
     let(:local_folder) do
@@ -25,15 +31,11 @@ module Imap::Backup
     let(:msf_exists) { false }
     let(:set_up_result) { true }
     let(:file) { instance_double(File, write: nil) }
-    let(:enumerator) { instance_double(Serializer::MboxEnumerator) }
 
     before do
       allow(File).to receive(:open).with("full_path", "w").and_yield(file)
       allow(File).to receive(:unlink)
       allow(Thunderbird::LocalFolder).to receive(:new) { local_folder }
-      allow(Serializer::MboxEnumerator).to receive(:new) { enumerator }
-      allow(enumerator).to receive(:each).and_yield("message")
-      allow(Email::Mboxrd::Message).to receive(:clean_serialized) { "cleaned" }
       allow(Kernel).to receive(:puts)
     end
 
@@ -104,8 +106,8 @@ module Imap::Backup
         expect(file).to have_received(:write).with(/From - \w+ \w+ \d+ \d+:\d+:\d+/)
       end
 
-      it "writes the cleaned message" do
-        expect(file).to have_received(:write).with(/cleaned/)
+      it "writes the message" do
+        expect(file).to have_received(:write).with(/Ciao/)
       end
 
       it "returns true" do

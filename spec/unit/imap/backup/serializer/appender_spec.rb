@@ -15,11 +15,11 @@ module Imap::Backup
     let(:mboxrd_message) do
       instance_double(Email::Mboxrd::Message, to_serialized: "serialized")
     end
-    let(:uid_found) { false }
+    let(:found_message) { nil }
     let(:command) { subject.run(uid: 99, message: "Hi", flags: [:MyFlag]) }
 
     before do
-      allow(imap).to receive(:include?) { uid_found }
+      allow(imap).to receive(:get) { found_message }
       allow(imap).to receive(:append)
       allow(Email::Mboxrd::Message).to receive(:new) { mboxrd_message }
     end
@@ -89,7 +89,7 @@ module Imap::Backup
     end
 
     context "when the message has already been backed up" do
-      let(:uid_found) { true }
+      let(:found_message) { instance_double(Serializer::Message) }
 
       it "doesn't append to the mailbox file" do
         command

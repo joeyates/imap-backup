@@ -30,13 +30,14 @@ module Imap::Backup
       )
     end
     let(:uids) { ["123"] }
-    let(:each_message) { [[123, message]] }
+    let(:each_message) { [message] }
     let(:message) do
       instance_double(
-        Email::Mboxrd::Message,
+        Imap::Backup::Serializer::Message,
+        uid: 123,
         date: Date.today,
         subject: message_subject,
-        supplied_body: "Supplied"
+        body: "Supplied"
       )
     end
     let(:message_subject) { "Ciao" }
@@ -91,7 +92,14 @@ module Imap::Backup
 
       context "when more than one email is requested" do
         let(:uids) { %w(123 456) }
-        let(:each_message) { [[123, message], [456, message]] }
+        let(:message1) do
+          instance_double(
+            Imap::Backup::Serializer::Message,
+            uid: 456,
+            body: "Message 2"
+          )
+        end
+        let(:each_message) { [message, message1] }
 
         it "prints a header" do
           expect(Kernel).to have_received(:puts).with(/\| UID: 123 /)

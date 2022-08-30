@@ -73,20 +73,18 @@ module Imap::Backup
       instance_double(
         Serializer::Mbox,
         valid?: true,
-        pathname: "aaa",
+        # pathname: "aaa",
         rename: nil,
         touch: nil
       )
     end
     let(:folder_path) { File.expand_path(File.join("path", "folder/sub")) }
     let(:existing_uid_validity) { nil }
-    let(:enumerator) { instance_double(Serializer::MboxEnumerator) }
 
     before do
       allow(Serializer::Directory).to receive(:new) { directory }
       allow(Serializer::Imap).to receive(:new).with(folder_path) { imap }
       allow(Serializer::Mbox).to receive(:new) { mbox }
-      allow(Serializer::MboxEnumerator).to receive(:new) { enumerator }
     end
 
     describe "#apply_uid_validity" do
@@ -168,45 +166,6 @@ module Imap::Backup
         subject.append("uid", "message", [])
 
         expect(appender).to have_received(:run)
-      end
-    end
-
-    describe "#load" do
-      it_behaves_like "a method that checks for invalid serialization" do
-        let(:action) { -> { result } }
-      end
-
-      let(:uid) { 999 }
-      let(:imap_index) { 0 }
-      let(:result) { subject.load(uid) }
-
-      before do
-        allow(imap).to receive(:index).with(999) { imap_index }
-        allow(enumerator).to receive(:each) { ["message"].enum_for(:each) }
-      end
-
-      it "returns an Email::Mboxrd::Message" do
-        expect(result).to be_a(Email::Mboxrd::Message)
-      end
-
-      it "returns the message" do
-        expect(result.supplied_body).to eq("message")
-      end
-
-      context "when the message is not found" do
-        let(:imap_index) { nil }
-
-        it "returns nil" do
-          expect(result).to be nil
-        end
-      end
-
-      context "when the supplied UID is a string" do
-        let(:uid) { "999" }
-
-        it "works" do
-          expect(result).to be_a(Email::Mboxrd::Message)
-        end
       end
     end
 

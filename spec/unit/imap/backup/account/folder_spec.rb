@@ -224,9 +224,10 @@ module Imap::Backup
     describe "#append" do
       let(:message) do
         instance_double(
-          Email::Mboxrd::Message,
+          Serializer::Message,
           imap_body: "imap body",
-          date: message_date
+          date: message_date,
+          flags: [:MyFlag]
         )
       end
       let(:message_date) { Time.new(2010, 10, 10, 9, 15, 22, 0) }
@@ -236,6 +237,20 @@ module Imap::Backup
 
       it "appends the message" do
         expect(client).to receive(:append)
+
+        subject.append(message)
+      end
+
+      it "sets the body" do
+        expect(client).to receive(:append).
+          with(anything, "imap body", anything, anything)
+
+        subject.append(message)
+      end
+
+      it "sets the flags" do
+        expect(client).to receive(:append).
+          with(anything, anything, [:MyFlag], anything)
 
         subject.append(message)
       end

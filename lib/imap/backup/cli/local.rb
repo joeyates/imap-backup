@@ -39,8 +39,8 @@ module Imap::Backup
 
       uids = folder_serializer.uids
 
-      folder_serializer.each_message(uids).map do |uid, message|
-        list_message uid, message
+      folder_serializer.each_message(uids).map do |message|
+        list_message message
       end
     end
 
@@ -59,22 +59,22 @@ module Imap::Backup
       raise "Folder '#{folder_name}' not found" if !folder_serializer
 
       uid_list = uids.split(",")
-      folder_serializer.each_message(uid_list).each do |uid, message|
+      folder_serializer.each_message(uid_list).each do |message|
         if uid_list.count > 1
           Kernel.puts <<~HEADER
             #{'-' * 80}
-            #{format('| UID: %-71s |', uid)}
+            #{format('| UID: %-71s |', message.uid)}
             #{'-' * 80}
           HEADER
         end
-        Kernel.puts message.supplied_body
+        Kernel.puts message.body
       end
     end
 
     no_commands do
-      def list_message(uid, message)
+      def list_message(message)
         m = {
-          uid: uid,
+          uid: message.uid,
           date: message.date.to_s,
           subject: message.subject || ""
         }

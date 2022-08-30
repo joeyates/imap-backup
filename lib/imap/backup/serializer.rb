@@ -3,8 +3,8 @@ require "forwardable"
 require "email/mboxrd/message"
 require "imap/backup/serializer/appender"
 require "imap/backup/serializer/imap"
+require "imap/backup/serializer/message"
 require "imap/backup/serializer/mbox"
-require "imap/backup/serializer/mbox_enumerator"
 require "imap/backup/serializer/message_enumerator"
 require "imap/backup/serializer/version2_migrator"
 require "imap/backup/serializer/unused_name_finder"
@@ -19,7 +19,7 @@ module Imap::Backup
     extend Forwardable
 
     def_delegator :mbox, :pathname, :mbox_pathname
-    def_delegators :imap, :uid_validity, :uids, :update_uid
+    def_delegators :imap, :messages, :uid_validity, :uids, :update_uid
 
     attr_reader :folder
     attr_reader :path
@@ -72,22 +72,12 @@ module Imap::Backup
       appender.run(uid: uid, message: message, flags: flags)
     end
 
-    def load(uid_maybe_string)
-      validate!
-
-      uid = uid_maybe_string.to_i
-      message_index = imap.index(uid)
-      return nil if message_index.nil?
-
-      internal_load_nth(message_index)
-    end
-
     def each_message(required_uids, &block)
       validate!
 
       return enum_for(:each_message, required_uids) if !block
 
-      enumerator = Serializer::MessageEnumerator.new(imap: imap, mbox: mbox)
+      enumerator = Serializer::MessageEnumerator.new(imap: imap)
       enumerator.run(uids: required_uids, &block)
     end
 
@@ -103,16 +93,6 @@ module Imap::Backup
     def internal_force_uid_validity(value)
       imap.uid_validity = value
       mbox.touch
-    end
-
-    def internal_load_nth(index)
-      enumerator = Serializer::MboxEnumerator.new(mbox.pathname)
-      enumerator.each.with_index do |raw, i|
-        next if i != index
-
-        return Email::Mboxrd::Message.from_serialized(raw)
-      end
-      nil
     end
 
     def mbox

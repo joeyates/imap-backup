@@ -1,14 +1,9 @@
-require "email/mboxrd/message"
-require "imap/backup/serializer/mbox_enumerator"
-
 module Imap::Backup
   class Serializer::MessageEnumerator
     attr_reader :imap
-    attr_reader :mbox
 
-    def initialize(imap:, mbox:)
+    def initialize(imap:)
       @imap = imap
-      @mbox = mbox
     end
 
     def run(uids:)
@@ -18,10 +13,7 @@ module Imap::Backup
 
         next if !message
 
-        raw = mbox.read(message[:offset], message[:length])
-        body = Email::Mboxrd::Message.from_serialized(raw)
-
-        yield message[:uid], body, message[:flags]
+        yield message
       end
     end
   end
