@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Changed
 
+* Added backup and restore of IMAP flags (e.g. "Seen", "Draft").
 * Introduced a new metadata format.
 * Included data about message offsets and lengths in the new metadata to
   facilitate for future integrity checks.
