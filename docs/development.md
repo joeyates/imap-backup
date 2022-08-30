@@ -1,3 +1,9 @@
+# Design Goals
+
+* Secure - use a local file protected by permissions
+* Restartable - calculate start point based on already downloaded messages
+* Standalone - do not rely on an email client or MTA
+
 # Testing
 
 ## Feature Specs
