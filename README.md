@@ -36,7 +36,7 @@ If you have [Homebrew](https://brew.sh/), do this:
 brew install imap-backup
 ```
 
-# As a Ruby Gem
+## As a Ruby Gem
 
 ```sh
 gem install imap-backup
