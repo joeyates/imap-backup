@@ -6,6 +6,7 @@ require "imap/backup/serializer/imap"
 require "imap/backup/serializer/mbox"
 require "imap/backup/serializer/mbox_enumerator"
 require "imap/backup/serializer/message_enumerator"
+require "imap/backup/serializer/version2_migrator"
 require "imap/backup/serializer/unused_name_finder"
 
 module Imap::Backup
@@ -31,6 +32,8 @@ module Imap::Backup
     # Returns true if there are existing, valid files
     # false otherwise (in which case any existing files are deleted)
     def validate!
+      optionally_migrate2to3
+
       return true if imap.valid? && mbox.valid?
 
       imap.delete
@@ -62,11 +65,11 @@ module Imap::Backup
       internal_force_uid_validity(value)
     end
 
-    def append(uid, message)
+    def append(uid, message, flags)
       validate!
 
       appender = Serializer::Appender.new(folder: folder, imap: imap, mbox: mbox)
-      appender.run(uid: uid, message: message)
+      appender.run(uid: uid, message: message, flags: flags)
     end
 
     def load(uid_maybe_string)
@@ -77,12 +80,6 @@ module Imap::Backup
       return nil if message_index.nil?
 
       internal_load_nth(message_index)
-    end
-
-    def load_nth(index)
-      validate!
-
-      internal_load_nth(index)
     end
 
     def each_message(required_uids, &block)
@@ -132,6 +129,19 @@ module Imap::Backup
           ensure_containing_directory(folder)
           Serializer::Imap.new(folder_path)
         end
+    end
+
+    def optionally_migrate2to3
+      migrator = Version2Migrator.new(folder_path)
+      return if !migrator.required?
+
+      Logger.logger.info <<~MESSAGE
+        Local metadata for folder '#{folder_path}' is currently stored in the version 2 format.
+
+        This will now be transformed into the version 3 format.
+      MESSAGE
+
+      migrator.run
     end
 
     def folder_path

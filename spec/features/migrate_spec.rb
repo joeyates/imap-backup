@@ -13,7 +13,7 @@ RSpec.describe "Migration", type: :aruba, docker: true do
 
   before do
     create_config(accounts: [source_account, destination_account])
-    store_email(email: email, folder: folder, subject: "Ciao")
+    store_email(email: email, folder: folder, subject: "Ciao", flags: [:Draft])
     run_command_and_stop("imap-backup migrate #{email} #{destination_account[:username]}")
   end
 
@@ -32,5 +32,10 @@ RSpec.describe "Migration", type: :aruba, docker: true do
 
     MESSAGE
     expect(messages[0]["BODY[]"]).to eq(expected)
+  end
+
+  it "copies flags" do
+    messages = server_messages(folder)
+    expect(messages[0]["FLAGS"]).to include(:Draft)
   end
 end

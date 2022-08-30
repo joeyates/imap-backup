@@ -73,7 +73,7 @@ module Imap::Backup
       examine
       fetch_data_items =
         retry_on_error(errors: UID_FETCH_RETRY_CLASSES) do
-          client.uid_fetch(uids, [BODY_ATTRIBUTE])
+          client.uid_fetch(uids, [BODY_ATTRIBUTE, "FLAGS"])
         end
       return nil if fetch_data_items.nil?
 
@@ -82,18 +82,19 @@ module Imap::Backup
 
         {
           uid: attributes["UID"],
-          body: attributes[BODY_ATTRIBUTE]
+          body: attributes[BODY_ATTRIBUTE],
+          flags: attributes["FLAGS"]
         }
       end
     rescue FolderNotFound
       nil
     end
 
-    def append(message)
+    def append(message, flags: nil)
       body = message.imap_body
       date = message.date&.to_time
       retry_on_error(errors: APPEND_RETRY_CLASSES, limit: 3) do
-        response = client.append(utf7_encoded_name, body, nil, date)
+        response = client.append(utf7_encoded_name, body, flags, date)
         extract_uid(response)
       end
     end

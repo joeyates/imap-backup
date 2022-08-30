@@ -3,32 +3,37 @@ module Imap::Backup
     subject { described_class.new(imap: imap, mbox: mbox) }
 
     let(:imap) { instance_double(Serializer::Imap) }
-    let(:mbox) { instance_double(Serializer::Mbox, pathname: "aaa") }
-    let(:enumerator) { instance_double(Serializer::MboxEnumerator) }
+    let(:mbox) { instance_double(Serializer::Mbox, read: "message") }
     let(:good_uid) { 999 }
 
     before do
-      allow(imap).to receive(:index) { nil }
-      allow(imap).to receive(:index).with(good_uid) { 0 }
-      allow(Serializer::MboxEnumerator).to receive(:new) { enumerator }
-      allow(enumerator).to receive(:each) { ["message"].enum_for(:each) }
+      allow(imap).to receive(:get) { nil }
+      allow(imap).to receive(:get).with(good_uid) do
+        {uid: good_uid, offset: 0, length: 100, flags: [:MyFlag]}
+      end
     end
 
     it "yields matching UIDs" do
       expect { |b| subject.run(uids: [good_uid], &b) }.
-        to yield_successive_args([good_uid, anything])
+        to yield_successive_args([good_uid, anything, anything])
     end
 
-    it "yields matching messages" do
-      subject.run(uids: [good_uid]) do |_uid, message|
+    it "yields messages" do
+      subject.run(uids: [good_uid]) do |_uid, message, _flags|
         expect(message.supplied_body).to eq("message")
+      end
+    end
+
+    it "yields flags" do
+      subject.run(uids: [good_uid]) do |_uid, _message, flags|
+        expect(flags).to eq([:MyFlag])
       end
     end
 
     context "with UIDs that are not present" do
       it "skips them" do
         expect { |b| subject.run(uids: [good_uid, 1234], &b) }.
-          to yield_successive_args([good_uid, anything])
+          to yield_successive_args([good_uid, anything, anything])
       end
     end
   end

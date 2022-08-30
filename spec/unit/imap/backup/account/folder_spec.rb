@@ -78,15 +78,18 @@ module Imap::Backup
 
     describe "#fetch_multi" do
       let(:message_body) { instance_double(String, force_encoding: nil) }
-      let(:attributes) { {"UID" => "uid", "BODY[]" => message_body, "other" => "xxx"} }
+      let(:attributes) do
+        {"UID" => "uid", "BODY[]" => message_body, "FLAGS" => [:MyFlag], "other" => "xxx"}
+      end
       let(:fetch_data_item) do
         instance_double(Net::IMAP::FetchData, attr: attributes)
       end
 
       before { allow(client).to receive(:uid_fetch) { [fetch_data_item] } }
 
-      it "returns the uid and message" do
-        expect(subject.fetch_multi([123])).to eq([{uid: "uid", body: message_body}])
+      it "returns the uid, message and flags" do
+        expected = [{uid: "uid", body: message_body, flags: [:MyFlag]}]
+        expect(subject.fetch_multi([123])).to eq(expected)
       end
 
       context "when the server responds with nothing" do

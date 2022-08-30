@@ -27,12 +27,22 @@ module ConfigurationHelpers
 end
 
 module StoreHelpers
+  def create_files(email:, folder:, uid_validity:)
+    account = config.accounts.find { |a| a.username == email }
+    raise "Account not found" if !account
+
+    FileUtils.mkdir_p account.local_path
+    serializer = Imap::Backup::Serializer.new(account.local_path, folder)
+    serializer.force_uid_validity uid_validity
+  end
+
   def store_email(
     email:, folder:,
     uid: 1,
     from: "sender@example.com",
     subject: "The Subject",
-    body: "body"
+    body: "body",
+    flags: []
   )
     account = config.accounts.find { |a| a.username == email }
     raise "Account not found" if !account
@@ -41,7 +51,7 @@ module StoreHelpers
     serializer = Imap::Backup::Serializer.new(account.local_path, folder)
     serializer.force_uid_validity("42") if !serializer.uid_validity
     serialized = to_serialized(from: from, subject: subject, body: body)
-    serializer.append uid, serialized
+    serializer.append uid, serialized, flags
   end
 
   def to_serialized(from:, subject:, body:)

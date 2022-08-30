@@ -28,8 +28,9 @@ module Imap::Backup
 
     describe "#each" do
       it "reads files as binary" do
-        expect(File).to receive(:open).with(mbox_pathname, "rb")
         subject.each {}
+
+        expect(File).to have_received(:open).with(mbox_pathname, "rb")
       end
 
       it "yields messages" do
@@ -40,6 +41,31 @@ module Imap::Backup
       context "without a block" do
         it "returns an Enumerator" do
           expect(subject.each).to be_a(Enumerator)
+        end
+      end
+    end
+
+    describe "#map" do
+      it "reads files as binary" do
+        subject.map {}
+
+        expect(File).to have_received(:open).with(mbox_pathname, "rb")
+      end
+
+      it "yields messages" do
+        expect { |b| subject.map(&b) }.
+          to yield_successive_args(message1.join, message2.join)
+      end
+
+      it "returns results of calling the supplied block" do
+        expected = [message1.join.length, message2.join.length]
+
+        expect(subject.map(&:length)).to eq(expected)
+      end
+
+      context "without a block" do
+        it "returns an Enumerator" do
+          expect(subject.map).to be_a(Enumerator)
         end
       end
     end

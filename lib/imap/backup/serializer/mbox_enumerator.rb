@@ -8,8 +8,8 @@ module Imap::Backup
       @mbox_pathname = mbox_pathname
     end
 
-    def each
-      return enum_for(:each) if !block_given?
+    def each(&block)
+      return enum_for(:each) if !block
 
       File.open(mbox_pathname, "rb") do |f|
         lines = []
@@ -26,8 +26,14 @@ module Imap::Backup
           end
         end
 
-        yield lines.join if lines.count.positive?
+        block.call(lines.join) if lines.count.positive?
       end
+    end
+
+    def map(&block)
+      return enum_for(:map) if !block
+
+      each.map { |line| block.call(line) }
     end
   end
 end

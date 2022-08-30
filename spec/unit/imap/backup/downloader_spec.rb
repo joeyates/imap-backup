@@ -7,12 +7,11 @@ module Imap::Backup
       let(:folder) do
         instance_double(
           Account::Folder,
-          fetch_multi: [{uid: "111", body: body}],
           name: "folder",
           uids: remote_uids
         )
       end
-      let(:remote_uids) { %w(111 222 333) }
+      let(:remote_uids) { %w(111) }
       let(:serializer) do
         instance_double(Serializer, append: nil, uids: local_uids)
       end
@@ -21,7 +20,11 @@ module Imap::Backup
 
       context "with fetched messages" do
         specify "are saved" do
-          expect(serializer).to receive(:append).with("111", body)
+          allow(folder).to receive(:fetch_multi).with(["111"]) do
+            [{uid: "111", body: body, flags: [:MyFlag]}]
+          end
+
+          expect(serializer).to receive(:append).with("111", body, [:MyFlag])
 
           subject.run
         end
@@ -29,7 +32,11 @@ module Imap::Backup
 
       context "with messages which are already present" do
         specify "are skipped" do
-          expect(serializer).to_not receive(:append).with("222", anything)
+          allow(folder).to receive(:fetch_multi).with(["111"]) do
+            [{uid: "111", body: body, flags: [:MyFlag]}]
+          end
+
+          expect(serializer).to_not receive(:append).with("222", anything, anything)
 
           subject.run
         end
@@ -51,17 +58,18 @@ module Imap::Backup
 
         context "when the first fetch fails" do
           before do
-            allow(folder).to receive(:fetch_multi).with(%w[111 999]) { nil }
+            allow(folder).to receive(:fetch_multi).with(remote_uids) { nil }
             allow(folder).to receive(:fetch_multi).with(["111"]).
-              and_return([{uid: "111", body: body}]).
-              and_return([{uid: "999", body: body}])
+              and_return([{uid: "111", body: body, flags: [:Flag1]}])
+            allow(folder).to receive(:fetch_multi).with(["999"]).
+              and_return([{uid: "999", body: body, flags: [:Flag2]}])
 
             subject.run
           end
 
           it "retries fetching messages singly" do
-            expect(serializer).to have_received(:append).with("111", body)
-            expect(serializer).to have_received(:append).with("999", body)
+            expect(serializer).to have_received(:append).with("111", body, [:Flag1])
+            expect(serializer).to have_received(:append).with("999", body, [:Flag2])
           end
         end
       end
@@ -98,6 +106,7 @@ module Imap::Backup
         let(:options) { {reset_seen_flags_after_fetch: true} }
 
         before do
+          allow(folder).to receive(:fetch_multi).with(["111"]) { [{uid: "111", body: body}] }
           allow(folder).to receive(:unseen).and_return([33], [])
           allow(folder).to receive(:unset_flags)
 

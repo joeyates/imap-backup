@@ -44,7 +44,23 @@ RSpec.describe "backup", type: :aruba, docker: true do
     end
 
     it "records IMAP ids" do
-      expect(imap_metadata[:uids]).to eq(folder_uids)
+      uids = imap_metadata[:messages].map { |m| m[:uid] }
+
+      expect(uids).to eq(folder_uids)
+    end
+
+    it "records message offsets in the mbox file" do
+      offsets = imap_metadata[:messages].map { |m| m[:offset] }
+      expected = [0, message_as_mbox_entry(msg1).length]
+
+      expect(offsets).to eq(expected)
+    end
+
+    it "records message lengths in the mbox file" do
+      lengths = imap_metadata[:messages].map { |m| m[:length] }
+      expected = [message_as_mbox_entry(msg1).length, message_as_mbox_entry(msg2).length]
+
+      expect(lengths).to eq(expected)
     end
 
     it "records uid_validity" do
@@ -91,7 +107,7 @@ RSpec.describe "backup", type: :aruba, docker: true do
         let!(:pre) do
           super()
           create_directory local_backup_path
-          valid_imap_data = {version: 2, uid_validity: 1, uids: []}
+          valid_imap_data = {version: 3, uid_validity: 1, messages: []}
           File.write(imap_path(renamed_folder), valid_imap_data.to_json)
           File.write(mbox_path(renamed_folder), "existing mbox")
         end

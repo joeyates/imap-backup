@@ -1,4 +1,21 @@
 shared_examples "a method that checks for invalid serialization" do
+  require "imap/backup/serializer/version2_migrator"
+
+  context "with version 2 metadata files" do
+    let(:version2_migrator) do
+      instance_double(Imap::Backup::Serializer::Version2Migrator, required?: true, run: false)
+    end
+
+    before do
+      allow(Imap::Backup::Serializer::Version2Migrator).to receive(:new) { version2_migrator }
+      action.call
+    end
+
+    it "migrates to version 3" do
+      expect(version2_migrator).to have_received(:run)
+    end
+  end
+
   context "when either file is invalid" do
     let(:imap_valid) { true }
     let(:mbox_valid) { true }
@@ -138,7 +155,7 @@ module Imap::Backup
 
     describe "#append" do
       it_behaves_like "a method that checks for invalid serialization" do
-        let(:action) { -> { subject.append("uid", "message") } }
+        let(:action) { -> { subject.append("uid", "message", []) } }
       end
 
       let(:appender) { instance_double(Serializer::Appender, run: nil) }
@@ -148,7 +165,7 @@ module Imap::Backup
       end
 
       it "runs the Appender" do
-        subject.append("uid", "message")
+        subject.append("uid", "message", [])
 
         expect(appender).to have_received(:run)
       end
@@ -189,35 +206,6 @@ module Imap::Backup
 
         it "works" do
           expect(result).to be_a(Email::Mboxrd::Message)
-        end
-      end
-    end
-
-    describe "#load_nth" do
-      it_behaves_like "a method that checks for invalid serialization" do
-        let(:action) { -> { result } }
-      end
-
-      let(:imap_index) { 0 }
-      let(:result) { subject.load_nth(imap_index) }
-
-      before do
-        allow(enumerator).to receive(:each) { ["message"].enum_for(:each) }
-      end
-
-      it "returns an Email::Mboxrd::Message" do
-        expect(result).to be_a(Email::Mboxrd::Message)
-      end
-
-      it "returns the message" do
-        expect(result.supplied_body).to eq("message")
-      end
-
-      context "when the message is not found" do
-        let(:imap_index) { 1 }
-
-        it "returns nil" do
-          expect(result).to be nil
         end
       end
     end

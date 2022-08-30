@@ -36,13 +36,17 @@ If you have [Homebrew](https://brew.sh/), do this:
 brew install imap-backup
 ```
 
-# As a Ruby Gem
+## As a Ruby Gem
 
 ```sh
 gem install imap-backup
 ```
 
 If that doesn't work, see the [detailed installation instructions](docs/installation/rubygem.md).
+
+## From Source Code
+
+If you want to use imap-backup directly from the source code, see [here](docs/installation/source.md).
 
 # Setup
 
