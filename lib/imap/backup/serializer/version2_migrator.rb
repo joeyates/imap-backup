@@ -1,7 +1,5 @@
 require "json"
 
-require "imap/backup/serializer/mbox_enumerator"
-
 module Imap::Backup
   class Serializer::Version2Migrator
     attr_reader :folder_path
@@ -13,9 +11,9 @@ module Imap::Backup
     def required?
       return false if !mbox_exists?
       return false if !imap_exists?
-      return false if !data
-      return false if data[:version] != 2
-      return false if !data[:uid_validity]
+      return false if !imap_data
+      return false if imap_data[:version] != 2
+      return false if !imap_data[:uid_validity]
       return false if !uids.is_a?(Array)
 
       true
@@ -29,7 +27,7 @@ module Imap::Backup
       return false if !messages
 
       imap.delete
-      imap.uid_validity = data[:uid_validity]
+      imap.uid_validity = imap_data[:uid_validity]
       messages.map { |m| imap.append(m[:uid], m[:length]) }
 
       true
@@ -53,8 +51,8 @@ module Imap::Backup
       File.exist?(mbox_pathname)
     end
 
-    def data
-      @data ||=
+    def imap_data
+      @imap_data ||=
         begin
           content = File.read(imap_pathname)
           JSON.parse(content, symbolize_names: true)
@@ -64,18 +62,43 @@ module Imap::Backup
     end
 
     def uids
-      data[:uids]
+      imap_data[:uids]
     end
 
     def message_uids_and_lengths
-      enumerator = Serializer::MboxEnumerator.new(mbox_pathname)
-      messages = enumerator.map.with_index do |raw, i|
-        length = raw.length
+      messages = []
+
+      File.open(mbox_pathname, "rb") do |f|
+        lines = []
+
+        loop do
+          line = f.gets
+          break if !line
+
+          if line.start_with?("From ")
+            if lines.any?
+              message = {
+                uid: uids[messages.count],
+                length: lines.join.length
+              }
+
+              messages << message
+            end
+
+            lines = [line]
+          else
+            lines << line
+          end
+        end
+
+        next if lines.count.zero?
+
         message = {
-          uid: uids[i],
-          length: length
+          uid: uids[messages.count],
+          length: lines.join.length
         }
-        message
+
+        messages << message
       end
 
       return nil if messages.count != uids.count

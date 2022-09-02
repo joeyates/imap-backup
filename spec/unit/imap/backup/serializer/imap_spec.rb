@@ -76,12 +76,15 @@ module Imap::Backup
         before { subject.append(123, 300, [:MyFlag]) }
 
         it "loads the existing metadata" do
-          expect(subject.messages).to include({length: 12_345, offset: 0, uid: 42, flags: [:AFlag]})
+          existing = subject.get(42)
+
+          expect(existing).to be_a(Serializer::Message)
         end
 
         it "appends the UID" do
-          expect(subject.messages).
-            to include({length: 300, offset: 12_345, uid: 123, flags: [:MyFlag]})
+          added = subject.get(123)
+
+          expect(added.uid).to eq(123)
         end
 
         it "saves the file" do
@@ -101,8 +104,9 @@ module Imap::Backup
           end
 
           it "appends the UID" do
-            expect(subject.messages).
-              to include({length: 300, offset: 0, uid: 123, flags: [:MyFlag]})
+            added = subject.get(123)
+
+            expect(added.uid).to eq(123)
           end
 
           it "saves the file" do
@@ -136,46 +140,6 @@ module Imap::Backup
           subject.delete
 
           expect(File).to_not have_received(:unlink)
-        end
-      end
-    end
-
-    describe "#include?" do
-      it "loads the existing metadata" do
-        subject.include?(42)
-
-        expect(File).to have_received(:read).with(pathname)
-      end
-
-      context "when there is a matching UID" do
-        it "is true" do
-          expect(subject.include?(42)).to be true
-        end
-      end
-
-      context "when there isn't a matching UID" do
-        it "is false" do
-          expect(subject.include?(99)).to be false
-        end
-      end
-    end
-
-    describe "#index" do
-      it "loads the existing metadata" do
-        subject.include?(42)
-
-        expect(File).to have_received(:read).with(pathname)
-      end
-
-      context "when there is a matching UID" do
-        it "returns the index of the matcing UID" do
-          expect(subject.index(42)).to eq(0)
-        end
-      end
-
-      context "when there isn't a matching UID" do
-        it "is nil" do
-          expect(subject.index(99)).to be nil
         end
       end
     end
@@ -242,7 +206,9 @@ module Imap::Backup
       before { subject.update_uid(42, 57) }
 
       it "sets the UID" do
-        expect(subject.messages).to eq([{length: 12_345, offset: 0, uid: 57, flags: [:AFlag]}])
+        added = subject.get(57)
+
+        expect(added).to be_a(Serializer::Message)
       end
 
       it "saves the file" do

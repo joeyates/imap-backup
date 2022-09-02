@@ -13,13 +13,19 @@ module Imap::Backup
     end
     let(:folder_uids) { [] }
     let(:reset) { false }
-    let(:messages) { [[1, message, [:MyFlag]]] }
-    let(:message) { instance_double(Email::Mboxrd::Message, supplied_body: body) }
+    let(:message) do
+      instance_double(
+        Imap::Backup::Serializer::Message,
+        uid: 33,
+        body: "foo",
+        flags: [:MyFlag]
+      )
+    end
     let(:body) { "body" }
 
     before do
       allow(serializer).to receive(:each_message) do
-        messages.enum_for(:each)
+        [message].enum_for(:each)
       end
     end
 
@@ -32,7 +38,7 @@ module Imap::Backup
     it "uploads messages" do
       subject.run
 
-      expect(folder).to have_received(:append).with(message, flags: [:MyFlag])
+      expect(folder).to have_received(:append).with(message)
     end
 
     context "when the folder is not empty" do

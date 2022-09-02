@@ -29,14 +29,18 @@ module Imap::Backup
           0
         else
           last_message = messages[-1]
-          last_message[:offset] + last_message[:length]
+          last_message.offset + last_message.length
         end
-      messages << {uid: uid, offset: offset, length: length, flags: flags}
+
+      messages << Serializer::Message.new(
+        uid: uid, offset: offset, length: length, mbox: mbox, flags: flags
+      )
+
       save
     end
 
     def get(uid)
-      messages.find { |m| m[:uid] == uid }
+      messages.find { |m| m.uid == uid }
     end
 
     def delete
@@ -47,16 +51,6 @@ module Imap::Backup
       @messages = nil
       @uid_validity = nil
       @version = nil
-    end
-
-    # Deprecated
-    def include?(uid)
-      uids.include?(uid)
-    end
-
-    # Deprecated
-    def index(uid)
-      uids.find_index(uid)
     end
 
     def rename(new_path)
@@ -88,15 +82,14 @@ module Imap::Backup
 
     # Deprecated
     def uids
-      messages.map { |m| m[:uid] }
+      messages.map(&:uid)
     end
 
     def update_uid(old, new)
-      index = messages.find_index { |m| m[:uid] == old }
+      index = messages.find_index { |m| m.uid == old }
       return if index.nil?
 
-      updated = messages[index].merge({uid: new})
-      messages[index] = updated
+      messages[index].uid = new
       save
     end
 
@@ -120,7 +113,7 @@ module Imap::Backup
 
       data = load
       if data
-        @messages = data[:messages]
+        @messages = data[:messages].map { |m| Serializer::Message.new(mbox: mbox, **m) }
         @uid_validity = data[:uid_validity]
         @version = data[:version]
       else
@@ -147,8 +140,6 @@ module Imap::Backup
       return nil if !data.key?(:messages)
       return nil if !data[:messages].is_a?(Array)
 
-      data[:messages].each { |m| m[:flags] = m[:flags].map(&:to_sym) }
-
       data
     end
 
@@ -160,10 +151,14 @@ module Imap::Backup
       data = {
         version: @version,
         uid_validity: @uid_validity,
-        messages: @messages
+        messages: @messages.map(&:to_h)
       }
       content = data.to_json
       File.open(pathname, "w") { |f| f.write content }
+    end
+
+    def mbox
+      @mbox ||= Serializer::Mbox.new(folder_path)
     end
   end
 end

@@ -64,12 +64,10 @@ module Imap::Backup
 
     def copy_messages
       File.open(local_folder.full_path, "w") do |f|
-        enumerator = Serializer::MboxEnumerator.new(serializer.mbox_pathname)
-        enumerator.each do |raw|
-          clean = Email::Mboxrd::Message.clean_serialized(raw)
+        serializer.messages.each do |message|
           timestamp = Time.now.strftime("%a %b %d %H:%M:%S %Y")
           thunderbird_fom_line = "From - #{timestamp}"
-          output = "#{thunderbird_fom_line}\n#{clean}\n"
+          output = "#{thunderbird_fom_line}\n#{message.body}\n"
           f.write output
         end
       end

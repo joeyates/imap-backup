@@ -30,11 +30,11 @@ module Imap::Backup
     let(:apply_uid_validity_result) { nil }
     let(:on_disk_uids) { [99] }
     let(:missing_message) do
-      instance_double(Email::Mboxrd::Message, supplied_body: "missing message")
+      instance_double(Imap::Backup::Serializer::Message, uid: 1, body: "body", flags: [:MyFlag])
     end
 
     def message_enumerator
-      yield [1, missing_message, [:MyFlag]]
+      yield missing_message
     end
 
     it "creates the folder" do
@@ -52,7 +52,7 @@ module Imap::Backup
     it "restores messages that are missing" do
       subject.run
 
-      expect(folder).to have_received(:append).with(missing_message, flags: [:MyFlag])
+      expect(folder).to have_received(:append).with(missing_message)
     end
 
     it "handles append failures" do
@@ -69,7 +69,7 @@ module Imap::Backup
       it "does nothing" do
         subject.run
 
-        expect(folder).to_not have_received(:append).with(existing_message)
+        expect(folder).to_not have_received(:append).with(existing_message, anything)
       end
     end
 

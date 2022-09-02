@@ -14,7 +14,8 @@ module Imap::Backup
       raise "Can't add messages without uid_validity" if !imap.uid_validity
 
       uid = uid.to_i
-      if imap.include?(uid)
+      existing = imap.get(uid)
+      if existing
         Logger.logger.debug(
           "[#{folder}] message #{uid} already downloaded - skipping"
         )
@@ -38,12 +39,12 @@ module Imap::Backup
       rescue StandardError => e
         mbox.rewind(initial) if mbox_appended
 
-        message = <<-ERROR.gsub(/^\s*/m, "")
+        error = <<-ERROR.gsub(/^\s*/m, "")
           [#{folder}] failed to append message #{uid}:
           #{message}. #{e}:
           #{e.backtrace.join("\n")}"
         ERROR
-        Logger.logger.warn message
+        Logger.logger.warn error
       end
     end
   end

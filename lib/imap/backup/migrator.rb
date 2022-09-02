@@ -16,16 +16,16 @@ module Imap::Backup
       ensure_destination_empty!
 
       Logger.logger.debug "[#{folder.name}] #{count} to migrate"
-      serializer.each_message(serializer.uids).with_index do |(uid, message, flags), i|
+      serializer.each_message(serializer.uids).with_index do |message, i|
         next if message.nil?
 
-        log_prefix = "[#{folder.name}] uid: #{uid} (#{i + 1}/#{count}) -"
+        log_prefix = "[#{folder.name}] uid: #{message.uid} (#{i + 1}/#{count}) -"
         Logger.logger.debug(
-          "#{log_prefix} #{message.supplied_body.size} bytes"
+          "#{log_prefix} #{message.body.size} bytes"
         )
 
         begin
-          folder.append(message, flags: flags)
+          folder.append(message)
         rescue StandardError => e
           Logger.logger.warn "#{log_prefix} append error: #{e}"
         end
