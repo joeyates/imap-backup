@@ -73,7 +73,7 @@ module Imap::Backup
         command
       end
 
-      it "reset the mailbox to the previous position" do
+      it "resets the mailbox to the previous position" do
         command
 
         expect(mbox).to have_received(:rewind)
