@@ -116,16 +116,6 @@ module Imap::Backup
             expect(menu.choices).to include(item)
           end
         end
-
-        context "when reset_seen_flags_after_fetch is set" do
-          let(:reset_seen_flags_after_fetch) { true }
-
-          before { subject.run }
-
-          it "has an entry to toggle the setting off" do
-            expect(menu.choices).to include("don't fix changes to unread flags during download")
-          end
-        end
       end
 
       describe "choosing 'modify email'" do
