@@ -7,6 +7,7 @@ module Imap::Backup
         Account,
         username: "user@example.com",
         password: existing_password,
+        mirror_mode: mirror_mode,
         local_path: local_path,
         reset_seen_flags_after_fetch: reset_seen_flags_after_fetch
       )
@@ -14,6 +15,7 @@ module Imap::Backup
     let(:account1) { instance_double(Account) }
     let(:accounts) { [account, account1] }
     let(:existing_password) { "password" }
+    let(:mirror_mode) { nil }
     let(:local_path) { "some/path" }
     let(:reset_seen_flags_after_fetch) { nil }
     let(:multi_fetch_size) { 1 }
@@ -278,6 +280,34 @@ module Imap::Backup
           it "reports the problem" do
             expect(Kernel).to have_received(:puts).
               with(/Malformed/)
+          end
+        end
+      end
+
+      describe "toggling mirror_mode" do
+        before { allow(account).to receive(:mirror_mode=) }
+
+        context "when mirror_mode is not set" do
+          before do
+            subject.run
+            menu.choices["toggle mode (keep/mirror)"].call
+          end
+
+          it "sets the flag" do
+            expect(account).to have_received(:mirror_mode=).with(true)
+          end
+        end
+
+        context "when mirror_mode is set" do
+          let(:mirror_mode) { true }
+
+          before do
+            subject.run
+            menu.choices["toggle mode (keep/mirror)"].call
+          end
+
+          it "sets the flag" do
+            expect(account).to have_received(:mirror_mode=).with(nil)
           end
         end
       end

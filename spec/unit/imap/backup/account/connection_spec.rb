@@ -38,6 +38,7 @@ module Imap::Backup
         Account,
         username: "username",
         local_path: local_path,
+        mirror_mode: false,
         multi_fetch_size: multi_fetch_size,
         reset_seen_flags_after_fetch: reset_seen_flags_after_fetch
       )
