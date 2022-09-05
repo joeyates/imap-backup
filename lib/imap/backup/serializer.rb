@@ -81,6 +81,26 @@ module Imap::Backup
       enumerator.run(uids: required_uids, &block)
     end
 
+    def filter(&block)
+      temp_name = Serializer::UnusedNameFinder.new(serializer: self).run
+      temp_folder_path = self.class.folder_path_for(path: path, folder: temp_name)
+      new_mbox = Serializer::Mbox.new(temp_folder_path)
+      new_imap = Serializer::Imap.new(temp_folder_path)
+      new_imap.uid_validity = imap.uid_validity
+      appender = Serializer::Appender.new(folder: temp_name, imap: new_imap, mbox: new_mbox)
+      enumerator = Serializer::MessageEnumerator.new(imap: imap)
+      enumerator.run(uids: uids) do |message|
+        keep = block.call(message)
+        appender.run(uid: message.uid, message: message.body, flags: message.flags) if keep
+      end
+      imap.delete
+      new_imap.rename imap.folder_path
+      mbox.delete
+      new_mbox.rename mbox.folder_path
+      @imap = nil
+      @mbox = nil
+    end
+
     private
 
     def rename(new_name)
