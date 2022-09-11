@@ -74,9 +74,9 @@ The backup is incremental and interruptable, so backups won't get messed if your
 
 # Commands
 
-* [folders](./commands/folders.md)
-* [restore](./commands/restore.md)
-* [status](./commands/status.md)
+* [folders](docs/commands/folders.md)
+* [restore](docs/commands/restore.md)
+* [status](docs/commands/status.md)
 
 For a full list of available commands, run
 
