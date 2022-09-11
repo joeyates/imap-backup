@@ -9,3 +9,7 @@ This command starts the interactive, menu-driven setup tool.
 The tool saves a configuration file in `~/.imap-backup/config.json`.
 
 [More information about the configuration file is available in the specific documentation](../configuration.md).
+
+# Logging
+
+If you want to see verbose output for all operations, choose 'start logging'.

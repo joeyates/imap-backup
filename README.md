@@ -67,11 +67,6 @@ imap-backup
 
 Alternatively, add it to your crontab.
 
-Emails are stored on disk in [Mbox files](./docs/files/mboxrd.md) for each folder, with metadata
-stored in [Imap files](./docs/files/imap.md).
-
-The backup is incremental and interruptable, so backups won't get messed if your connection goes down during an operation.
-
 # Commands
 
 * [backup](docs/commands/backup.md)
