@@ -20,12 +20,6 @@ inspected or exported.
 [Rubygem]: https://rubygems.org/gems/imap-backup "Ruby gem at rubygems.org"
 [CI Status]: https://github.com/joeyates/imap-backup/actions/workflows/main.yml
 
-# Backup Emails
-
-imap-backup downloads emails and stores them on disk.
-
-The backup is incremental and interruptable, so backups won't get messed if your connection goes down during an operation.
-
 # Installation
 
 ## Homebrew (macOS)
@@ -63,7 +57,7 @@ imap-backup setup
 
 To use imap-backup with GMail, you will need to enable 'App passwords' on your account.
 
-# Run Backup
+# Backup
 
 Manually, from the command line:
 
@@ -75,6 +69,8 @@ Alternatively, add it to your crontab.
 
 Emails are stored on disk in [Mbox files](./docs/files/mboxrd.md) for each folder, with metadata
 stored in [Imap files](./docs/files/imap.md).
+
+The backup is incremental and interruptable, so backups won't get messed if your connection goes down during an operation.
 
 # Commands
 
