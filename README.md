@@ -11,20 +11,14 @@ The backups can then be restored, used to migrate to another service,
 inspected or exported.
 
   * [Source Code]
-  * [Documentation]
+  * [Code Documentation]
   * [Rubygem]
   * [CI Status]
 
 [Source Code]: https://github.com/joeyates/imap-backup "Source code at GitHub"
-[Documentation]: https://rubydoc.info/gems/imap-backup/frames "RDoc API Documentation at Rubydoc.info"
+[Code Documentation]: https://rubydoc.info/gems/imap-backup/frames "Code Documentation at Rubydoc.info"
 [Rubygem]: https://rubygems.org/gems/imap-backup "Ruby gem at rubygems.org"
 [CI Status]: https://github.com/joeyates/imap-backup/actions/workflows/main.yml
-
-# Backup Emails
-
-imap-backup downloads emails and stores them on disk.
-
-The backup is incremental and interruptable, so backups won't get messed if your connection goes down during an operation.
 
 # Installation
 
@@ -63,7 +57,7 @@ imap-backup setup
 
 To use imap-backup with GMail, you will need to enable 'App passwords' on your account.
 
-# Run Backup
+# Backup
 
 Manually, from the command line:
 
@@ -76,11 +70,23 @@ Alternatively, add it to your crontab.
 Emails are stored on disk in [Mbox files](./docs/files/mboxrd.md) for each folder, with metadata
 stored in [Imap files](./docs/files/imap.md).
 
+The backup is incremental and interruptable, so backups won't get messed if your connection goes down during an operation.
+
 # Commands
 
-* [folders](./commands/folders.md)
-* [restore](./commands/restore.md)
-* [status](./commands/status.md)
+* [backup](docs/commands/backup.md)
+* [folders](docs/commands/folders.md)
+* [local accounts](docs/commands/local-accounts.md)
+* [local folders](docs/commands/local-folders.md)
+* [local list](docs/commands/local-list.md)
+* [local show](docs/commands/local-show.md)
+* [migrate](docs/commands/migrate.md)
+* [remote folders](docs/commands/remote-folders.md)
+* [restore](docs/commands/restore.md)
+* [setup](docs/commands/setup.md)
+* [status](docs/commands/status.md)
+* [utils export-to-thunderbird](docs/commands/utils-export-to-thunderbird.md)
+* [utils ignore-history](docs/commands/utils-ignore-history.md)
 
 For a full list of available commands, run
 
@@ -93,12 +99,6 @@ For more information about a command, run
 ```sh
 imap-backup help COMMAND
 ```
-
-## Configuration
-
-`imap-backup setup` creates the file `~/.imap-backup/config.json`.
-
-[More information about configuration is available in the specific documentation](./docs/configuration.md).
 
 # Troubleshooting
 
