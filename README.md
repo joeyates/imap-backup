@@ -76,9 +76,17 @@ The backup is incremental and interruptable, so backups won't get messed if your
 
 * [backup](docs/commands/backup.md)
 * [folders](docs/commands/folders.md)
+* [local accounts](docs/commands/local-accounts.md)
+* [local folders](docs/commands/local-folders.md)
+* [local list](docs/commands/local-list.md)
+* [local show](docs/commands/local-show.md)
+* [migrate](docs/commands/migrate.md)
+* [remote folders](docs/commands/remote-folders.md)
 * [restore](docs/commands/restore.md)
 * [setup](docs/commands/setup.md)
 * [status](docs/commands/status.md)
+* [utils export-to-thunderbird](docs/commands/utils-export-to-thunderbird.md)
+* [utils ignore-history](docs/commands/utils-ignore-history.md)
 
 For a full list of available commands, run
 
