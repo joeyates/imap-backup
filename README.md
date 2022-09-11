@@ -76,6 +76,7 @@ The backup is incremental and interruptable, so backups won't get messed if your
 
 * [folders](docs/commands/folders.md)
 * [restore](docs/commands/restore.md)
+* [setup](docs/commands/setup.md)
 * [status](docs/commands/status.md)
 
 For a full list of available commands, run
@@ -89,12 +90,6 @@ For more information about a command, run
 ```sh
 imap-backup help COMMAND
 ```
-
-## Setup
-
-`imap-backup setup` creates the file `~/.imap-backup/config.json`.
-
-[More information about configuration is available in the specific documentation](./docs/configuration.md).
 
 # Troubleshooting
 
