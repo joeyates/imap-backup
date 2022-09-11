@@ -11,12 +11,12 @@ The backups can then be restored, used to migrate to another service,
 inspected or exported.
 
   * [Source Code]
-  * [Documentation]
+  * [Code Documentation]
   * [Rubygem]
   * [CI Status]
 
 [Source Code]: https://github.com/joeyates/imap-backup "Source code at GitHub"
-[Documentation]: https://rubydoc.info/gems/imap-backup/frames "RDoc API Documentation at Rubydoc.info"
+[Code Documentation]: https://rubydoc.info/gems/imap-backup/frames "Code Documentation at Rubydoc.info"
 [Rubygem]: https://rubygems.org/gems/imap-backup "Ruby gem at rubygems.org"
 [CI Status]: https://github.com/joeyates/imap-backup/actions/workflows/main.yml
 
