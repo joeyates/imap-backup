@@ -90,7 +90,7 @@ For more information about a command, run
 imap-backup help COMMAND
 ```
 
-## Configuration
+## Setup
 
 `imap-backup setup` creates the file `~/.imap-backup/config.json`.
 
