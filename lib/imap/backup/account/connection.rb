@@ -3,6 +3,7 @@ require "imap/backup/client/default"
 require "imap/backup/account/connection/backup_folders"
 require "imap/backup/account/connection/client_factory"
 require "imap/backup/account/connection/folder_names"
+require "imap/backup/flag_refresher"
 require "imap/backup/local_only_message_deleter"
 require "imap/backup/serializer/directory"
 
@@ -61,6 +62,7 @@ module Imap::Backup
           if account.mirror_mode
             Logger.logger.info "Mirror mode - Deleting messages only present locally"
             LocalOnlyMessageDeleter.new(folder, serializer).run
+            FlagRefresher.new(folder, serializer).run
           end
         rescue Net::IMAP::ByeResponseError
           reconnect

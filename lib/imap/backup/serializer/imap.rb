@@ -98,6 +98,20 @@ module Imap::Backup
       @version
     end
 
+    def save
+      ensure_loaded
+
+      raise "Cannot save metadata without a uid_validity" if !uid_validity
+
+      data = {
+        version: @version,
+        uid_validity: @uid_validity,
+        messages: @messages.map(&:to_h)
+      }
+      content = data.to_json
+      File.open(pathname, "w") { |f| f.write content }
+    end
+
     private
 
     def pathname
@@ -141,20 +155,6 @@ module Imap::Backup
       return nil if !data[:messages].is_a?(Array)
 
       data
-    end
-
-    def save
-      ensure_loaded
-
-      raise "Cannot save metadata without a uid_validity" if !uid_validity
-
-      data = {
-        version: @version,
-        uid_validity: @uid_validity,
-        messages: @messages.map(&:to_h)
-      }
-      content = data.to_json
-      File.open(pathname, "w") { |f| f.write content }
     end
 
     def mbox

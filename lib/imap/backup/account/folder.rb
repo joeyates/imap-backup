@@ -69,11 +69,11 @@ module Imap::Backup
       []
     end
 
-    def fetch_multi(uids)
+    def fetch_multi(uids, attr = [BODY_ATTRIBUTE, "FLAGS"])
       examine
       fetch_data_items =
         retry_on_error(errors: UID_FETCH_RETRY_CLASSES) do
-          client.uid_fetch(uids, [BODY_ATTRIBUTE, "FLAGS"])
+          client.uid_fetch(uids, attr)
         end
       return nil if fetch_data_items.nil?
 

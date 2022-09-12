@@ -72,6 +72,14 @@ module Imap::Backup
       appender.run(uid: uid, message: message, flags: flags)
     end
 
+    def update(uid, flags: nil)
+      message = imap.get(uid)
+      return if !message
+
+      message.flags = flags if flags
+      imap.save
+    end
+
     def each_message(required_uids, &block)
       validate!
 
