@@ -11,20 +11,20 @@ RSpec.describe "backup", type: :aruba, docker: true do
   end
 
   let!(:pre) do
-    server_delete_folder folder
+    test_server.delete_folder folder
   end
   let!(:setup) do
-    server_create_folder folder
-    send_email folder, msg1
-    send_email folder, msg2
+    test_server.create_folder folder
+    test_server.send_email folder, msg1
+    test_server.send_email folder, msg2
     create_config(accounts: [account.to_h])
 
     run_command_and_stop("imap-backup backup")
   end
 
   after do
-    server_delete_folder folder
-    disconnect_imap
+    test_server.delete_folder folder
+    test_server.disconnect
   end
 
   it "downloads messages" do
@@ -64,27 +64,27 @@ RSpec.describe "backup", type: :aruba, docker: true do
     end
 
     it "records uid_validity" do
-      expect(imap_metadata[:uid_validity]).to eq(server_uid_validity(folder))
+      expect(imap_metadata[:uid_validity]).to eq(test_server.folder_uid_validity(folder))
     end
 
     context "when uid_validity does not match" do
       let(:new_name) { "NEWNAME" }
-      let(:original_folder_uid_validity) { server_uid_validity(folder) }
+      let(:original_folder_uid_validity) { test_server.folder_uid_validity(folder) }
       let(:connection) { Imap::Backup::Account::Connection.new(account) }
       let!(:pre) do
         super()
-        server_delete_folder new_name
-        server_create_folder folder
-        send_email folder, msg3
+        test_server.delete_folder new_name
+        test_server.create_folder folder
+        test_server.send_email folder, msg3
         original_folder_uid_validity
         connection.run_backup
         connection.disconnect
-        server_rename_folder folder, new_name
+        test_server.rename_folder folder, new_name
       end
       let(:renamed_folder) { "#{folder}-#{original_folder_uid_validity}" }
 
       after do
-        server_delete_folder new_name
+        test_server.delete_folder new_name
       end
 
       it "renames the old backup" do

@@ -18,12 +18,12 @@ RSpec.describe "Migration", type: :aruba, docker: true do
   end
 
   after do
-    server_delete_folder folder
-    disconnect_imap
+    test_server.delete_folder folder
+    test_server.disconnect
   end
 
   it "copies email to the destination account" do
-    messages = server_messages(folder)
+    messages = test_server.folder_messages(folder)
     expected = <<~MESSAGE.gsub("\n", "\r\n")
       From: sender@example.com
       Subject: Ciao
@@ -35,7 +35,7 @@ RSpec.describe "Migration", type: :aruba, docker: true do
   end
 
   it "copies flags" do
-    messages = server_messages(folder)
+    messages = test_server.folder_messages(folder)
     expect(messages[0]["FLAGS"]).to include(:Draft)
   end
 end

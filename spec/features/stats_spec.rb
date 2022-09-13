@@ -8,17 +8,17 @@ RSpec.describe "stats", type: :aruba, docker: true do
   let(:command) { "stats #{account.username}" }
 
   before do
-    server_create_folder folder
-    send_email folder, msg1
+    test_server.create_folder folder
+    test_server.send_email folder, msg1
     create_config accounts: [account.to_h]
-    disconnect_imap
+    test_server.disconnect
 
     run_command_and_stop "imap-backup #{command}"
   end
 
   after do
-    server_delete_folder folder
-    disconnect_imap
+    test_server.delete_folder folder
+    test_server.disconnect
   end
 
   it "lists messages to be backed up" do

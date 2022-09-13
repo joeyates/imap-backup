@@ -1,11 +1,5 @@
-module EmailServerHelpers
+module ServerMessageHelpers
   BODY_ATTRIBUTE = "BODY[]".freeze
-  REQUESTED_ATTRIBUTES = [BODY_ATTRIBUTE, "FLAGS"].freeze
-
-  def send_email(folder, options)
-    message = message_as_server_message(**options)
-    imap.append(folder, message, nil, nil)
-  end
 
   def message_as_server_message(from:, subject:, body:, **options)
     <<~MESSAGE.gsub("\n", "\r\n")
@@ -17,89 +11,26 @@ module EmailServerHelpers
     MESSAGE
   end
 
-  def server_messages(folder)
-    server_uids(folder).map do |uid|
-      server_fetch_email(folder, uid)
-    end
-  end
-
   def server_message_to_body(message)
     message[BODY_ATTRIBUTE]
   end
+end
 
-  def server_fetch_email(folder, uid)
-    examine folder
+class TestEmailServer
+  include ServerMessageHelpers
 
-    fetch_data_items = imap.uid_fetch([uid.to_i], REQUESTED_ATTRIBUTES)
-    return nil if fetch_data_items.nil?
+  REQUESTED_ATTRIBUTES = [BODY_ATTRIBUTE, "FLAGS"].freeze
 
-    fetch_data_item = fetch_data_items[0]
-    fetch_data_item.attr
-  end
+  attr_reader :connection_parameters
 
-  def server_empty_folder(folder)
-    imap.select(folder)
-    uids = imap.uid_search(["ALL"]).sort
-    imap.store(1..uids.size, "+FLAGS", [:Deleted])
-    imap.expunge
-  end
-
-  def examine(folder)
-    imap.examine(folder)
-  end
-
-  def server_uids(folder)
-    examine(folder)
-    imap.uid_search(["ALL"]).sort
-  end
-
-  def server_uid_validity(folder)
-    examine(folder)
-    imap.responses["UIDVALIDITY"][0]
-  end
-
-  def server_folders
-    imap.list(server_root_folder, "*")
-  end
-
-  def server_root_folder
-    root_info = imap.list("", "")[0]
-    root_info.name
-  end
-
-  def server_folder_exists?(folder)
-    examine(folder)
-    true
-  rescue StandardError
-    false
-  end
-
-  def server_create_folder(folder)
-    return if server_folder_exists?(folder)
-
-    imap.create(folder)
-  end
-
-  def server_rename_folder(from, to)
-    imap.rename(from, to)
-  end
-
-  def server_delete_folder(folder)
-    # Reconnect if necessary to avoid '#<IOError: closed stream>'
-    reconnect_imap
-
-    return if !server_folder_exists?(folder)
-
-    # N.B. If we are deleting the currently selected folder
-    # (previously selected via "select" or "examine"),
-    # this command will cause a disconnect
-    imap.delete folder
+  def initialize(**connection_parameters)
+    @connection_parameters = connection_parameters
   end
 
   def imap
     @imap ||=
       begin
-        connection = fixture("connection")
+        connection = connection_parameters
         imap = Net::IMAP.new(
           connection[:server], connection[:connection_options]
         )
@@ -108,12 +39,12 @@ module EmailServerHelpers
       end
   end
 
-  def reconnect_imap
-    disconnect_imap
+  def reconnect
+    disconnect
     imap
   end
 
-  def disconnect_imap
+  def disconnect
     return if !@imap
 
     if !imap.disconnected?
@@ -127,8 +58,107 @@ module EmailServerHelpers
 
     @imap = nil
   end
+
+  def root_folder
+    root_info = imap.list("", "")[0]
+    root_info.name
+  end
+
+  def folders
+    imap.list(root_folder, "*")
+  end
+
+  def create_folder(folder)
+    return if folder_exists?(folder)
+
+    imap.create(folder)
+  end
+
+  def delete_folder(folder)
+    # Reconnect if necessary to avoid '#<IOError: closed stream>'
+    reconnect
+
+    return if !folder_exists?(folder)
+
+    # N.B. If we are deleting the currently selected folder
+    # (previously selected via "select" or "examine"),
+    # this command will cause a disconnect
+    imap.delete folder
+  end
+
+  def folder_exists?(folder)
+    examine(folder)
+    true
+  rescue StandardError
+    false
+  end
+
+  def rename_folder(from, to)
+    imap.rename(from, to)
+  end
+
+  def empty_folder(folder)
+    imap.select(folder)
+    uids = imap.uid_search(["ALL"]).sort
+    imap.store(1..uids.size, "+FLAGS", [:Deleted])
+    imap.expunge
+  end
+
+  def send_email(folder, options)
+    message = message_as_server_message(**options)
+    imap.append(folder, message, nil, nil)
+  end
+
+  def fetch_email(folder, uid)
+    examine folder
+
+    fetch_data_items = imap.uid_fetch([uid.to_i], REQUESTED_ATTRIBUTES)
+    return nil if fetch_data_items.nil?
+
+    fetch_data_item = fetch_data_items[0]
+    fetch_data_item.attr
+  end
+
+  def examine(folder)
+    imap.examine(folder)
+  end
+
+  def folder_uid_validity(folder)
+    examine(folder)
+    imap.responses["UIDVALIDITY"][0]
+  end
+
+  def folder_uids(folder)
+    examine(folder)
+    imap.uid_search(["ALL"]).sort
+  end
+
+  def folder_messages(folder)
+    folder_uids(folder).map do |uid|
+      fetch_email(folder, uid)
+    end
+  end
+end
+
+module EmailServerHelpers
+  def test_server_connection_parameters
+    {
+      server: 'localhost',
+      username: 'address@example.com',
+      password: 'pass',
+      connection_options: {
+        port: 8993,
+        ssl: {verify_mode: 0}
+      }
+    }
+  end
+
+  def test_server
+    @test_server ||= TestEmailServer.new(**test_server_connection_parameters)
+  end
 end
 
 RSpec.configure do |config|
+  config.include ServerMessageHelpers, type: :aruba
   config.include EmailServerHelpers, type: :aruba
 end
