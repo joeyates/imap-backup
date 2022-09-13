@@ -9,7 +9,7 @@ RSpec.describe "restore", type: :aruba, docker: true do
     to_mbox_entry(**msg1) + to_mbox_entry(**msg2)
   end
   let(:messages_as_server_messages) do
-    [message_as_server_message(msg1), message_as_server_message(msg2)]
+    [message_as_server_message(**msg1), message_as_server_message(**msg2)]
   end
   let(:uid_validity) { 1234 }
 
@@ -66,9 +66,9 @@ RSpec.describe "restore", type: :aruba, docker: true do
       end
       let(:messages_as_server_messages) do
         [
-          message_as_server_message(msg3),
-          message_as_server_message(msg1),
-          message_as_server_message(msg2)
+          message_as_server_message(**msg3),
+          message_as_server_message(**msg1),
+          message_as_server_message(**msg2)
         ]
       end
       let(:uid_validity) { server_uid_validity(folder) }
@@ -118,7 +118,7 @@ RSpec.describe "restore", type: :aruba, docker: true do
           messages = server_messages(folder).map do |m|
             server_message_to_body(m)
           end
-          expect(messages).to eq([message_as_server_message(msg3)])
+          expect(messages).to eq([message_as_server_message(**msg3)])
         end
 
         it "creates the new folder" do
@@ -159,7 +159,7 @@ RSpec.describe "restore", type: :aruba, docker: true do
         server_messages(folder).
         first["BODY[]"]
 
-      server_message = message_as_server_message(msg_iso8859)
+      server_message = message_as_server_message(**msg_iso8859)
 
       expect(message).to eq(server_message)
     end

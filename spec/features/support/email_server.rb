@@ -1,18 +1,13 @@
 module EmailServerHelpers
   BODY_ATTRIBUTE = "BODY[]".freeze
   REQUESTED_ATTRIBUTES = [BODY_ATTRIBUTE, "FLAGS"].freeze
-  DEFAULT_EMAIL = "address@example.org".freeze
 
   def send_email(folder, options)
-    message = message_as_server_message(options)
+    message = message_as_server_message(**options)
     imap.append(folder, message, nil, nil)
   end
 
-  def message_as_server_message(options)
-    from = options[:from] || DEFAULT_EMAIL
-    subject = options[:subject]
-    body = options[:body]
-
+  def message_as_server_message(from:, subject:, body:, **options)
     <<~MESSAGE.gsub("\n", "\r\n")
       From: #{from}
       Subject: #{subject}
