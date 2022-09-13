@@ -6,10 +6,17 @@ services:
     image: antespi/docker-imap-devel:latest
     container_name: imap
     ports:
-    - "8025:25"
-    - "8143:143"
     - "8993:993"
     environment:
-    - MAILNAME=example.org
-    - MAIL_ADDRESS=address@example.org
+    - MAILNAME=example.com
+    - MAIL_ADDRESS=address@example.com
+    - MAIL_PASS=pass
+  other-imap:
+    image: antespi/docker-imap-devel:latest
+    container_name: other-imap
+    ports:
+    - "9993:993"
+    environment:
+    - MAILNAME=other.org
+    - MAIL_ADDRESS=email@other.org
     - MAIL_PASS=pass
