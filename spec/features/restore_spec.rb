@@ -6,7 +6,7 @@ RSpec.describe "restore", type: :aruba, docker: true do
 
   let(:folder) { "my-stuff" }
   let(:messages_as_mbox) do
-    message_as_mbox_entry(msg1) + message_as_mbox_entry(msg2)
+    to_mbox_entry(**msg1) + to_mbox_entry(**msg2)
   end
   let(:messages_as_server_messages) do
     [message_as_server_message(msg1), message_as_server_message(msg2)]
@@ -16,9 +16,9 @@ RSpec.describe "restore", type: :aruba, docker: true do
   let!(:pre) {}
   let!(:setup) do
     create_config accounts: [account.to_h]
-    create_files email: account.username, folder: folder, uid_validity: uid_validity
-    store_email email: account.username, folder: folder, flags: [:Flagged], **msg1
-    store_email email: account.username, folder: folder, flags: [:Draft], **msg2
+    create_local_folder email: account.username, folder: folder, uid_validity: uid_validity
+    append_local email: account.username, folder: folder, flags: [:Flagged], **msg1
+    append_local email: account.username, folder: folder, flags: [:Draft], **msg2
 
     run_command_and_stop("imap-backup restore #{account.username}")
   end
@@ -43,13 +43,13 @@ RSpec.describe "restore", type: :aruba, docker: true do
     end
 
     it "updates local uids to match the new server ones" do
-      updated_imap_content = imap_parsed(folder)
+      updated_imap_content = imap_parsed(email, folder)
       stored_uids = updated_imap_content[:messages].map { |m| m[:uid] }
       expect(server_uids(folder)).to eq(stored_uids)
     end
 
     it "sets the backup uid_validity to match the new folder" do
-      updated_imap_content = imap_parsed(folder)
+      updated_imap_content = imap_parsed(email, folder)
       expect(updated_imap_content[:uid_validity]).
         to eq(server_uid_validity(folder))
     end
@@ -86,7 +86,7 @@ RSpec.describe "restore", type: :aruba, docker: true do
         end
 
         it "sets the backup uid_validity to match the folder" do
-          updated_imap_content = imap_parsed(folder)
+          updated_imap_content = imap_parsed(email, folder)
           expect(updated_imap_content[:uid_validity]).
             to eq(server_uid_validity(folder))
         end
@@ -111,7 +111,7 @@ RSpec.describe "restore", type: :aruba, docker: true do
         end
 
         it "renames the backup" do
-          expect(mbox_content(new_folder)).to eq(messages_as_mbox)
+          expect(mbox_content(email, new_folder)).to eq(messages_as_mbox)
         end
 
         it "leaves the existing folder as is" do
@@ -126,7 +126,7 @@ RSpec.describe "restore", type: :aruba, docker: true do
         end
 
         it "sets the backup uid_validity to match the new folder" do
-          updated_imap_content = imap_parsed(new_folder)
+          updated_imap_content = imap_parsed(email, new_folder)
           expect(updated_imap_content[:uid_validity]).
             to eq(server_uid_validity(new_folder))
         end
@@ -148,8 +148,8 @@ RSpec.describe "restore", type: :aruba, docker: true do
       server_create_folder folder
       uid_validity
       create_config accounts: [account.to_h]
-      create_files email: account.username, folder: folder, uid_validity: uid_validity
-      store_email email: account.username, folder: folder, **msg_iso8859
+      create_local_folder email: account.username, folder: folder, uid_validity: uid_validity
+      append_local email: account.username, folder: folder, **msg_iso8859
 
       run_command_and_stop("imap-backup restore #{account.username}")
     end

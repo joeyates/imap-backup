@@ -7,7 +7,7 @@ RSpec.describe "backup", type: :aruba, docker: true do
   let(:backup_folders) { [{name: folder}] }
   let(:folder) { "my-stuff" }
   let(:messages_as_mbox) do
-    message_as_mbox_entry(msg1) + message_as_mbox_entry(msg2)
+    to_mbox_entry(**msg1) + to_mbox_entry(**msg2)
   end
 
   let!(:pre) do
@@ -28,12 +28,12 @@ RSpec.describe "backup", type: :aruba, docker: true do
   end
 
   it "downloads messages" do
-    expect(mbox_content(folder)).to eq(messages_as_mbox)
+    expect(mbox_content(email, folder)).to eq(messages_as_mbox)
   end
 
   describe "IMAP metadata" do
-    let(:imap_metadata) { imap_parsed(folder) }
-    let(:folder_uids) { server_uids(folder) }
+    let(:imap_metadata) { imap_parsed(email, folder) }
+    let(:folder_uids) { test_server.folder_uids(folder) }
 
     it "saves IMAP metadata in a JSON file" do
       expect { imap_metadata }.to_not raise_error
@@ -51,14 +51,14 @@ RSpec.describe "backup", type: :aruba, docker: true do
 
     it "records message offsets in the mbox file" do
       offsets = imap_metadata[:messages].map { |m| m[:offset] }
-      expected = [0, message_as_mbox_entry(msg1).length]
+      expected = [0, to_mbox_entry(**msg1).length]
 
       expect(offsets).to eq(expected)
     end
 
     it "records message lengths in the mbox file" do
       lengths = imap_metadata[:messages].map { |m| m[:length] }
-      expected = [message_as_mbox_entry(msg1).length, message_as_mbox_entry(msg2).length]
+      expected = [to_mbox_entry(**msg1).length, to_mbox_entry(**msg2).length]
 
       expect(lengths).to eq(expected)
     end
@@ -88,19 +88,19 @@ RSpec.describe "backup", type: :aruba, docker: true do
       end
 
       it "renames the old backup" do
-        expect(mbox_content(renamed_folder)).to eq(message_as_mbox_entry(msg3))
+        expect(mbox_content(email, renamed_folder)).to eq(to_mbox_entry(**msg3))
       end
 
       it "renames the old metadata file" do
-        expect(imap_parsed(renamed_folder)).to be_a Hash
+        expect(imap_parsed(email, renamed_folder)).to be_a Hash
       end
 
       it "downloads messages" do
-        expect(mbox_content(folder)).to eq(messages_as_mbox)
+        expect(mbox_content(email, folder)).to eq(messages_as_mbox)
       end
 
       it "creates a metadata file" do
-        expect(imap_parsed(folder)).to be_a Hash
+        expect(imap_parsed(email, folder)).to be_a Hash
       end
 
       context "when a renamed local backup exists" do
@@ -114,7 +114,7 @@ RSpec.describe "backup", type: :aruba, docker: true do
 
         it "renames the renamed backup to a uniquely name" do
           renamed = "#{folder}-#{original_folder_uid_validity}-1"
-          expect(mbox_content(renamed)).to eq(message_as_mbox_entry(msg3))
+          expect(mbox_content(email, renamed)).to eq(to_mbox_entry(**msg3))
         end
       end
     end
