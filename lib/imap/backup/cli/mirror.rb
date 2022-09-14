@@ -1,3 +1,5 @@
+require "imap/backup/mirror"
+
 module Imap::Backup
   class CLI::Mirror < Thor
     include Thor::Actions
@@ -25,6 +27,10 @@ module Imap::Backup
         check_accounts!
 
         CLI::Backup.new(accounts: source_email).run
+
+        folders.each do |serializer, folder|
+          Mirror.new(serializer, folder).run
+        end
       end
 
       def check_accounts!

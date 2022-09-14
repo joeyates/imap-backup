@@ -24,5 +24,9 @@ module Imap::Backup
     it "runs backup on the source" do
       expect(connection1).to have_received(:run_backup)
     end
+
+    it "mirrors each folder" do
+      expect(mirror).to have_received(:run)
+    end
   end
 end
