@@ -44,7 +44,7 @@ use `last_command_started.output`.
 require "net/imap"
 
 imap = Net::IMAP.new("localhost", {port: 8993, ssl: {verify_mode: 0}})
-username = "address@example.org"
+username = "address@example.com"
 imap.login(username, "pass")
 
 message = "From: #{username}\nSubject: Some Subject\n\nHello!\n"
