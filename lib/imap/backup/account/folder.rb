@@ -99,6 +99,11 @@ module Imap::Backup
       end
     end
 
+    def delete_multi(uids)
+      set_flags(uids, [:Deleted])
+      client.expunge
+    end
+
     def set_flags(uids, flags)
       # Use read-write access, via `select`
       client.select(utf7_encoded_name)

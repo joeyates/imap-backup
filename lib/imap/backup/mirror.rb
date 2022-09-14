@@ -1,3 +1,5 @@
+require "imap/backup/mirror/map"
+
 module Imap::Backup
   class Mirror
     attr_reader :serializer
@@ -9,6 +11,15 @@ module Imap::Backup
     end
 
     def run
+      ensure_destination_folder
+    end
+
+    private
+
+    def ensure_destination_folder
+      return if folder.exist?
+
+      folder.create
     end
   end
 end

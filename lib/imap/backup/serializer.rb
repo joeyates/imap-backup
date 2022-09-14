@@ -109,6 +109,10 @@ module Imap::Backup
       @mbox = nil
     end
 
+    def folder_path
+      self.class.folder_path_for(path: path, folder: folder)
+    end
+
     private
 
     def rename(new_name)
@@ -150,10 +154,6 @@ module Imap::Backup
       MESSAGE
 
       migrator.run
-    end
-
-    def folder_path
-      self.class.folder_path_for(path: path, folder: folder)
     end
 
     def ensure_containing_directory(folder)

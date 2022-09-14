@@ -153,8 +153,24 @@ module EmailServerHelpers
     }
   end
 
+  def other_server_connection_parameters
+    {
+      server: 'localhost',
+      username: 'email@other.org',
+      password: 'pass',
+      connection_options: {
+        port: 9993,
+        ssl: {verify_mode: 0}
+      }
+    }
+  end
+
   def test_server
     @test_server ||= TestEmailServer.new(**test_server_connection_parameters)
+  end
+
+  def other_server
+    @other_server ||= TestEmailServer.new(**other_server_connection_parameters)
   end
 end
 
