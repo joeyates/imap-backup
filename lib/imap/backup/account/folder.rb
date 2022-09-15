@@ -116,7 +116,10 @@ module Imap::Backup
     end
 
     def clear
-      set_flags(uids, [:Deleted])
+      existing = uids
+      return if existing.empty?
+
+      set_flags(existing, [:Deleted])
       client.expunge
     end
 
