@@ -25,6 +25,7 @@ module Imap::Backup
     no_commands do
       def run
         check_accounts!
+        warn_if_source_account_is_not_in_mirror_mode
 
         CLI::Backup.new(accounts: source_email).run
 
@@ -41,6 +42,15 @@ module Imap::Backup
         raise "Account '#{destination_email}' does not exist" if !destination_account
 
         raise "Account '#{source_email}' does not exist" if !source_account
+      end
+
+      def warn_if_source_account_is_not_in_mirror_mode
+        return if source_account.mirror_mode
+
+        message =
+          "The account '#{source_account.email}' " \
+          "is not set up to make mirror backups"
+        Logger.logger.info message
       end
 
       def config
