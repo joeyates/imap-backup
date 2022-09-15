@@ -80,7 +80,9 @@ module Imap::Backup
       imap.save
     end
 
-    def each_message(required_uids, &block)
+    def each_message(required_uids = nil, &block)
+      required_uids ||= uids
+
       validate!
 
       return enum_for(:each_message, required_uids) if !block
