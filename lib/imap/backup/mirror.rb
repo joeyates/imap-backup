@@ -13,6 +13,7 @@ module Imap::Backup
     def run
       ensure_destination_folder
       delete_destination_only_emails
+      append_emails
       map.save
     end
 
