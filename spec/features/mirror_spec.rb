@@ -37,7 +37,7 @@ RSpec.describe "Mirroring", type: :aruba, docker: true do
 
   before do
     test_server.create_folder folder
-    test_server.send_email folder, msg1, flags: [:Seen]
+    test_server.send_email folder, **msg1, flags: [:Seen]
 
     create_config accounts: [source_account, destination_account]
 
@@ -84,7 +84,7 @@ RSpec.describe "Mirroring", type: :aruba, docker: true do
   context "when there are emails on the destination server" do
     let(:pre) do
       other_server.create_folder folder
-      other_server.send_email folder, msg2
+      other_server.send_email folder, **msg2
     end
 
     it "deletes them" do
@@ -105,13 +105,15 @@ RSpec.describe "Mirroring", type: :aruba, docker: true do
         }
       }
     end
+    let!(:mirror_file) do
+      FileUtils.mkdir_p source_account[:local_path]
+      File.write(mirror_file_path, mirror_contents.to_json)
+    end
     let(:pre) do
       # msg1 on both, msg2 on source
       other_server.create_folder folder
-      other_server.send_email folder, msg1
-      test_server.send_email folder, msg2
-      FileUtils.mkdir_p source_account[:local_path]
-      File.write(mirror_file_path, mirror_contents.to_json)
+      other_server.send_email folder, **msg1
+      test_server.send_email folder, **msg2
     end
 
     it "appends missing emails" do
@@ -122,7 +124,7 @@ RSpec.describe "Mirroring", type: :aruba, docker: true do
     context "when there are emails on the destination server that are not on the source server" do
       let(:pre) do
         super()
-        other_server.send_email folder, msg3
+        other_server.send_email folder, **msg3
       end
 
       it "deletes them" do

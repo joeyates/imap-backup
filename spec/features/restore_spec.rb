@@ -56,7 +56,7 @@ RSpec.describe "restore", type: :aruba, docker: true do
   end
 
   context "when the folder exists" do
-    let(:email3) { test_server.send_email folder, msg3 }
+    let(:email3) { test_server.send_email folder, **msg3 }
 
     context "when the uid_validity matches" do
       let(:pre) do

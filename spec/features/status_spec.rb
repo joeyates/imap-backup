@@ -10,7 +10,7 @@ RSpec.describe "status", type: :aruba, docker: true do
   before do
     create_config(accounts: [account.to_h])
     test_server.create_folder folder
-    test_server.send_email folder, msg1
+    test_server.send_email folder, **msg1
     test_server.disconnect
 
     run_command_and_stop("imap-backup status")

@@ -9,7 +9,7 @@ RSpec.describe "stats", type: :aruba, docker: true do
 
   before do
     test_server.create_folder folder
-    test_server.send_email folder, msg1
+    test_server.send_email folder, **msg1
     create_config accounts: [account.to_h]
     test_server.disconnect
 

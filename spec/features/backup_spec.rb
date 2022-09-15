@@ -15,8 +15,8 @@ RSpec.describe "backup", type: :aruba, docker: true do
   end
   let!(:setup) do
     test_server.create_folder folder
-    test_server.send_email folder, msg1
-    test_server.send_email folder, msg2
+    test_server.send_email folder, **msg1
+    test_server.send_email folder, **msg2
     create_config(accounts: [account.to_h])
 
     run_command_and_stop("imap-backup backup")
@@ -75,7 +75,7 @@ RSpec.describe "backup", type: :aruba, docker: true do
         super()
         test_server.delete_folder new_name
         test_server.create_folder folder
-        test_server.send_email folder, msg3
+        test_server.send_email folder, **msg3
         original_folder_uid_validity
         connection.run_backup
         connection.disconnect
