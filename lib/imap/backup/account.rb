@@ -55,9 +55,7 @@ module Imap::Backup
       h = {username: @username, password: @password}
       h[:local_path] = @local_path if @local_path
       h[:folders] = @folders if @folders
-      if @mirror_mode
-        h[:mirror_mode] = true
-      end
+      h[:mirror_mode] = true if @mirror_mode
       h[:server] = @server if @server
       h[:connection_options] = @connection_options if @connection_options
       h[:multi_fetch_size] = multi_fetch_size if @multi_fetch_size

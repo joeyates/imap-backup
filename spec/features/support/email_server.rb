@@ -1,7 +1,7 @@
 module ServerMessageHelpers
   BODY_ATTRIBUTE = "BODY[]".freeze
 
-  def message_as_server_message(from:, subject:, body:, **options)
+  def message_as_server_message(from:, subject:, body:, **_options)
     <<~MESSAGE.gsub("\n", "\r\n")
       From: #{from}
       Subject: #{subject}
@@ -144,9 +144,9 @@ end
 module EmailServerHelpers
   def test_server_connection_parameters
     {
-      server: 'localhost',
-      username: 'address@example.com',
-      password: 'pass',
+      server: "localhost",
+      username: "address@example.com",
+      password: "pass",
       local_path: File.join(File.expand_path("~/.imap-backup"), "address_example.com"),
       connection_options: {
         port: 8993,
@@ -157,9 +157,9 @@ module EmailServerHelpers
 
   def other_server_connection_parameters
     {
-      server: 'localhost',
-      username: 'email@other.org',
-      password: 'pass',
+      server: "localhost",
+      username: "email@other.org",
+      password: "pass",
       local_path: File.join(File.expand_path("~/.imap-backup"), "email_other.org"),
       connection_options: {
         port: 9993,

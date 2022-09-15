@@ -51,7 +51,7 @@ module Imap::Backup
     private
 
     def store
-      @store ||= begin
+      @store ||=
         if File.exist?(pathname)
           content = File.read(pathname)
           store = JSON.parse(content)
@@ -64,7 +64,6 @@ module Imap::Backup
         else
           {}
         end
-      end
     end
 
     def destination_store

@@ -21,9 +21,11 @@ RSpec.describe "Mirroring", type: :aruba, docker: true do
 
     pre
 
-    run_command_and_stop "imap-backup mirror " +
-      "#{test_server_connection_parameters[:username]} " +
+    command =
+      "imap-backup mirror " \
+      "#{test_server_connection_parameters[:username]} " \
       "#{other_server_connection_parameters[:username]}"
+    run_command_and_stop command
   end
 
   after do
@@ -124,7 +126,12 @@ RSpec.describe "Mirroring", type: :aruba, docker: true do
 
       it "deletes them" do
         messages = other_server.folder_messages(folder).map { |m| server_message_to_body(m) }
-        expect(messages).to eq([message_as_server_message(**msg1), message_as_server_message(**msg2)])
+        expect(messages).to eq(
+          [
+            message_as_server_message(**msg1),
+            message_as_server_message(**msg2)
+          ]
+        )
       end
     end
   end

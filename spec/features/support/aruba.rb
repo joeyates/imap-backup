@@ -53,7 +53,7 @@ module LocalHelpers
     serializer.append uid, serialized, flags
   end
 
-  def to_serialized(from:, subject:, body:, **options)
+  def to_serialized(from:, subject:, body:, **_options)
     <<~BODY
       From: #{from}
       Subject: #{subject}
@@ -65,6 +65,7 @@ module LocalHelpers
   def local_path(email)
     account = config.accounts.find { |a| a.username == email }
     raise "Account not found" if !account
+
     account.local_path
   end
 

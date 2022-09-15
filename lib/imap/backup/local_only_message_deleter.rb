@@ -3,7 +3,7 @@ module Imap::Backup
     attr_reader :folder
     attr_reader :serializer
 
-    def initialize(folder, serializer, multi_fetch_size: 1, reset_seen_flags_after_fetch: false)
+    def initialize(folder, serializer)
       @folder = folder
       @serializer = serializer
     end
