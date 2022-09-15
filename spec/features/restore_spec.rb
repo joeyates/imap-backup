@@ -12,6 +12,7 @@ RSpec.describe "restore", type: :aruba, docker: true do
     [message_as_server_message(**msg1), message_as_server_message(**msg2)]
   end
   let(:uid_validity) { 1234 }
+  let(:email) { test_server_connection_parameters[:username] }
 
   let!(:pre) {}
   let!(:setup) do

@@ -4,33 +4,9 @@ RSpec.describe "Mirroring", type: :aruba, docker: true do
   include_context "message-fixtures"
 
   let(:folder) { "my_folder" }
-  let(:source_account) do
-    {
-      username: "address@example.com",
-      password: "pass",
-      mirror_mode: true,
-      folders: [{name: folder}],
-      local_path: File.join(config_path, "address_example.com"),
-      server: "localhost",
-      connection_options: {
-        port: 8993,
-        ssl: {verify_mode: 0}
-      }
-    }
+  let(:mirror_file_path) do
+    File.join(test_server_connection_parameters[:local_path], "#{folder}.mirror")
   end
-  let(:destination_account) do
-    {
-      username: "email@other.org",
-      password: "pass",
-      local_path: File.join(config_path, "email_other.org"),
-      server: "localhost",
-      connection_options: {
-        port: 9993,
-        ssl: {verify_mode: 0}
-      }
-    }
-  end
-  let(:mirror_file_path) { File.join(source_account[:local_path], "#{folder}.mirror") }
   let(:msg1_source_uid) { test_server.folder_uids(folder).first }
   let(:msg1_destination_id) { other_server.folder_uids(folder).first }
   let(:pre) { nil }
@@ -39,11 +15,15 @@ RSpec.describe "Mirroring", type: :aruba, docker: true do
     test_server.create_folder folder
     test_server.send_email folder, **msg1, flags: [:Seen]
 
-    create_config accounts: [source_account, destination_account]
+    create_config accounts: [
+      test_server_connection_parameters, other_server_connection_parameters
+    ]
 
     pre
 
-    run_command_and_stop "imap-backup mirror #{source_account[:username]} #{destination_account[:username]}"
+    run_command_and_stop "imap-backup mirror " +
+      "#{test_server_connection_parameters[:username]} " +
+      "#{other_server_connection_parameters[:username]}"
   end
 
   after do
@@ -54,7 +34,7 @@ RSpec.describe "Mirroring", type: :aruba, docker: true do
   end
 
   it "backs up the source account" do
-    content = mbox_content(source_account[:username], folder)
+    content = mbox_content(test_server_connection_parameters[:username], folder)
 
     expect(content).to eq(to_mbox_entry(**msg1))
   end
@@ -76,7 +56,7 @@ RSpec.describe "Mirroring", type: :aruba, docker: true do
 
   it "saves the .mirror file" do
     content = JSON.parse(File.read(mirror_file_path))
-    map = content.dig(destination_account[:username], "map")
+    map = content.dig(other_server_connection_parameters[:username], "map")
 
     expect(map).to eq({msg1_source_uid.to_s => msg1_destination_id})
   end
@@ -96,7 +76,7 @@ RSpec.describe "Mirroring", type: :aruba, docker: true do
   context "when a mirror file exists" do
     let(:mirror_contents) do
       {
-        destination_account[:username] => {
+        other_server_connection_parameters[:username] => {
           "source_uid_validity" => test_server.folder_uid_validity(folder),
           "destination_uid_validity" => other_server.folder_uid_validity(folder),
           "map" => {
@@ -106,7 +86,7 @@ RSpec.describe "Mirroring", type: :aruba, docker: true do
       }
     end
     let(:mirror_file) do
-      FileUtils.mkdir_p source_account[:local_path]
+      FileUtils.mkdir_p test_server_connection_parameters[:local_path]
       File.write(mirror_file_path, mirror_contents.to_json)
     end
     let(:pre) do

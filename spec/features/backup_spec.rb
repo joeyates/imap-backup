@@ -9,6 +9,8 @@ RSpec.describe "backup", type: :aruba, docker: true do
   let(:messages_as_mbox) do
     to_mbox_entry(**msg1) + to_mbox_entry(**msg2)
   end
+  let(:email) { test_server_connection_parameters[:username] }
+  let(:write_config) { create_config(accounts: [account.to_h]) }
 
   let!(:pre) do
     test_server.delete_folder folder
@@ -17,7 +19,7 @@ RSpec.describe "backup", type: :aruba, docker: true do
     test_server.create_folder folder
     test_server.send_email folder, **msg1
     test_server.send_email folder, **msg2
-    create_config(accounts: [account.to_h])
+    write_config
 
     run_command_and_stop("imap-backup backup")
   end
@@ -108,8 +110,10 @@ RSpec.describe "backup", type: :aruba, docker: true do
           super()
           create_directory local_backup_path
           valid_imap_data = {version: 3, uid_validity: 1, messages: []}
-          File.write(imap_path(renamed_folder), valid_imap_data.to_json)
-          File.write(mbox_path(renamed_folder), "existing mbox")
+          imap_path = File.join(local_backup_path, "#{renamed_folder}.imap")
+          File.write(imap_path, valid_imap_data.to_json)
+          mbox_path = File.join(local_backup_path, "#{renamed_folder}.mbox")
+          File.write(mbox_path, "existing mbox")
         end
 
         it "renames the renamed backup to a uniquely name" do
