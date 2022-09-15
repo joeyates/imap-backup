@@ -10,7 +10,8 @@ RSpec.describe "Mirroring", type: :aruba, docker: true do
       password: "pass",
       mirror_mode: true,
       folders: [{name: folder}],
-      local_path: File.join(config_path, "source"),
+      local_path: File.join(config_path, "address_example.com"),
+      server: "localhost",
       connection_options: {
         port: 8993,
         ssl: {verify_mode: 0}
@@ -21,18 +22,22 @@ RSpec.describe "Mirroring", type: :aruba, docker: true do
     {
       username: "email@other.org",
       password: "pass",
-      local_path: File.join(config_path, "destination"),
+      local_path: File.join(config_path, "email_other.org"),
+      server: "localhost",
       connection_options: {
         port: 9993,
         ssl: {verify_mode: 0}
       }
     }
   end
+  let(:mirror_file_path) { File.join(source_account[:local_path], "#{folder}.mirror") }
+  let(:msg1_source_uid) { test_server.folder_uids(folder).first }
+  let(:msg1_destination_id) { other_server.folder_uids(folder).first }
   let(:pre) { nil }
 
   before do
     test_server.create_folder folder
-    test_server.send_email folder, msg1
+    test_server.send_email folder, msg1, flags: [:Seen]
 
     create_config accounts: [source_account, destination_account]
 
@@ -58,16 +63,72 @@ RSpec.describe "Mirroring", type: :aruba, docker: true do
     expect(other_server.folder_exists?(folder)).to be true
   end
 
+  it "appends all emails" do
+    messages = other_server.folder_messages(folder).map { |m| server_message_to_body(m) }
+    expect(messages).to eq([message_as_server_message(**msg1)])
+  end
 
-  context "when there are emails on the destination server that are not on the source server" do
+  it "sets flags" do
+    flags = other_server.folder_messages(folder).first["FLAGS"]
+    flags.reject! { |f| f == :Recent }
+    expect(flags).to eq([:Seen])
+  end
+
+  it "saves the .mirror file" do
+    content = JSON.parse(File.read(mirror_file_path))
+    map = content.dig(destination_account[:username], "map")
+
+    expect(map).to eq({msg1_source_uid.to_s => msg1_destination_id})
+  end
+
+  context "when there are emails on the destination server" do
     let(:pre) do
       other_server.create_folder folder
       other_server.send_email folder, msg2
     end
 
     it "deletes them" do
-      messages = other_server.folder_messages(folder)
-      expect(messages).to eq([])
+      messages = other_server.folder_messages(folder).map { |m| server_message_to_body(m) }
+      expect(messages).to eq([message_as_server_message(**msg1)])
+    end
+  end
+
+  context "when a mirror file exists" do
+    let(:mirror_contents) do
+      {
+        destination_account[:username] => {
+          "source_uid_validity" => test_server.folder_uid_validity(folder),
+          "destination_uid_validity" => other_server.folder_uid_validity(folder),
+          "map" => {
+            msg1_source_uid => msg1_destination_id
+          }
+        }
+      }
+    end
+    let(:pre) do
+      # msg1 on both, msg2 on source
+      other_server.create_folder folder
+      other_server.send_email folder, msg1
+      test_server.send_email folder, msg2
+      FileUtils.mkdir_p source_account[:local_path]
+      File.write(mirror_file_path, mirror_contents.to_json)
+    end
+
+    it "appends missing emails" do
+      messages = other_server.folder_messages(folder).map { |m| server_message_to_body(m) }
+      expect(messages).to eq([message_as_server_message(**msg1), message_as_server_message(**msg2)])
+    end
+
+    context "when there are emails on the destination server that are not on the source server" do
+      let(:pre) do
+        super()
+        other_server.send_email folder, msg3
+      end
+
+      it "deletes them" do
+        messages = other_server.folder_messages(folder).map { |m| server_message_to_body(m) }
+        expect(messages).to eq([message_as_server_message(**msg1), message_as_server_message(**msg2)])
+      end
     end
   end
 end
