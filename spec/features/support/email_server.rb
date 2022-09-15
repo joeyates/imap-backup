@@ -100,7 +100,7 @@ class TestEmailServer
   def empty_folder(folder)
     imap.select(folder)
     uids = imap.uid_search(["ALL"]).sort
-    imap.store(1..uids.size, "+FLAGS", [:Deleted])
+    imap.uid_store(uids, "+FLAGS", [:Deleted])
     imap.expunge
   end
 
