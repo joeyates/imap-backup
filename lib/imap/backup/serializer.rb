@@ -19,7 +19,7 @@ module Imap::Backup
     extend Forwardable
 
     def_delegator :mbox, :pathname, :mbox_pathname
-    def_delegators :imap, :messages, :uid_validity, :uids, :update_uid
+    def_delegators :imap, :get, :messages, :uid_validity, :uids, :update_uid
 
     attr_reader :folder
     attr_reader :path
