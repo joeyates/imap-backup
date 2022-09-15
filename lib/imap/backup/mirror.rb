@@ -13,6 +13,7 @@ module Imap::Backup
     def run
       ensure_destination_folder
       delete_destination_only_emails
+      update_flags
       append_emails
       map.save
     end
@@ -36,6 +37,16 @@ module Imap::Backup
       source_uids = serializer.uids
       destination_uids = folder.uids
       destination_uids.filter { |uid| !source_uids.include?(map.source_uid(uid)) }
+    end
+
+    def update_flags
+      folder.uids.each do |destination_uid|
+        source_uid = map.source_uid(destination_uid)
+        next if !source_uid
+
+        message = serializer.get(source_uid)
+        folder.apply_flags [destination_uid], message.flags
+      end
     end
 
     def append_emails

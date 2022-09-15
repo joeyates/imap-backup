@@ -105,7 +105,7 @@ RSpec.describe "Mirroring", type: :aruba, docker: true do
         }
       }
     end
-    let!(:mirror_file) do
+    let(:mirror_file) do
       FileUtils.mkdir_p source_account[:local_path]
       File.write(mirror_file_path, mirror_contents.to_json)
     end
@@ -114,11 +114,26 @@ RSpec.describe "Mirroring", type: :aruba, docker: true do
       other_server.create_folder folder
       other_server.send_email folder, **msg1
       test_server.send_email folder, **msg2
+      mirror_file
     end
 
     it "appends missing emails" do
       messages = other_server.folder_messages(folder).map { |m| server_message_to_body(m) }
       expect(messages).to eq([message_as_server_message(**msg1), message_as_server_message(**msg2)])
+    end
+
+    context "when flags have changed" do
+      let(:pre) do
+        other_server.create_folder folder
+        other_server.send_email folder, **msg1, flags: [:Draft]
+        mirror_file
+      end
+
+      it "updates them" do
+        flags = other_server.folder_messages(folder).first["FLAGS"]
+        flags.reject! { |f| f == :Recent }
+        expect(flags).to eq([:Seen])
+      end
     end
 
     context "when there are emails on the destination server that are not on the source server" do
