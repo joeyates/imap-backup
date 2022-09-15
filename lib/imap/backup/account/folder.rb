@@ -107,6 +107,7 @@ module Imap::Backup
     def set_flags(uids, flags)
       # Use read-write access, via `select`
       client.select(utf7_encoded_name)
+      flags.reject! { |f| f == :Recent }
       client.uid_store(uids, "+FLAGS", flags)
     end
 
