@@ -104,9 +104,9 @@ class TestEmailServer
     imap.expunge
   end
 
-  def send_email(folder, options)
+  def send_email(folder, options, flags: [])
     message = message_as_server_message(**options)
-    imap.append(folder, message, nil, nil)
+    imap.append(folder, message, flags, nil)
   end
 
   def fetch_email(folder, uid)
