@@ -1,7 +1,6 @@
 require "features/helper"
 
 RSpec.describe "backup", type: :aruba, docker: true do
-  include_context "account fixture"
   include_context "message-fixtures"
 
   let(:backup_folders) { [{name: folder}] }
@@ -9,8 +8,9 @@ RSpec.describe "backup", type: :aruba, docker: true do
   let(:messages_as_mbox) do
     to_mbox_entry(**msg1) + to_mbox_entry(**msg2)
   end
-  let(:email) { test_server_connection_parameters[:username] }
-  let(:write_config) { create_config(accounts: [account.to_h]) }
+  let(:account) { test_server_connection_parameters }
+  let(:email) { account[:username] }
+  let(:write_config) { create_config(accounts: [account]) }
 
   let!(:pre) do
     test_server.delete_folder folder
@@ -72,7 +72,7 @@ RSpec.describe "backup", type: :aruba, docker: true do
     context "when uid_validity does not match" do
       let(:new_name) { "NEWNAME" }
       let(:original_folder_uid_validity) { test_server.folder_uid_validity(folder) }
-      let(:connection) { Imap::Backup::Account::Connection.new(account) }
+      let(:connection) { Imap::Backup::Account::Connection.new(Imap::Backup::Account.new(account)) }
       let!(:pre) do
         super()
         test_server.delete_folder new_name
@@ -108,11 +108,11 @@ RSpec.describe "backup", type: :aruba, docker: true do
       context "when a renamed local backup exists" do
         let!(:pre) do
           super()
-          create_directory local_backup_path
+          create_directory account[:local_path]
           valid_imap_data = {version: 3, uid_validity: 1, messages: []}
-          imap_path = File.join(local_backup_path, "#{renamed_folder}.imap")
+          imap_path = File.join(account[:local_path], "#{renamed_folder}.imap")
           File.write(imap_path, valid_imap_data.to_json)
-          mbox_path = File.join(local_backup_path, "#{renamed_folder}.mbox")
+          mbox_path = File.join(account[:local_path], "#{renamed_folder}.mbox")
           File.write(mbox_path, "existing mbox")
         end
 

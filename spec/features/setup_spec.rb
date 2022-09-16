@@ -1,10 +1,10 @@
 require "features/helper"
 
 RSpec.describe "setup", type: :aruba do
-  include_context "account fixture"
+  let(:account) { test_server_connection_parameters }
 
   before do
-    create_config(accounts: [account.to_h])
+    create_config(accounts: [account])
 
     run_command "imap-backup setup"
   end
@@ -23,12 +23,12 @@ RSpec.describe "setup", type: :aruba do
     last_command_started.stop
 
     expect(last_command_started).to have_output(/imap-backup - Account/m)
-    expect(last_command_started).to have_output(/email\s+#{account.username}/)
+    expect(last_command_started).to have_output(/email\s+#{account[:username]}/)
   end
 
   context "when the account's local_path has backslashes" do
     let(:account) do
-      super().to_h.merge(local_path: local_path)
+      super().merge(local_path: local_path)
     end
     let(:local_path) { "c:\\my_user\\backup" }
 
@@ -48,7 +48,7 @@ RSpec.describe "setup", type: :aruba do
 
   context "when the account's connection_options are set" do
     let(:account) do
-      super().to_h.merge(connection_options: connection_options)
+      super().merge(connection_options: connection_options)
     end
     let(:connection_options) { {"port" => 600} }
 

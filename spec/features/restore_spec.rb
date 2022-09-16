@@ -1,9 +1,9 @@
 require "features/helper"
 
 RSpec.describe "restore", type: :aruba, docker: true do
-  include_context "account fixture"
   include_context "message-fixtures"
 
+  let(:account) { test_server_connection_parameters }
   let(:folder) { "my-stuff" }
   let(:messages_as_mbox) do
     to_mbox_entry(**msg1) + to_mbox_entry(**msg2)
@@ -16,12 +16,12 @@ RSpec.describe "restore", type: :aruba, docker: true do
 
   let!(:pre) {}
   let!(:setup) do
-    create_config accounts: [account.to_h]
-    create_local_folder email: account.username, folder: folder, uid_validity: uid_validity
-    append_local email: account.username, folder: folder, flags: [:Flagged], **msg1
-    append_local email: account.username, folder: folder, flags: [:Draft], **msg2
+    create_config accounts: [account]
+    create_local_folder email: account[:username], folder: folder, uid_validity: uid_validity
+    append_local email: account[:username], folder: folder, flags: [:Flagged], **msg1
+    append_local email: account[:username], folder: folder, flags: [:Draft], **msg2
 
-    run_command_and_stop("imap-backup restore #{account.username}")
+    run_command_and_stop("imap-backup restore #{account[:username]}")
   end
   let(:cleanup) do
     test_server.delete_folder folder
@@ -148,11 +148,11 @@ RSpec.describe "restore", type: :aruba, docker: true do
     let(:setup) do
       test_server.create_folder folder
       uid_validity
-      create_config accounts: [account.to_h]
-      create_local_folder email: account.username, folder: folder, uid_validity: uid_validity
-      append_local email: account.username, folder: folder, **msg_iso8859
+      create_config accounts: [account]
+      create_local_folder email: account[:username], folder: folder, uid_validity: uid_validity
+      append_local email: account[:username], folder: folder, **msg_iso8859
 
-      run_command_and_stop("imap-backup restore #{account.username}")
+      run_command_and_stop("imap-backup restore #{account[:username]}")
     end
 
     it "maintains encodings" do

@@ -2,9 +2,9 @@ require "features/helper"
 require "imap/backup/cli/status"
 
 RSpec.describe "status", type: :aruba, docker: true do
-  include_context "account fixture"
   include_context "message-fixtures"
 
+  let(:account) { test_server_connection_parameters }
   let(:folder) { "my-stuff" }
 
   before do
