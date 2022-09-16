@@ -58,13 +58,13 @@ module Imap::Backup
     rescue FolderNotFound
       []
     rescue NoMethodError
-      message = <<~MESSAGE
-        Folder '#{name}' caused NoMethodError
-        probably
-        `undefined method `[]' for nil:NilClass (NoMethodError)`
-        in `search_internal` in stdlib net/imap.rb.
-        This is caused by `@responses["SEARCH"] being unset/undefined
-      MESSAGE
+      message =
+        "Folder '#{name}' caused a NoMethodError. " \
+        "Probably this was `undefined method `[]' for nil:NilClass (NoMethodError)` " \
+        "in `search_internal` in stdlib net/imap.rb. " \
+        'This is caused by `@responses["SEARCH"] being unset/undefined. ' \
+        "Among others, Apple Mail servers send empty responses when " \
+        "folders are empty, causing this error."
       Logger.logger.warn message
       []
     end
