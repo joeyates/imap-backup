@@ -139,6 +139,11 @@ class TestEmailServer
       fetch_email(folder, uid)
     end
   end
+
+  def set_flags(folder, uids, flags)
+    imap.select(folder)
+    imap.uid_store(uids, "FLAGS", flags)
+  end
 end
 
 module EmailServerHelpers
