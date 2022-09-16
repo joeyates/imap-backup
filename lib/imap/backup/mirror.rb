@@ -5,6 +5,8 @@ module Imap::Backup
     attr_reader :serializer
     attr_reader :folder
 
+    CHUNK_SIZE = 100
+
     def initialize(serializer, folder)
       @serializer = serializer
       @folder = folder
@@ -40,12 +42,21 @@ module Imap::Backup
     end
 
     def update_flags
-      folder.uids.each do |destination_uid|
+      folder.uids.each_slice(CHUNK_SIZE) do |uids|
+        update_uids(uids)
+      end
+    end
+
+    def update_uids(uids)
+      uids_and_flags = folder.fetch_multi(uids, ["FLAGS"])
+      uids_and_flags.each do |uid_and_flags|
+        destination_uid = uid_and_flags[:uid]
+        flags = uid_and_flags[:flags]
         source_uid = map.source_uid(destination_uid)
         next if !source_uid
 
         message = serializer.get(source_uid)
-        folder.apply_flags [destination_uid], message.flags
+        folder.apply_flags([destination_uid], message.flags) if flags.sort != message.flags.sort
       end
     end
 
