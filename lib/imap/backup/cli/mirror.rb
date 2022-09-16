@@ -48,7 +48,7 @@ module Imap::Backup
         return if source_account.mirror_mode
 
         message =
-          "The account '#{source_account.email}' " \
+          "The account '#{source_account.username}' " \
           "is not set up to make mirror backups"
         Logger.logger.info message
       end
