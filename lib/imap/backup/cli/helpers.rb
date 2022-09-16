@@ -3,6 +3,28 @@ require "imap/backup/cli/accounts"
 
 module Imap::Backup
   module CLI::Helpers
+    def self.included(base)
+      base.class_eval do
+        def self.verbose_option
+          method_option(
+            "verbose",
+            type: :boolean,
+            desc: "increase the amount of logging",
+            aliases: ["-v"]
+          )
+        end
+
+        def self.quiet_option
+          method_option(
+            "quiet",
+            type: :boolean,
+            desc: "silence all output",
+            aliases: ["-q"]
+          )
+        end
+      end
+    end
+
     def symbolized(options)
       options.each.with_object({}) do |(k, v), acc|
         key = k.gsub("-", "_").intern

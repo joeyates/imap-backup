@@ -8,8 +8,6 @@ CliCoverage.conditionally_activate
 require "imap/backup/cli"
 require "imap/backup/logger"
 
-Imap::Backup::Logger.setup_logging ::Logger::Severity::INFO
-
 Imap::Backup::Logger.sanitize_stderr do
   Imap::Backup::CLI.start(ARGV)
 end

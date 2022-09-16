@@ -3,6 +3,8 @@ require "net/imap"
 module Imap::Backup
   describe Logger do
     describe ".setup_logging" do
+      let(:options) { {} }
+
       around do |example|
         logger_previous = described_class.logger.level
         net_imap_previous = Net::IMAP.debug
@@ -14,15 +16,51 @@ module Imap::Backup
       end
 
       before do
-        described_class.setup_logging ::Logger::Severity::ERROR
+        described_class.setup_logging options
       end
 
-      it "sets logger level to error" do
-        expect(described_class.logger.level).to eq(::Logger::Severity::ERROR)
+      it "sets logger level to info" do
+        expect(described_class.logger.level).to eq(::Logger::Severity::INFO)
       end
 
-      it "doesn't set the Net::IMAP debug flag" do
-        expect(Net::IMAP.debug).to be_a(FalseClass)
+      it "unsets the Net::IMAP debug flag" do
+        expect(Net::IMAP.debug).to be false
+      end
+
+      context "when verbose is passed" do
+        let(:options) { {verbose: true} }
+
+        it "sets logger level to debug" do
+          expect(described_class.logger.level).to eq(::Logger::Severity::DEBUG)
+        end
+
+        it "sets the Net::IMAP debug flag" do
+          expect(Net::IMAP.debug).to be true
+        end
+      end
+
+      context "when quiet is passed" do
+        let(:options) { {quiet: true} }
+
+        it "sets logger level to unknown" do
+          expect(described_class.logger.level).to eq(::Logger::Severity::UNKNOWN)
+        end
+
+        it "unsets the Net::IMAP debug flag" do
+          expect(Net::IMAP.debug).to be false
+        end
+      end
+
+      context "when quiet and verbose are passed" do
+        let(:options) { {quiet: true, verbose: true} }
+
+        it "sets logger level to unknown" do
+          expect(described_class.logger.level).to eq(::Logger::Severity::UNKNOWN)
+        end
+
+        it "unsets the Net::IMAP debug flag" do
+          expect(Net::IMAP.debug).to be false
+        end
       end
     end
   end

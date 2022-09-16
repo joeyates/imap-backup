@@ -12,7 +12,17 @@ module Imap::Backup
       Logger.instance.logger
     end
 
-    def self.setup_logging(level)
+    def self.setup_logging(options = {})
+      level =
+        if options[:quiet]
+          ::Logger::Severity::UNKNOWN
+        else
+          if options[:verbose]
+            ::Logger::Severity::DEBUG
+          else
+            ::Logger::Severity::INFO
+          end
+        end
       logger.level = level
       debug = level == ::Logger::Severity::DEBUG
       Net::IMAP.debug = debug

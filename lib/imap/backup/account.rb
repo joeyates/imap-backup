@@ -1,3 +1,5 @@
+module Imap; end
+
 module Imap::Backup
   class Account
     DEFAULT_MULTI_FETCH_SIZE = 1
