@@ -110,6 +110,11 @@ class TestEmailServer
     imap.append(folder, message, flags, nil)
   end
 
+  def delete_email(folder, uid)
+    set_flags(folder, [uid], [:Deleted])
+    imap.expunge
+  end
+
   def fetch_email(folder, uid)
     examine folder
 
