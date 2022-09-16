@@ -19,6 +19,7 @@ module Imap::Backup
     let(:pathname) { Pathname.new("path/folder.imap") }
 
     before do
+      allow(Configuration).to receive(:exist?) { true }
       allow(Configuration).to receive(:new) { config }
       allow(Mirror).to receive(:new) { mirror }
       allow(Pathname).to receive(:glob).and_yield(pathname)
