@@ -8,7 +8,10 @@ module Imap::Backup
     let(:mirror) { instance_double(Mirror, run: nil) }
     let(:config) { instance_double(Configuration, accounts: [account1, account2]) }
     let(:account1) do
-      instance_double(Account, username: source, connection: connection1, local_path: "path")
+      instance_double(
+        Account,
+        username: source, connection: connection1, local_path: "path", mirror_mode: false
+      )
     end
     let(:connection1) { instance_double(Account::Connection, run_backup: nil) }
     let(:account2) { instance_double(Account, username: destination, connection: connection2) }

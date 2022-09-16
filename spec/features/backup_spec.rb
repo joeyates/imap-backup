@@ -123,4 +123,27 @@ RSpec.describe "backup", type: :aruba, docker: true do
       end
     end
   end
+
+  context "in mirror mode" do
+    let(:account) { test_server_connection_parameters.merge(mirror_mode: true) }
+    let(:imap_path) { File.join(account[:local_path], "Foo.imap") }
+    let(:mbox_path) { File.join(account[:local_path], "Foo.mbox") }
+
+    let!(:pre) do
+      create_directory account[:local_path]
+      valid_imap_data = {version: 3, uid_validity: 1, messages: [{uid: 1, offset: 0, length: 3}]}
+      File.write(imap_path, valid_imap_data.to_json)
+      File.write(mbox_path, "existing mbox")
+    end
+
+    context "with folders that are not being backed up" do
+      it "deletes .imap files" do
+        expect(File.exist?(imap_path)).to be false
+      end
+
+      it "deletes .mbox files" do
+        expect(File.exist?(mbox_path)).to be false
+      end
+    end
+  end
 end

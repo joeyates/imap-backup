@@ -36,12 +36,16 @@ module Imap::Backup
 
       return true if imap.valid? && mbox.valid?
 
+      delete
+
+      false
+    end
+
+    def delete
       imap.delete
       @imap = nil
       mbox.delete
       @mbox = nil
-
-      false
     end
 
     def apply_uid_validity(value)

@@ -40,6 +40,13 @@ module Imap::Backup
       # start the connection so we get logging messages in the right order
       client
       ensure_account_folder
+      if account.mirror_mode
+        # Delete serialized folders that are not to be backed up
+        wanted = backup_folders.map(&:name)
+        local_folders do |serializer, _folder|
+          serializer.delete if !wanted.include?(serializer.folder)
+        end
+      end
       each_folder do |folder, serializer|
         begin
           next if !folder.exist?
