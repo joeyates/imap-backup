@@ -15,13 +15,14 @@ RSpec.describe "backup", type: :aruba, docker: true do
   let!(:pre) do
     test_server.delete_folder folder
   end
+  let(:command) { "imap-backup backup" }
   let!(:setup) do
     test_server.create_folder folder
     test_server.send_email folder, **msg1
     test_server.send_email folder, **msg2
     write_config
 
-    run_command_and_stop("imap-backup backup")
+    run_command_and_stop command
   end
 
   after do
@@ -67,6 +68,30 @@ RSpec.describe "backup", type: :aruba, docker: true do
 
     it "records uid_validity" do
       expect(imap_metadata[:uid_validity]).to eq(test_server.folder_uid_validity(folder))
+    end
+
+    context "with the --refresh option" do
+      let(:command) { "imap-backup backup --refresh" }
+      let(:connection) { Imap::Backup::Account::Connection.new(Imap::Backup::Account.new(account)) }
+
+      context "with messages that have already been backed up" do
+        let!(:pre) do
+          super()
+          write_config
+          test_server.create_folder folder
+          test_server.send_email folder, **msg3, flags: [:Draft]
+          connection.run_backup
+          connection.disconnect
+          test_server.set_flags folder, [1], [:Seen]
+        end
+
+        it "updates flags" do
+          imap_content = imap_parsed(email, folder)
+          message3 = imap_content[:messages].first
+          flags = message3[:flags].reject { |f| f == "Recent" }
+          expect(flags).to eq(["Seen"])
+        end
+      end
     end
 
     context "when uid_validity does not match" do

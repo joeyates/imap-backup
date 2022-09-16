@@ -35,7 +35,7 @@ module Imap::Backup
       end
     end
 
-    def run_backup
+    def run_backup(refresh: false)
       Logger.logger.debug "Running backup of account: #{account.username}"
       # start the connection so we get logging messages in the right order
       client
@@ -69,8 +69,8 @@ module Imap::Backup
           if account.mirror_mode
             Logger.logger.info "Mirror mode - Deleting messages only present locally"
             LocalOnlyMessageDeleter.new(folder, serializer).run
-            FlagRefresher.new(folder, serializer).run
           end
+          FlagRefresher.new(folder, serializer).run if account.mirror_mode || refresh
         rescue Net::IMAP::ByeResponseError
           reconnect
           retry

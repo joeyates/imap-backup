@@ -44,6 +44,12 @@ module Imap::Backup
       The setup tool can be used to choose a specific list of folders to back up.
     DESC
     accounts_option
+    method_option(
+      "refresh",
+      type: :boolean,
+      desc: "in 'keep all emails' mode, update flags for messages that are already downloaded",
+      aliases: ["-r"]
+    )
     def backup
       Backup.new(symbolized(options)).run
     end
