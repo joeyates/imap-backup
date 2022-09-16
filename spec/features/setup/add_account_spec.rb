@@ -7,10 +7,10 @@ RSpec.describe "adding an account", type: :aruba do
 
   before do
     run_command "imap-backup setup"
-    last_command_started.write "1\n" # Add account
+    last_command_started.write "add account\n"
     last_command_started.write "me@example.com\n"
-    last_command_started.write "11\n" # Back to main menu
-    last_command_started.write "4\n" # Save and exit
+    last_command_started.write "(q) return to main menu\n"
+    last_command_started.write "save and exit\n"
     last_command_started.stop
   end
 

@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [7.0.0] - [TBA]
+
+* Added a 'mirror mode' to account configuration that changes backup behaviour:
+  * removes local folders that are no longer to be backed up,
+  * removes emails that are no longer present on the server,
+  * updates flags on the local backup to match those on the server.
+* Added a 'mirror' command that takes a 'mirror mode' backup and copies
+  it to another server.
+* Added a '--refresh' option to the backup command that, updates flags
+  on the local backup to match those on the server, even for accounts
+  that are *not* in 'mirror mode'.
+
 ## [7.0.0.rc1] - 2022-08-30
 
 ## Changed

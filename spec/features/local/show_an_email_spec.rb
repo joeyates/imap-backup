@@ -11,7 +11,7 @@ RSpec.describe "Show an email", type: :aruba do
 
   before do
     create_config(accounts: [account])
-    store_email(
+    append_local(
       email: email,
       folder: "my_folder",
       uid: 99,

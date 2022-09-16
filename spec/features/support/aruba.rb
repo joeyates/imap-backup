@@ -1,6 +1,5 @@
 require "aruba/rspec"
 
-require_relative "backup_directory"
 require "imap/backup/serializer/mbox"
 
 Aruba.configure do |config|
@@ -26,8 +25,8 @@ module ConfigurationHelpers
   end
 end
 
-module StoreHelpers
-  def create_files(email:, folder:, uid_validity:)
+module LocalHelpers
+  def create_local_folder(email:, folder:, uid_validity:)
     account = config.accounts.find { |a| a.username == email }
     raise "Account not found" if !account
 
@@ -36,7 +35,7 @@ module StoreHelpers
     serializer.force_uid_validity uid_validity
   end
 
-  def store_email(
+  def append_local(
     email:, folder:,
     uid: 1,
     from: "sender@example.com",
@@ -54,13 +53,44 @@ module StoreHelpers
     serializer.append uid, serialized, flags
   end
 
-  def to_serialized(from:, subject:, body:)
+  def to_serialized(from:, subject:, body:, **_options)
     <<~BODY
       From: #{from}
       Subject: #{subject}
 
       #{body}
     BODY
+  end
+
+  def local_path(email)
+    account = config.accounts.find { |a| a.username == email }
+    raise "Account not found" if !account
+
+    account.local_path
+  end
+
+  def mbox_path(email, name)
+    File.join(local_path(email), "#{name}.mbox")
+  end
+
+  def mbox_content(email, name)
+    File.read(mbox_path(email, name))
+  end
+
+  def imap_path(email, name)
+    File.join(local_path(email), "#{name}.imap")
+  end
+
+  def imap_content(email, name)
+    File.read(imap_path(email, name))
+  end
+
+  def imap_parsed(email, name)
+    JSON.parse(imap_content(email, name), symbolize_names: true)
+  end
+
+  def to_mbox_entry(**options)
+    "From #{options[:from]}\n#{to_serialized(**options)}\n"
   end
 
   def config
@@ -72,8 +102,7 @@ end
 
 RSpec.configure do |config|
   config.include ConfigurationHelpers, type: :aruba
-  config.include StoreHelpers, type: :aruba
-  config.include BackupDirectoryHelpers, type: :aruba
+  config.include LocalHelpers, type: :aruba
 
   config.before(:suite) do
     FileUtils.rm_rf "./tmp/home"

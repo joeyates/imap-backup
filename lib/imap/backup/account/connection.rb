@@ -3,6 +3,8 @@ require "imap/backup/client/default"
 require "imap/backup/account/connection/backup_folders"
 require "imap/backup/account/connection/client_factory"
 require "imap/backup/account/connection/folder_names"
+require "imap/backup/flag_refresher"
+require "imap/backup/local_only_message_deleter"
 require "imap/backup/serializer/directory"
 
 module Imap::Backup
@@ -33,11 +35,18 @@ module Imap::Backup
       end
     end
 
-    def run_backup
+    def run_backup(refresh: false)
       Logger.logger.debug "Running backup of account: #{account.username}"
       # start the connection so we get logging messages in the right order
       client
       ensure_account_folder
+      if account.mirror_mode
+        # Delete serialized folders that are not to be backed up
+        wanted = backup_folders.map(&:name)
+        local_folders do |serializer, _folder|
+          serializer.delete if !wanted.include?(serializer.folder)
+        end
+      end
       each_folder do |folder, serializer|
         begin
           next if !folder.exist?
@@ -57,6 +66,11 @@ module Imap::Backup
             multi_fetch_size: account.multi_fetch_size,
             reset_seen_flags_after_fetch: account.reset_seen_flags_after_fetch
           ).run
+          if account.mirror_mode
+            Logger.logger.info "Mirror mode - Deleting messages only present locally"
+            LocalOnlyMessageDeleter.new(folder, serializer).run
+          end
+          FlagRefresher.new(folder, serializer).run if account.mirror_mode || refresh
         rescue Net::IMAP::ByeResponseError
           reconnect
           retry

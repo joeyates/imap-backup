@@ -48,10 +48,16 @@ jobs:
       imap:
         image: antespi/docker-imap-devel:latest
         ports:
-        - "8025:25"
-        - "8143:143"
         - "8993:993"
         env:
-          MAILNAME: example.org
-          MAIL_ADDRESS: address@example.org
+          MAILNAME: example.com
+          MAIL_ADDRESS: address@example.com
+          MAIL_PASS: pass
+      other-imap:
+        image: antespi/docker-imap-devel:latest
+        ports:
+        - "9993:993"
+        env:
+          MAILNAME: other.org
+          MAIL_ADDRESS: email@other.org
           MAIL_PASS: pass

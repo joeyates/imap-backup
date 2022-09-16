@@ -145,6 +145,14 @@ module Imap::Backup
         end
       end
 
+      context "when mirror_mode is set" do
+        let(:options) { {username: "user", password: "pwd", mirror_mode: true} }
+
+        it "includes mirror_mode" do
+          expect(subject.to_h).to include({mirror_mode: true})
+        end
+      end
+
       context "when multi_fetch_size is set" do
         let(:options) { {username: "user", password: "pwd", multi_fetch_size: "3"} }
 
@@ -172,7 +180,7 @@ module Imap::Backup
       context "when reset_seen_flags_after_fetch is set" do
         let(:options) { {username: "user", password: "pwd", reset_seen_flags_after_fetch: true} }
 
-        it "includes connection_options" do
+        it "includes reset_seen_flags_after_fetch" do
           expect(subject.to_h).to include({reset_seen_flags_after_fetch: true})
         end
       end

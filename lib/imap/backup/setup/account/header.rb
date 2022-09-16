@@ -20,7 +20,7 @@ module Imap::Backup
         email   #{space}#{account.username}
         password#{space}#{masked_password}
         path    #{space}#{local_path}
-        folders #{space}#{folders.map { |f| f[:name] }.join(', ')}#{multi_fetch_size}
+        folders #{space}#{folders.map { |f| f[:name] }.join(', ')}#{mirror_mode}#{multi_fetch_size}
         server  #{space}#{account.server}#{connection_options}#{reset_seen_flags_after_fetch}
 
         Choose an action
@@ -31,6 +31,14 @@ module Imap::Backup
 
     def folders
       account.folders || []
+    end
+
+    def mirror_mode
+      if account.mirror_mode
+        "\nmode    #{space}mirror emails"
+      else
+        "\nmode    #{space}keep all emails"
+      end
     end
 
     def helpers

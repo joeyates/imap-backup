@@ -69,11 +69,11 @@ module Imap::Backup
       []
     end
 
-    def fetch_multi(uids)
+    def fetch_multi(uids, attr = [BODY_ATTRIBUTE, "FLAGS"])
       examine
       fetch_data_items =
         retry_on_error(errors: UID_FETCH_RETRY_CLASSES) do
-          client.uid_fetch(uids, [BODY_ATTRIBUTE, "FLAGS"])
+          client.uid_fetch(uids, attr)
         end
       return nil if fetch_data_items.nil?
 
@@ -99,9 +99,21 @@ module Imap::Backup
       end
     end
 
+    def delete_multi(uids)
+      set_flags(uids, [:Deleted])
+      client.expunge
+    end
+
+    def apply_flags(uids, flags)
+      client.select(utf7_encoded_name)
+      flags.reject! { |f| f == :Recent }
+      client.uid_store(uids, "FLAGS", flags)
+    end
+
     def set_flags(uids, flags)
       # Use read-write access, via `select`
       client.select(utf7_encoded_name)
+      flags.reject! { |f| f == :Recent }
       client.uid_store(uids, "+FLAGS", flags)
     end
 
@@ -111,7 +123,10 @@ module Imap::Backup
     end
 
     def clear
-      set_flags(uids, [:Deleted])
+      existing = uids
+      return if existing.empty?
+
+      set_flags(existing, [:Deleted])
       client.expunge
     end
 

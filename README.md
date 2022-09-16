@@ -76,6 +76,7 @@ Alternatively, add it to your crontab.
 * [local list](docs/commands/local-list.md)
 * [local show](docs/commands/local-show.md)
 * [migrate](docs/commands/migrate.md)
+* [mirror](docs/commands/mirror.md)
 * [remote folders](docs/commands/remote-folders.md)
 * [restore](docs/commands/restore.md)
 * [setup](docs/commands/setup.md)

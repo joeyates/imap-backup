@@ -10,6 +10,7 @@ module Imap::Backup
     autoload :Folders, "imap/backup/cli/folders"
     autoload :Local, "imap/backup/cli/local"
     autoload :Migrate, "imap/backup/cli/migrate"
+    autoload :Mirror, "imap/backup/cli/mirror"
     autoload :Remote, "imap/backup/cli/remote"
     autoload :Restore, "imap/backup/cli/restore"
     autoload :Setup, "imap/backup/cli/setup"
@@ -43,6 +44,12 @@ module Imap::Backup
       The setup tool can be used to choose a specific list of folders to back up.
     DESC
     accounts_option
+    method_option(
+      "refresh",
+      type: :boolean,
+      desc: "in 'keep all emails' mode, update flags for messages that are already downloaded",
+      aliases: ["-r"]
+    )
     def backup
       Backup.new(symbolized(options)).run
     end
@@ -105,6 +112,42 @@ module Imap::Backup
     )
     def migrate(source_email, destination_email)
       Migrate.new(source_email, destination_email, **symbolized(options)).run
+    end
+
+    desc(
+      "mirror SOURCE_EMAIL DESTINATION_EMAIL [OPTIONS]",
+      "Keeps the DESTINATION_EMAIL account aligned with the SOURCE_EMAIL account"
+    )
+    long_desc <<~DESC
+      This command updates the DESTINATION_EMAIL account's folders to have the same contents
+      as those on the SOURCE_EMAIL account.
+
+      If a folder list is configured for the SOURCE_EMAIL account,
+      only the folders indicated by the setting are copied.
+
+      First, runs the download of the SOURCE_EMAIL account.
+      If the SOURCE_EMAIL account is **not** configured to be in 'mirror' mode,
+      a warning is printed.
+
+      When the mirror command is used, for each folder that is processed,
+      a new file is created alongside the normal backup files (.imap and .mbox)
+      This file has a '.mirror' extension. This file contains a mapping of
+      the known UIDs on the source account to those on the destination account.
+    DESC
+    method_option(
+      "destination-prefix",
+      type: :string,
+      desc: "the prefix (namespace) to add to destination folder names",
+      aliases: ["-d"]
+    )
+    method_option(
+      "source-prefix",
+      type: :string,
+      desc: "the prefix (namespace) to strip from source folder names",
+      aliases: ["-s"]
+    )
+    def mirror(source_email, destination_email)
+      Mirror.new(source_email, destination_email, **symbolized(options)).run
     end
 
     desc "remote SUBCOMMAND [OPTIONS]", "View info about online accounts"

@@ -19,7 +19,7 @@ module Imap::Backup
     extend Forwardable
 
     def_delegator :mbox, :pathname, :mbox_pathname
-    def_delegators :imap, :messages, :uid_validity, :uids, :update_uid
+    def_delegators :imap, :get, :messages, :uid_validity, :uids, :update_uid
 
     attr_reader :folder
     attr_reader :path
@@ -36,12 +36,16 @@ module Imap::Backup
 
       return true if imap.valid? && mbox.valid?
 
+      delete
+
+      false
+    end
+
+    def delete
       imap.delete
       @imap = nil
       mbox.delete
       @mbox = nil
-
-      false
     end
 
     def apply_uid_validity(value)
@@ -72,13 +76,47 @@ module Imap::Backup
       appender.run(uid: uid, message: message, flags: flags)
     end
 
-    def each_message(required_uids, &block)
+    def update(uid, flags: nil)
+      message = imap.get(uid)
+      return if !message
+
+      message.flags = flags if flags
+      imap.save
+    end
+
+    def each_message(required_uids = nil, &block)
+      required_uids ||= uids
+
       validate!
 
       return enum_for(:each_message, required_uids) if !block
 
       enumerator = Serializer::MessageEnumerator.new(imap: imap)
       enumerator.run(uids: required_uids, &block)
+    end
+
+    def filter(&block)
+      temp_name = Serializer::UnusedNameFinder.new(serializer: self).run
+      temp_folder_path = self.class.folder_path_for(path: path, folder: temp_name)
+      new_mbox = Serializer::Mbox.new(temp_folder_path)
+      new_imap = Serializer::Imap.new(temp_folder_path)
+      new_imap.uid_validity = imap.uid_validity
+      appender = Serializer::Appender.new(folder: temp_name, imap: new_imap, mbox: new_mbox)
+      enumerator = Serializer::MessageEnumerator.new(imap: imap)
+      enumerator.run(uids: uids) do |message|
+        keep = block.call(message)
+        appender.run(uid: message.uid, message: message.body, flags: message.flags) if keep
+      end
+      imap.delete
+      new_imap.rename imap.folder_path
+      mbox.delete
+      new_mbox.rename mbox.folder_path
+      @imap = nil
+      @mbox = nil
+    end
+
+    def folder_path
+      self.class.folder_path_for(path: path, folder: folder)
     end
 
     private
@@ -122,10 +160,6 @@ module Imap::Backup
       MESSAGE
 
       migrator.run
-    end
-
-    def folder_path
-      self.class.folder_path_for(path: path, folder: folder)
     end
 
     def ensure_containing_directory(folder)

@@ -3,9 +3,9 @@ require "email/mboxrd/message"
 module Imap::Backup
   class Serializer::Message
     attr_accessor :uid
+    attr_accessor :flags
     attr_reader :offset
     attr_reader :length
-    attr_reader :flags
     attr_reader :mbox
 
     # TODO: delegate to Mboxrd::Message

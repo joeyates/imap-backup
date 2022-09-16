@@ -38,6 +38,7 @@ module Imap::Backup
         modify_password menu
         modify_backup_path menu
         choose_folders menu
+        toggle_mirror_mode menu
         modify_multi_fetch_size menu
         modify_server menu
         modify_connection_options menu
@@ -76,6 +77,14 @@ module Imap::Backup
     def choose_folders(menu)
       menu.choice("choose backup folders") do
         Setup::FolderChooser.new(account).run
+      end
+    end
+
+    def toggle_mirror_mode(menu)
+      menu_item = "toggle mode (keep/mirror)"
+      new_value = account.mirror_mode ? nil : true
+      menu.choice(menu_item) do
+        account.mirror_mode = new_value
       end
     end
 

@@ -6,6 +6,7 @@ module Imap::Backup
     attr_reader :password
     attr_reader :local_path
     attr_reader :folders
+    attr_reader :mirror_mode
     attr_reader :server
     attr_reader :connection_options
     attr_reader :reset_seen_flags_after_fetch
@@ -16,6 +17,7 @@ module Imap::Backup
       @password = options[:password]
       @local_path = options[:local_path]
       @folders = options[:folders]
+      @mirror_mode = options[:mirror_mode]
       @server = options[:server]
       @connection_options = options[:connection_options]
       @multi_fetch_size = options[:multi_fetch_size]
@@ -53,6 +55,7 @@ module Imap::Backup
       h = {username: @username, password: @password}
       h[:local_path] = @local_path if @local_path
       h[:folders] = @folders if @folders
+      h[:mirror_mode] = true if @mirror_mode
       h[:server] = @server if @server
       h[:connection_options] = @connection_options if @connection_options
       h[:multi_fetch_size] = multi_fetch_size if @multi_fetch_size
@@ -78,6 +81,10 @@ module Imap::Backup
       raise "folders must be an Array" if !value.is_a?(Array)
 
       update(:folders, value)
+    end
+
+    def mirror_mode=(value)
+      update(:mirror_mode, value)
     end
 
     def server=(value)

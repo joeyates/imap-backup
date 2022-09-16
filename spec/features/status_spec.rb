@@ -2,23 +2,23 @@ require "features/helper"
 require "imap/backup/cli/status"
 
 RSpec.describe "status", type: :aruba, docker: true do
-  include_context "account fixture"
   include_context "message-fixtures"
 
+  let(:account) { test_server_connection_parameters }
   let(:folder) { "my-stuff" }
 
   before do
     create_config(accounts: [account.to_h])
-    server_create_folder folder
-    send_email folder, msg1
-    disconnect_imap
+    test_server.create_folder folder
+    test_server.send_email folder, **msg1
+    test_server.disconnect
 
     run_command_and_stop("imap-backup status")
   end
 
   after do
-    server_delete_folder folder
-    disconnect_imap
+    test_server.delete_folder folder
+    test_server.disconnect
   end
 
   it "prints the count of messages to download" do

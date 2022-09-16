@@ -13,17 +13,17 @@ RSpec.describe "Migration", type: :aruba, docker: true do
 
   before do
     create_config(accounts: [source_account, destination_account])
-    store_email(email: email, folder: folder, subject: "Ciao", flags: [:Draft])
+    append_local(email: email, folder: folder, subject: "Ciao", flags: [:Draft])
     run_command_and_stop("imap-backup migrate #{email} #{destination_account[:username]}")
   end
 
   after do
-    server_delete_folder folder
-    disconnect_imap
+    test_server.delete_folder folder
+    test_server.disconnect
   end
 
   it "copies email to the destination account" do
-    messages = server_messages(folder)
+    messages = test_server.folder_messages(folder)
     expected = <<~MESSAGE.gsub("\n", "\r\n")
       From: sender@example.com
       Subject: Ciao
@@ -35,7 +35,7 @@ RSpec.describe "Migration", type: :aruba, docker: true do
   end
 
   it "copies flags" do
-    messages = server_messages(folder)
+    messages = test_server.folder_messages(folder)
     expect(messages[0]["FLAGS"]).to include(:Draft)
   end
 end

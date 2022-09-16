@@ -1,24 +1,24 @@
 require "features/helper"
 
 RSpec.describe "stats", type: :aruba, docker: true do
-  include_context "account fixture"
   include_context "message-fixtures"
 
+  let(:account) { test_server_connection_parameters }
   let(:folder) { "my-stuff" }
-  let(:command) { "stats #{account.username}" }
+  let(:command) { "stats #{account[:username]}" }
 
   before do
-    server_create_folder folder
-    send_email folder, msg1
-    create_config accounts: [account.to_h]
-    disconnect_imap
+    test_server.create_folder folder
+    test_server.send_email folder, **msg1
+    create_config accounts: [account]
+    test_server.disconnect
 
     run_command_and_stop "imap-backup #{command}"
   end
 
   after do
-    server_delete_folder folder
-    disconnect_imap
+    test_server.delete_folder folder
+    test_server.disconnect
   end
 
   it "lists messages to be backed up" do
@@ -26,7 +26,7 @@ RSpec.describe "stats", type: :aruba, docker: true do
   end
 
   context "when JSON is requested" do
-    let(:command) { "stats #{account.username} --format json" }
+    let(:command) { "stats #{account[:username]} --format json" }
 
     it "produces JSON" do
       expect(last_command_started).

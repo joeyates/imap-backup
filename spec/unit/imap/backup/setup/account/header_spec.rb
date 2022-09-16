@@ -10,6 +10,7 @@ module Imap::Backup
         password: existing_password,
         local_path: "/backup/path",
         folders: [{name: "my_folder"}],
+        mirror_mode: mirror_mode,
         server: "imap.example.com",
         connection_options: connection_options,
         modified?: modified,
@@ -18,6 +19,7 @@ module Imap::Backup
       )
     end
     let(:existing_password) { "password" }
+    let(:mirror_mode) { nil }
     let(:connection_options) { nil }
     let(:modified) { false }
     let(:multi_fetch_size) { 2 }
@@ -28,6 +30,7 @@ module Imap::Backup
       ["password", /password\s+x+/],
       ["path", %r(path\s+/backup/path)],
       ["folders", /folders\s+my_folder/],
+      ["mode", /keep/],
       ["server", /server\s+imap.example.com/]
     ].each do |attribute, value|
       before { subject.run }
@@ -56,6 +59,14 @@ module Imap::Backup
 
       it "indicates that a password is not set" do
         expect(menu.header).to match(/^password\s+\(unset\)/)
+      end
+    end
+
+    context "with mirror_mode" do
+      let(:mirror_mode) { true }
+
+      it "indicates the flag is set" do
+        expect(menu.header).to match(/mirror/)
       end
     end
 
