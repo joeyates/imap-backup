@@ -31,7 +31,6 @@ module Imap::Backup
         MENU
         account_items menu
         add_account_item menu
-        toggle_logging_item menu
         if config.modified?
           menu.choice("save and exit") do
             config.save
@@ -60,15 +59,6 @@ module Imap::Backup
       menu.choice("add account") do
         username = Asker.email
         edit_account username
-      end
-    end
-
-    def toggle_logging_item(menu)
-      menu_item = config.debug? ? "stop logging" : "start logging"
-      new_setting = !config.debug?
-      menu.choice(menu_item) do
-        config.debug = new_setting
-        Logger.setup_logging(config)
       end
     end
 
