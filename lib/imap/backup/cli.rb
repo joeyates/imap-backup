@@ -1,4 +1,5 @@
 require "thor"
+require "imap/backup/logger"
 
 module Imap; end
 
@@ -44,6 +45,8 @@ module Imap::Backup
       The setup tool can be used to choose a specific list of folders to back up.
     DESC
     accounts_option
+    verbose_option
+    quiet_option
     method_option(
       "refresh",
       type: :boolean,
@@ -51,6 +54,7 @@ module Imap::Backup
       aliases: ["-r"]
     )
     def backup
+      Imap::Backup::Logger.setup_logging symbolized(options)
       Backup.new(symbolized(options)).run
     end
 
@@ -92,6 +96,8 @@ module Imap::Backup
       use the `--reset` option. In this case, all existing emails are
       deleted before uploading the migrated emails.
     DESC
+    verbose_option
+    quiet_option
     method_option(
       "destination-prefix",
       type: :string,
@@ -111,6 +117,7 @@ module Imap::Backup
       aliases: ["-s"]
     )
     def migrate(source_email, destination_email)
+      Imap::Backup::Logger.setup_logging symbolized(options)
       Migrate.new(source_email, destination_email, **symbolized(options)).run
     end
 
@@ -134,6 +141,8 @@ module Imap::Backup
       This file has a '.mirror' extension. This file contains a mapping of
       the known UIDs on the source account to those on the destination account.
     DESC
+    verbose_option
+    quiet_option
     method_option(
       "destination-prefix",
       type: :string,
@@ -147,6 +156,7 @@ module Imap::Backup
       aliases: ["-s"]
     )
     def mirror(source_email, destination_email)
+      Imap::Backup::Logger.setup_logging symbolized(options)
       Mirror.new(source_email, destination_email, **symbolized(options)).run
     end
 
@@ -159,7 +169,10 @@ module Imap::Backup
       their original server.
     DESC
     accounts_option
+    verbose_option
+    quiet_option
     def restore(email = nil)
+      Imap::Backup::Logger.setup_logging symbolized(options)
       Restore.new(email, symbolized(options)).run
     end
 
@@ -168,7 +181,10 @@ module Imap::Backup
       A menu-driven command-line application used to configure imap-backup.
       Configure email accounts to back up.
     DESC
+    verbose_option
+    quiet_option
     def setup
+      Imap::Backup::Logger.setup_logging symbolized(options)
       Setup.new.run
     end
 

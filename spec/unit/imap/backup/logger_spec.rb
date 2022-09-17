@@ -3,7 +3,7 @@ require "net/imap"
 module Imap::Backup
   describe Logger do
     describe ".setup_logging" do
-      let(:config) { instance_double(Configuration, debug?: debug) }
+      let(:options) { {} }
 
       around do |example|
         logger_previous = described_class.logger.level
@@ -16,31 +16,50 @@ module Imap::Backup
       end
 
       before do
-        allow(Configuration).to receive(:new) { config }
-        described_class.setup_logging
+        described_class.setup_logging options
       end
 
-      context "when config.debug?" do
-        let(:debug) { true }
+      it "sets logger level to info" do
+        expect(described_class.logger.level).to eq(::Logger::Severity::INFO)
+      end
+
+      it "unsets the Net::IMAP debug flag" do
+        expect(Net::IMAP.debug).to be false
+      end
+
+      context "when verbose is passed" do
+        let(:options) { {verbose: true} }
 
         it "sets logger level to debug" do
           expect(described_class.logger.level).to eq(::Logger::Severity::DEBUG)
         end
 
         it "sets the Net::IMAP debug flag" do
-          expect(Net::IMAP.debug).to be_a(TrueClass)
+          expect(Net::IMAP.debug).to be true
         end
       end
 
-      context "when not config.debug?" do
-        let(:debug) { false }
+      context "when quiet is passed" do
+        let(:options) { {quiet: true} }
 
-        it "sets logger level to error" do
-          expect(described_class.logger.level).to eq(::Logger::Severity::ERROR)
+        it "sets logger level to unknown" do
+          expect(described_class.logger.level).to eq(::Logger::Severity::UNKNOWN)
         end
 
-        it "doesn't set the Net::IMAP debug flag" do
-          expect(Net::IMAP.debug).to be_a(FalseClass)
+        it "unsets the Net::IMAP debug flag" do
+          expect(Net::IMAP.debug).to be false
+        end
+      end
+
+      context "when quiet and verbose are passed" do
+        let(:options) { {quiet: true, verbose: true} }
+
+        it "sets logger level to unknown" do
+          expect(described_class.logger.level).to eq(::Logger::Severity::UNKNOWN)
+        end
+
+        it "unsets the Net::IMAP debug flag" do
+          expect(Net::IMAP.debug).to be false
         end
       end
     end

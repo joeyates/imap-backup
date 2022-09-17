@@ -12,12 +12,11 @@ module ConfigurationHelpers
     File.expand_path("~/.imap-backup")
   end
 
-  def create_config(accounts:, debug: false)
+  def create_config(accounts:)
     pathname = File.join(config_path, "config.json")
     save_data = {
       version: Imap::Backup::Configuration::VERSION,
-      accounts: accounts,
-      debug: debug
+      accounts: accounts
     }
     FileUtils.mkdir_p config_path
     File.open(pathname, "w") { |f| f.write(JSON.pretty_generate(save_data)) }

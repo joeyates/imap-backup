@@ -36,7 +36,7 @@ module Imap::Backup
     end
 
     def run_backup(refresh: false)
-      Logger.logger.debug "Running backup of account: #{account.username}"
+      Logger.logger.info "Running backup of account: #{account.username}"
       # start the connection so we get logging messages in the right order
       client
       ensure_account_folder

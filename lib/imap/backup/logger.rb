@@ -12,14 +12,20 @@ module Imap::Backup
       Logger.instance.logger
     end
 
-    def self.setup_logging(config = Configuration.new)
-      logger.level =
-        if config.debug?
-          ::Logger::Severity::DEBUG
+    def self.setup_logging(options = {})
+      level =
+        if options[:quiet]
+          ::Logger::Severity::UNKNOWN
         else
-          ::Logger::Severity::ERROR
+          if options[:verbose]
+            ::Logger::Severity::DEBUG
+          else
+            ::Logger::Severity::INFO
+          end
         end
-      Net::IMAP.debug = config.debug?
+      logger.level = level
+      debug = level == ::Logger::Severity::DEBUG
+      Net::IMAP.debug = debug
     end
 
     def self.sanitize_stderr

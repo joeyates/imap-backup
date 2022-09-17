@@ -35,12 +35,9 @@ module Imap::Backup
         accounts: accounts,
         path: "/base/path",
         save: nil,
-        debug?: debug,
-        "debug=": nil,
         modified?: config_modified
       )
     end
-    let(:debug) { false }
     let(:config_modified) { false }
     let!(:highline_streams) { prepare_highline }
     let(:input) { highline_streams[0] }
@@ -201,69 +198,6 @@ module Imap::Backup
           # rubocop:disable RSpec/PredicateMatcher
           expect(accounts[1].modified?).to be_falsey
           # rubocop:enable RSpec/PredicateMatcher
-        end
-      end
-
-      describe "logging" do
-        context "when debug logging is disabled" do
-          let(:config_modified) { true }
-
-          before do
-            allow(input).to receive(:gets).and_return("start\n", "exit\n")
-          end
-
-          it "shows a menu item" do
-            subject.run
-
-            expect(output.string).to include("start logging")
-          end
-
-          context "when selected" do
-            it "sets the debug flag" do
-              expect(store).to receive(:debug=).with(true)
-
-              subject.run
-            end
-
-            it "updates logging status" do
-              expect(Logger).to receive(:setup_logging)
-
-              subject.run
-            end
-          end
-        end
-
-        context "when debug logging is enabled" do
-          let(:debug) { true }
-          let(:config_modified) { true }
-
-          before do
-            allow(input).to receive(:gets).and_return("stop\n", "exit\n")
-          end
-
-          it "shows a menu item" do
-            subject.run
-
-            expect(output.string).to include("stop logging")
-          end
-
-          context "when selected" do
-            before do
-              allow(input).to receive(:gets).and_return("stop\n", "exit\n")
-            end
-
-            it "unsets the debug flag" do
-              expect(store).to receive(:debug=).with(false)
-
-              subject.run
-            end
-
-            it "updates logging status" do
-              expect(Logger).to receive(:setup_logging)
-
-              subject.run
-            end
-          end
         end
       end
 

@@ -8,7 +8,10 @@ module Imap::Backup
     FAKE_EMAIL = "fake@email.com".freeze
 
     desc "ignore-history EMAIL", "Skip downloading emails up to today for all configured folders"
+    verbose_option
+    quiet_option
     def ignore_history(email)
+      Imap::Backup::Logger.setup_logging symbolized(options)
       connection = connection(email)
 
       connection.backup_folders.each do |folder|
@@ -26,6 +29,8 @@ module Imap::Backup
         A folder called 'imap-backup/EMAIL' is created under 'Local Folders'.
       DOC
     )
+    verbose_option
+    quiet_option
     method_option(
       "force",
       type: :boolean,
@@ -40,6 +45,7 @@ module Imap::Backup
     )
     def export_to_thunderbird(email)
       opts = symbolized(options)
+      Imap::Backup::Logger.setup_logging opts
       force = opts.key?(:force) ? opts[:force] : false
       profile_name = opts[:profile]
 
