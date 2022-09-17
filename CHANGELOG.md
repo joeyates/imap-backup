@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [7.0.2] - 2022-09-17
+
+* Changed logging behaviour:
+  * Made info the normal logger level,
+  * Removed configuration 'debug' setting,
+  * Added a --verbose flag,
+  * Add a --quiet flag.
+
 ## [7.0.1] - 2022-09-16
 
 * Added a 'mirror mode' to account configuration that changes backup behaviour:
