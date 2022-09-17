@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   * Removed configuration 'debug' setting,
   * Added a --verbose flag,
   * Add a --quiet flag.
+* Corrected handling of account connection options after changes.
 
 ## [7.0.1] - 2022-09-16
 
