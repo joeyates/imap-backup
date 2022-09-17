@@ -9,6 +9,7 @@ module Imap::Backup
         password: existing_password,
         mirror_mode: mirror_mode,
         local_path: local_path,
+        connection_options: connection_options,
         reset_seen_flags_after_fetch: reset_seen_flags_after_fetch
       )
     end

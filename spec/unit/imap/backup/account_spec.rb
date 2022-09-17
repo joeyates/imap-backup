@@ -226,7 +226,7 @@ module Imap::Backup
       [:multi_fetch_size, "2", 2],
       [:server, "server", "server"],
       [:folders, ["folder"], ["folder"]],
-      [:connection_options, '{"some": "option"}', {"some" => "option"}]
+      [:connection_options, '{"some": "option"}', {some: "option"}]
     ].each do |attribute, value, expected|
       describe "setting ##{attribute}=" do
         let(:options) { {} }
