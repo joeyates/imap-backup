@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [7.0.0] - 2022-09-16
+## [7.0.1] - 2022-09-16
 
 * Added a 'mirror mode' to account configuration that changes backup behaviour:
   * removes local folders that are no longer to be backed up,
