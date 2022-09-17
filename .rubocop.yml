@@ -10,8 +10,6 @@ AllCops:
     Enabled: true
   TargetRubyVersion: 2.6
 
-Gemspec/DeprecatedAttributeAssignment:
-  Enabled: true
 Gemspec/RequireMFA:
   Enabled: true
 

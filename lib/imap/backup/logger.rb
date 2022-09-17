@@ -14,14 +14,13 @@ module Imap::Backup
 
     def self.setup_logging(options = {})
       level =
-        if options[:quiet]
+        case
+        when options[:quiet]
           ::Logger::Severity::UNKNOWN
+        when options[:verbose]
+          ::Logger::Severity::DEBUG
         else
-          if options[:verbose]
-            ::Logger::Severity::DEBUG
-          else
-            ::Logger::Severity::INFO
-          end
+          ::Logger::Severity::INFO
         end
       logger.level = level
       debug = level == ::Logger::Severity::DEBUG
