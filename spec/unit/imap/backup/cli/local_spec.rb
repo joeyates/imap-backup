@@ -48,10 +48,11 @@ module Imap::Backup
       allow(CLI::Accounts).to receive(:new) { accounts }
       allow(Account::Connection).to receive(:new) { connection }
       allow(Mail).to receive(:new) { mail }
-      allow(accounts).to receive(:each).and_yield(account)
     end
 
     describe "accounts" do
+      before { allow(accounts).to receive(:each).and_yield(account) }
+
       it "lists configured emails" do
         subject.accounts
 
