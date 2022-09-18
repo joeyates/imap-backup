@@ -2,7 +2,7 @@ module Imap::Backup
   describe Setup do
     include HighLineTestHelpers
 
-    subject { described_class.new }
+    subject { described_class.new(config: config) }
 
     let(:normal_account) do
       instance_double(
@@ -29,7 +29,7 @@ module Imap::Backup
       )
     end
     let(:accounts) { [normal_account] }
-    let(:store) do
+    let(:config) do
       instance_double(
         Configuration,
         accounts: accounts,
@@ -44,17 +44,8 @@ module Imap::Backup
     let(:output) { highline_streams[1] }
     let(:gmail_imap_server) { "imap.gmail.com" }
 
-    describe "#initialize" do
-      context "without a config file" do
-        it "works" do
-          described_class.new
-        end
-      end
-    end
-
     describe "#run" do
       before do
-        allow(Configuration).to receive(:new) { store }
         allow(Logger).to receive(:setup_logging)
         allow(input).to receive(:eof?) { false }
         allow(input).to receive(:gets) { "q\n" }
@@ -129,7 +120,7 @@ module Imap::Backup
           allow(Setup::Asker).to receive(:email).
             with(no_args) { "new@example.com" }
           allow(Setup::Account).to receive(:new).
-            with(store, normal_account, anything) { account }
+            with(config, normal_account, anything) { account }
         end
 
         it "edits the account" do
@@ -160,7 +151,7 @@ module Imap::Backup
           allow(Setup::Asker).to receive(:email).
             with(no_args) { added_email }
           allow(Setup::Account).to receive(:new).
-            with(store, anything, anything) { account }
+            with(config, anything, anything) { account }
 
           subject.run
         end
@@ -214,7 +205,7 @@ module Imap::Backup
         end
 
         it "saves the configuration" do
-          expect(store).to receive(:save)
+          expect(config).to receive(:save)
 
           subject.run
         end
@@ -233,7 +224,7 @@ module Imap::Backup
         end
 
         it "doesn't save the configuration" do
-          expect(store).to_not receive(:save)
+          expect(config).to_not receive(:save)
 
           subject.run
         end

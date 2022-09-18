@@ -4,15 +4,16 @@ module Imap::Backup
     include CLI::Helpers
 
     attr_reader :emails
+    attr_reader :options
 
     def initialize(options)
       super([])
-      @emails = (options[:accounts] || "").split(",")
+      @options = options
     end
 
     no_commands do
       def run
-        config = load_config
+        config = load_config(**options)
         each_connection(config, emails) do |connection|
           Kernel.puts connection.account.username
           # TODO: Make folder_names private once this command
@@ -24,6 +25,10 @@ module Imap::Backup
           end
           folders.each { |f| Kernel.puts "\t#{f}" }
         end
+      end
+
+      def emails
+        (options[:accounts] || "").split(",")
       end
     end
   end

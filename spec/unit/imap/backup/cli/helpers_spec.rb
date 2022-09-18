@@ -8,24 +8,15 @@ module Imap::Backup
   RSpec.describe CLI::Helpers do
     subject { WithHelpers.new }
 
-    let(:accounts) { instance_double(CLI::Accounts) }
     let(:email) { "email@example.com" }
     let(:account1) { instance_double(Account, username: email, connection: "c1") }
     let(:account2) { instance_double(Account, username: "foo", connection: "c2") }
-    let(:items) { [account1, account2] }
-
-    before do
-      allow(CLI::Accounts).to receive(:new) { accounts }
-      allow(accounts).to receive(:each).
-        and_yield(account1).
-        and_yield(account2)
-      allow(accounts).to receive(:find) do |&block|
-        items.find { |a| block.call(a) }
-      end
-    end
+    let(:accounts) { [account1, account2] }
+    let(:config) { instance_double(Configuration, accounts: accounts) }
 
     describe ".load_config" do
       let(:exists) { true }
+      let(:options) { {} }
       let(:params) { {path: nil} }
       let(:config) { "Configuration" }
 
@@ -36,6 +27,25 @@ module Imap::Backup
 
       it "returns the configuration" do
         expect(subject.load_config).to eq(config)
+      end
+
+      context "when a config path is supplied" do
+        let(:options) { {config: "foo"} }
+        let(:params) { {path: "foo"} }
+
+        it "loads che configuration for that path" do
+          subject.load_config(**options)
+        end
+      end
+
+      context "when the configuration file is missing" do
+        let(:exists) { false }
+
+        it "fails" do
+          expect do
+            subject.load_config
+          end.to raise_error(ConfigurationNotFound, /not found/)
+        end
       end
     end
 
@@ -58,15 +68,15 @@ module Imap::Backup
 
     describe ".account" do
       it "returns any account with a matching username" do
-        expect(subject.account("config", email)).to eq(account1)
+        expect(subject.account(config, email)).to eq(account1)
       end
 
       context "when no match is found" do
-        let(:items) { [account2] }
+        let(:accounts) { [account2] }
 
         it "fails" do
           expect do
-            subject.account("config", email)
+            subject.account(config, email)
           end.to raise_error(RuntimeError, /not a configured account/)
         end
       end
@@ -74,13 +84,13 @@ module Imap::Backup
 
     describe ".connection" do
       it "returns a connection" do
-        result = subject.connection("config", email)
+        result = subject.connection(config, email)
 
         expect(result).to be_a(Account::Connection)
       end
 
       it "returns the connection for any account with a matching username" do
-        result = subject.connection("config", email)
+        result = subject.connection(config, email)
 
         expect(result.account).to eq(account1)
       end
@@ -88,21 +98,8 @@ module Imap::Backup
 
     describe ".each_connection" do
       it "yields each connection" do
-        expect { |b| subject.each_connection("config", [email, "foo"], &b) }.
+        expect { |b| subject.each_connection(config, [email, "foo"], &b) }.
           to yield_successive_args("c1", "c2")
-      end
-
-      context "when there is no configuration" do
-        before do
-          allow(accounts).to receive(:each).
-            and_raise(ConfigurationNotFound)
-        end
-
-        it "fails" do
-          expect do
-            subject.each_connection("config", [email])
-          end.to raise_error(RuntimeError, /not configured/)
-        end
       end
     end
   end

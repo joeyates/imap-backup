@@ -4,17 +4,17 @@ module Imap::Backup
     include CLI::Helpers
 
     attr_reader :email
-    attr_reader :emails
+    attr_reader :options
 
     def initialize(email = nil, options)
       super([])
       @email = email
-      @emails = options[:accounts].split(",") if options.key?(:accounts)
+      @options = options
     end
 
     no_commands do
       def run
-        config = load_config
+        config = load_config(**options)
         case
         when email && !emails
           connection = connection(config, email)
@@ -31,6 +31,10 @@ module Imap::Backup
           )
           each_connection(config, emails, &:restore)
         end
+      end
+
+      def emails
+        @emails ||= options[:accounts].split(",") if options.key?(:accounts)
       end
     end
   end

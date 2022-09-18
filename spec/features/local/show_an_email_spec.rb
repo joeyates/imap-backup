@@ -1,36 +1,44 @@
 require "features/helper"
 
 RSpec.describe "Show an email", type: :aruba do
-  let(:email) { "me@example.com" }
-  let(:account) do
-    {
-      username: email,
-      local_path: File.join(config_path, email.gsub("@", "_"))
-    }
-  end
+  include_context "message-fixtures"
+
+  let(:email) { account[:username] }
+  let(:account) { test_server_connection_parameters }
   let(:config_options) { {accounts: [account]} }
-
-  before do
-    create_config **config_options
-    append_local(
-      email: email,
-      folder: "my_folder",
-      uid: 99,
-      from: "me@example.com",
-      subject: "Hello",
-      body: "How're things?"
-    )
-
-    run_command_and_stop("imap-backup local show #{email} my_folder 99")
+  let!(:setup) do
+    create_config(**config_options)
+    append_local email: account[:username], folder: "my_folder", **msg1, uid: 99
   end
 
   it "shows the email" do
-    expected = <<~BODY
-      From: me@example.com
-      Subject: Hello
+    run_command_and_stop "imap-backup local show #{email} my_folder 99"
 
-      How're things?
-    BODY
-    expect(last_command_started).to have_output(expected)
+    expect(last_command_started).to have_output(to_serialized(**msg1))
+  end
+
+  context "when a config path is supplied" do
+    let(:account) { other_server_connection_parameters }
+    let(:custom_config_path) { File.join(File.expand_path("~/.imap-backup"), "foo.json") }
+    let(:config_options) { {path: custom_config_path, accounts: [account]} }
+    let!(:setup) do
+      create_config(**config_options)
+      append_local(
+        configuration_path: custom_config_path,
+        email: account[:username],
+        folder: "my_folder",
+        **msg1,
+        uid: 99
+      )
+    end
+    let(:command) { "imap-backup local show #{email} --config #{custom_config_path}" }
+
+    it "works" do
+      run_command_and_stop(
+        "imap-backup local show #{email} my_folder 99 --config #{custom_config_path}"
+      )
+
+      expect(last_command_started).to have_output(to_serialized(**msg1))
+    end
   end
 end

@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [8.0.0] - TBA
 
+### Added
+
+* --config parameter to allow for non-default placing of the configuration file
+
 ### Removed
 
 * Deprecated `status` command, replaced by `stats`.

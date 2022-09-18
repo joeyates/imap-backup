@@ -1,11 +1,5 @@
 module Imap::Backup
   describe CLI::Local do
-    let(:accounts) do
-      instance_double(
-        CLI::Accounts,
-        find: ->(&block) { [account].find { |a| block.call(a) } }
-      )
-    end
     let(:account) do
       instance_double(
         Account,
@@ -42,17 +36,17 @@ module Imap::Backup
     end
     let(:message_subject) { "Ciao" }
     let(:email) { "foo@example.com" }
+    let(:config) { instance_double(Configuration, accounts: [account]) }
 
     before do
+      allow(Configuration).to receive(:exist?) { true }
+      allow(Configuration).to receive(:new) { config }
       allow(Kernel).to receive(:puts)
-      allow(CLI::Accounts).to receive(:new) { accounts }
       allow(Account::Connection).to receive(:new) { connection }
       allow(Mail).to receive(:new) { mail }
     end
 
     describe "accounts" do
-      before { allow(accounts).to receive(:each).and_yield(account) }
-
       it "lists configured emails" do
         subject.accounts
 

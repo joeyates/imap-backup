@@ -1,5 +1,3 @@
-require "imap/backup/cli/accounts"
-
 module Imap::Backup
   class CLI::Local < Thor
     include Thor::Actions
@@ -8,15 +6,16 @@ module Imap::Backup
     MAX_SUBJECT = 60
 
     desc "accounts", "List locally backed-up accounts"
+    config_option
     def accounts
-      config = load_config
-      accounts = CLI::Accounts.new(config: config)
-      accounts.each { |a| Kernel.puts a.username }
+      config = load_config(**symbolized(options))
+      config.accounts.each { |a| Kernel.puts a.username }
     end
 
     desc "folders EMAIL", "List backed up folders"
+    config_option
     def folders(email)
-      config = load_config
+      config = load_config(**symbolized(options))
       connection = connection(config, email)
 
       connection.local_folders.each do |_s, f|
@@ -25,8 +24,9 @@ module Imap::Backup
     end
 
     desc "list EMAIL FOLDER", "List emails in a folder"
+    config_option
     def list(email, folder_name)
-      config = load_config
+      config = load_config(**symbolized(options))
       connection = connection(config, email)
 
       folder_serializer, _folder = connection.local_folders.find do |(_s, f)|
@@ -53,8 +53,9 @@ module Imap::Backup
       If more than one UID is given, they are separated by a header indicating
       the UID.
     DESC
+    config_option
     def show(email, folder_name, uids)
-      config = load_config
+      config = load_config(**symbolized(options))
       connection = connection(config, email)
 
       folder_serializer, _folder = connection.local_folders.find do |(_s, f)|

@@ -13,6 +13,7 @@ module Imap::Backup
     let(:imap_pathname) { Pathname.new("path/foo.imap") }
 
     before do
+      allow(Configuration).to receive(:exist?) { true }
       allow(Configuration).to receive(:new) { config }
       allow(Pathname).to receive(:glob).and_yield(imap_pathname)
       allow(Migrator).to receive(:new) { migrator }

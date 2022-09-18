@@ -5,7 +5,7 @@ RSpec.describe "adding an account", type: :aruba do
   let(:config_options) { {accounts: [account]} }
 
   before do
-    create_config **config_options
+    create_config(**config_options)
 
     run_command "imap-backup setup"
     last_command_started.write "add account\n"

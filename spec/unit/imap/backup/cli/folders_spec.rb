@@ -9,8 +9,11 @@ module Imap::Backup
     end
     let(:account) { instance_double(Account, username: "user") }
     let(:folder_names) { ["my-folder"] }
+    let(:config) { instance_double(Configuration, accounts: [account]) }
 
     before do
+      allow(Configuration).to receive(:exist?) { true }
+      allow(Configuration).to receive(:new) { config }
       allow(Kernel).to receive(:puts)
       allow(Kernel).to receive(:warn)
       # rubocop:disable RSpec/SubjectStub
