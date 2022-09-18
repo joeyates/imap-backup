@@ -20,6 +20,7 @@ RSpec.describe "Show an email", type: :aruba do
       subject: "Hello",
       body: "How're things?"
     )
+
     run_command_and_stop("imap-backup local show #{email} my_folder 99")
   end
 

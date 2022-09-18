@@ -13,6 +13,7 @@ RSpec.describe "Listing emails", type: :aruba do
   before do
     create_config **config_options
     append_local(email: email, folder: "my_folder", subject: "Ciao")
+
     run_command_and_stop("imap-backup local list #{email} my_folder")
   end
 
