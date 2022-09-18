@@ -17,6 +17,11 @@ RSpec.describe "Mirroring", type: :aruba, docker: true do
       ]
     }
   end
+  let(:command) do
+    "imap-backup mirror " \
+      "#{test_server_connection_parameters[:username]} " \
+      "#{other_server_connection_parameters[:username]}"
+  end
 
   before do
     test_server.create_folder folder
@@ -25,10 +30,6 @@ RSpec.describe "Mirroring", type: :aruba, docker: true do
 
     pre
 
-    command =
-      "imap-backup mirror " \
-      "#{test_server_connection_parameters[:username]} " \
-      "#{other_server_connection_parameters[:username]}"
     run_command_and_stop command
   end
 
