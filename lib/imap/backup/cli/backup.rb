@@ -3,18 +3,18 @@ module Imap::Backup
     include Thor::Actions
     include CLI::Helpers
 
-    attr_reader :account_names
+    attr_reader :emails
     attr_reader :refresh
 
     def initialize(options)
       super([])
-      @account_names = (options[:accounts] || "").split(",")
+      @emails = (options[:accounts] || "").split(",")
       @refresh = options.key?(:refresh) ? !!options[:refresh] : false
     end
 
     no_commands do
       def run
-        each_connection(account_names) do |connection|
+        each_connection(config, emails) do |connection|
           connection.run_backup(refresh: refresh)
         end
       end

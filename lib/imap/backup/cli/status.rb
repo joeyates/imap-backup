@@ -3,16 +3,16 @@ module Imap::Backup
     include Thor::Actions
     include CLI::Helpers
 
-    attr_reader :account_names
+    attr_reader :emails
 
     def initialize(options)
       super([])
-      @account_names = (options[:accounts] || "").split(",")
+      @emails = (options[:accounts] || "").split(",")
     end
 
     no_commands do
       def run
-        each_connection(account_names) do |connection|
+        each_connection(emails) do |connection|
           Kernel.puts connection.account.username
           folders = connection.status
           folders.each do |f|

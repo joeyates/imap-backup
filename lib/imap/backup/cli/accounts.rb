@@ -4,10 +4,10 @@ module Imap::Backup
   class CLI::Accounts
     include Enumerable
 
-    attr_reader :required_accounts
+    attr_reader :emails
 
-    def initialize(required_accounts = [])
-      @required_accounts = required_accounts
+    def initialize(emails = [])
+      @emails = emails
     end
 
     def each(&block)
@@ -20,11 +20,11 @@ module Imap::Backup
 
     def accounts
       @accounts ||=
-        if required_accounts.empty?
+        if emails.empty?
           config.accounts
         else
           config.accounts.select do |account|
-            required_accounts.include?(account.username)
+            emails.include?(account.username)
           end
         end
     end

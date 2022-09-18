@@ -4,31 +4,31 @@ module Imap::Backup
     include CLI::Helpers
 
     attr_reader :email
-    attr_reader :account_names
+    attr_reader :emails
 
     def initialize(email = nil, options)
       super([])
       @email = email
-      @account_names = options[:accounts].split(",") if options.key?(:accounts)
+      @emails = options[:accounts].split(",") if options.key?(:accounts)
     end
 
     no_commands do
       def run
         case
-        when email && !account_names
+        when email && !emails
           connection = connection(email)
           connection.restore
-        when !email && !account_names
+        when !email && !emails
           Logger.logger.info "Calling restore without an EMAIL parameter is deprecated"
           each_connection([], &:restore)
-        when email && account_names.any?
+        when email && emails.any?
           raise "Pass either an email or the --accounts option, not both"
-        when account_names.any?
+        when emails.any?
           Logger.logger.info(
             "Calling restore with the --account option is deprected, " \
             "please pass a single EMAIL argument"
           )
-          each_connection(account_names, &:restore)
+          each_connection(emails, &:restore)
         end
       end
     end

@@ -2,9 +2,9 @@ require "imap/backup/cli/accounts"
 
 module Imap::Backup
   describe CLI::Accounts do
-    subject { described_class.new(required_accounts) }
+    subject { described_class.new(emails) }
 
-    let(:required_accounts) { [] }
+    let(:emails) { [] }
     let(:accounts) { [account1, account2] }
     let(:account1) do
       instance_double(
@@ -47,7 +47,7 @@ module Imap::Backup
       end
 
       context "when an account list is provided" do
-        let(:required_accounts) { %w(a2@example.com) }
+        let(:emails) { %w(a2@example.com) }
 
         specify "calls the block with each account" do
           result = subject.map { |a| a }
