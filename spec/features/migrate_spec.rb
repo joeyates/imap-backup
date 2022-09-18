@@ -9,7 +9,7 @@ RSpec.describe "Migration", type: :aruba, docker: true do
       local_path: File.join(config_path, email.gsub("@", "_"))
     }
   end
-  let(:destination_account) { fixture("connection") }
+  let(:destination_account) { test_server_connection_parameters }
 
   before do
     create_config(accounts: [source_account, destination_account])

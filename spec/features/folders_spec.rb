@@ -2,7 +2,7 @@ require "features/helper"
 require "imap/backup/cli/folders"
 
 RSpec.describe "folders", type: :aruba, docker: true do
-  let(:account) { fixture("connection") }
+  let(:account) { test_server_connection_parameters }
   let(:options) { {accounts: account[:username]} }
 
   before do

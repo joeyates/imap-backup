@@ -1,7 +1,7 @@
 require "features/helper"
 
 RSpec.describe "List account folders", type: :aruba, docker: true do
-  let(:account) { fixture("connection") }
+  let(:account) { test_server_connection_parameters }
 
   before do
     create_config(accounts: [account])
