@@ -6,7 +6,7 @@ module Imap::Backup
 
     before do
       # rubocop:disable RSpec/SubjectStub
-      allow(subject).to receive(:each_connection).with([]).and_yield(connection)
+      allow(subject).to receive(:each_connection).with(anything, []).and_yield(connection)
       # rubocop:enable RSpec/SubjectStub
     end
 

@@ -14,13 +14,14 @@ module Imap::Backup
 
     no_commands do
       def run
+        config = load_config
         case
         when email && !emails
-          connection = connection(email)
+          connection = connection(config, email)
           connection.restore
         when !email && !emails
           Logger.logger.info "Calling restore without an EMAIL parameter is deprecated"
-          each_connection([], &:restore)
+          each_connection(config, [], &:restore)
         when email && emails.any?
           raise "Pass either an email or the --accounts option, not both"
         when emails.any?
@@ -28,7 +29,7 @@ module Imap::Backup
             "Calling restore with the --account option is deprected, " \
             "please pass a single EMAIL argument"
           )
-          each_connection(emails, &:restore)
+          each_connection(config, emails, &:restore)
         end
       end
     end

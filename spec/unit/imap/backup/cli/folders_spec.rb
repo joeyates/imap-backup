@@ -14,7 +14,7 @@ module Imap::Backup
       allow(Kernel).to receive(:puts)
       allow(Kernel).to receive(:warn)
       # rubocop:disable RSpec/SubjectStub
-      allow(subject).to receive(:each_connection).with([]).and_yield(connection)
+      allow(subject).to receive(:each_connection).with(anything, []).and_yield(connection)
       # rubocop:enable RSpec/SubjectStub
 
       subject.run

@@ -25,6 +25,15 @@ module Imap::Backup
       end
     end
 
+    def load_config
+      path = Configuration.default_pathname
+      exists = Configuration.exist?(path: path)
+      if !exists
+        raise ConfigurationNotFound, "Configuration file '#{path}' not found"
+      end
+      Configuration.new(path: path)
+    end
+
     def symbolized(options)
       options.each.with_object({}) do |(k, v), acc|
         key = k.gsub("-", "_").intern
@@ -32,22 +41,22 @@ module Imap::Backup
       end
     end
 
-    def account(email)
-      accounts = CLI::Accounts.new
+    def account(config, email)
+      accounts = CLI::Accounts.new(config: config)
       account = accounts.find { |a| a.username == email }
       raise "#{email} is not a configured account" if !account
 
       account
     end
 
-    def connection(email)
-      account = account(email)
+    def connection(config, email)
+      account = account(config, email)
 
       Account::Connection.new(account)
     end
 
-    def each_connection(names)
-      accounts = CLI::Accounts.new(names)
+    def each_connection(config, names)
+      accounts = CLI::Accounts.new(config: config, emails: names)
 
       accounts.each do |account|
         yield account.connection

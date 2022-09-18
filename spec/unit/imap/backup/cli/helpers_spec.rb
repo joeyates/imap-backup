@@ -24,6 +24,21 @@ module Imap::Backup
       end
     end
 
+    describe ".load_config" do
+      let(:exists) { true }
+      let(:params) { {path: nil} }
+      let(:config) { "Configuration" }
+
+      before do
+        allow(Configuration).to receive(:new).with(params) { config }
+        allow(Configuration).to receive(:exist?) { exists }
+      end
+
+      it "returns the configuration" do
+        expect(subject.load_config).to eq(config)
+      end
+    end
+
     describe ".symbolized" do
       let(:arguments) { {"foo" => 1, "bar" => 2} }
       let(:result) { subject.symbolized(arguments) }
@@ -43,7 +58,7 @@ module Imap::Backup
 
     describe ".account" do
       it "returns any account with a matching username" do
-        expect(subject.account(email)).to eq(account1)
+        expect(subject.account("config", email)).to eq(account1)
       end
 
       context "when no match is found" do
@@ -51,7 +66,7 @@ module Imap::Backup
 
         it "fails" do
           expect do
-            subject.account(email)
+            subject.account("config", email)
           end.to raise_error(RuntimeError, /not a configured account/)
         end
       end
@@ -59,13 +74,13 @@ module Imap::Backup
 
     describe ".connection" do
       it "returns a connection" do
-        result = subject.connection(email)
+        result = subject.connection("config", email)
 
         expect(result).to be_a(Account::Connection)
       end
 
       it "returns the connection for any account with a matching username" do
-        result = subject.connection(email)
+        result = subject.connection("config", email)
 
         expect(result.account).to eq(account1)
       end
@@ -73,7 +88,7 @@ module Imap::Backup
 
     describe ".each_connection" do
       it "yields each connection" do
-        expect { |b| subject.each_connection([email, "foo"], &b) }.
+        expect { |b| subject.each_connection("config", [email, "foo"], &b) }.
           to yield_successive_args("c1", "c2")
       end
 
@@ -85,7 +100,7 @@ module Imap::Backup
 
         it "fails" do
           expect do
-            subject.each_connection([email])
+            subject.each_connection("config", [email])
           end.to raise_error(RuntimeError, /not configured/)
         end
       end

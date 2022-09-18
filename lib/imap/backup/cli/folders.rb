@@ -12,7 +12,8 @@ module Imap::Backup
 
     no_commands do
       def run
-        each_connection(emails) do |connection|
+        config = load_config
+        each_connection(config, emails) do |connection|
           Kernel.puts connection.account.username
           # TODO: Make folder_names private once this command
           # has been removed.

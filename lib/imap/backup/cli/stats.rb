@@ -31,7 +31,8 @@ module Imap::Backup
       end
 
       def stats
-        connection = connection(email)
+        config = load_config
+        connection = connection(config, email)
 
         connection.backup_folders.map do |folder|
           next if !folder.exist?

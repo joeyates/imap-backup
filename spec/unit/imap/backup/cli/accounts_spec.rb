@@ -2,7 +2,7 @@ require "imap/backup/cli/accounts"
 
 module Imap::Backup
   describe CLI::Accounts do
-    subject { described_class.new(emails) }
+    subject { described_class.new(config: config, emails: emails) }
 
     let(:emails) { [] }
     let(:accounts) { [account1, account2] }
@@ -18,15 +18,8 @@ module Imap::Backup
         username: "a2@example.com"
       )
     end
-    let(:store) do
+    let(:config) do
       instance_double(Configuration, accounts: accounts)
-    end
-    let(:exists) { true }
-
-    before do
-      allow(Configuration).to receive(:new) { store }
-      allow(Configuration).
-        to receive(:exist?) { exists }
     end
 
     describe "#each" do
@@ -34,16 +27,6 @@ module Imap::Backup
         result = subject.map { |a| a }
 
         expect(result).to eq(accounts)
-      end
-
-      context "when the configuration file is missing" do
-        let(:exists) { false }
-
-        it "fails" do
-          expect do
-            subject.each {}
-          end.to raise_error(ConfigurationNotFound, /not found/)
-        end
       end
 
       context "when an account list is provided" do

@@ -4,9 +4,11 @@ module Imap::Backup
   class CLI::Accounts
     include Enumerable
 
+    attr_reader :config
     attr_reader :emails
 
-    def initialize(emails = [])
+    def initialize(config:, emails: [])
+      @config = config
       @emails = emails
     end
 
@@ -27,17 +29,6 @@ module Imap::Backup
             emails.include?(account.username)
           end
         end
-    end
-
-    def config
-      @config ||= begin
-        exists = Configuration.exist?
-        if !exists
-          path = Configuration.default_pathname
-          raise ConfigurationNotFound, "Configuration file '#{path}' not found"
-        end
-        Configuration.new
-      end
     end
   end
 end

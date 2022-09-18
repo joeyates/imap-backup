@@ -3,11 +3,13 @@ module Imap::Backup
     include Thor::Actions
     include CLI::Helpers
 
+    attr_reader :config
     attr_reader :emails
     attr_reader :refresh
 
     def initialize(options)
       super([])
+      @config = load_config
       @emails = (options[:accounts] || "").split(",")
       @refresh = options.key?(:refresh) ? !!options[:refresh] : false
     end

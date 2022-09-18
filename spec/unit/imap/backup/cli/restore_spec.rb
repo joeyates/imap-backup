@@ -11,7 +11,7 @@ module Imap::Backup
         let(:options) { {} }
 
         before do
-          allow(subject).to receive(:connection).with(email) { connection }
+          allow(subject).to receive(:connection).with(anything, email) { connection }
 
           subject.run
         end
@@ -26,7 +26,7 @@ module Imap::Backup
         let(:options) { {} }
 
         before do
-          allow(subject).to receive(:each_connection).with([]).and_yield(connection)
+          allow(subject).to receive(:each_connection).with(anything, []).and_yield(connection)
 
           subject.run
         end
@@ -52,7 +52,7 @@ module Imap::Backup
         let(:options) { {accounts: "email2"} }
 
         before do
-          allow(subject).to receive(:each_connection).with(["email2"]).and_yield(connection)
+          allow(subject).to receive(:each_connection).with(anything, ["email2"]).and_yield(connection)
 
           subject.run
         end

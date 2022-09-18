@@ -12,7 +12,8 @@ module Imap::Backup
     quiet_option
     def ignore_history(email)
       Imap::Backup::Logger.setup_logging symbolized(options)
-      connection = connection(email)
+      config = load_config
+      connection = connection(config, email)
 
       connection.backup_folders.each do |folder|
         next if !folder.exist?
@@ -49,7 +50,8 @@ module Imap::Backup
       force = opts.key?(:force) ? opts[:force] : false
       profile_name = opts[:profile]
 
-      connection = connection(email)
+      config = load_config
+      connection = connection(config, email)
       profile = thunderbird_profile(profile_name)
 
       if !profile
