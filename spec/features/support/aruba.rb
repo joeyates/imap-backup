@@ -94,7 +94,7 @@ module LocalHelpers
 
   def config
     Imap::Backup::Configuration.new(
-      File.expand_path("~/.imap-backup/config.json")
+      path: File.expand_path("~/.imap-backup/config.json")
     )
   end
 end

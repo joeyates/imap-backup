@@ -14,12 +14,12 @@ module Imap::Backup
       File.join(CONFIGURATION_DIRECTORY, "config.json")
     end
 
-    def self.exist?(pathname = default_pathname)
-      File.exist?(pathname)
+    def self.exist?(path: nil)
+      File.exist?(path || default_pathname)
     end
 
-    def initialize(pathname = self.class.default_pathname)
-      @pathname = pathname
+    def initialize(path: nil)
+      @pathname = path || self.class.default_pathname
     end
 
     def path
