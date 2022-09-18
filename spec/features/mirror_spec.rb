@@ -10,14 +10,18 @@ RSpec.describe "Mirroring", type: :aruba, docker: true do
   let(:msg1_source_uid) { test_server.folder_uids(folder).first }
   let(:msg1_destination_id) { other_server.folder_uids(folder).first }
   let(:pre) { nil }
+  let(:config_options) do
+    {
+      accounts: [
+        test_server_connection_parameters, other_server_connection_parameters
+      ]
+    }
+  end
 
   before do
     test_server.create_folder folder
     test_server.send_email folder, **msg1, flags: [:Seen]
-
-    create_config accounts: [
-      test_server_connection_parameters, other_server_connection_parameters
-    ]
+    create_config **config_options
 
     pre
 

@@ -2,9 +2,10 @@ require "features/helper"
 
 RSpec.describe "setup", type: :aruba do
   let(:account) { test_server_connection_parameters }
+  let(:config_options) { {accounts: [account]} }
 
   before do
-    create_config(accounts: [account])
+    create_config **config_options
 
     run_command "imap-backup setup"
   end

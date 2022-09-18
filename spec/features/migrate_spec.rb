@@ -10,10 +10,12 @@ RSpec.describe "Migration", type: :aruba, docker: true do
     }
   end
   let(:destination_account) { test_server_connection_parameters }
+  let(:config_options) { {accounts: [source_account, destination_account]} }
 
   before do
-    create_config(accounts: [source_account, destination_account])
+    create_config **config_options
     append_local(email: email, folder: folder, subject: "Ciao", flags: [:Draft])
+
     run_command_and_stop("imap-backup migrate #{email} #{destination_account[:username]}")
   end
 

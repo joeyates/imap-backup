@@ -10,7 +10,8 @@ RSpec.describe "backup", type: :aruba, docker: true do
   end
   let(:account) { test_server_connection_parameters }
   let(:email) { account[:username] }
-  let(:write_config) { create_config(accounts: [account]) }
+  let(:config_options) { {accounts: [account]} }
+  let(:write_config) { create_config **config_options }
 
   let!(:pre) do
     test_server.delete_folder folder

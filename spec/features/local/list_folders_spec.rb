@@ -8,9 +8,10 @@ RSpec.describe "Listing account folders", type: :aruba do
       local_path: File.join(config_path, email.gsub("@", "_"))
     }
   end
+  let(:config_options) { {accounts: [account]} }
 
   before do
-    create_config(accounts: [account])
+    create_config **config_options
     append_local(email: email, folder: "my_folder", body: "Hi")
     run_command_and_stop("imap-backup local folders #{email}")
   end
