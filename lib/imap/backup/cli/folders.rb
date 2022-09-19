@@ -3,16 +3,18 @@ module Imap::Backup
     include Thor::Actions
     include CLI::Helpers
 
-    attr_reader :account_names
+    attr_reader :emails
+    attr_reader :options
 
     def initialize(options)
       super([])
-      @account_names = (options[:accounts] || "").split(",")
+      @options = options
     end
 
     no_commands do
       def run
-        each_connection(account_names) do |connection|
+        config = load_config(**options)
+        each_connection(config, emails) do |connection|
           Kernel.puts connection.account.username
           # TODO: Make folder_names private once this command
           # has been removed.
@@ -23,6 +25,10 @@ module Imap::Backup
           end
           folders.each { |f| Kernel.puts "\t#{f}" }
         end
+      end
+
+      def emails
+        (options[:accounts] || "").split(",")
       end
     end
   end

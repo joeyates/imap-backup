@@ -75,19 +75,5 @@ module Imap::Backup
         expect(setup).to have_received(:run)
       end
     end
-
-    describe "#status" do
-      let(:status) { instance_double(CLI::Status, run: nil) }
-
-      before do
-        allow(CLI::Status).to receive(:new) { status }
-
-        subject.status
-      end
-
-      it "runs status" do
-        expect(status).to have_received(:run)
-      end
-    end
   end
 end

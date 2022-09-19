@@ -1,10 +1,18 @@
 require "imap/backup"
-require "imap/backup/cli/accounts"
 
 module Imap::Backup
   module CLI::Helpers
     def self.included(base)
       base.class_eval do
+        def self.config_option
+          method_option(
+            "config",
+            type: :string,
+            desc: "supply the configuration file path (default: ~/.imap-backup/config.json)",
+            aliases: ["-c"]
+          )
+        end
+
         def self.verbose_option
           method_option(
             "verbose",
@@ -25,31 +33,49 @@ module Imap::Backup
       end
     end
 
+    def load_config(**options)
+      opts = symbolized(options)
+      path = opts[:config]
+      require_exists = opts.key?(:require_exists) ? opts[:require_exists] : true
+      if require_exists
+        exists = Configuration.exist?(path: path)
+        if !exists
+          expected = path || Configuration.default_pathname
+          raise ConfigurationNotFound, "Configuration file '#{expected}' not found"
+        end
+      end
+      Configuration.new(path: path)
+    end
+
     def symbolized(options)
       options.each.with_object({}) do |(k, v), acc|
-        key = k.gsub("-", "_").intern
+        key =
+          if k.is_a?(String)
+            k.gsub("-", "_").intern
+          else
+            k
+          end
         acc[key] = v
       end
     end
 
-    def account(email)
-      accounts = CLI::Accounts.new
-      account = accounts.find { |a| a.username == email }
+    def account(config, email)
+      account = config.accounts.find { |a| a.username == email }
       raise "#{email} is not a configured account" if !account
 
       account
     end
 
-    def connection(email)
-      account = account(email)
+    def connection(config, email)
+      account = account(config, email)
 
       Account::Connection.new(account)
     end
 
-    def each_connection(names)
-      accounts = CLI::Accounts.new(names)
+    def each_connection(config, names)
+      config.accounts.each do |account|
+        next if names.any? && !names.include?(account.username)
 
-      accounts.each do |account|
         yield account.connection
       end
     rescue ConfigurationNotFound

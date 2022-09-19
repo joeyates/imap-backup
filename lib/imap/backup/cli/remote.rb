@@ -4,8 +4,12 @@ module Imap::Backup
     include CLI::Helpers
 
     desc "folders EMAIL", "List account folders"
+    config_option
+    verbose_option
+    quiet_option
     def folders(email)
-      connection = connection(email)
+      config = load_config(**symbolized(options))
+      connection = connection(config, email)
 
       connection.folder_names.each do |name|
         Kernel.puts %("#{name}")

@@ -16,7 +16,6 @@ module Imap::Backup
     autoload :Restore, "imap/backup/cli/restore"
     autoload :Setup, "imap/backup/cli/setup"
     autoload :Stats, "imap/backup/cli/stats"
-    autoload :Status, "imap/backup/cli/status"
     autoload :Utils, "imap/backup/cli/utils"
 
     include Helpers
@@ -45,6 +44,7 @@ module Imap::Backup
       The setup tool can be used to choose a specific list of folders to back up.
     DESC
     accounts_option
+    config_option
     verbose_option
     quiet_option
     method_option(
@@ -66,6 +66,7 @@ module Imap::Backup
       and `imap-backup remote folders ACCOUNT` to get the folder list.
     DESC
     accounts_option
+    config_option
     def folders
       Folders.new(symbolized(options)).run
     end
@@ -96,6 +97,7 @@ module Imap::Backup
       use the `--reset` option. In this case, all existing emails are
       deleted before uploading the migrated emails.
     DESC
+    config_option
     verbose_option
     quiet_option
     method_option(
@@ -141,6 +143,7 @@ module Imap::Backup
       This file has a '.mirror' extension. This file contains a mapping of
       the known UIDs on the source account to those on the destination account.
     DESC
+    config_option
     verbose_option
     quiet_option
     method_option(
@@ -169,6 +172,7 @@ module Imap::Backup
       their original server.
     DESC
     accounts_option
+    config_option
     verbose_option
     quiet_option
     def restore(email = nil)
@@ -181,11 +185,12 @@ module Imap::Backup
       A menu-driven command-line application used to configure imap-backup.
       Configure email accounts to back up.
     DESC
+    config_option
     verbose_option
     quiet_option
     def setup
       Imap::Backup::Logger.setup_logging symbolized(options)
-      Setup.new.run
+      Setup.new(symbolized(options)).run
     end
 
     desc "stats EMAIL [OPTIONS]", "Print stats for each account folder"
@@ -194,6 +199,9 @@ module Imap::Backup
       are downloaded (exist on server and locally) "both" and those which
       are only present in the backup (as they have been deleted on the server) "local".
     DESC
+    config_option
+    verbose_option
+    quiet_option
     method_option(
       "format",
       type: :string,
@@ -201,17 +209,8 @@ module Imap::Backup
       aliases: ["-f"]
     )
     def stats(email)
+      Imap::Backup::Logger.setup_logging symbolized(options)
       Stats.new(email, symbolized(options)).run
-    end
-
-    desc "status", "This command is deprecated, use `imap-backup stats ACCOUNT`"
-    long_desc <<~DESC
-      For each configured account and folder, lists the number of emails yet to be downloaded.
-      This command is deprecated.
-    DESC
-    accounts_option
-    def status
-      Status.new(symbolized(options)).run
     end
 
     desc "utils SUBCOMMAND [OPTIONS]", "Various utilities"

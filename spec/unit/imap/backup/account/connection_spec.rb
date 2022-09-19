@@ -102,38 +102,6 @@ module Imap::Backup
       end
     end
 
-    describe "#status" do
-      let(:folder) do
-        instance_double(
-          Account::Folder,
-          uids: [remote_uid],
-          name: imap_folder
-        )
-      end
-      let(:remote_uid) { "remote_uid" }
-
-      before do
-        allow(Account::Folder).to receive(:new) { folder }
-        allow(Serializer).to receive(:new) { serializer }
-      end
-
-      it_behaves_like "ensures the backup directory exists" do
-        let(:action) { -> { subject.status } }
-      end
-
-      it "returns the names of folders" do
-        expect(subject.status[0][:name]).to eq(imap_folder)
-      end
-
-      it "returns local message uids" do
-        expect(subject.status[0][:local]).to eq([local_uid])
-      end
-
-      it "retrieves the available uids" do
-        expect(subject.status[0][:remote]).to eq([remote_uid])
-      end
-    end
-
     describe "#run_backup" do
       let(:folder) do
         instance_double(

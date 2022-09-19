@@ -80,7 +80,6 @@ Alternatively, add it to your crontab.
 * [remote folders](docs/commands/remote-folders.md)
 * [restore](docs/commands/restore.md)
 * [setup](docs/commands/setup.md)
-* [status](docs/commands/status.md)
 * [utils export-to-thunderbird](docs/commands/utils-export-to-thunderbird.md)
 * [utils ignore-history](docs/commands/utils-ignore-history.md)
 

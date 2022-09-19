@@ -11,6 +11,12 @@ module Imap::Backup
     end
     self.highline = HighLine.new
 
+    attr_accessor :config
+
+    def initialize(config:)
+      @config = config
+    end
+
     def run
       catch :done do
         loop do
@@ -60,10 +66,6 @@ module Imap::Backup
         username = Asker.email
         edit_account username
       end
-    end
-
-    def config
-      @config ||= Configuration.new
     end
 
     def default_account_config(username)

@@ -14,7 +14,7 @@ module Imap::Backup
     attr_reader :email
     attr_reader :options
 
-    def initialize(email, options = {})
+    def initialize(email, options)
       super([])
       @email = email
       @options = options
@@ -31,7 +31,8 @@ module Imap::Backup
       end
 
       def stats
-        connection = connection(email)
+        config = load_config(**options)
+        connection = connection(config, email)
 
         connection.backup_folders.map do |folder|
           next if !folder.exist?

@@ -13,10 +13,11 @@ RSpec.describe "restore", type: :aruba, docker: true do
   end
   let(:uid_validity) { 1234 }
   let(:email) { test_server_connection_parameters[:username] }
+  let(:config_options) { {accounts: [account]} }
 
   let!(:pre) {}
   let!(:setup) do
-    create_config accounts: [account]
+    create_config(**config_options)
     create_local_folder email: account[:username], folder: folder, uid_validity: uid_validity
     append_local email: account[:username], folder: folder, flags: [:Flagged], **msg1
     append_local email: account[:username], folder: folder, flags: [:Draft], **msg2
@@ -163,6 +164,36 @@ RSpec.describe "restore", type: :aruba, docker: true do
       server_message = message_as_server_message(**msg_iso8859)
 
       expect(message).to eq(server_message)
+    end
+  end
+
+  context "when a config path is supplied" do
+    let(:custom_config_path) { File.join(File.expand_path("~/.imap-backup"), "foo.json") }
+    let(:config_options) { {path: custom_config_path, accounts: [account]} }
+
+    let(:setup) do
+      create_config(**config_options)
+      create_local_folder(
+        configuration_path: custom_config_path,
+        email: account[:username],
+        folder: folder,
+        uid_validity: uid_validity
+      )
+      append_local(
+        configuration_path: custom_config_path,
+        email: account[:username],
+        folder: folder,
+        flags: [:Flagged],
+        **msg1
+      )
+    end
+
+    it "works" do
+      run_command_and_stop(
+        "imap-backup restore #{account[:username]} --config #{custom_config_path}"
+      )
+
+      expect(last_command_started).to have_exit_status(0)
     end
   end
 end

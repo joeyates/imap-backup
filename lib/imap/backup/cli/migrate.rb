@@ -3,9 +3,11 @@ require "imap/backup/migrator"
 module Imap::Backup
   class CLI::Migrate < Thor
     include Thor::Actions
+    include CLI::Helpers
 
     attr_reader :destination_email
     attr_reader :destination_prefix
+    attr_reader :config_path
     attr_reader :reset
     attr_reader :source_email
     attr_reader :source_prefix
@@ -13,6 +15,7 @@ module Imap::Backup
     def initialize(
       source_email,
       destination_email,
+      config: nil,
       destination_prefix: "",
       reset: false,
       source_prefix: ""
@@ -20,6 +23,7 @@ module Imap::Backup
       super([])
       @destination_email = destination_email
       @destination_prefix = destination_prefix
+      @config_path = config
       @reset = reset
       @source_email = source_email
       @source_prefix = source_prefix
@@ -44,7 +48,7 @@ module Imap::Backup
       end
 
       def config
-        Configuration.new
+        @config ||= load_config(config: config_path)
       end
 
       def destination_account

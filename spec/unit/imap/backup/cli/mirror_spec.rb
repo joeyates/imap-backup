@@ -13,9 +13,9 @@ module Imap::Backup
         username: source, connection: connection1, local_path: "path", mirror_mode: false
       )
     end
-    let(:connection1) { instance_double(Account::Connection, run_backup: nil) }
+    let(:connection1) { instance_double(Account::Connection, "connection1", run_backup: nil) }
     let(:account2) { instance_double(Account, username: destination, connection: connection2) }
-    let(:connection2) { instance_double(Account::Connection) }
+    let(:connection2) { instance_double(Account::Connection, "connection2") }
     let(:pathname) { Pathname.new("path/folder.imap") }
 
     before do

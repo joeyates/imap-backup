@@ -27,14 +27,6 @@ module Imap::Backup
         Account::Connection::BackupFolders.new(client: client, account: account).run
     end
 
-    def status
-      ensure_account_folder
-      backup_folders.map do |folder|
-        s = Serializer.new(account.local_path, folder.name)
-        {name: folder.name, local: s.uids, remote: folder.uids}
-      end
-    end
-
     def run_backup(refresh: false)
       Logger.logger.info "Running backup of account: #{account.username}"
       # start the connection so we get logging messages in the right order

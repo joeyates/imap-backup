@@ -1,11 +1,5 @@
 module Imap::Backup
   describe CLI::Utils do
-    let(:accounts) do
-      instance_double(
-        CLI::Accounts,
-        find: ->(&block) { [account].find { |a| block.call(a) } }
-      )
-    end
     let(:account) do
       instance_double(
         Account,
@@ -40,9 +34,11 @@ module Imap::Backup
     end
     let(:exporter) { instance_double(Thunderbird::MailboxExporter, run: nil) }
     let(:email) { "foo@example.com" }
+    let(:config) { instance_double(Configuration, accounts: [account]) }
 
     before do
-      allow(CLI::Accounts).to receive(:new) { accounts }
+      allow(Configuration).to receive(:exist?) { true }
+      allow(Configuration).to receive(:new) { config }
       allow(Account::Connection).to receive(:new) { connection }
       allow(Serializer).to receive(:new) { serializer }
     end

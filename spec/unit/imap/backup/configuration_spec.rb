@@ -76,8 +76,6 @@ module Imap::Backup
     end
 
     describe "#save" do
-      subject { described_class.new }
-
       let(:directory_exists) { false }
       let(:file) { instance_double(File, write: nil) }
 

@@ -10,7 +10,8 @@ RSpec.describe "backup", type: :aruba, docker: true do
   end
   let(:account) { test_server_connection_parameters }
   let(:email) { account[:username] }
-  let(:write_config) { create_config(accounts: [account]) }
+  let(:config_options) { {accounts: [account]} }
+  let(:write_config) { create_config(**config_options) }
 
   let!(:pre) do
     test_server.delete_folder folder
@@ -169,6 +170,34 @@ RSpec.describe "backup", type: :aruba, docker: true do
       it "deletes .mbox files" do
         expect(File.exist?(mbox_path)).to be false
       end
+    end
+  end
+
+  context "when a config path is supplied" do
+    let(:custom_config_path) { File.join(File.expand_path("~/.imap-backup"), "foo.json") }
+    let(:config_options) do
+      {path: custom_config_path, accounts: [other_server_connection_parameters]}
+    end
+    let(:account) { other_server_connection_parameters }
+    let(:command) { "imap-backup backup --config #{custom_config_path}" }
+
+    let(:setup) do
+      other_server.create_folder folder
+      other_server.send_email folder, **msg1
+      write_config
+    end
+
+    after do
+      other_server.delete_folder folder
+      other_server.disconnect
+    end
+
+    it "downloads messages" do
+      run_command_and_stop command
+
+      content = mbox_content(email, folder, configuration_path: custom_config_path)
+      messages_as_mbox = to_mbox_entry(**msg1)
+      expect(content).to eq(messages_as_mbox)
     end
   end
 end

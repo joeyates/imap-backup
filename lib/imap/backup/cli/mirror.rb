@@ -3,21 +3,25 @@ require "imap/backup/mirror"
 module Imap::Backup
   class CLI::Mirror < Thor
     include Thor::Actions
+    include CLI::Helpers
 
     attr_reader :destination_email
     attr_reader :destination_prefix
+    attr_reader :config_path
     attr_reader :source_email
     attr_reader :source_prefix
 
     def initialize(
       source_email,
       destination_email,
+      config: nil,
       destination_prefix: "",
       source_prefix: ""
     )
       super([])
       @destination_email = destination_email
       @destination_prefix = destination_prefix
+      @config_path = config
       @source_email = source_email
       @source_prefix = source_prefix
     end
@@ -27,7 +31,7 @@ module Imap::Backup
         check_accounts!
         warn_if_source_account_is_not_in_mirror_mode
 
-        CLI::Backup.new(accounts: source_email).run
+        CLI::Backup.new(config: config_path, accounts: source_email).run
 
         folders.each do |serializer, folder|
           Mirror.new(serializer, folder).run
@@ -54,7 +58,7 @@ module Imap::Backup
       end
 
       def config
-        Configuration.new
+        @config = load_config(config: config_path)
       end
 
       def destination_account
