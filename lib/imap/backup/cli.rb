@@ -16,7 +16,6 @@ module Imap::Backup
     autoload :Restore, "imap/backup/cli/restore"
     autoload :Setup, "imap/backup/cli/setup"
     autoload :Stats, "imap/backup/cli/stats"
-    autoload :Status, "imap/backup/cli/status"
     autoload :Utils, "imap/backup/cli/utils"
 
     include Helpers
@@ -201,17 +200,8 @@ module Imap::Backup
       aliases: ["-f"]
     )
     def stats(email)
+      Imap::Backup::Logger.setup_logging symbolized(options)
       Stats.new(email, symbolized(options)).run
-    end
-
-    desc "status", "This command is deprecated, use `imap-backup stats ACCOUNT`"
-    long_desc <<~DESC
-      For each configured account and folder, lists the number of emails yet to be downloaded.
-      This command is deprecated.
-    DESC
-    accounts_option
-    def status
-      Status.new(symbolized(options)).run
     end
 
     desc "utils SUBCOMMAND [OPTIONS]", "Various utilities"
