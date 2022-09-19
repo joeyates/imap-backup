@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [8.0.0] - TBA
+## [8.0.0.rc1] - 2022-09-19
 
 ### Added
 
