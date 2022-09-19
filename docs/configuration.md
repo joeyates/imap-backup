@@ -1,6 +1,6 @@
 Configuration is stored in a JSON file.
 
-The format is documented [here](./docs/files/config.json).
+The format is documented [here](files/config.md).
 
 # Folders
 
