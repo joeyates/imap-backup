@@ -11,6 +11,8 @@ specific folders.
 
 You can override the parameters passed to `Net::IMAP` with `connection_options`.
 
+See the Ruby Standard Library documentation for `Net::IMAP` of details of [supported parameters](https://ruby-doc.org/stdlib-3.1.2/libdoc/net-imap/rdoc/Net/IMAP.html#method-c-new).
+
 Specifically, if you are using a self-signed certificate and get SSL errors, e.g.
 `certificate verify failed`, you can choose to not verify the TLS connection.
 
