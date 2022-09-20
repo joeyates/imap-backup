@@ -14,11 +14,22 @@ module Imap::Backup
     end
 
     def run
-      rows = [email, password, path, folders, mode, multi_fetch, server, connection_options].compact
+      rows = [
+        email,
+        password,
+        path,
+        folders,
+        mode,
+        multi_fetch,
+        server,
+        connection_options,
+        reset_seen_flags_after_fetch
+      ].compact
+
       menu.header = <<~HEADER.chomp
         #{helpers.title_prefix} Account#{modified_flag}
 
-        #{format_rows(rows)}#{reset_seen_flags_after_fetch}
+        #{format_rows(rows)}
 
         Choose an action
       HEADER
@@ -54,7 +65,12 @@ module Imap::Backup
 
     def folders
       items = account.folders || []
-      list = items.map { |f| f[:name] }.join(", ")
+      list =
+        if items.any?
+          items.map { |f| f[:name] }.join(", ")
+        else
+          "(all folders)"
+        end
       ["folders", list]
     end
 
@@ -89,11 +105,17 @@ module Imap::Backup
     def reset_seen_flags_after_fetch
       return nil if !account.reset_seen_flags_after_fetch
 
-      "\nchanges to unread flags will be reset during download"
+      ["changes to unread flags will be reset during download"]
     end
 
     def format_rows(rows)
-      largest_label, _value = rows.max_by { |(label, _value)| label.length }
+      largest_label, _value = rows.max_by do |(label, value)|
+        if value
+          label.length
+        else
+          0
+        end
+      end
       rows.map do |(label, value)|
         format(
           "%-#{largest_label.length}<label>s %<value>s",
