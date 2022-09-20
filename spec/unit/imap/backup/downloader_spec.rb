@@ -108,13 +108,13 @@ module Imap::Backup
         before do
           allow(folder).to receive(:fetch_multi).with(["111"]) { [{uid: "111", body: body}] }
           allow(folder).to receive(:unseen).and_return([33], [])
-          allow(folder).to receive(:unset_flags)
+          allow(folder).to receive(:remove_flags)
 
           subject.run
         end
 
         it "resets seen flags set during fetch" do
-          expect(folder).to have_received(:unset_flags).with([33], [:Seen])
+          expect(folder).to have_received(:remove_flags).with([33], [:Seen])
         end
       end
     end

@@ -56,7 +56,7 @@ module Imap::Backup
         next if !source_uid
 
         message = serializer.get(source_uid)
-        folder.apply_flags([destination_uid], message.flags) if flags.sort != message.flags.sort
+        folder.set_flags([destination_uid], message.flags) if flags.sort != message.flags.sort
       end
     end
 

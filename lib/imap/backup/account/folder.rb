@@ -100,24 +100,24 @@ module Imap::Backup
     end
 
     def delete_multi(uids)
-      set_flags(uids, [:Deleted])
+      add_flags(uids, [:Deleted])
       client.expunge
     end
 
-    def apply_flags(uids, flags)
+    def set_flags(uids, flags)
       client.select(utf7_encoded_name)
       flags.reject! { |f| f == :Recent }
       client.uid_store(uids, "FLAGS", flags)
     end
 
-    def set_flags(uids, flags)
+    def add_flags(uids, flags)
       # Use read-write access, via `select`
       client.select(utf7_encoded_name)
       flags.reject! { |f| f == :Recent }
       client.uid_store(uids, "+FLAGS", flags)
     end
 
-    def unset_flags(uids, flags)
+    def remove_flags(uids, flags)
       client.select(utf7_encoded_name)
       client.uid_store(uids, "-FLAGS", flags)
     end
@@ -126,7 +126,7 @@ module Imap::Backup
       existing = uids
       return if existing.empty?
 
-      set_flags(existing, [:Deleted])
+      add_flags(existing, [:Deleted])
       client.expunge
     end
 
