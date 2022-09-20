@@ -32,6 +32,7 @@ module Imap::Backup
         A folder called 'imap-backup/EMAIL' is created under 'Local Folders'.
       DOC
     )
+    config_option
     verbose_option
     quiet_option
     method_option(
