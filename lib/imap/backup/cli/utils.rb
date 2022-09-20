@@ -8,6 +8,7 @@ module Imap::Backup
     FAKE_EMAIL = "fake@email.com".freeze
 
     desc "ignore-history EMAIL", "Skip downloading emails up to today for all configured folders"
+    config_option
     verbose_option
     quiet_option
     def ignore_history(email)
@@ -31,6 +32,7 @@ module Imap::Backup
         A folder called 'imap-backup/EMAIL' is created under 'Local Folders'.
       DOC
     )
+    config_option
     verbose_option
     quiet_option
     method_option(
