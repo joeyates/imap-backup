@@ -64,14 +64,23 @@ module Imap::Backup
     end
 
     def folders
+      label =
+        if account.folder_blacklist
+          "exclude"
+        else
+          "include"
+        end
       items = account.folders || []
       list =
-        if items.any?
+        case
+        when items.any?
           items.map { |f| f[:name] }.join(", ")
-        else
+        when !account.folder_blacklist
           "(all folders)"
+        else
+          "(all folders) <- you have opted to not backup any folders!"
         end
-      ["folders", list]
+      [label, list]
     end
 
     def mode

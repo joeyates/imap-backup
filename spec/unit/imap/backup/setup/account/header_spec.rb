@@ -14,6 +14,7 @@ module Imap::Backup
         server: "imap.example.com",
         connection_options: connection_options,
         modified?: modified,
+        folder_blacklist: false,
         multi_fetch_size: multi_fetch_size,
         reset_seen_flags_after_fetch: reset_seen_flags_after_fetch
       )
@@ -29,7 +30,7 @@ module Imap::Backup
       ["email", /email\s+user@example.com/],
       ["password", /password\s+x+/],
       ["path", %r(path\s+/backup/path)],
-      ["folders", /folders\s+my_folder/],
+      ["folders to be backed up", /include\s+my_folder/],
       ["mode", /keep/],
       ["server", /server\s+imap.example.com/]
     ].each do |attribute, value|

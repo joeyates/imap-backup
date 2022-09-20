@@ -41,6 +41,7 @@ module Imap::Backup
         test_connection menu
         toggle_mirror_mode menu
         modify_backup_path menu
+        toggle_folder_blacklist menu
         choose_folders menu
         modify_multi_fetch_size menu
         toggle_reset_seen_flags_after_fetch menu
@@ -74,8 +75,17 @@ module Imap::Backup
       end
     end
 
+    def toggle_folder_blacklist(menu)
+      menu_item = "toggle folder inclusion mode (whitelist/backlist)"
+      new_value = account.folder_blacklist ? nil : true
+      menu.choice(menu_item) do
+        account.folder_blacklist = new_value
+      end
+    end
+
     def choose_folders(menu)
-      menu.choice("choose backup folders") do
+      action = account.folder_blacklist ? "exclude from backups" : "include in backups"
+      menu.choice("choose folders to #{action}") do
         Setup::FolderChooser.new(account).run
       end
     end
