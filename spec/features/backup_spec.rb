@@ -157,9 +157,12 @@ RSpec.describe "backup", type: :aruba, docker: true do
 
     let!(:pre) do
       create_directory account[:local_path]
-      valid_imap_data = {version: 3, uid_validity: 1, messages: [{uid: 1, offset: 0, length: 3}]}
+      message = "existing mbox"
+      valid_imap_data = {
+        version: 3, uid_validity: 1, messages: [{uid: 1, offset: 0, length: message.length}]
+      }
       File.write(imap_path, valid_imap_data.to_json)
-      File.write(mbox_path, "existing mbox")
+      File.write(mbox_path, message)
     end
 
     context "with folders that are not being backed up" do
