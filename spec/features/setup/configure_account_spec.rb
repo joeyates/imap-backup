@@ -17,6 +17,18 @@ RSpec.describe "configuring accounts", type: :aruba do
     expect(last_command_started).to have_output(/email\s+#{account[:username]}/)
   end
 
+  it "tests the connection" do
+    run_command "imap-backup setup"
+    last_command_started.write "#{email}\n"
+    last_command_started.write "test connection\n"
+    last_command_started.write "\n"
+    last_command_started.write "q\n"
+    last_command_started.write "q\n"
+    last_command_started.stop
+
+    expect(last_command_started).to have_output(/Connection successful/m)
+  end
+
   context "when the account's local_path has backslashes" do
     let(:account) do
       super().merge(local_path: local_path)
