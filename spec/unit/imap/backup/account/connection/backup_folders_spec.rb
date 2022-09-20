@@ -2,11 +2,17 @@ module Imap::Backup
   describe Account::Connection::BackupFolders do
     subject { described_class.new(client: client, account: account) }
 
-    let(:account) { instance_double(Account, folders: account_folders, connection: connection) }
+    let(:account) do
+      instance_double(
+        Account, folders: account_folders, connection: connection, folder_blacklist: false
+      )
+    end
     let(:client) { instance_double(Client::Default) }
     let(:connection) { instance_double(Account::Connection) }
     let(:account_folders) { [{name: "foo"}] }
-    let(:folder_names) { instance_double(Account::Connection::FolderNames, run: ["imap_folder"]) }
+    let(:folder_names) do
+      instance_double(Account::Connection::FolderNames, run: %w(imap_folder foo))
+    end
     let(:result) { subject.run }
 
     before do

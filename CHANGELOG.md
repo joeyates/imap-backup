@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## ??? - TBA
 
+### Added
+
+* An account option 'folder_blacklist'. When set the user chooses
+  which folders to **exclude** from backups. Otherwise, the folders
+  chosen by the user are the ones to **include**.
+
 ### Changed
 
 * Removed 'Experimental' warning from 'migrate' command,
