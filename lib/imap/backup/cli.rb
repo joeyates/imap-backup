@@ -76,7 +76,6 @@ module Imap::Backup
 
     desc(
       "migrate SOURCE_EMAIL DESTINATION_EMAIL [OPTIONS]",
-      "[Experimental] " \
       "Uploads backed-up emails from account SOURCE_EMAIL to account DESTINATION_EMAIL"
     )
     long_desc <<~DESC

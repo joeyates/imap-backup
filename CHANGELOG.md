@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## ??? - TBA
+
+### Changed
+
+* Removed 'Experimental' warning from 'migrate' command,
+* Removed 'Experimental' warning from 'export-to-thunderbird' command.
+
 ## [8.0.0.rc1] - 2022-09-19
 
 ### Added

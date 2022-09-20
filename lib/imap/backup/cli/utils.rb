@@ -27,7 +27,7 @@ module Imap::Backup
     desc(
       "export-to-thunderbird EMAIL [OPTIONS]",
       <<~DOC
-        [Experimental] Copy backed up emails to Thunderbird.
+        Copy backed up emails to Thunderbird.
         A folder called 'imap-backup/EMAIL' is created under 'Local Folders'.
       DOC
     )
