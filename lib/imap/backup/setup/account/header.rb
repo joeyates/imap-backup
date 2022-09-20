@@ -17,12 +17,12 @@ module Imap::Backup
       rows = [
         email,
         password,
-        path,
-        folders,
-        mode,
-        multi_fetch,
         server,
         connection_options,
+        mode,
+        path,
+        folders,
+        multi_fetch,
         reset_seen_flags_after_fetch
       ].compact
 

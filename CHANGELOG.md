@@ -10,7 +10,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 * Removed 'Experimental' warning from 'migrate' command,
 * Removed 'Experimental' warning from 'export-to-thunderbird' command,
-* Renamed Folder#*_flags methods.
+* Renamed Folder#*_flags methods,
+* Improved setup account menu ordering.
 
 ### Removed
 

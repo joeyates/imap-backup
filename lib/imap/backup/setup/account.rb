@@ -36,14 +36,14 @@ module Imap::Backup
         header menu
         modify_email menu
         modify_password menu
-        modify_backup_path menu
-        choose_folders menu
-        toggle_mirror_mode menu
-        modify_multi_fetch_size menu
         modify_server menu
         modify_connection_options menu
-        toggle_reset_seen_flags_after_fetch menu
         test_connection menu
+        toggle_mirror_mode menu
+        modify_backup_path menu
+        choose_folders menu
+        modify_multi_fetch_size menu
+        toggle_reset_seen_flags_after_fetch menu
         delete_account menu
         menu.choice("(q) return to main menu") { throw :done }
         menu.hidden("quit") { throw :done }
