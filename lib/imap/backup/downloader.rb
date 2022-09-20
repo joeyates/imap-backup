@@ -51,7 +51,7 @@ module Imap::Backup
           if changed.any?
             ids = changed.join(", ")
             debug "Removing '\Seen' flag for the following messages: #{ids}"
-            folder.unset_flags(changed, [:Seen])
+            folder.remove_flags(changed, [:Seen])
           end
           uids_and_bodies
         else
