@@ -58,19 +58,6 @@ module Imap::Backup
       Backup.new(symbolized(options)).run
     end
 
-    desc "folders [OPTIONS]", "This command is deprecated, use `imap-backup remote folders ACCOUNT`"
-    long_desc <<~DESC
-      Lists all folders of all configured accounts.
-      This command is deprecated.
-      Instead, use a combination of `imap-backup local accounts` to get the list of accounts,
-      and `imap-backup remote folders ACCOUNT` to get the folder list.
-    DESC
-    accounts_option
-    config_option
-    def folders
-      Folders.new(symbolized(options)).run
-    end
-
     desc "local SUBCOMMAND [OPTIONS]", "View local info"
     subcommand "local", Local
 

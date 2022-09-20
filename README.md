@@ -70,7 +70,6 @@ Alternatively, add it to your crontab.
 # Commands
 
 * [backup](docs/commands/backup.md)
-* [folders](docs/commands/folders.md)
 * [local accounts](docs/commands/local-accounts.md)
 * [local folders](docs/commands/local-folders.md)
 * [local list](docs/commands/local-list.md)

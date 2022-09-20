@@ -20,20 +20,6 @@ module Imap::Backup
       end
     end
 
-    describe "#folders" do
-      let(:folders) { instance_double(CLI::Folders, run: nil) }
-
-      before do
-        allow(CLI::Folders).to receive(:new) { folders }
-
-        subject.folders
-      end
-
-      it "runs folders" do
-        expect(folders).to have_received(:run)
-      end
-    end
-
     describe "#migrate" do
       let(:migrate) { instance_double(CLI::Migrate, run: nil) }
 

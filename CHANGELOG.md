@@ -12,6 +12,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 * Removed 'Experimental' warning from 'export-to-thunderbird' command,
 * Renamed Folder#*_flags methods.
 
+### Removed
+
+* Deprecated `folders` command, replaced by `remote folders`.
+
 ## [8.0.0.rc1] - 2022-09-19
 
 ### Added
