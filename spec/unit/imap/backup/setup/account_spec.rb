@@ -10,6 +10,7 @@ module Imap::Backup
         mirror_mode: mirror_mode,
         local_path: local_path,
         connection_options: connection_options,
+        folder_blacklist: false,
         reset_seen_flags_after_fetch: reset_seen_flags_after_fetch
       )
     end
@@ -103,7 +104,7 @@ module Imap::Backup
           "modify email",
           "modify password",
           "modify backup path",
-          "choose backup folders",
+          "choose folders to include in backups",
           "modify multi-fetch size (number of emails to fetch at a time)",
           "modify server",
           "modify connection options",
@@ -176,7 +177,7 @@ module Imap::Backup
         end
       end
 
-      describe "choosing 'choose backup folders'" do
+      describe "choosing 'choose folders to include in backups'" do
         let(:chooser) do
           instance_double(Setup::FolderChooser, run: nil)
         end
@@ -185,7 +186,7 @@ module Imap::Backup
           allow(Setup::FolderChooser).
             to receive(:new) { chooser }
           subject.run
-          menu.choices["choose backup folders"].call
+          menu.choices["choose folders to include in backups"].call
         end
 
         it "edits folders" do

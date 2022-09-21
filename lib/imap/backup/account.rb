@@ -8,6 +8,7 @@ module Imap::Backup
     attr_reader :password
     attr_reader :local_path
     attr_reader :folders
+    attr_reader :folder_blacklist
     attr_reader :mirror_mode
     attr_reader :server
     attr_reader :connection_options
@@ -19,6 +20,7 @@ module Imap::Backup
       @password = options[:password]
       @local_path = options[:local_path]
       @folders = options[:folders]
+      @folder_blacklist = options[:folder_blacklist]
       @mirror_mode = options[:mirror_mode]
       @server = options[:server]
       @connection_options = options[:connection_options]
@@ -57,6 +59,7 @@ module Imap::Backup
       h = {username: @username, password: @password}
       h[:local_path] = @local_path if @local_path
       h[:folders] = @folders if @folders
+      h[:folder_blacklist] = true if @folder_blacklist
       h[:mirror_mode] = true if @mirror_mode
       h[:server] = @server if @server
       h[:connection_options] = @connection_options if @connection_options
@@ -83,6 +86,10 @@ module Imap::Backup
       raise "folders must be an Array" if !value.is_a?(Array)
 
       update(:folders, value)
+    end
+
+    def folder_blacklist=(value)
+      update(:folder_blacklist, value)
     end
 
     def mirror_mode=(value)
