@@ -76,7 +76,7 @@ module Imap::Backup
     end
 
     def toggle_folder_blacklist(menu)
-      menu_item = "toggle folder inclusion mode (whitelist/backlist)"
+      menu_item = "toggle folder inclusion mode (whitelist/blacklist)"
       new_value = account.folder_blacklist ? nil : true
       menu.choice(menu_item) do
         account.folder_blacklist = new_value
