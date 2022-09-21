@@ -101,7 +101,12 @@ module Imap::Backup
     end
 
     def connection_options=(value)
-      parsed = JSON.parse(value, symbolize_names: true)
+      parsed =
+        if value == ""
+          nil
+        else
+          JSON.parse(value, symbolize_names: true)
+        end
       update(:connection_options, parsed)
     end
 

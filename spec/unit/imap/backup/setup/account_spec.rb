@@ -263,6 +263,21 @@ module Imap::Backup
           end
         end
 
+        context "when an empty string is entered" do
+          before do
+            allow(highline).to receive(:ask).with("connections options (as JSON): ") { "" }
+            allow(account).to receive(:"connection_options=")
+
+            subject.run
+
+            menu.choices["modify connection options"].call
+          end
+
+          it "unsets connection_options" do
+            expect(account).to have_received(:"connection_options=").with("")
+          end
+        end
+
         context "when the JSON is malformed" do
           before do
             allow(Kernel).to receive(:puts)

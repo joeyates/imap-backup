@@ -17,7 +17,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 * Removed 'Experimental' warning from 'migrate' command,
 * Removed 'Experimental' warning from 'export-to-thunderbird' command,
 * Renamed Folder#*_flags methods,
-* Improved setup account menu ordering.
+* Improved setup account menu ordering,
+* An account's connection_options can now be cleared by entering an empty string.
 
 ### Removed
 

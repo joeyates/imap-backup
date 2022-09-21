@@ -115,15 +115,7 @@ module Imap::Backup
 
     def modify_connection_options(menu)
       menu.choice("modify connection options") do
-        default =
-          if account.connection_options
-            account.connection_options.to_json
-          else
-            ""
-          end
-        connection_options = highline.ask("connections options (as JSON): ") do |q|
-          q.default = default
-        end
+        connection_options = highline.ask("connections options (as JSON): ")
         if !connection_options.nil?
           begin
             account.connection_options = connection_options
