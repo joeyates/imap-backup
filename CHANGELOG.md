@@ -11,7 +11,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 * An account option 'folder_blacklist'. When set the user chooses
   which folders to **exclude** from backups. Otherwise, the folders
   chosen by the user are the ones to **include**,
-* Provision of JSON output for the 'remote folders' command.
+* Provision of JSON output for the 'remote folders' command,
+* A 'remote namespaces' command to help with configuration of
+  the 'mirgate' and 'mirror' commands.
 
 ### Changed
 
