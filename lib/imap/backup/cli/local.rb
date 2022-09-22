@@ -7,9 +7,17 @@ module Imap::Backup
 
     desc "accounts", "List locally backed-up accounts"
     config_option
+    format_option
     def accounts
       config = load_config(**options)
-      config.accounts.each { |a| Kernel.puts a.username }
+      names = config.accounts.map(&:username)
+      case options[:format]
+      when "json"
+        list = names.map { |n| {username: n} }
+        Kernel.puts list.to_json
+      else
+        names.each { |n| Kernel.puts n }
+      end
     end
 
     desc "folders EMAIL", "List backed up folders"
