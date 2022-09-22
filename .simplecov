@@ -8,7 +8,8 @@ end
 
 SimpleCov.at_exit do
   File.open(File.join(SimpleCov.coverage_path, "coverage_percent.txt"), "w") do |f|
-    f.write SimpleCov.result.covered_percent
+    rounded = (SimpleCov.result.covered_percent + 0.5).floor
+    f.write rounded
   end
   SimpleCov.result.format!
 end
