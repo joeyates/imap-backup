@@ -66,25 +66,23 @@ module Imap::Backup
       the UID.
     DESC
     config_option
+    format_option
     def show(email, folder_name, uids)
       config = load_config(**options)
       connection = connection(config, email)
 
-      folder_serializer, _folder = connection.local_folders.find do |(_s, f)|
+      serializer, _folder = connection.local_folders.find do |(_s, f)|
         f.name == folder_name
       end
-      raise "Folder '#{folder_name}' not found" if !folder_serializer
+      raise "Folder '#{folder_name}' not found" if !serializer
 
       uid_list = uids.split(",")
-      folder_serializer.each_message(uid_list).each do |message|
-        if uid_list.count > 1
-          Kernel.puts <<~HEADER
-            #{'-' * 80}
-            #{format('| UID: %-71s |', message.uid)}
-            #{'-' * 80}
-          HEADER
-        end
-        Kernel.puts message.body
+
+      case options[:format]
+      when "json"
+        show_emails_as_json serializer, uid_list
+      else
+        show_emails_as_text serializer, uid_list
       end
     end
 
@@ -122,6 +120,26 @@ module Imap::Backup
           Kernel.puts format("% 10<uid>u: %.#{MAX_SUBJECT - 3}<subject>s... - %<date>s", m)
         else
           Kernel.puts format("% 10<uid>u: %-#{MAX_SUBJECT}<subject>s - %<date>s", m)
+        end
+      end
+
+      def show_emails_as_json(serializer, uids)
+        emails = serializer.each_message(uids).map do |m|
+          m.to_h.tap { |h| h[:body] = m.body }
+        end
+        Kernel.puts emails.to_json
+      end
+
+      def show_emails_as_text(serializer, uids)
+        serializer.each_message(uids).each do |message|
+          if uids.count > 1
+            Kernel.puts <<~HEADER
+            #{'-' * 80}
+            #{format('| UID: %-71s |', message.uid)}
+            #{'-' * 80}
+          HEADER
+          end
+          Kernel.puts message.body
         end
       end
     end
