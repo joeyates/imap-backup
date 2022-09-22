@@ -186,14 +186,9 @@ module Imap::Backup
       are only present in the backup (as they have been deleted on the server) "local".
     DESC
     config_option
+    format_option
     quiet_option
     verbose_option
-    method_option(
-      "format",
-      type: :string,
-      desc: "the output type, text (plain text) or json",
-      aliases: ["-f"]
-    )
     def stats(email)
       Imap::Backup::Logger.setup_logging options
       Stats.new(email, options).run

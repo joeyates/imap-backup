@@ -13,6 +13,15 @@ module Imap::Backup
           )
         end
 
+        def self.format_option
+          method_option(
+            "format",
+            type: :string,
+            desc: "the output type, 'text' for plain text or 'json'",
+            aliases: ["-f"]
+          )
+        end
+
         def self.quiet_option
           method_option(
             "quiet",
