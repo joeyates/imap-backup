@@ -22,12 +22,20 @@ module Imap::Backup
 
     desc "folders EMAIL", "List backed up folders"
     config_option
+    format_option
     def folders(email)
       config = load_config(**options)
       connection = connection(config, email)
 
-      connection.local_folders.each do |_s, f|
-        Kernel.puts %("#{f.name}")
+      folders = connection.local_folders
+      case options[:format]
+      when "json"
+        list = folders.map { |_s, f| {name: f.name} }
+        Kernel.puts list.to_json
+      else
+        folders.each do |_s, f|
+          Kernel.puts %("#{f.name}")
+        end
       end
     end
 
