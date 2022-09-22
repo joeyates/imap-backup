@@ -9,8 +9,8 @@ module Imap::Backup
 
     desc "ignore-history EMAIL", "Skip downloading emails up to today for all configured folders"
     config_option
-    verbose_option
     quiet_option
+    verbose_option
     def ignore_history(email)
       Imap::Backup::Logger.setup_logging options
       config = load_config(**options)
@@ -32,8 +32,8 @@ module Imap::Backup
       DOC
     )
     config_option
-    verbose_option
     quiet_option
+    verbose_option
     method_option(
       "force",
       type: :boolean,

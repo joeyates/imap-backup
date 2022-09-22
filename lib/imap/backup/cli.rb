@@ -45,8 +45,8 @@ module Imap::Backup
     DESC
     accounts_option
     config_option
-    verbose_option
     quiet_option
+    verbose_option
     method_option(
       "refresh",
       type: :boolean,
@@ -84,8 +84,8 @@ module Imap::Backup
       deleted before uploading the migrated emails.
     DESC
     config_option
-    verbose_option
     quiet_option
+    verbose_option
     method_option(
       "destination-prefix",
       type: :string,
@@ -130,8 +130,8 @@ module Imap::Backup
       the known UIDs on the source account to those on the destination account.
     DESC
     config_option
-    verbose_option
     quiet_option
+    verbose_option
     method_option(
       "destination-prefix",
       type: :string,
@@ -159,8 +159,8 @@ module Imap::Backup
     DESC
     accounts_option
     config_option
-    verbose_option
     quiet_option
+    verbose_option
     def restore(email = nil)
       Imap::Backup::Logger.setup_logging options
       Restore.new(email, options).run
@@ -172,8 +172,8 @@ module Imap::Backup
       Configure email accounts to back up.
     DESC
     config_option
-    verbose_option
     quiet_option
+    verbose_option
     def setup
       Imap::Backup::Logger.setup_logging options
       Setup.new(options).run
@@ -186,8 +186,8 @@ module Imap::Backup
       are only present in the backup (as they have been deleted on the server) "local".
     DESC
     config_option
-    verbose_option
     quiet_option
+    verbose_option
     method_option(
       "format",
       type: :string,

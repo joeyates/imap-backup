@@ -13,21 +13,21 @@ module Imap::Backup
           )
         end
 
-        def self.verbose_option
-          method_option(
-            "verbose",
-            type: :boolean,
-            desc: "increase the amount of logging",
-            aliases: ["-v"]
-          )
-        end
-
         def self.quiet_option
           method_option(
             "quiet",
             type: :boolean,
             desc: "silence all output",
             aliases: ["-q"]
+          )
+        end
+
+        def self.verbose_option
+          method_option(
+            "verbose",
+            type: :boolean,
+            desc: "increase the amount of logging",
+            aliases: ["-v"]
           )
         end
       end
