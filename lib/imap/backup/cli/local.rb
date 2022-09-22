@@ -41,25 +41,21 @@ module Imap::Backup
 
     desc "list EMAIL FOLDER", "List emails in a folder"
     config_option
+    format_option
     def list(email, folder_name)
       config = load_config(**options)
       connection = connection(config, email)
 
-      folder_serializer, _folder = connection.local_folders.find do |(_s, f)|
+      serializer, _folder = connection.local_folders.find do |(_s, f)|
         f.name == folder_name
       end
-      raise "Folder '#{folder_name}' not found" if !folder_serializer
+      raise "Folder '#{folder_name}' not found" if !serializer
 
-      Kernel.puts format(
-        "%-10<uid>s  %-#{MAX_SUBJECT}<subject>s - %<date>s",
-        {uid: "UID", subject: "Subject", date: "Date"}
-      )
-      Kernel.puts "-" * (12 + MAX_SUBJECT + 28)
-
-      uids = folder_serializer.uids
-
-      folder_serializer.each_message(uids).map do |message|
-        list_message message
+      case options[:format]
+      when "json"
+        list_emails_as_json serializer
+      else
+        list_emails_as_text serializer
       end
     end
 
@@ -93,7 +89,30 @@ module Imap::Backup
     end
 
     no_commands do
-      def list_message(message)
+      def list_emails_as_json(serializer)
+        emails = serializer.each_message.map do |message|
+          {
+            uid: message.uid,
+            date: message.date.to_s,
+            subject: message.subject || ""
+          }
+        end
+        Kernel.puts emails.to_json
+      end
+
+      def list_emails_as_text(serializer)
+        Kernel.puts format(
+          "%-10<uid>s  %-#{MAX_SUBJECT}<subject>s - %<date>s",
+          {uid: "UID", subject: "Subject", date: "Date"}
+        )
+        Kernel.puts "-" * (12 + MAX_SUBJECT + 28)
+
+        serializer.each_message.map do |message|
+          list_message_as_text message
+        end
+      end
+
+      def list_message_as_text(message)
         m = {
           uid: message.uid,
           date: message.date.to_s,

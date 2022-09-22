@@ -19,6 +19,14 @@ RSpec.describe "Listing emails", type: :aruba do
     expect(last_command_started).to have_output(/1: Ciao/)
   end
 
+  context "when JSON is requested" do
+    it "lists emails" do
+      run_command_and_stop "imap-backup local list #{email} my_folder --format json"
+
+      expect(last_command_started).to have_output(/"subject":"Ciao"/)
+    end
+  end
+
   context "when a config path is supplied" do
     let(:custom_config_path) { File.join(File.expand_path("~/.imap-backup"), "foo.json") }
     let(:account) { other_server_connection_parameters }
