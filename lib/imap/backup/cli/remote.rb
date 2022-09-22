@@ -8,7 +8,7 @@ module Imap::Backup
     verbose_option
     quiet_option
     def folders(email)
-      config = load_config(**symbolized(options))
+      config = load_config(**options)
       connection = connection(config, email)
 
       connection.folder_names.each do |name|

@@ -1,22 +1,26 @@
 require "imap/backup/cli/helpers"
 
 module Imap::Backup
-  class WithHelpers
+  class WithHelpers < Thor
     include CLI::Helpers
+
+    def initialize(options)
+      super([], options, {})
+    end
   end
 
   RSpec.describe CLI::Helpers do
-    subject { WithHelpers.new }
+    subject { WithHelpers.new(options) }
 
     let(:email) { "email@example.com" }
     let(:account1) { instance_double(Account, username: email, connection: "c1") }
     let(:account2) { instance_double(Account, username: "foo", connection: "c2") }
     let(:accounts) { [account1, account2] }
     let(:config) { instance_double(Configuration, accounts: accounts) }
+    let(:options) { {} }
 
     describe ".load_config" do
       let(:exists) { true }
-      let(:options) { {} }
       let(:params) { {path: nil} }
       let(:config) { "Configuration" }
 
@@ -49,16 +53,16 @@ module Imap::Backup
       end
     end
 
-    describe ".symbolized" do
-      let(:arguments) { {"foo" => 1, "bar" => 2} }
-      let(:result) { subject.symbolized(arguments) }
+    describe ".options" do
+      let(:options) { {"foo" => 1, "bar" => 2} }
+      let(:result) { subject.options }
 
       it "converts string keys to symbols" do
         expect(result.keys).to eq([:foo, :bar])
       end
 
       context "when keys have hyphens" do
-        let(:arguments) { {"some-option" => 3} }
+        let(:options) { {"some-option" => 3} }
 
         it "replaces them with underscores" do
           expect(result.keys).to eq([:some_option])

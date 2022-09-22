@@ -54,8 +54,8 @@ module Imap::Backup
       aliases: ["-r"]
     )
     def backup
-      Imap::Backup::Logger.setup_logging symbolized(options)
-      Backup.new(symbolized(options)).run
+      Imap::Backup::Logger.setup_logging options
+      Backup.new(options).run
     end
 
     desc "local SUBCOMMAND [OPTIONS]", "View local info"
@@ -105,8 +105,8 @@ module Imap::Backup
       aliases: ["-s"]
     )
     def migrate(source_email, destination_email)
-      Imap::Backup::Logger.setup_logging symbolized(options)
-      Migrate.new(source_email, destination_email, **symbolized(options)).run
+      Imap::Backup::Logger.setup_logging options
+      Migrate.new(source_email, destination_email, **options).run
     end
 
     desc(
@@ -145,8 +145,8 @@ module Imap::Backup
       aliases: ["-s"]
     )
     def mirror(source_email, destination_email)
-      Imap::Backup::Logger.setup_logging symbolized(options)
-      Mirror.new(source_email, destination_email, **symbolized(options)).run
+      Imap::Backup::Logger.setup_logging options
+      Mirror.new(source_email, destination_email, **options).run
     end
 
     desc "remote SUBCOMMAND [OPTIONS]", "View info about online accounts"
@@ -162,8 +162,8 @@ module Imap::Backup
     verbose_option
     quiet_option
     def restore(email = nil)
-      Imap::Backup::Logger.setup_logging symbolized(options)
-      Restore.new(email, symbolized(options)).run
+      Imap::Backup::Logger.setup_logging options
+      Restore.new(email, options).run
     end
 
     desc "setup", "Configure imap-backup"
@@ -175,8 +175,8 @@ module Imap::Backup
     verbose_option
     quiet_option
     def setup
-      Imap::Backup::Logger.setup_logging symbolized(options)
-      Setup.new(symbolized(options)).run
+      Imap::Backup::Logger.setup_logging options
+      Setup.new(options).run
     end
 
     desc "stats EMAIL [OPTIONS]", "Print stats for each account folder"
@@ -195,8 +195,8 @@ module Imap::Backup
       aliases: ["-f"]
     )
     def stats(email)
-      Imap::Backup::Logger.setup_logging symbolized(options)
-      Stats.new(email, symbolized(options)).run
+      Imap::Backup::Logger.setup_logging options
+      Stats.new(email, options).run
     end
 
     desc "utils SUBCOMMAND [OPTIONS]", "Various utilities"

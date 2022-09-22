@@ -8,14 +8,14 @@ module Imap::Backup
     desc "accounts", "List locally backed-up accounts"
     config_option
     def accounts
-      config = load_config(**symbolized(options))
+      config = load_config(**options)
       config.accounts.each { |a| Kernel.puts a.username }
     end
 
     desc "folders EMAIL", "List backed up folders"
     config_option
     def folders(email)
-      config = load_config(**symbolized(options))
+      config = load_config(**options)
       connection = connection(config, email)
 
       connection.local_folders.each do |_s, f|
@@ -26,7 +26,7 @@ module Imap::Backup
     desc "list EMAIL FOLDER", "List emails in a folder"
     config_option
     def list(email, folder_name)
-      config = load_config(**symbolized(options))
+      config = load_config(**options)
       connection = connection(config, email)
 
       folder_serializer, _folder = connection.local_folders.find do |(_s, f)|
@@ -55,7 +55,7 @@ module Imap::Backup
     DESC
     config_option
     def show(email, folder_name, uids)
-      config = load_config(**symbolized(options))
+      config = load_config(**options)
       connection = connection(config, email)
 
       folder_serializer, _folder = connection.local_folders.find do |(_s, f)|

@@ -86,7 +86,7 @@ module Imap::Backup
       end
 
       context "when a profile_name is supplied" do
-        let(:options) { {"profile" => "profile"} }
+        let(:options) { {profile: "profile"} }
 
         context "when the supplied profile_name is not found" do
           let(:named_profile) { nil }
