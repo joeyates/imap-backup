@@ -6,11 +6,20 @@ RSpec.describe "Listing accounts", type: :aruba do
 
   before do
     create_config(**config_options)
+
     run_command_and_stop command
   end
 
   it "lists accounts" do
     expect(last_command_started).to have_output("me@example.com")
+  end
+
+  context "when JSON is requested" do
+    let(:command) { "imap-backup local accounts --format json" }
+
+    it "lists accounts" do
+      expect(last_command_started).to have_output('[{"username":"me@example.com"}]')
+    end
   end
 
   context "when a config path is supplied" do

@@ -13,12 +13,12 @@ module Imap::Backup
           )
         end
 
-        def self.verbose_option
+        def self.format_option
           method_option(
-            "verbose",
-            type: :boolean,
-            desc: "increase the amount of logging",
-            aliases: ["-v"]
+            "format",
+            type: :string,
+            desc: "the output type, 'text' for plain text or 'json'",
+            aliases: ["-f"]
           )
         end
 
@@ -30,13 +30,37 @@ module Imap::Backup
             aliases: ["-q"]
           )
         end
+
+        def self.verbose_option
+          method_option(
+            "verbose",
+            type: :boolean,
+            desc: "increase the amount of logging",
+            aliases: ["-v"]
+          )
+        end
       end
     end
 
+    def options
+      @symbolized_options ||=
+        begin
+          options = super()
+          options.each.with_object({}) do |(k, v), acc|
+            key =
+              if k.is_a?(String)
+                k.gsub("-", "_").intern
+              else
+                k
+              end
+            acc[key] = v
+          end
+        end
+    end
+
     def load_config(**options)
-      opts = symbolized(options)
-      path = opts[:config]
-      require_exists = opts.key?(:require_exists) ? opts[:require_exists] : true
+      path = options[:config]
+      require_exists = options.key?(:require_exists) ? options[:require_exists] : true
       if require_exists
         exists = Configuration.exist?(path: path)
         if !exists
@@ -45,18 +69,6 @@ module Imap::Backup
         end
       end
       Configuration.new(path: path)
-    end
-
-    def symbolized(options)
-      options.each.with_object({}) do |(k, v), acc|
-        key =
-          if k.is_a?(String)
-            k.gsub("-", "_").intern
-          else
-            k
-          end
-        acc[key] = v
-      end
     end
 
     def account(config, email)

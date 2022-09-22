@@ -17,6 +17,15 @@ RSpec.describe "Show an email", type: :aruba do
     expect(last_command_started).to have_output(to_serialized(**msg1))
   end
 
+  context "when JSON is requested" do
+    it "shows the email" do
+      run_command_and_stop "imap-backup local show #{email} my_folder 99 --format json"
+
+      expected = /"body":"#{to_serialized(**msg1)}\n"/
+      expect(last_command_started).to have_output(expected)
+    end
+  end
+
   context "when a config path is supplied" do
     let(:account) { other_server_connection_parameters }
     let(:custom_config_path) { File.join(File.expand_path("~/.imap-backup"), "foo.json") }

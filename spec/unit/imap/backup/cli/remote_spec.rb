@@ -17,7 +17,7 @@ module Imap::Backup
       subject.folders(account.username)
     end
 
-    it "prints counts of emails to be backed up" do
+    it "prints names of emails to be backed up" do
       expect(Kernel).to have_received(:puts).with('"foo"')
     end
   end

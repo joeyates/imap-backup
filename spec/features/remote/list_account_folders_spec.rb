@@ -15,6 +15,16 @@ RSpec.describe "List account folders", type: :aruba, docker: true do
     expect(last_command_started).to have_output(/"INBOX"/)
   end
 
+  context "when JSON is requested" do
+    let(:command) { "imap-backup remote folders #{account[:username]} --format json" }
+
+    it "lists folders as JSON" do
+      run_command_and_stop command
+
+      expect(last_command_started).to have_output(/\{"name":"INBOX"\}/)
+    end
+  end
+
   context "when a config path is supplied" do
     let(:custom_config_path) { File.join(File.expand_path("~/.imap-backup"), "foo.json") }
     let(:config_options) do
