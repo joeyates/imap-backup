@@ -43,7 +43,7 @@ module Imap::Backup
     end
 
     def options
-      @symbolized_options ||=
+      @symbolized_options ||= # rubocop:disable Naming/MemoizedInstanceVariableName
         begin
           options = super()
           options.each.with_object({}) do |(k, v), acc|

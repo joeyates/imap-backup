@@ -134,10 +134,10 @@ module Imap::Backup
         serializer.each_message(uids).each do |message|
           if uids.count > 1
             Kernel.puts <<~HEADER
-            #{'-' * 80}
-            #{format('| UID: %-71s |', message.uid)}
-            #{'-' * 80}
-          HEADER
+              #{'-' * 80}
+              #{format('| UID: %-71s |', message.uid)}
+              #{'-' * 80}
+            HEADER
           end
           Kernel.puts message.body
         end
