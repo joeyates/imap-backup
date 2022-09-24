@@ -20,7 +20,9 @@ RSpec.describe "restore", type: :aruba, docker: true do
     create_config(**config_options)
     create_local_folder email: account[:username], folder: folder, uid_validity: uid_validity
     append_local email: account[:username], folder: folder, flags: [:Flagged], **msg1
-    append_local email: account[:username], folder: folder, flags: [:Draft], **msg2
+    append_local(
+      email: account[:username], folder: folder, flags: [:Draft, :$NON_SYSTEM_FLAG], **msg2
+    )
 
     run_command_and_stop("imap-backup restore #{account[:username]}")
   end

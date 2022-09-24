@@ -14,7 +14,7 @@ RSpec.describe "Migration", type: :aruba, docker: true do
 
   let!(:setup) do
     create_config(**config_options)
-    append_local(email: email, folder: folder, subject: "Ciao", flags: [:Draft])
+    append_local(email: email, folder: folder, subject: "Ciao", flags: [:Draft, :$CUSTOM])
   end
 
   after do

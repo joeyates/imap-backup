@@ -227,7 +227,7 @@ module Imap::Backup
           Serializer::Message,
           imap_body: "imap body",
           date: message_date,
-          flags: [:MyFlag]
+          flags: %i(Draft MyFlag)
         )
       end
       let(:message_date) { Time.new(2010, 10, 10, 9, 15, 22, 0) }
@@ -248,9 +248,9 @@ module Imap::Backup
         subject.append(message)
       end
 
-      it "sets the flags" do
+      it "sets permitted flags" do
         expect(client).to receive(:append).
-          with(anything, anything, [:MyFlag], anything)
+          with(anything, anything, [:Draft], anything)
 
         subject.append(message)
       end
