@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   chosen by the user are the ones to **include**,
 * Provision of JSON output for the 'remote folders' command,
 * A 'remote namespaces' command to help with configuration of
-  the 'mirgate' and 'mirror' commands.
+  the 'migrate' and 'mirror' commands.
 
 ### Changed
 
