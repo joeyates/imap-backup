@@ -7,8 +7,7 @@
 
 Backup, restore and migrate email accounts.
 
-The backups can then be restored, used to migrate to another service,
-inspected or exported.
+Backups can also be inspected and exported.
 
   * [Source Code]
   * [Code Documentation]
