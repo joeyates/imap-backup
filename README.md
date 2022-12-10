@@ -7,8 +7,12 @@
 
 Backup, restore and migrate email accounts.
 
-Backups can also be inspected and exported.
+# Main Functionality
 
+* Backup - progressively save a local copy of all emails,
+* Mirror - keep the local copy up to date with the server by adding and deleting local emails,
+* Migrate - make a copy of one account to another, deleting anything on the destination account as necessary,
+* Restore - push a local backup (a 'backup' or 'mirror') and push it back to the server, renaming anything that doesn't match.
 
 # Installation
 
@@ -56,6 +60,8 @@ imap-backup
 ```
 
 Alternatively, add it to your crontab.
+
+Backups can also be inspected and exported.
 
 # Commands
 
