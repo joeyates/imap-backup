@@ -14,6 +14,8 @@ Backup, restore and migrate email accounts.
 * Migrate - make a copy of one account to another, deleting anything on the destination account as necessary,
 * Restore - push a local backup (a 'backup' or 'mirror') and push it back to the server, renaming anything that doesn't match.
 
+See below for a [full list of commands](#Commands).
+
 # Installation
 
 ## Homebrew (macOS)
