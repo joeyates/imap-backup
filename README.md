@@ -17,6 +17,7 @@ There are two types of backups:
 # What You Can Do with a Backup
 
 * Migrate - use the backup to make a copy to another account, deleting anything on the destination account as necessary (it refuses to merge content from two accounts),
+* Mirror - make a destination account match the local copy. This action can be repeated.
 * Restore - push a local backup (a 'backup' or 'mirror') back to the original account.
 
 See below for a [full list of commands](#Commands).
