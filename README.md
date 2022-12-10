@@ -11,7 +11,7 @@ Backup, restore and migrate email accounts.
 
 There are two types of backups:
 
-* Backup - progressively save a local copy of all emails,
+* Backup (the default) - progressively saves a local copy of all emails,
 * Mirror - adds and deletes emails from the local copy to keep it up to date with the account.
 
 # What You Can Do with a Backup
