@@ -10,7 +10,7 @@ Backup, restore and migrate email accounts.
 # Main Functionality
 
 * Backup - progressively save a local copy of all emails,
-* Mirror - keep the local copy up to date with the server by adding and deleting local emails,
+* Mirror - add and delete emails from the local backup to keep it up to date with the account,
 * Migrate - make a copy of one account to another, deleting anything on the destination account as necessary,
 * Restore - push a local backup (a 'backup' or 'mirror') and push it back to the server, renaming anything that doesn't match.
 
