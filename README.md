@@ -69,7 +69,8 @@ imap-backup
 
 Alternatively, add it to your crontab.
 
-Backups can also be inspected and exported.
+Backups can also be inspected, for example via [local show](docs/commands/local-show.md)
+and exported via [utils export-to-thunderbird](docs/commands/utils-export-to-thunderbird.md).
 
 # Commands
 
