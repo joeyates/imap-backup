@@ -104,7 +104,7 @@ imap-backup help COMMAND
 If you have problems:
 
 1. ensure that you have the latest release,
-2. turn on debugging output via the `imap-backup setup` main menu.
+2. run `imap-backup` with the `-v` or `--verbose` parameter.
 
 # Development
 
