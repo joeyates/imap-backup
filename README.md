@@ -11,14 +11,14 @@ Backup, restore and migrate email accounts.
 
 There are two types of backups:
 
-* Backup (the default) - progressively saves a local copy of all emails,
+* Keep all (the default) - progressively saves a local copy of all emails,
 * Mirror - adds and deletes emails from the local copy to keep it up to date with the account.
 
 # What You Can Do with a Backup
 
-* Migrate - use the backup to make a copy to another account, deleting anything on the destination account as necessary (it refuses to merge content from two accounts),
+* Migrate - use the local copy to populate emails on another account. This is a once-only action that deletes any existing emails on the destination account.
 * Mirror - make a destination account match the local copy. This action can be repeated.
-* Restore - push a local backup (a 'backup' or 'mirror') back to the original account.
+* Restore - push the local copy back to the original account.
 
 See below for a [full list of commands](#Commands).
 
