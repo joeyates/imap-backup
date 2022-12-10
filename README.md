@@ -9,15 +9,6 @@ Backup, restore and migrate email accounts.
 
 Backups can also be inspected and exported.
 
-  * [Source Code]
-  * [Code Documentation]
-  * [Rubygem]
-  * [CI Status]
-
-[Source Code]: https://github.com/joeyates/imap-backup "Source code at GitHub"
-[Code Documentation]: https://rubydoc.info/gems/imap-backup/frames "Code Documentation at Rubydoc.info"
-[Rubygem]: https://rubygems.org/gems/imap-backup "Ruby gem at rubygems.org"
-[CI Status]: https://github.com/joeyates/imap-backup/actions/workflows/main.yml
 
 # Installation
 
@@ -107,3 +98,13 @@ on development and testing.
 
 See [the CHANGELOG](./CHANGELOG.md) to a list of changes that have been
 made in each release.
+
+* [Source Code]
+* [Code Documentation]
+* [Rubygem]
+* [CI Status]
+
+[Source Code]: https://github.com/joeyates/imap-backup "Source code at GitHub"
+[Code Documentation]: https://rubydoc.info/gems/imap-backup/frames "Code Documentation at Rubydoc.info"
+[Rubygem]: https://rubygems.org/gems/imap-backup "Ruby gem at rubygems.org"
+[CI Status]: https://github.com/joeyates/imap-backup/actions/workflows/main.yml
