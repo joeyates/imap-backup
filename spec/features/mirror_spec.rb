@@ -171,7 +171,7 @@ RSpec.describe "Mirroring", type: :aruba, docker: true do
         "--config #{custom_config_path}"
     end
 
-    it "works" do
+    it "copies messages" do
       run_command_and_stop command
 
       messages = other_server.folder_messages(folder).map { |m| server_message_to_body(m) }

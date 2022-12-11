@@ -232,7 +232,10 @@ module Imap::Backup
       end
       let(:message_date) { Time.new(2010, 10, 10, 9, 15, 22, 0) }
       let(:append_response) do
-        OpenStruct.new(data: OpenStruct.new(code: OpenStruct.new(data: "1 2")))
+        uid_data = instance_double(
+          Net::IMAP::UIDPlusData, uidvalidity: 1, assigned_uids: [2]
+        )
+        OpenStruct.new(data: OpenStruct.new(code: OpenStruct.new(data: uid_data)))
       end
 
       it "appends the message" do

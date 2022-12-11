@@ -40,7 +40,7 @@ RSpec.describe "Listing account folders", type: :aruba do
     let(:config_options) { {path: custom_config_path, accounts: [account]} }
     let(:command) { "imap-backup local folders #{email} --config #{custom_config_path}" }
 
-    it "works" do
+    it "lists folders" do
       expect(last_command_started).to have_output('"my_folder"')
     end
   end

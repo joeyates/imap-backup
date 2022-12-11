@@ -18,7 +18,7 @@ RSpec.describe "setup", type: :aruba do
   context "when the configuration file does not exist" do
     let(:setup) {}
 
-    it "works" do
+    it "does not raise any errors" do
       run_command command
       last_command_started.write "q\n"
       last_command_started.stop

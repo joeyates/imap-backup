@@ -55,7 +55,7 @@ RSpec.describe "stats", type: :aruba, docker: true do
       other_server.disconnect
     end
 
-    it "works" do
+    it "lists statistics" do
       run_command_and_stop command
 
       expect(last_command_started).to have_output(/ciao\s+\|\s+1\|\s+0\|\s+0/)

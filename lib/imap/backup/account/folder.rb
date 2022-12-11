@@ -154,8 +154,9 @@ module Imap::Backup
     end
 
     def extract_uid(response)
-      @uid_validity, uid = response.data.code.data.split.map(&:to_i)
-      uid
+      uid_data = response.data.code.data
+      @uid_validity = uid_data.uidvalidity
+      uid_data.assigned_uids.first
     end
 
     def utf7_encoded_name

@@ -38,7 +38,7 @@ RSpec.describe "Migration", type: :aruba, docker: true do
       )
     end
 
-    it "works" do
+    it "does not raise any errors" do
       run_command_and_stop(
         "imap-backup migrate " \
         "#{email} " \

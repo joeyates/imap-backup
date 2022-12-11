@@ -35,7 +35,7 @@ RSpec.describe "configuring accounts", type: :aruba do
     end
     let(:local_path) { "c:\\my_user\\backup" }
 
-    it "works" do
+    it "displays the path correctly" do
       run_command "imap-backup setup"
       last_command_started.write "#{email}\n"
       last_command_started.write "q\n"
