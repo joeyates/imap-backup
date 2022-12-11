@@ -7,18 +7,20 @@
 
 Backup, restore and migrate email accounts.
 
-The backups can then be restored, used to migrate to another service,
-inspected or exported.
+# Modes
 
-  * [Source Code]
-  * [Code Documentation]
-  * [Rubygem]
-  * [CI Status]
+There are two types of backups:
 
-[Source Code]: https://github.com/joeyates/imap-backup "Source code at GitHub"
-[Code Documentation]: https://rubydoc.info/gems/imap-backup/frames "Code Documentation at Rubydoc.info"
-[Rubygem]: https://rubygems.org/gems/imap-backup "Ruby gem at rubygems.org"
-[CI Status]: https://github.com/joeyates/imap-backup/actions/workflows/main.yml
+* Keep all (the default) - progressively saves a local copy of all emails,
+* Mirror - adds and deletes emails from the local copy to keep it up to date with the account.
+
+# What You Can Do with a Backup
+
+* Migrate - use the local copy to populate emails on another account. This is a once-only action that deletes any existing emails on the destination account.
+* Mirror - make a destination account match the local copy. This action can be repeated.
+* Restore - push the local copy back to the original account.
+
+See below for a [full list of commands](#Commands).
 
 # Installation
 
@@ -67,6 +69,9 @@ imap-backup
 
 Alternatively, add it to your crontab.
 
+Backups can also be inspected, for example via [local show](docs/commands/local-show.md)
+and exported via [utils export-to-thunderbird](docs/commands/utils-export-to-thunderbird.md).
+
 # Commands
 
 * [backup](docs/commands/backup.md)
@@ -99,7 +104,7 @@ imap-backup help COMMAND
 If you have problems:
 
 1. ensure that you have the latest release,
-2. turn on debugging output via the `imap-backup setup` main menu.
+2. run `imap-backup` with the `-v` or `--verbose` parameter.
 
 # Development
 
@@ -108,3 +113,13 @@ on development and testing.
 
 See [the CHANGELOG](./CHANGELOG.md) to a list of changes that have been
 made in each release.
+
+* [Source Code]
+* [Code Documentation]
+* [Rubygem]
+* [CI Status]
+
+[Source Code]: https://github.com/joeyates/imap-backup "Source code at GitHub"
+[Code Documentation]: https://rubydoc.info/gems/imap-backup/frames "Code Documentation at Rubydoc.info"
+[Rubygem]: https://rubygems.org/gems/imap-backup "Ruby gem at rubygems.org"
+[CI Status]: https://github.com/joeyates/imap-backup/actions/workflows/main.yml
