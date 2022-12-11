@@ -42,7 +42,7 @@ RSpec.describe "Show an email", type: :aruba do
     end
     let(:command) { "imap-backup local show #{email} --config #{custom_config_path}" }
 
-    it "works" do
+    it "shows emails correctly" do
       run_command_and_stop(
         "imap-backup local show #{email} my_folder 99 --config #{custom_config_path}"
       )

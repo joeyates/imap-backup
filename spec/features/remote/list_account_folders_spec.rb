@@ -35,7 +35,7 @@ RSpec.describe "List account folders", type: :aruba, docker: true do
       "imap-backup remote folders #{account[:username]} --config #{custom_config_path}"
     end
 
-    it "works" do
+    it "lists folders" do
       run_command_and_stop command
 
       expect(last_command_started).to have_output(/"INBOX"/)

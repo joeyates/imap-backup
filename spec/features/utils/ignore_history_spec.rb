@@ -48,7 +48,7 @@ RSpec.describe "ignore history", type: :aruba, docker: true do
     let(:custom_config_path) { File.join(File.expand_path("~/.imap-backup"), "foo.json") }
     let(:config_options) { {path: custom_config_path, accounts: [account]} }
 
-    it "works" do
+    it "creates the required dummy messages" do
       run_command_and_stop(
         "imap-backup utils ignore-history #{email} --config #{custom_config_path}"
       )

@@ -190,7 +190,7 @@ RSpec.describe "restore", type: :aruba, docker: true do
       )
     end
 
-    it "works" do
+    it "does not raise any errors" do
       run_command_and_stop(
         "imap-backup restore #{account[:username]} --config #{custom_config_path}"
       )

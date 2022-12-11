@@ -42,7 +42,7 @@ RSpec.describe "Listing emails", type: :aruba do
       other_server.disconnect
     end
 
-    it "works" do
+    it "lists emails" do
       run_command_and_stop(
         "imap-backup local list #{email} my_folder --config #{custom_config_path}"
       )
