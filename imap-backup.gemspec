@@ -23,7 +23,7 @@ Gem::Specification.new do |gem|
 
   gem.add_runtime_dependency "highline"
   gem.add_runtime_dependency "mail"
-  gem.add_runtime_dependency "net-imap"
+  gem.add_runtime_dependency "net-imap", ">= 0.3.2"
   gem.add_runtime_dependency "net-smtp"
   gem.add_runtime_dependency "os"
   gem.add_runtime_dependency "rake"
