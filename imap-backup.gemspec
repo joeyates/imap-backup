@@ -22,7 +22,7 @@ Gem::Specification.new do |gem|
   gem.required_ruby_version = ">= 2.6"
 
   gem.add_runtime_dependency "highline"
-  gem.add_runtime_dependency "mail"
+  gem.add_runtime_dependency "mail", "2.7.1"
   gem.add_runtime_dependency "net-imap", ">= 0.3.2"
   gem.add_runtime_dependency "net-smtp"
   gem.add_runtime_dependency "os"
