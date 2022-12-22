@@ -2,10 +2,8 @@ module Imap::Backup
   class CLI::FolderEnumerator
     attr_reader :destination
     attr_reader :destination_delimiter
-    attr_reader :destination_prefix
     attr_reader :source
     attr_reader :source_delimiter
-    attr_reader :source_prefix
 
     def initialize(
       destination:,
@@ -37,18 +35,36 @@ module Imap::Backup
 
     private
 
+    def destination_prefix_clipped
+      @destination_prefix_clipped ||=
+        if @destination_prefix.end_with?(destination_delimiter)
+          @destination_prefix[0..-2]
+        else
+          @destination_prefix
+        end
+    end
+
+    def source_prefix_clipped
+      @source_prefix_clipped ||=
+        if @source_prefix.end_with?(source_delimiter)
+          @source_prefix[0..-2]
+        else
+          @source_prefix
+        end
+    end
+
     def destination_folder_for(name)
       parts = name.split(source_delimiter)
       no_source_prefix =
-        if source_prefix != "" && parts.first == source_prefix
+        if source_prefix_clipped != "" && parts.first == source_prefix_clipped
           parts[1..-1]
         else
           parts
         end
 
       with_destination_prefix =
-        if destination_prefix && destination_prefix != ""
-          no_source_prefix.unshift(destination_prefix)
+        if destination_prefix_clipped && destination_prefix_clipped != ""
+          no_source_prefix.unshift(destination_prefix_clipped)
         else
           no_source_prefix
         end

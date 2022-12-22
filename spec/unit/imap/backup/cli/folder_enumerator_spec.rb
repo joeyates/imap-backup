@@ -42,6 +42,15 @@ module Imap::Backup
       end
     end
 
+    context "when the destination_prefix ends with the delimiter" do
+      let(:options) { super().merge(destination_delimiter: ":", destination_prefix: "dest:") }
+      let(:imap_pathname) { Pathname.new("path/foo.imap") }
+
+      it "removes the delimiter" do
+        expect(result[1].name).to eq("dest:foo")
+      end
+    end
+
     context "when source_delimiter is supplied" do
       let(:options) { super().merge(source_delimiter: ".") }
       let(:imap_pathname) { Pathname.new("path/src.foo.imap") }
@@ -56,6 +65,15 @@ module Imap::Backup
       let(:imap_pathname) { Pathname.new("path/src/foo.imap") }
 
       it "removes the prefix" do
+        expect(result[1].name).to eq("foo")
+      end
+    end
+
+    context "when the source_prefix ends with the delimiter" do
+      let(:options) { super().merge(source_delimiter: ":", source_prefix: "src:") }
+      let(:imap_pathname) { Pathname.new("path/src:foo.imap") }
+
+      it "removes the delimiter" do
         expect(result[1].name).to eq("foo")
       end
     end
