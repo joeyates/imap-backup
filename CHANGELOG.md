@@ -1,8 +1,15 @@
 # Change Log
+
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
+
+## 9.0.0.rc1 - ???
+
+### Added
+
+* Options for setting source and destination delimiters for the `migrate` and `mirror` commands.
 
 ## 8.0.1 - 2022-09-24
 
