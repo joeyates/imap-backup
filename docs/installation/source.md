@@ -27,3 +27,17 @@ Check that it runs
 ```sh
 bin/imap-backup help
 ```
+
+Install dependencies
+
+```sh
+cd imap-backup
+gem install bundler --version=2.3.22
+bundle install
+```
+
+Check that it runs
+
+```sh
+bin/imap-backup help
+```
