@@ -40,11 +40,9 @@ module Imap::Backup
 
     %i[
       destination_delimiter
-      destination_email
       destination_prefix
-      config_path
+      config
       source_delimiter
-      source_email
       source_prefix
     ].each do |option|
       it "accepts a #{option} option" do
