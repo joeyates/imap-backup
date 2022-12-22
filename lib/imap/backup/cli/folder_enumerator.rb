@@ -57,7 +57,7 @@ module Imap::Backup
       parts = name.split(source_delimiter)
       no_source_prefix =
         if source_prefix_clipped != "" && parts.first == source_prefix_clipped
-          parts[1..-1]
+          parts[1..]
         else
           parts
         end

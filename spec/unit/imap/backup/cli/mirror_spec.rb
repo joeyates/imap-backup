@@ -38,21 +38,18 @@ module Imap::Backup
       expect(mirror).to have_received(:run)
     end
 
-    context "options" do
-      %i[
-        destination_delimiter
-        destination_email
-        destination_prefix
-        config_path
-        source_delimiter
-        source_email
-        source_prefix
-      ].each do |option|
-        let(:options) { super().merge(option => "foo") }
-
-        it "accepts a #{option} option" do
-          subject
-        end
+    %i[
+      destination_delimiter
+      destination_email
+      destination_prefix
+      config_path
+      source_delimiter
+      source_email
+      source_prefix
+    ].each do |option|
+      it "accepts a #{option} option" do
+        opts = options.merge(option => "foo")
+        described_class.new(source, destination, **opts)
       end
     end
   end

@@ -25,7 +25,7 @@ module Imap::Backup
       expect(result[1].name).to eq("foo")
     end
 
-    context "defaults" do
+    context "without provided values" do
       let(:path) { "path/foo/bar.imap" }
 
       specify "delimiters default to '/'" do
