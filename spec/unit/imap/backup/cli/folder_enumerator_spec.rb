@@ -25,6 +25,14 @@ module Imap::Backup
       expect(result[1].name).to eq("foo")
     end
 
+    context "defaults" do
+      let(:path) { "path/foo/bar.imap" }
+
+      specify "delimiters default to '/'" do
+        expect(result[1].name).to eq("foo/bar")
+      end
+    end
+
     context "when destination_delimiter is supplied" do
       let(:options) { super().merge(destination_delimiter: ".") }
       let(:path) { "path/bar/foo.imap" }
