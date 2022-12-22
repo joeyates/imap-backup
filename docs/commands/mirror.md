@@ -17,3 +17,8 @@ If the local copy is in 'keep all' mode, the destination account will gradually 
 
 On the other hand, if the local copy is in 'mirror' mode, the destination account will have the same emails
 as the source account.
+
+# Delimiters and Prefixes
+
+For details of the delimiter and prefix options,
+see [the note about delimiters and prefixes](../delimiters-and-prefixes.md).
