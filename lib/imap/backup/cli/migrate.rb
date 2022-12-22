@@ -5,10 +5,12 @@ module Imap::Backup
     include Thor::Actions
     include CLI::Helpers
 
+    attr_reader :destination_delimiter
     attr_reader :destination_email
     attr_reader :destination_prefix
     attr_reader :config_path
     attr_reader :reset
+    attr_reader :source_delimiter
     attr_reader :source_email
     attr_reader :source_prefix
 
@@ -16,15 +18,19 @@ module Imap::Backup
       source_email,
       destination_email,
       config: nil,
+      destination_delimiter: "/",
       destination_prefix: "",
       reset: false,
+      source_delimiter: "/",
       source_prefix: ""
     )
       super([])
+      @destination_delimiter = destination_delimiter
       @destination_email = destination_email
       @destination_prefix = destination_prefix
       @config_path = config
       @reset = reset
+      @source_delimiter = source_delimiter
       @source_email = source_email
       @source_prefix = source_prefix
     end
