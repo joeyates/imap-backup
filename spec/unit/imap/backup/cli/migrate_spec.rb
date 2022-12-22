@@ -9,15 +9,17 @@ module Imap::Backup
     let(:account1) { instance_double(Account, username: "source", local_path: "path") }
     let(:account2) { instance_double(Account, username: "destination", connection: connection) }
     let(:connection) { instance_double(Account::Connection) }
+    let(:serializer) { instance_double(Serializer) }
+    let(:folder) { instance_double(Account::Folder) }
     let(:migrator) { instance_double(Migrator, run: nil) }
-    let(:imap_pathname) { Pathname.new("path/foo.imap") }
+    let(:folder_enumerator) { instance_double(CLI::FolderEnumerator) }
 
     before do
       allow(Configuration).to receive(:exist?) { true }
       allow(Configuration).to receive(:new) { config }
-      allow(Pathname).to receive(:glob).and_yield(imap_pathname)
       allow(Migrator).to receive(:new) { migrator }
-      allow(Account::Folder).to receive(:new).and_call_original
+      allow(CLI::FolderEnumerator).to receive(:new) { folder_enumerator }
+      allow(folder_enumerator).to receive(:each).and_yield(serializer, folder)
     end
 
     it "migrates each folder" do
@@ -56,25 +58,21 @@ module Imap::Backup
       end
     end
 
-    context "when source_prefix is supplied" do
-      let(:options) { {source_prefix: "src/"} }
-      let(:imap_pathname) { Pathname.new("path/src/foo.imap") }
+    context "options" do
+      %i[
+        destination_delimiter
+        destination_email
+        destination_prefix
+        config_path
+        source_delimiter
+        source_email
+        source_prefix
+      ].each do |option|
+        let(:options) { super().merge(option => "foo") }
 
-      it "removes the prefix" do
-        subject.run
-
-        expect(Account::Folder).to have_received(:new).with(anything, "foo")
-      end
-    end
-
-    context "when destination_prefix is supplied" do
-      let(:options) { {destination_prefix: "dest/"} }
-      let(:imap_pathname) { Pathname.new("path/foo.imap") }
-
-      it "removes the prefix" do
-        subject.run
-
-        expect(Account::Folder).to have_received(:new).with(anything, "dest/foo")
+        it "accepts a #{option} option" do
+          subject
+        end
       end
     end
   end

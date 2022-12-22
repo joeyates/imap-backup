@@ -16,13 +16,16 @@ module Imap::Backup
     let(:connection1) { instance_double(Account::Connection, "connection1", run_backup: nil) }
     let(:account2) { instance_double(Account, username: destination, connection: connection2) }
     let(:connection2) { instance_double(Account::Connection, "connection2") }
-    let(:pathname) { Pathname.new("path/folder.imap") }
+    let(:serializer) { instance_double(Serializer) }
+    let(:folder) { instance_double(Account::Folder) }
+    let(:folder_enumerator) { instance_double(CLI::FolderEnumerator) }
 
     before do
       allow(Configuration).to receive(:exist?) { true }
       allow(Configuration).to receive(:new) { config }
       allow(Mirror).to receive(:new) { mirror }
-      allow(Pathname).to receive(:glob).and_yield(pathname)
+      allow(CLI::FolderEnumerator).to receive(:new) { folder_enumerator }
+      allow(folder_enumerator).to receive(:each).and_yield(serializer, folder)
 
       subject.run
     end
@@ -33,6 +36,24 @@ module Imap::Backup
 
     it "mirrors each folder" do
       expect(mirror).to have_received(:run)
+    end
+
+    context "options" do
+      %i[
+        destination_delimiter
+        destination_email
+        destination_prefix
+        config_path
+        source_delimiter
+        source_email
+        source_prefix
+      ].each do |option|
+        let(:options) { super().merge(option => "foo") }
+
+        it "accepts a #{option} option" do
+          subject
+        end
+      end
     end
   end
 end
