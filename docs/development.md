@@ -56,6 +56,11 @@ uids = imap.uid_search(["ALL"]).sort
 fetch_data_items = imap.uid_fetch(uids, ["BODY[]"])
 ```
 
+# Older Ruby Versions
+
+Dockerfiles are available for all the supported Ruby versions,
+see the `docker` directory.
+
 # Contributing
 
 1. Fork it
