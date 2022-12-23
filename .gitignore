@@ -4,7 +4,6 @@ Gemfile.lock
 coverage
 /doc
 pkg
-.rbenv-version
 vendor
 /tmp
 /.yardoc/
