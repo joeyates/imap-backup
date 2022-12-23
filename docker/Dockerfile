@@ -1,4 +1,5 @@
-FROM ruby:3.1-buster
+ARG RUBY_VERSION
+FROM ruby:$RUBY_VERSION-buster
 
 # Install dependencies
 RUN \

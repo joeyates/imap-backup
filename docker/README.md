@@ -1,7 +1,7 @@
 # Build an Image
 
 ```sh
-podman build --file docker/Dockerfile-[VERSION] --tag imap-backup:VERSION .
+podman build --file docker/Dockerfile --build-arg=[VERSION] --tag imap-backup:VERSION .
 ```
 
 # Run an Image
