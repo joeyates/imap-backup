@@ -1,18 +1,28 @@
 FROM ruby:3.1-buster
 
-RUN apt update
+# Install dependencies
+RUN \
+  apt update && \
+  apt install --yes libffi-dev
 
-RUN apt install --yes libffi-dev
+# Run as an unprivileged user
+RUN \
+  mkdir /app && \
+  groupadd -r user && \
+  useradd --system --create-home --gid user user && \
+  chown user: /app
+
+WORKDIR /app
+USER user
 
 RUN gem install bundler --version=2.1.4
 
-RUN mkdir /app
-WORKDIR /app
 COPY Gemfile .
 COPY imap-backup.gemspec .
-COPY Gemfile.lock .
-COPY lib lib
+COPY lib/imap/backup/version.rb lib/imap/backup/version.rb
+
 RUN bundle install
+
 COPY . .
 
 ENTRYPOINT ["bash"]
