@@ -1,8 +1,10 @@
 FROM ruby:2.7.6-buster
 
-RUN apt update
+# Install dependencies
+RUN \
+  apt update && \
+  apt install --yes libffi-dev
 
-RUN apt install --yes libffi-dev
 
 RUN gem install bundler --version=2.1.4
 
