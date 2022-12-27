@@ -4,6 +4,11 @@
 * Restartable - calculate start point based on already downloaded messages
 * Standalone - do not rely on an email client or MTA
 
+# Development
+
+A setup for developing under any available Ruby version is
+available in the container directory.
+
 # Testing
 
 ## Feature Specs
