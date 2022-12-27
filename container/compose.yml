@@ -1,0 +1,30 @@
+# This file adapted from github.com/antespi/docker-imap-devel
+version: "3"
+
+services:
+  imap:
+    image: antespi/docker-imap-devel:latest
+    container_name: imap
+    ports:
+    - "8993:993"
+    environment:
+    - MAILNAME=example.com
+    - MAIL_ADDRESS=me@example.com
+    - MAIL_PASS=pass
+  imap-backup:
+    build:
+      context: .
+      args:
+      - RUBY_VERSION
+    image: imap-backup:${RUBY_VERSION}
+    container_name: imap-backup
+    tty: true
+    stdin_open: true
+    user: $ID
+    environment:
+    - RUBY_VERSION=$RUBY_VERSION
+    - BUNDLE_PATH=/app/vendor
+    - BUNDLE_BINSTUBS=./bin/stubs
+    - HOME=/app
+    volumes:
+      - ..:/app
