@@ -15,8 +15,8 @@ RUBY_VERSION=[VERSION] ID=$(id -u) docker-compose --file container/compose.yml d
 # Setup
 
 It's best to delete any `Gemfile.lock` you may have
-in order to get versions which
-are incompatible with the Ruby version you are using.
+in order to get gem versions which
+are compatible with the Ruby version you are using.
 
 ```sh
 rm Gemfile.lock
