@@ -2,9 +2,9 @@
   "version": "2.0",
   "accounts": [
     {
-      "username": "me@example.com",
+      "username": "address@example.com",
       "password": "pass",
-      "local_path": ".",
+      "local_path": "tmp/imap-backup",
       "server": "imap",
       "connection_options": {
         "port": 993,
