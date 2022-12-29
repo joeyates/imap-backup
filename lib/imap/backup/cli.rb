@@ -69,8 +69,11 @@ module Imap::Backup
       All emails which have been backed up for the "source account" (SOURCE_EMAIL) are
       uploaded to the "destination account" (DESTINATION_EMAIL).
 
-      When one or other account has namespaces (i.e. prefixes like "INBOX."),
+      When one or other account has namespaces (i.e. prefixes like "INBOX"),
       use the `--source-prefix=` and/or `--destination-prefix=` options.
+
+      When one or other account uses a delimiter other than `/` (i.e. `.`),
+      use the `--source-delimiter=` and/or `--destination-delimiter=` options.
 
       Usually, you should migrate to an account with empty folders.
 
@@ -87,6 +90,11 @@ module Imap::Backup
     quiet_option
     verbose_option
     method_option(
+      "destination-delimiter",
+      type: :string,
+      desc: "the delimiter for destination folder names"
+    )
+    method_option(
       "destination-prefix",
       type: :string,
       desc: "the prefix (namespace) to add to destination folder names",
@@ -97,6 +105,11 @@ module Imap::Backup
       type: :boolean,
       desc: "DANGER! This option deletes all messages from destination folders before uploading",
       aliases: ["-r"]
+    )
+    method_option(
+      "source-delimiter",
+      type: :string,
+      desc: "the delimiter for source folder names"
     )
     method_option(
       "source-prefix",
@@ -133,10 +146,20 @@ module Imap::Backup
     quiet_option
     verbose_option
     method_option(
+      "destination-delimiter",
+      type: :string,
+      desc: "the delimiter for destination folder names"
+    )
+    method_option(
       "destination-prefix",
       type: :string,
       desc: "the prefix (namespace) to add to destination folder names",
       aliases: ["-d"]
+    )
+    method_option(
+      "source-delimiter",
+      type: :string,
+      desc: "the delimiter for source folder names"
     )
     method_option(
       "source-prefix",

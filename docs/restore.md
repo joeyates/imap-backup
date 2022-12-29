@@ -25,6 +25,4 @@ is already on the server is skipped.
 
 ## How do I restore to a different service?
 
-1. Run setup and add the new server, (but don't run any backups),
-2. Rename of the existing backup directory to match the new email address,
-3. Run the restore.
+It is best to use the `migrate` command in this case.
