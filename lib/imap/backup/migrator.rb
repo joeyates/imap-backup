@@ -13,7 +13,7 @@ module Imap::Backup
     def run
       count = serializer.uids.count
       folder.create
-      ensure_destination_empty!
+      folder.clear if reset
 
       Logger.logger.debug "[#{folder.name}] #{count} to migrate"
       serializer.each_message(serializer.uids).with_index do |message, i|
@@ -30,26 +30,6 @@ module Imap::Backup
           Logger.logger.warn "#{log_prefix} append error: #{e}"
         end
       end
-    end
-
-    private
-
-    def ensure_destination_empty!
-      if reset
-        folder.clear
-      else
-        fail_if_destination_not_empty!
-      end
-    end
-
-    def fail_if_destination_not_empty!
-      return if folder.uids.empty?
-
-      raise <<~ERROR
-        The destination folder '#{folder.name}' is not empty.
-        Pass the --reset flag if you want to clear existing emails from destination
-        folders before uploading.
-      ERROR
     end
   end
 end

@@ -44,10 +44,8 @@ module Imap::Backup
     context "when the folder is not empty" do
       let(:folder_uids) { [99] }
 
-      it "fails" do
-        expect do
-          subject.run
-        end.to raise_error(RuntimeError, /The destination folder 'name' is not empty/)
+      it "works normally" do
+        subject.run
       end
 
       context "when `reset` is true" do
