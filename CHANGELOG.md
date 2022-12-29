@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 9.0.1 - 2022-12-29
+
+### Changed
+
+* Made `--reset` option on `migrate` optional. Now, existing emails
+  in destination folders are kept.
+
 ## 9.0.0 - 2022-12-29
 
 ### Added
