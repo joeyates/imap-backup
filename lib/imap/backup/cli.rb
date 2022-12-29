@@ -75,14 +75,7 @@ module Imap::Backup
       When one or other account uses a delimiter other than `/` (i.e. `.`),
       use the `--source-delimiter=` and/or `--destination-delimiter=` options.
 
-      Usually, you should migrate to an account with empty folders.
-
-      Before migrating each folder, `imap-backup` checks if the destination
-      folder is empty.
-
-      If it finds a non-empty destination folder, it halts with an error.
-
-      If you are sure that these destination emails can be deleted,
+      If you you want to delete existing emails in destination folders,
       use the `--reset` option. In this case, all existing emails are
       deleted before uploading the migrated emails.
     DESC
