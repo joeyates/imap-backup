@@ -5,11 +5,16 @@ services:
   imap:
     image: antespi/docker-imap-devel:latest
     container_name: imap
-    ports:
-    - "8993:993"
     environment:
     - MAILNAME=example.com
-    - MAIL_ADDRESS=me@example.com
+    - MAIL_ADDRESS=address@example.com
+    - MAIL_PASS=pass
+  other-imap:
+    image: antespi/docker-imap-devel:latest
+    container_name: other-imap
+    environment:
+    - MAILNAME=other.org
+    - MAIL_ADDRESS=email@other.org
     - MAIL_PASS=pass
   imap-backup:
     build:
@@ -25,6 +30,10 @@ services:
     - RUBY_VERSION=$RUBY_VERSION
     - BUNDLE_PATH=/app/vendor
     - BUNDLE_BINSTUBS=./bin/stubs
+    - DOCKER_HOST_IMAP=imap
+    - DOCKER_PORT_IMAP=993
+    - DOCKER_HOST_OTHER_IMAP=other-imap
+    - DOCKER_PORT_OTHER_IMAP=993
     - HOME=/app
     volumes:
       - ..:/app
