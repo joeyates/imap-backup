@@ -4,14 +4,18 @@ module Imap::Backup
 
     let(:account) do
       instance_double(
-        Account, folders: account_folders, connection: connection, folder_blacklist: false
+        Account,
+        folders: account_folders,
+        connection: connection,
+        folder_blacklist: folder_blacklist
       )
     end
     let(:client) { instance_double(Client::Default) }
     let(:connection) { instance_double(Account::Connection) }
     let(:account_folders) { [{name: "foo"}] }
+    let(:folder_blacklist) { false }
     let(:folder_names) do
-      instance_double(Account::Connection::FolderNames, run: %w(imap_folder foo))
+      instance_double(Account::Connection::FolderNames, run: %w(foo bar baz))
     end
     let(:result) { subject.run }
 
@@ -20,7 +24,7 @@ module Imap::Backup
     end
 
     it "returns a folder for each configured folder" do
-      expect(result.count).to eq(1)
+      expect(result.map(&:name)).to eq(%w(foo))
     end
 
     it "returns Account::Folders" do
@@ -31,23 +35,43 @@ module Imap::Backup
       expect(result.first.connection).to eq(connection)
     end
 
-    it "sets the name" do
-      expect(result.first.name).to eq("foo")
-    end
-
-    context "when the configured folders are missing" do
+    context "when no folders are configured" do
       let(:account_folders) { nil }
 
-      it "uses the online folders" do
-        expect(result.first.name).to eq("imap_folder")
+      it "returns all online folders" do
+        expect(result.map(&:name)).to eq(%w(foo bar baz))
       end
     end
 
     context "when the configured folders are an empty list" do
       let(:account_folders) { [] }
 
-      it "uses the online folders" do
-        expect(result.first.name).to eq("imap_folder")
+      it "returns all online folders" do
+        expect(result.map(&:name)).to eq(%w(foo bar baz))
+      end
+    end
+
+    context "when the folder_blacklist flag is set" do
+      let(:folder_blacklist) { true }
+
+      it "returns account folders except the configured folders" do
+        expect(result.map(&:name)).to eq(%w(bar baz))
+      end
+
+      context "when no folders are configured" do
+        let(:account_folders) { nil }
+
+        it "returns all online folders" do
+          expect(result.map(&:name)).to eq(%w(foo bar baz))
+        end
+      end
+
+      context "when the configured folders are an empty list" do
+        let(:account_folders) { [] }
+
+        it "returns all online folders" do
+          expect(result.map(&:name)).to eq(%w(foo bar baz))
+        end
       end
     end
   end

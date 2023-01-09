@@ -18,7 +18,11 @@ module Imap::Backup
         if account.folders&.any?
           account.folders.map { |af| af[:name] }
         else
-          all_names
+          if account.folder_blacklist
+            []
+          else
+            all_names
+          end
         end
 
       all_names.map do |name|
