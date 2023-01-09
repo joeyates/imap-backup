@@ -65,6 +65,7 @@ module Imap::Backup
         Serializer::Imap,
         valid?: true,
         rename: nil,
+        save: nil,
         uid_validity: existing_uid_validity,
         "uid_validity=": nil
       )
@@ -73,7 +74,6 @@ module Imap::Backup
       instance_double(
         Serializer::Mbox,
         valid?: true,
-        # pathname: "aaa",
         rename: nil,
         touch: nil
       )
@@ -169,6 +169,41 @@ module Imap::Backup
       end
     end
 
+    describe "#update" do
+      let(:flags) { [:Foo] }
+      let(:message) { instance_double(Serializer::Message, "flags=": nil) }
+
+      before do
+        allow(imap).to receive(:get) { message }
+
+        subject.update(33, flags: flags)
+      end
+
+      it "updates the message flags" do
+        expect(message).to have_received(:flags=).with(flags)
+      end
+
+      it "saves the .imap file" do
+        expect(imap).to have_received(:save)
+      end
+
+      context "when no flags are supplied" do
+        let(:flags) { nil }
+
+        it "does not update the message flags" do
+          expect(message).to_not have_received(:flags=)
+        end
+      end
+
+      context "when the UID is not known" do
+        let(:message) { nil }
+
+        it "does not save" do
+          expect(imap).to_not have_received(:save)
+        end
+      end
+    end
+
     describe "#each_message" do
       it_behaves_like "a method that checks for invalid serialization" do
         let(:action) { -> { subject.each_message([]) {} } }
@@ -189,6 +224,70 @@ module Imap::Backup
       context "when called without a block" do
         it "returns an Enumerator" do
           expect(subject.each_message([])).to be_a(Enumerator)
+        end
+      end
+    end
+
+    describe "#filter" do
+      let(:appender) { instance_double(Serializer::Appender, run: nil) }
+      let(:old_imap) do
+        instance_double(
+          Serializer::Imap, "Old Imap",
+          uid_validity: 1,
+          uids: [1],
+          get: message,
+          delete: nil,
+          folder_path: "existing/imap"
+        )
+      end
+      let(:old_mbox) do
+        instance_double(
+          Serializer::Mbox, "Old Mbox",
+          delete: nil,
+          folder_path: "existing/mbox"
+        )
+      end
+      let(:imap) { instance_double(Serializer::Imap, "New Imap", "uid_validity=": nil, rename: nil) }
+      let(:mbox) { instance_double(Serializer::Mbox, "New Mbox", rename: nil) }
+      let(:message) { instance_double(Serializer::Message, uid: 1, body: "body", flags: []) }
+      let(:keep) { true }
+      let(:unused) { instance_double(Serializer::UnusedNameFinder, run: "temp") }
+
+      before do
+        allow(Serializer::Appender).to receive(:new) { appender }
+        allow(Serializer::UnusedNameFinder).to receive(:new) { unused }
+        allow(Serializer::Imap).to receive(:new).with(/sub$/) { old_imap }
+        allow(Serializer::Mbox).to receive(:new).with(/sub$/) { old_mbox }
+        allow(Serializer::Imap).to receive(:new).with(/temp$/) { imap }
+        allow(Serializer::Mbox).to receive(:new).with(/temp$/) { mbox }
+        subject.filter { keep }
+      end
+
+      it "adds messages" do
+        expect(appender).to have_received(:run)
+      end
+
+      it "deletes the old imap" do
+        expect(old_imap).to have_received(:delete)
+      end
+
+      it "deletes the old mbox" do
+        expect(old_mbox).to have_received(:delete)
+      end
+
+      it "renames the new imap" do
+        expect(imap).to have_received(:rename).with("existing/imap")
+      end
+
+      it "renames the new mbox" do
+        expect(mbox).to have_received(:rename).with("existing/mbox")
+      end
+
+      context "when the block returns false" do
+        let(:keep) { false }
+
+        it "skips the message" do
+          expect(appender).to_not have_received(:run)
         end
       end
     end
