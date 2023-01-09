@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 9.0.2 - 2023-01-09
+
+### Changed
+
+* BUGFIX: When an account has `folder_blacklist` set but no list of
+  configured folders, it now backs up all folders.
+
 ## 9.0.1 - 2022-12-29
 
 ### Changed
