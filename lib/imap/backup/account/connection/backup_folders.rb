@@ -14,24 +14,25 @@ module Imap::Backup
     def run
       all_names = Account::Connection::FolderNames.new(client: client, account: account).run
 
-      names =
+      configured =
         if account.folders&.any?
           account.folders.map { |af| af[:name] }
         else
-          all_names
+          if account.folder_blacklist
+            []
+          else
+            all_names
+          end
         end
 
-      all_names.map do |name|
-        backup =
-          if account.folder_blacklist
-            !names.include?(name)
-          else
-            names.include?(name)
-          end
-        next if !backup
+      names =
+        if account.folder_blacklist
+          all_names - configured
+        else
+          all_names & configured
+        end
 
-        Account::Folder.new(account.connection, name)
-      end.compact
+      names.map { |name | Account::Folder.new(account.connection, name) }
     end
   end
 end
