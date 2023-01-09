@@ -247,7 +247,9 @@ module Imap::Backup
           folder_path: "existing/mbox"
         )
       end
-      let(:imap) { instance_double(Serializer::Imap, "New Imap", "uid_validity=": nil, rename: nil) }
+      let(:imap) do
+        instance_double(Serializer::Imap, "New Imap", "uid_validity=": nil, rename: nil)
+      end
       let(:mbox) { instance_double(Serializer::Mbox, "New Mbox", rename: nil) }
       let(:message) { instance_double(Serializer::Message, uid: 1, body: "body", flags: []) }
       let(:keep) { true }

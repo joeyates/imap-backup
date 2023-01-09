@@ -49,9 +49,7 @@ module Imap::Backup
     end
 
     def map_uids(source:, destination:)
-      if destination_store == {}
-        raise "Assign UID validities with #reset before calling #map_uids"
-      end
+      raise "Assign UID validities with #reset before calling #map_uids" if destination_store == {}
 
       map[source] = destination
     end
