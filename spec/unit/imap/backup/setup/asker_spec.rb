@@ -27,7 +27,7 @@ module Imap::Backup
       [:email, [], "email address"],
       [:password, [], "password"]
     ].each do |method, params, prompt|
-      context ".#{method}" do
+      describe ".#{method}" do
         it "asks for input" do
           expect(highline).to receive(:ask).with("#{prompt}: ")
 
