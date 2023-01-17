@@ -4,10 +4,13 @@
 imap-backup mirror SOURCE_EMAIL DESTINATION_EMAIL
 ```
 
-This command makes a local copy of the source account and then copies
-that to the destination account.
+This command makes a local copy of the emails in the source account
+and then copies them to the destination account.
 
 Exactly which folders are backed up (and mirrored) depends on how the account is set up.
+
+Specifically, the `folder inclusion mode (whitelist/blacklist)` and
+`folders to include/exclude` list.
 
 Note that, anything on the destination account that is not on the source account gets deleted.
 

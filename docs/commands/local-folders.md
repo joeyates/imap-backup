@@ -4,4 +4,4 @@
 imap-backup local folders EMAIL
 ```
 
-This command lists the folders what will be backed up for a geiven account.
+This command lists the folders that have been backed up for a given account.

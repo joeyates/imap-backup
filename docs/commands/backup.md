@@ -6,12 +6,13 @@ imap-backup backup
 
 This command runs the backup operation.
 
-Backups for all configured accounts are copied to disk.
+By default, emails for all configured accounts are copied to disk.
 
-Emails are stored on disk in [Mbox files](../files/mboxrd.md) for each folder, with metadata
-stored in [Imap files](../files/imap.md).
+Emails are stored on disk in [Mbox files](../files/mboxrd.md), one for each folder,
+with metadata stored in [Imap files](../files/imap.md).
 
-The backup is incremental and interruptable, so backups won't get messed if your connection goes down during an operation.
+The backup is incremental and interruptable, so backups won't get messed up
+if your connection goes down during an operation.
 
 # Output
 
