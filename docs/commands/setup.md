@@ -20,6 +20,10 @@ In this case, it is up to you to create the directory for the configuration file
 
 # Account Setup
 
+## `modify server`
+
+For GMail accounts, use `imap.gmail.com` as the 'server' setting.
+
 ## `modify connection options`
 
 You can override the parameters passed to `Net::IMAP` with `modify connection options`.
