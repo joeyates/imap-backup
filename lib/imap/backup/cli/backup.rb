@@ -15,6 +15,12 @@ module Imap::Backup
         config = load_config(**options)
         each_connection(config, emails) do |connection|
           connection.run_backup(refresh: refresh)
+        rescue StandardError => e
+          message =
+            "Backup for account '#{connection.account.username}' " \
+            "failed with error #{e}"
+          Logger.logger.warn message
+          next
         end
       end
 
