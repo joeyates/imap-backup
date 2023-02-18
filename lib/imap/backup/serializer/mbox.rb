@@ -59,8 +59,6 @@ module Imap::Backup
       File.open(pathname, "a") {}
     end
 
-    private
-
     def exist?
       File.exist?(pathname)
     end

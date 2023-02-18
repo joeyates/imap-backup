@@ -20,6 +20,47 @@ module Imap::Backup
       end
     end
 
+    desc(
+      "check",
+      "Check the integrity of backups for all accounts (or the selected account(s))"
+    )
+    method_option(
+      "delete_corrupt",
+      type: :boolean,
+      desc: "deletes any corrupted folders - USE WITH CAUTION!"
+    )
+    config_option
+    format_option
+    def check
+      config = load_config(**options)
+      results = each_connection(config, emails).map do |connection|
+        folders = connection.local_folders
+        folder_results = folders.map do |serializer|
+          serializer.check_integrity!
+          {name: serializer.folder, result: "OK"}
+        rescue Serializer::FolderIntegrityError => e
+          message = e.to_s
+          if options[:delete_corrupt]
+            serializer.delete
+            message << " and has been deleted"
+          end
+
+          {
+            name: serializer.folder,
+            result: message
+          }
+        end
+        {account: connection.account.username, folders: folder_results}
+      end
+
+      case options[:format]
+      when "json"
+        print_check_results_as_json(results)
+      else
+        print_check_results_as_text(results)
+      end
+    end
+
     desc "folders EMAIL", "List backed up folders"
     config_option
     format_option
@@ -87,6 +128,19 @@ module Imap::Backup
     end
 
     no_commands do
+      def print_check_results_as_json(results)
+        Kernel.puts results.to_json
+      end
+
+      def print_check_results_as_text(results)
+        results.each do |account_results|
+          Kernel.puts "Account: #{account_results[:account]}"
+          account_results[:folders].each do |folder_results|
+            Kernel.puts "\t#{folder_results[:name]}: #{folder_results[:result]}"
+          end
+        end
+      end
+
       def list_emails_as_json(serializer)
         emails = serializer.each_message.map do |message|
           {
@@ -141,6 +195,10 @@ module Imap::Backup
           end
           Kernel.puts message.body
         end
+      end
+
+      def emails
+        (options[:accounts] || "").split(",")
       end
     end
   end

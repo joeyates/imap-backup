@@ -15,6 +15,14 @@ module Imap::Backup
       @version = nil
     end
 
+    def pathname
+      "#{folder_path}.imap"
+    end
+
+    def exist?
+      File.exist?(pathname)
+    end
+
     def valid?
       return false if !exist?
       return false if version != CURRENT_VERSION
@@ -113,14 +121,6 @@ module Imap::Backup
     end
 
     private
-
-    def pathname
-      "#{folder_path}.imap"
-    end
-
-    def exist?
-      File.exist?(pathname)
-    end
 
     def ensure_loaded
       return if loaded
