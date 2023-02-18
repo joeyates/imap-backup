@@ -25,12 +25,24 @@ module Imap::Backup
 
       before do
         allow(CLI::Migrate).to receive(:new) { migrate }
-
-        subject.migrate("source", "destination")
       end
 
       it "runs migrate" do
+        subject.invoke(:migrate, ["source", "destination"])
+
         expect(migrate).to have_received(:run)
+      end
+
+      context "when logger options are passed" do
+        before do
+          require "pry"; binding.pry
+          subject.invoke(:migrate, ["source", "destination"], {})
+        end
+
+        it "configures the logger"
+        it "does not pass the option to the class" do
+          expect(CLI::Migrate).to have_received(:new).with(:a)
+        end
       end
     end
 
