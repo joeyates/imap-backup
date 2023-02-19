@@ -3,8 +3,6 @@ require "net/imap"
 module Imap::Backup
   describe Logger do
     describe ".setup_logging" do
-      let(:options) { {} }
-
       around do |example|
         logger_previous = described_class.logger.level
         net_imap_previous = Net::IMAP.debug
@@ -15,9 +13,8 @@ module Imap::Backup
         described_class.logger.level = logger_previous
       end
 
-      before do
-        described_class.setup_logging options
-      end
+      let(:options) { {ciao: true} }
+      let!(:result) { described_class.setup_logging(options) }
 
       it "sets logger level to info" do
         expect(described_class.logger.level).to eq(::Logger::Severity::INFO)
@@ -25,6 +22,18 @@ module Imap::Backup
 
       it "unsets the Net::IMAP debug flag" do
         expect(Net::IMAP.debug).to be false
+      end
+
+      it "returns options" do
+        expect(result).to eq({ciao: true})
+      end
+
+      context "when logger-related options are passed" do
+        let(:options) { {ciao: true, quiet: true, verbose: true} }
+
+        it "excludes them and returns other options" do
+          expect(result).to eq({ciao: true})
+        end
       end
 
       context "when verbose is passed" do
