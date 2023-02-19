@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 9.1.1 - 2023-02-19
+
+### Changed
+
+* BUGFIX: Correctly accept logging options when running `migrate` and
+  `mirror` commands.
+
 ## 9.1.0 - 2023-02-18
 
 ### Changed
