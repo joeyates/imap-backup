@@ -1,4 +1,6 @@
 module Imap::Backup
+  require "support/shared_examples/an_action_that_handle_logger_options"
+
   RSpec.describe CLI do
     describe ".exit_on_failure?" do
       it "is true" do
@@ -11,12 +13,23 @@ module Imap::Backup
 
       before do
         allow(CLI::Backup).to receive(:new) { backup }
-
-        subject.backup
       end
 
       it "runs Backup" do
+        subject.backup
+
         expect(backup).to have_received(:run)
+      end
+
+      it_behaves_like(
+        "an action that handles Logger options",
+        action: ->(subject, options) do
+          subject.invoke(:backup, [], options)
+        end
+      ) do
+        it "does not pass the option to the class" do
+          expect(CLI::Backup).to have_received(:new).with({})
+        end
       end
     end
 
@@ -25,12 +38,48 @@ module Imap::Backup
 
       before do
         allow(CLI::Migrate).to receive(:new) { migrate }
-
-        subject.migrate("source", "destination")
       end
 
       it "runs migrate" do
+        subject.invoke(:migrate, %w[source destination])
+
         expect(migrate).to have_received(:run)
+      end
+
+      it_behaves_like(
+        "an action that handles Logger options",
+        action: ->(subject, options) do
+          subject.invoke(:migrate, %w[source destination], options)
+        end
+      ) do
+        it "does not pass the option to the class" do
+          expect(CLI::Migrate).to have_received(:new).with("source", "destination")
+        end
+      end
+    end
+
+    describe "#mirror" do
+      let(:mirror) { instance_double(CLI::Mirror, run: nil) }
+
+      before do
+        allow(CLI::Mirror).to receive(:new) { mirror }
+      end
+
+      it "runs mirror" do
+        subject.invoke(:mirror, %w[source destination])
+
+        expect(mirror).to have_received(:run)
+      end
+
+      it_behaves_like(
+        "an action that handles Logger options",
+        action: ->(subject, options) do
+          subject.invoke(:mirror, %w[source destination], options)
+        end
+      ) do
+        it "does not pass the option to the class" do
+          expect(CLI::Mirror).to have_received(:new).with("source", "destination")
+        end
       end
     end
 
@@ -39,12 +88,23 @@ module Imap::Backup
 
       before do
         allow(CLI::Restore).to receive(:new) { restore }
-
-        subject.restore
       end
 
       it "runs restore" do
+        subject.restore
+
         expect(restore).to have_received(:run)
+      end
+
+      it_behaves_like(
+        "an action that handles Logger options",
+        action: ->(subject, options) do
+          subject.invoke(:restore, ["me@example.com"], options)
+        end
+      ) do
+        it "does not pass the option to the class" do
+          expect(CLI::Restore).to have_received(:new).with("me@example.com", {})
+        end
       end
     end
 
@@ -53,12 +113,48 @@ module Imap::Backup
 
       before do
         allow(CLI::Setup).to receive(:new) { setup }
-
-        subject.setup
       end
 
       it "runs setup" do
+        subject.setup
+
         expect(setup).to have_received(:run)
+      end
+
+      it_behaves_like(
+        "an action that handles Logger options",
+        action: ->(subject, options) do
+          subject.invoke(:setup, [], options)
+        end
+      ) do
+        it "does not pass the option to the class" do
+          expect(CLI::Setup).to have_received(:new).with({})
+        end
+      end
+    end
+
+    describe "#stats" do
+      let(:stats) { instance_double(CLI::Stats, run: nil) }
+
+      before do
+        allow(CLI::Stats).to receive(:new) { stats }
+      end
+
+      it "runs stats" do
+        subject.stats("me@example.com")
+
+        expect(stats).to have_received(:run)
+      end
+
+      it_behaves_like(
+        "an action that handles Logger options",
+        action: ->(subject, options) do
+          subject.invoke(:stats, ["me@example.com"], options)
+        end
+      ) do
+        it "does not pass the option to the class" do
+          expect(CLI::Stats).to have_received(:new).with("me@example.com", {})
+        end
       end
     end
   end

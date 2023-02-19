@@ -13,11 +13,14 @@ module Imap::Backup
     end
 
     def self.setup_logging(options = {})
+      copy = options.clone
+      quiet = copy.delete(:quiet)
+      verbose = copy.delete(:verbose)
       level =
         case
-        when options[:quiet]
+        when quiet
           ::Logger::Severity::UNKNOWN
-        when options[:verbose]
+        when verbose
           ::Logger::Severity::DEBUG
         else
           ::Logger::Severity::INFO
@@ -25,6 +28,8 @@ module Imap::Backup
       logger.level = level
       debug = level == ::Logger::Severity::DEBUG
       Net::IMAP.debug = debug
+
+      copy
     end
 
     def self.sanitize_stderr

@@ -1,3 +1,5 @@
+require "support/shared_examples/an_action_that_handle_logger_options"
+
 module Imap::Backup
   describe CLI::Utils do
     let(:account) do
@@ -57,10 +59,15 @@ module Imap::Backup
       before do
         allow(Thunderbird::MailboxExporter).to receive(:new) { exporter }
         allow(Thunderbird::Profiles).to receive(:new) { profiles }
-        # rubocop:disable RSpec/SubjectStub
         allow(subject).to receive(:options) { options }
-        # rubocop:enable RSpec/SubjectStub
       end
+
+      it_behaves_like(
+        "an action that handles Logger options",
+        action: ->(subject, options) do
+          subject.invoke(:export_to_thunderbird, ["foo@example.com"], options)
+        end
+      )
 
       context "when no profile_name is supplied" do
         context "when no default Thunderbird profile is found" do
@@ -106,7 +113,7 @@ module Imap::Backup
       end
     end
 
-    describe "ignore_history" do
+    describe "#ignore_history" do
       it "ensures the local UID validity matches the server" do
         subject.ignore_history(email)
 
@@ -118,6 +125,13 @@ module Imap::Backup
 
         expect(serializer).to have_received(:append).with("456", /From: fake@email.com/, [])
       end
+
+      it_behaves_like(
+        "an action that handles Logger options",
+        action: ->(subject, options) do
+          subject.invoke(:ignore_history, ["foo@example.com"], options)
+        end
+      )
     end
   end
 end
