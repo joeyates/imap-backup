@@ -1,4 +1,6 @@
 module Imap::Backup
+  require "support/shared_examples/an_action_that_handle_logger_options"
+
   describe CLI::Remote do
     subject { described_class.new }
 
@@ -13,12 +15,23 @@ module Imap::Backup
       allow(Configuration).to receive(:new) { config }
       allow(Account::Connection).to receive(:new) { connection }
       allow(Kernel).to receive(:puts)
-
-      subject.folders(account.username)
     end
 
-    it "prints names of emails to be backed up" do
-      expect(Kernel).to have_received(:puts).with('"foo"')
+    describe "#folders" do
+      it "prints names of emails to be backed up" do
+        subject.folders(account.username)
+
+        expect(Kernel).to have_received(:puts).with('"foo"')
+      end
+
+      it_behaves_like(
+        "an action that handles Logger options",
+        action: -> (subject, options) do
+          subject.invoke(:folders, ["user"], options)
+        end
+      )
+    end
+
     end
   end
 end

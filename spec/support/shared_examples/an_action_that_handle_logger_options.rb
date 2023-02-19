@@ -1,5 +1,5 @@
 module Imap::Backup
-  shared_examples "an action that handles Logger options" do |action:, klass:, expected_args:|
+  shared_examples "an action that handles Logger options" do |action:, &block|
     before do
       allow(Logger).to receive(:setup_logging).and_call_original
       action.call(subject, {verbose: true})
@@ -9,8 +9,8 @@ module Imap::Backup
       expect(Logger).to have_received(:setup_logging)
     end
 
-    it "does not pass the option to the class" do
-      expect(klass).to have_received(:new).with(*expected_args)
+    if block
+      block.call
     end
   end
 end

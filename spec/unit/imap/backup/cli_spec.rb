@@ -25,10 +25,12 @@ module Imap::Backup
         "an action that handles Logger options",
         action: -> (subject, options) do
           subject.invoke(:backup, [], options)
-        end,
-        klass: CLI::Backup,
-        expected_args: [{}]
-      )
+        end
+      ) do
+        it "does not pass the option to the class" do
+          expect(CLI::Backup).to have_received(:new).with({})
+        end
+      end
     end
 
     describe "#migrate" do
@@ -48,10 +50,12 @@ module Imap::Backup
         "an action that handles Logger options",
         action: -> (subject, options) do
           subject.invoke(:migrate, ["source", "destination"], options)
-        end,
-        klass: CLI::Migrate,
-        expected_args: ["source", "destination"]
-      )
+        end
+      ) do
+        it "does not pass the option to the class" do
+          expect(CLI::Migrate).to have_received(:new).with("source", "destination")
+        end
+      end
     end
 
     describe "#mirror" do
@@ -71,10 +75,12 @@ module Imap::Backup
         "an action that handles Logger options",
         action: -> (subject, options) do
           subject.invoke(:mirror, ["source", "destination"], options)
-        end,
-        klass: CLI::Mirror,
-        expected_args: ["source", "destination"]
-      )
+        end
+      ) do
+        it "does not pass the option to the class" do
+          expect(CLI::Mirror).to have_received(:new).with("source", "destination")
+        end
+      end
     end
 
     describe "#restore" do
@@ -94,10 +100,12 @@ module Imap::Backup
         "an action that handles Logger options",
         action: -> (subject, options) do
           subject.invoke(:restore, ["me@example.com"], options)
-        end,
-        klass: CLI::Restore,
-        expected_args: ["me@example.com", {}]
-      )
+          end
+      ) do
+        it "does not pass the option to the class" do
+          expect(CLI::Restore).to have_received(:new).with("me@example.com", {})
+        end
+      end
     end
 
     describe "#setup" do
@@ -117,10 +125,12 @@ module Imap::Backup
         "an action that handles Logger options",
         action: -> (subject, options) do
           subject.invoke(:setup, [], options)
-        end,
-        klass: CLI::Setup,
-        expected_args: [{}]
-      )
+          end
+      ) do
+        it "does not pass the option to the class" do
+          expect(CLI::Setup).to have_received(:new).with({})
+        end
+      end
     end
 
     describe "#stats" do
@@ -140,10 +150,12 @@ module Imap::Backup
         "an action that handles Logger options",
         action: -> (subject, options) do
           subject.invoke(:stats, ["me@example.com"], options)
-        end,
-        klass: CLI::Stats,
-        expected_args: ["me@example.com", {}]
-      )
+        end
+      ) do
+        it "does not pass the option to the class" do
+          expect(CLI::Stats).to have_received(:new).with("me@example.com", {})
+        end
+      end
     end
   end
 end
