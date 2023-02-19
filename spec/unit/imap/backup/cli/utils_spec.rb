@@ -59,14 +59,12 @@ module Imap::Backup
       before do
         allow(Thunderbird::MailboxExporter).to receive(:new) { exporter }
         allow(Thunderbird::Profiles).to receive(:new) { profiles }
-        # rubocop:disable RSpec/SubjectStub
         allow(subject).to receive(:options) { options }
-        # rubocop:enable RSpec/SubjectStub
       end
 
       it_behaves_like(
         "an action that handles Logger options",
-        action: -> (subject, options) do
+        action: ->(subject, options) do
           subject.invoke(:export_to_thunderbird, ["foo@example.com"], options)
         end
       )
@@ -130,7 +128,7 @@ module Imap::Backup
 
       it_behaves_like(
         "an action that handles Logger options",
-        action: -> (subject, options) do
+        action: ->(subject, options) do
           subject.invoke(:ignore_history, ["foo@example.com"], options)
         end
       )

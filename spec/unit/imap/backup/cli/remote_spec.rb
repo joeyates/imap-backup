@@ -37,7 +37,7 @@ module Imap::Backup
 
       it_behaves_like(
         "an action that handles Logger options",
-        action: -> (subject, options) do
+        action: ->(subject, options) do
           subject.invoke(:folders, ["user"], options)
         end
       )
@@ -52,7 +52,7 @@ module Imap::Backup
 
       it_behaves_like(
         "an action that handles Logger options",
-        action: -> (subject, options) do
+        action: ->(subject, options) do
           subject.invoke(:namespaces, ["user"], options)
         end
       )

@@ -23,7 +23,7 @@ module Imap::Backup
 
       it_behaves_like(
         "an action that handles Logger options",
-        action: -> (subject, options) do
+        action: ->(subject, options) do
           subject.invoke(:backup, [], options)
         end
       ) do
@@ -41,15 +41,15 @@ module Imap::Backup
       end
 
       it "runs migrate" do
-        subject.invoke(:migrate, ["source", "destination"])
+        subject.invoke(:migrate, %w[source destination])
 
         expect(migrate).to have_received(:run)
       end
 
       it_behaves_like(
         "an action that handles Logger options",
-        action: -> (subject, options) do
-          subject.invoke(:migrate, ["source", "destination"], options)
+        action: ->(subject, options) do
+          subject.invoke(:migrate, %w[source destination], options)
         end
       ) do
         it "does not pass the option to the class" do
@@ -66,15 +66,15 @@ module Imap::Backup
       end
 
       it "runs mirror" do
-        subject.invoke(:mirror, ["source", "destination"])
+        subject.invoke(:mirror, %w[source destination])
 
         expect(mirror).to have_received(:run)
       end
 
       it_behaves_like(
         "an action that handles Logger options",
-        action: -> (subject, options) do
-          subject.invoke(:mirror, ["source", "destination"], options)
+        action: ->(subject, options) do
+          subject.invoke(:mirror, %w[source destination], options)
         end
       ) do
         it "does not pass the option to the class" do
@@ -98,9 +98,9 @@ module Imap::Backup
 
       it_behaves_like(
         "an action that handles Logger options",
-        action: -> (subject, options) do
+        action: ->(subject, options) do
           subject.invoke(:restore, ["me@example.com"], options)
-          end
+        end
       ) do
         it "does not pass the option to the class" do
           expect(CLI::Restore).to have_received(:new).with("me@example.com", {})
@@ -123,9 +123,9 @@ module Imap::Backup
 
       it_behaves_like(
         "an action that handles Logger options",
-        action: -> (subject, options) do
+        action: ->(subject, options) do
           subject.invoke(:setup, [], options)
-          end
+        end
       ) do
         it "does not pass the option to the class" do
           expect(CLI::Setup).to have_received(:new).with({})
@@ -148,7 +148,7 @@ module Imap::Backup
 
       it_behaves_like(
         "an action that handles Logger options",
-        action: -> (subject, options) do
+        action: ->(subject, options) do
           subject.invoke(:stats, ["me@example.com"], options)
         end
       ) do

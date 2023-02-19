@@ -9,8 +9,6 @@ module Imap::Backup
       expect(Logger).to have_received(:setup_logging)
     end
 
-    if block
-      block.call
-    end
+    block&.call
   end
 end
