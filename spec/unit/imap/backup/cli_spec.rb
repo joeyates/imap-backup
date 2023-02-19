@@ -21,15 +21,14 @@ module Imap::Backup
         expect(backup).to have_received(:run)
       end
 
-      it_behaves_like "an action that handles Logger options" do
-        let(:action) do
-          -> (options) do
-            subject.invoke(:backup, [], options)
-          end
-        end
-        let(:klass) { CLI::Backup }
-        let(:expected_args) { [{}] }
-      end
+      it_behaves_like(
+        "an action that handles Logger options",
+        action: -> (subject, options) do
+          subject.invoke(:backup, [], options)
+        end,
+        klass: CLI::Backup,
+        expected_args: [{}]
+      )
     end
 
     describe "#migrate" do
@@ -45,15 +44,14 @@ module Imap::Backup
         expect(migrate).to have_received(:run)
       end
 
-      it_behaves_like "an action that handles Logger options" do
-        let(:action) do
-          -> (options) do
-            subject.invoke(:migrate, ["source", "destination"], options)
-          end
-        end
-        let(:klass) { CLI::Migrate }
-        let(:expected_args) { ["source", "destination"] }
-      end
+      it_behaves_like(
+        "an action that handles Logger options",
+        action: -> (subject, options) do
+          subject.invoke(:migrate, ["source", "destination"], options)
+        end,
+        klass: CLI::Migrate,
+        expected_args: ["source", "destination"]
+      )
     end
 
     describe "#mirror" do
@@ -69,15 +67,14 @@ module Imap::Backup
         expect(mirror).to have_received(:run)
       end
 
-      it_behaves_like "an action that handles Logger options" do
-        let(:action) do
-          -> (options) do
-            subject.invoke(:mirror, ["source", "destination"], options)
-          end
-        end
-        let(:klass) { CLI::Mirror }
-        let(:expected_args) { ["source", "destination"] }
-      end
+      it_behaves_like(
+        "an action that handles Logger options",
+        action: -> (subject, options) do
+          subject.invoke(:mirror, ["source", "destination"], options)
+        end,
+        klass: CLI::Mirror,
+        expected_args: ["source", "destination"]
+      )
     end
 
     describe "#restore" do
@@ -93,15 +90,14 @@ module Imap::Backup
         expect(restore).to have_received(:run)
       end
 
-      it_behaves_like "an action that handles Logger options" do
-        let(:action) do
-          -> (options) do
-            subject.invoke(:restore, ["me@example.com"], options)
-          end
-        end
-        let(:klass) { CLI::Restore }
-        let(:expected_args) { ["me@example.com", {}] }
-      end
+      it_behaves_like(
+        "an action that handles Logger options",
+        action: -> (subject, options) do
+          subject.invoke(:restore, ["me@example.com"], options)
+        end,
+        klass: CLI::Restore,
+        expected_args: ["me@example.com", {}]
+      )
     end
 
     describe "#setup" do
@@ -117,15 +113,14 @@ module Imap::Backup
         expect(setup).to have_received(:run)
       end
 
-      it_behaves_like "an action that handles Logger options" do
-        let(:action) do
-          -> (options) do
-            subject.invoke(:setup, [], options)
-          end
-        end
-        let(:klass) { CLI::Setup }
-        let(:expected_args) { [{}] }
-      end
+      it_behaves_like(
+        "an action that handles Logger options",
+        action: -> (subject, options) do
+          subject.invoke(:setup, [], options)
+        end,
+        klass: CLI::Setup,
+        expected_args: [{}]
+      )
     end
 
     describe "#stats" do
@@ -141,15 +136,14 @@ module Imap::Backup
         expect(stats).to have_received(:run)
       end
 
-      it_behaves_like "an action that handles Logger options" do
-        let(:action) do
-          -> (options) do
-            subject.invoke(:stats, ["me@example.com"], options)
-          end
-        end
-        let(:klass) { CLI::Stats }
-        let(:expected_args) { ["me@example.com", {}] }
-      end
+      it_behaves_like(
+        "an action that handles Logger options",
+        action: -> (subject, options) do
+          subject.invoke(:stats, ["me@example.com"], options)
+        end,
+        klass: CLI::Stats,
+        expected_args: ["me@example.com", {}]
+      )
     end
   end
 end

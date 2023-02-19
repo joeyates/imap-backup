@@ -1,8 +1,8 @@
 module Imap::Backup
-  shared_examples "an action that handles Logger options" do
+  shared_examples "an action that handles Logger options" do |action:, klass:, expected_args:|
     before do
       allow(Logger).to receive(:setup_logging).and_call_original
-      action.call({verbose: true})
+      action.call(subject, {verbose: true})
     end
 
     it "configures the logger" do
