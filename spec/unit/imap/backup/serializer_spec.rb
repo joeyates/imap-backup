@@ -56,10 +56,22 @@ shared_examples "a method that checks for invalid serialization" do
 end
 
 module Imap::Backup
+  shared_examples "a method sets up the folder directory" do
+    let(:directory) { instance_double(Serializer::Directory, ensure_exists: nil) }
+
+    before do
+      allow(Serializer::Directory).to receive(:new) { directory }
+      action.call
+    end
+
+    it "ensures the folder's containing directory exists" do
+      expect(directory).to have_received(:ensure_exists).twice
+    end
+  end
+
   describe Serializer do
     subject { described_class.new("path", "folder/sub") }
 
-    let(:directory) { instance_double(Serializer::Directory, ensure_exists: nil) }
     let(:imap) do
       instance_double(
         Serializer::Imap,
@@ -82,13 +94,16 @@ module Imap::Backup
     let(:existing_uid_validity) { nil }
 
     before do
-      allow(Serializer::Directory).to receive(:new) { directory }
       allow(Serializer::Imap).to receive(:new).with(folder_path) { imap }
       allow(Serializer::Mbox).to receive(:new) { mbox }
     end
 
     describe "#apply_uid_validity" do
       it_behaves_like "a method that checks for invalid serialization" do
+        let(:action) { -> { result } }
+      end
+
+      it_behaves_like "a method sets up the folder directory" do
         let(:action) { -> { result } }
       end
 
@@ -144,6 +159,10 @@ module Imap::Backup
         let(:action) { -> { subject.force_uid_validity("new") } }
       end
 
+      it_behaves_like "a method sets up the folder directory" do
+        let(:action) { -> { subject.force_uid_validity("new") } }
+      end
+
       it "sets the metadata file's uid_validity" do
         subject.force_uid_validity("new")
 
@@ -153,6 +172,10 @@ module Imap::Backup
 
     describe "#append" do
       it_behaves_like "a method that checks for invalid serialization" do
+        let(:action) { -> { subject.append("uid", "message", []) } }
+      end
+
+      it_behaves_like "a method sets up the folder directory" do
         let(:action) { -> { subject.append("uid", "message", []) } }
       end
 
@@ -206,6 +229,10 @@ module Imap::Backup
 
     describe "#each_message" do
       it_behaves_like "a method that checks for invalid serialization" do
+        let(:action) { -> { subject.each_message([]) {} } }
+      end
+
+      it_behaves_like "a method sets up the folder directory" do
         let(:action) { -> { subject.each_message([]) {} } }
       end
 
