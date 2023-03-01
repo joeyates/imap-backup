@@ -1,3 +1,8 @@
+# container
+
+This directory contains the files that allow experimenting with
+any desired Ruby version locally.
+
 # Run
 
 ```sh
