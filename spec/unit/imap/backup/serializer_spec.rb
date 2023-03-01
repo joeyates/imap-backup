@@ -80,6 +80,22 @@ module Imap::Backup
     end
   end
 
+  shared_examples "a method that sanitizes folder paths" do
+    let(:folder_name) { "a:b/%;::" }
+
+    it "sanitizes the .imap path" do
+      action.call
+
+      expect(Serializer::Imap).to have_received(:new).with(%r(a%3a;b/%25;%3b;%3a;%3a;$))
+    end
+
+    it "sanitizes the .mbox path" do
+      action.call
+
+      expect(Serializer::Mbox).to have_received(:new).with(%r(a%3a;b/%25;%3b;%3a;%3a;$))
+    end
+  end
+
   describe Serializer do
     subject { described_class.new("path", folder_name) }
 
@@ -102,13 +118,11 @@ module Imap::Backup
       )
     end
     let(:folder_name) { "folder/sub" }
-    let(:sanitized_folder_name) { folder_name.gsub(":", "%3a;") }
     let(:folder_path) { File.expand_path(File.join("path", folder_name)) }
-    let(:sanitized_folder_path) { File.expand_path(File.join("path", sanitized_folder_name)) }
     let(:existing_uid_validity) { nil }
 
     before do
-      allow(Serializer::Imap).to receive(:new).with(sanitized_folder_path) { imap }
+      allow(Serializer::Imap).to receive(:new) { imap }
       allow(Serializer::Mbox).to receive(:new) { mbox }
     end
 
