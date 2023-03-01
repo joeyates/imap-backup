@@ -1,6 +1,6 @@
 require "features/helper"
 
-RSpec.describe "ignore history", type: :aruba, docker: true do
+RSpec.describe "imap-backup utils ignore-history", type: :aruba, docker: true do
   include_context "message-fixtures"
 
   let(:account) { test_server_connection_parameters }

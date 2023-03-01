@@ -1,6 +1,6 @@
 require "features/helper"
 
-RSpec.describe "stats", type: :aruba, docker: true do
+RSpec.describe "imap-backup stats", type: :aruba, docker: true do
   include_context "message-fixtures"
 
   let(:account) { test_server_connection_parameters }

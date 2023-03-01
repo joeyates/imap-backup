@@ -1,6 +1,6 @@
 require "features/helper"
 
-RSpec.describe "backup", type: :aruba, docker: true do
+RSpec.describe "imap-backup backup", type: :aruba, docker: true do
   include_context "message-fixtures"
 
   let(:backup_folders) { [{name: folder}] }

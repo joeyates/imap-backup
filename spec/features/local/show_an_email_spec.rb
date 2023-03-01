@@ -1,6 +1,6 @@
 require "features/helper"
 
-RSpec.describe "Show an email", type: :aruba do
+RSpec.describe "imap-backup local show", type: :aruba do
   include_context "message-fixtures"
 
   let(:email) { account[:username] }

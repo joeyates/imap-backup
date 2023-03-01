@@ -1,6 +1,6 @@
 require "features/helper"
 
-RSpec.describe "Listing emails", type: :aruba do
+RSpec.describe "imap-backup local list", type: :aruba do
   let(:email) { account[:username] }
   let(:account) { test_server_connection_parameters }
   let(:config_options) { {accounts: [account]} }

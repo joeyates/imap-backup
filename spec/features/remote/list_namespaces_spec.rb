@@ -1,6 +1,6 @@
 require "features/helper"
 
-RSpec.describe "List account folders", type: :aruba, docker: true do
+RSpec.describe "imap-backup remote namespaces", type: :aruba, docker: true do
   let(:account) { test_server_connection_parameters }
   let(:config_options) { {accounts: [account]} }
   let(:command) { "imap-backup remote namespaces #{account[:username]}" }

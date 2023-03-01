@@ -1,6 +1,6 @@
 require "features/helper"
 
-RSpec.describe "adding an account", type: :aruba do
+RSpec.describe "imap-backup setup - adding an account", type: :aruba do
   let(:account) { test_server_connection_parameters }
   let(:config_options) { {accounts: [account]} }
 

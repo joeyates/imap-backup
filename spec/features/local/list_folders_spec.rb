@@ -1,6 +1,6 @@
 require "features/helper"
 
-RSpec.describe "Listing account folders", type: :aruba do
+RSpec.describe "imap-backup local folders", type: :aruba do
   let(:email) { "me@example.com" }
   let(:account) do
     {
