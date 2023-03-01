@@ -76,6 +76,7 @@ and exported via [utils export-to-thunderbird](docs/commands/utils-export-to-thu
 
 * [backup](docs/commands/backup.md)
 * [local accounts](docs/commands/local-accounts.md)
+* [local check](docs/commands/local-check.md)
 * [local folders](docs/commands/local-folders.md)
 * [local list](docs/commands/local-list.md)
 * [local show](docs/commands/local-show.md)
