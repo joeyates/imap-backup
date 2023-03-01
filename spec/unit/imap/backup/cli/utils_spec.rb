@@ -70,6 +70,11 @@ module Imap::Backup
           subject.invoke(:export_to_thunderbird, ["foo@example.com"], options)
         end
       )
+      it_behaves_like("an action that requires an existing configuration",
+        action: ->(subject) do
+          subject.invoke(:export_to_thunderbird, ["foo@example.com"])
+        end
+      )
 
       context "when no profile_name is supplied" do
         context "when no default Thunderbird profile is found" do
@@ -116,6 +121,12 @@ module Imap::Backup
     end
 
     describe "#ignore_history" do
+      it_behaves_like("an action that requires an existing configuration",
+        action: ->(subject) do
+          subject.ignore_history("foo@example.com")
+        end
+      )
+
       it "ensures the local UID validity matches the server" do
         subject.ignore_history(email)
 

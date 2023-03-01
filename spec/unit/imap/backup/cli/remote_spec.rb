@@ -29,6 +29,10 @@ module Imap::Backup
     end
 
     describe "#folders" do
+      it_behaves_like("an action that requires an existing configuration",
+        action: ->(subject) { subject.folders("email") }
+      )
+
       it "prints names of emails to be backed up" do
         subject.folders(account.username)
 
@@ -44,6 +48,10 @@ module Imap::Backup
     end
 
     describe "#namespaces" do
+      it_behaves_like("an action that requires an existing configuration",
+        action: ->(subject) { subject.namespaces("email") }
+      )
+
       it "prints namespaces with prefixes and delimiters" do
         subject.invoke(:namespaces, [account.username], format: "json")
 

@@ -47,6 +47,10 @@ module Imap::Backup
     end
 
     describe "accounts" do
+      it_behaves_like("an action that requires an existing configuration",
+        action: ->(subject) { subject.accounts }
+      )
+
       it "lists configured emails" do
         subject.accounts
 
@@ -55,6 +59,10 @@ module Imap::Backup
     end
 
     describe "folders" do
+      it_behaves_like("an action that requires an existing configuration",
+        action: ->(subject) { subject.folders("email") }
+      )
+
       it "lists downloaded folders in quotes" do
         subject.folders(email)
 
@@ -64,6 +72,10 @@ module Imap::Backup
 
     describe "list" do
       before { subject.list(email, "bar") }
+
+      it_behaves_like("an action that requires an existing configuration",
+        action: ->(subject) { subject.list("email", "bar") }
+      )
 
       it "lists downloaded emails" do
         expect(Kernel).to have_received(:puts).with(/Ciao/)
@@ -80,6 +92,10 @@ module Imap::Backup
 
     describe "show" do
       before { subject.show(email, "bar", uids.join(",")) }
+
+      it_behaves_like("an action that requires an existing configuration",
+        action: ->(subject) { subject.show("email", "bar", "1") }
+      )
 
       it "prints a downloaded email" do
         expect(Kernel).to have_received(:puts).with("Supplied")

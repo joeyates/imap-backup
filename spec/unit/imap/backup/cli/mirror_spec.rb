@@ -30,6 +30,10 @@ module Imap::Backup
       subject.run
     end
 
+    it_behaves_like("an action that requires an existing configuration",
+      action: ->(subject) { subject.run }
+    )
+
     it "runs backup on the source" do
       expect(connection1).to have_received(:run_backup)
     end

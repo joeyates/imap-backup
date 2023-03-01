@@ -6,17 +6,20 @@ module Imap::Backup
     let(:connection) { instance_double(Account::Connection, restore: nil) }
     let(:account) { instance_double(Account, username: email) }
     let(:config) { instance_double(Configuration, accounts: [account]) }
+    let(:email) { "email" }
+    let(:options) { {} }
 
     before do
       allow(Configuration).to receive(:exist?) { true }
       allow(Configuration).to receive(:new) { config }
     end
 
+    it_behaves_like("an action that requires an existing configuration",
+      action: ->(subject) { subject.run }
+    )
+
     describe "#run" do
       context "when an email is provided" do
-        let(:email) { "email" }
-        let(:options) { {} }
-
         before do
           allow(subject).to receive(:connection).with(anything, email) { connection }
 

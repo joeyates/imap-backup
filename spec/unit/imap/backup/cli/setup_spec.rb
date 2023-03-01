@@ -11,6 +11,10 @@ module Imap::Backup
       allow(Setup).to receive(:new) { setup }
     end
 
+    it_behaves_like("an action that doesn't require an existing configuration",
+      action: ->(subject) { subject.run }
+    )
+
     it "reruns the setup process" do
       subject.run
 
