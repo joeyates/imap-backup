@@ -12,7 +12,7 @@ module Imap::Backup
     quiet_option
     verbose_option
     def ignore_history(email)
-      Imap::Backup::Logger.setup_logging options
+      Logger.setup_logging options
       config = load_config(**options)
       connection = connection(config, email)
 

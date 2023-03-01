@@ -2,7 +2,7 @@ module Imap::Backup
   shared_examples "an action that handles Logger options" do |action:, &block|
     before do
       allow(Logger).to receive(:setup_logging).and_call_original
-      action.call(subject, {verbose: true})
+      action.call(subject, {quiet: true})
     end
 
     it "configures the logger" do
