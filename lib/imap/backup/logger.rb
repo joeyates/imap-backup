@@ -2,7 +2,7 @@ require "logger"
 require "singleton"
 
 require "imap/backup/configuration"
-require "imap/backup/sanitizer"
+require "text/sanitizer"
 
 module Imap::Backup
   class Logger
@@ -33,7 +33,7 @@ module Imap::Backup
     end
 
     def self.sanitize_stderr
-      sanitizer = Sanitizer.new($stdout)
+      sanitizer = Text::Sanitizer.new($stdout)
       previous_stderr = $stderr
       $stderr = sanitizer
       yield
