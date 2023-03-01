@@ -32,7 +32,7 @@ module Imap::Backup
             expect(described_class.to_local_path(char)).to eq(char)
           end
         else
-          it "coverts '#{char}' to '#{expected}'" do
+          it "converts '#{char}' to '#{expected}'" do
             expect(described_class.to_local_path(char)).to eq(expected)
           end
         end
