@@ -85,6 +85,8 @@ module Imap::Backup
     end
 
     def each_connection(config, names)
+      return enum_for(:each_connection, config, names) if !block_given?
+
       config.accounts.each do |account|
         next if names.any? && !names.include?(account.username)
 
