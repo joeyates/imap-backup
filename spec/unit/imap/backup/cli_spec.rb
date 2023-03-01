@@ -53,7 +53,11 @@ module Imap::Backup
         end
       ) do
         it "does not pass the option to the class" do
-          expect(CLI::Migrate).to have_received(:new).with("source", "destination")
+          if RUBY_VERSION < "3"
+            expect(CLI::Migrate).to have_received(:new).with("source", "destination", {})
+          else
+            expect(CLI::Migrate).to have_received(:new).with("source", "destination")
+          end
         end
       end
     end
@@ -78,7 +82,11 @@ module Imap::Backup
         end
       ) do
         it "does not pass the option to the class" do
-          expect(CLI::Mirror).to have_received(:new).with("source", "destination")
+          if RUBY_VERSION < "3"
+            expect(CLI::Mirror).to have_received(:new).with("source", "destination", {})
+          else
+            expect(CLI::Mirror).to have_received(:new).with("source", "destination")
+          end
         end
       end
     end
