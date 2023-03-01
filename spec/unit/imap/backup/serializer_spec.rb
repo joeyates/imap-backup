@@ -193,16 +193,15 @@ module Imap::Backup
     end
 
     describe "#append" do
-      let(:action) { -> { subject.append("uid", "message", []) } }
-
-      it_behaves_like "a method that checks for invalid serialization"
-      it_behaves_like "a method sets up the folder directory"
-
-      let(:appender) { instance_double(Serializer::Appender, run: nil) }
-
       before do
         allow(Serializer::Appender).to receive(:new) { appender }
       end
+
+      let(:action) { -> { subject.append("uid", "message", []) } }
+      let(:appender) { instance_double(Serializer::Appender, run: nil) }
+
+      it_behaves_like "a method that checks for invalid serialization"
+      it_behaves_like "a method sets up the folder directory"
 
       it "runs the Appender" do
         subject.append("uid", "message", [])
@@ -247,16 +246,15 @@ module Imap::Backup
     end
 
     describe "#each_message" do
-      let(:action) { -> { subject.each_message([]) {} } }
-
-      it_behaves_like "a method that checks for invalid serialization"
-      it_behaves_like "a method sets up the folder directory"
-
-      let(:message_enumerator) { instance_double(Serializer::MessageEnumerator, run: nil) }
-
       before do
         allow(Serializer::MessageEnumerator).to receive(:new) { message_enumerator }
       end
+
+      let(:action) { -> { subject.each_message([]) {} } }
+      let(:message_enumerator) { instance_double(Serializer::MessageEnumerator, run: nil) }
+
+      it_behaves_like "a method that checks for invalid serialization"
+      it_behaves_like "a method sets up the folder directory"
 
       it "runs the MessageEnumerator" do
         subject.each_message([]) {}

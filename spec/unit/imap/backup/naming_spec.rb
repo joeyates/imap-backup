@@ -12,7 +12,7 @@ module Imap::Backup
           expect(described_class.to_local_path("c:a%")).to eq("c%3a;a%25;")
         end
       end
-     
+
       context "when there are no unacceptable characters" do
         it "returns the text unchanged" do
           expect(described_class.to_local_path("ciao")).to eq("ciao")
