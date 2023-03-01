@@ -1,5 +1,5 @@
 require "ostruct"
-require "support/shared_examples/an_action_that_handle_logger_options"
+require "support/shared_examples/an_action_that_handles_logger_options"
 
 module Imap::Backup
   describe CLI::Remote do
