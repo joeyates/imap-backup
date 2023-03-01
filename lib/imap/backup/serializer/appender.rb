@@ -1,4 +1,6 @@
 module Imap::Backup
+  class Serializer; end
+
   class Serializer::Appender
     attr_reader :imap
     attr_reader :folder
