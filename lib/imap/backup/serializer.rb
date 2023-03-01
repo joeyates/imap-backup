@@ -1,6 +1,7 @@
 require "forwardable"
 
 require "email/mboxrd/message"
+require "imap/backup/naming"
 require "imap/backup/serializer/appender"
 require "imap/backup/serializer/imap"
 require "imap/backup/serializer/message"
@@ -72,7 +73,7 @@ module Imap::Backup
     def append(uid, message, flags)
       validate!
 
-      appender = Serializer::Appender.new(folder: folder, imap: imap, mbox: mbox)
+      appender = Serializer::Appender.new(folder: sanitized, imap: imap, mbox: mbox)
       appender.run(uid: uid, message: message, flags: flags)
     end
 
@@ -116,14 +117,16 @@ module Imap::Backup
     end
 
     def folder_path
-      self.class.folder_path_for(path: path, folder: folder)
+      self.class.folder_path_for(path: path, folder: sanitized)
     end
 
     private
 
     def rename(new_name)
       destination = self.class.folder_path_for(path: path, folder: new_name)
-      ensure_containing_directory(new_name)
+      relative = File.dirname(new_name)
+      directory = Serializer::Directory.new(path, relative)
+      directory.ensure_exists
       mbox.rename destination
       imap.rename destination
     end
@@ -136,7 +139,7 @@ module Imap::Backup
     def mbox
       @mbox ||=
         begin
-          ensure_containing_directory(folder)
+          ensure_containing_directory
           Serializer::Mbox.new(folder_path)
         end
     end
@@ -144,9 +147,13 @@ module Imap::Backup
     def imap
       @imap ||=
         begin
-          ensure_containing_directory(folder)
+          ensure_containing_directory
           Serializer::Imap.new(folder_path)
         end
+    end
+
+    def sanitized
+      @sanitized ||= Naming.to_local_path(folder)
     end
 
     def optionally_migrate2to3
@@ -162,8 +169,8 @@ module Imap::Backup
       migrator.run
     end
 
-    def ensure_containing_directory(folder)
-      relative = File.dirname(folder)
+    def ensure_containing_directory
+      relative = File.dirname(sanitized)
       directory = Serializer::Directory.new(path, relative)
       directory.ensure_exists
     end

@@ -65,12 +65,23 @@ module Imap::Backup
     end
 
     it "ensures the folder's containing directory exists" do
-      expect(directory).to have_received(:ensure_exists).twice
+      expect(directory).to have_received(:ensure_exists).at_least(:once)
+    end
+
+    context "when the directory contains invalid characters" do
+      let(:folder_name) { "a:b/sub" }
+
+      it "creates it using valid characters" do
+        expect(Serializer::Directory).
+          to have_received(:new).
+          with(anything, "a%3a;b").
+          at_least(:once)
+      end
     end
   end
 
   describe Serializer do
-    subject { described_class.new("path", "folder/sub") }
+    subject { described_class.new("path", folder_name) }
 
     let(:imap) do
       instance_double(
@@ -90,11 +101,14 @@ module Imap::Backup
         touch: nil
       )
     end
-    let(:folder_path) { File.expand_path(File.join("path", "folder/sub")) }
+    let(:folder_name) { "folder/sub" }
+    let(:sanitized_folder_name) { folder_name.gsub(":", "%3a;") }
+    let(:folder_path) { File.expand_path(File.join("path", folder_name)) }
+    let(:sanitized_folder_path) { File.expand_path(File.join("path", sanitized_folder_name)) }
     let(:existing_uid_validity) { nil }
 
     before do
-      allow(Serializer::Imap).to receive(:new).with(folder_path) { imap }
+      allow(Serializer::Imap).to receive(:new).with(sanitized_folder_path) { imap }
       allow(Serializer::Mbox).to receive(:new) { mbox }
     end
 
