@@ -70,7 +70,8 @@ module Imap::Backup
           subject.invoke(:export_to_thunderbird, ["foo@example.com"], options)
         end
       )
-      it_behaves_like("an action that requires an existing configuration",
+      it_behaves_like(
+        "an action that requires an existing configuration",
         action: ->(subject) do
           subject.invoke(:export_to_thunderbird, ["foo@example.com"])
         end
@@ -121,7 +122,8 @@ module Imap::Backup
     end
 
     describe "#ignore_history" do
-      it_behaves_like("an action that requires an existing configuration",
+      it_behaves_like(
+        "an action that requires an existing configuration",
         action: ->(subject) do
           subject.ignore_history("foo@example.com")
         end

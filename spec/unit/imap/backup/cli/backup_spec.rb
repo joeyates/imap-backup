@@ -13,7 +13,8 @@ module Imap::Backup
       # rubocop:enable RSpec/SubjectStub
     end
 
-    it_behaves_like("an action that requires an existing configuration",
+    it_behaves_like(
+      "an action that requires an existing configuration",
       action: ->(subject) { subject.run }
     )
 

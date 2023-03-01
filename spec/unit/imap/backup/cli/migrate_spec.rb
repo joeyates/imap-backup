@@ -22,7 +22,8 @@ module Imap::Backup
       allow(folder_enumerator).to receive(:each).and_yield(serializer, folder)
     end
 
-    it_behaves_like("an action that requires an existing configuration",
+    it_behaves_like(
+      "an action that requires an existing configuration",
       action: ->(subject) { subject.run }
     )
 

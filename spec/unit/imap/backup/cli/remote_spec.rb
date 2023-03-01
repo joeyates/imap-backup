@@ -29,7 +29,8 @@ module Imap::Backup
     end
 
     describe "#folders" do
-      it_behaves_like("an action that requires an existing configuration",
+      it_behaves_like(
+        "an action that requires an existing configuration",
         action: ->(subject) { subject.folders("email") }
       )
 
@@ -48,7 +49,8 @@ module Imap::Backup
     end
 
     describe "#namespaces" do
-      it_behaves_like("an action that requires an existing configuration",
+      it_behaves_like(
+        "an action that requires an existing configuration",
         action: ->(subject) { subject.namespaces("email") }
       )
 

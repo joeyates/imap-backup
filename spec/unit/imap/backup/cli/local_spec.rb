@@ -47,7 +47,8 @@ module Imap::Backup
     end
 
     describe "accounts" do
-      it_behaves_like("an action that requires an existing configuration",
+      it_behaves_like(
+        "an action that requires an existing configuration",
         action: ->(subject) { subject.accounts }
       )
 
@@ -59,7 +60,8 @@ module Imap::Backup
     end
 
     describe "folders" do
-      it_behaves_like("an action that requires an existing configuration",
+      it_behaves_like(
+        "an action that requires an existing configuration",
         action: ->(subject) { subject.folders("email") }
       )
 
@@ -73,7 +75,8 @@ module Imap::Backup
     describe "list" do
       before { subject.list(email, "bar") }
 
-      it_behaves_like("an action that requires an existing configuration",
+      it_behaves_like(
+        "an action that requires an existing configuration",
         action: ->(subject) { subject.list("email", "bar") }
       )
 
@@ -93,7 +96,8 @@ module Imap::Backup
     describe "show" do
       before { subject.show(email, "bar", uids.join(",")) }
 
-      it_behaves_like("an action that requires an existing configuration",
+      it_behaves_like(
+        "an action that requires an existing configuration",
         action: ->(subject) { subject.show("email", "bar", "1") }
       )
 

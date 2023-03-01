@@ -30,7 +30,8 @@ module Imap::Backup
       subject.run
     end
 
-    it_behaves_like("an action that requires an existing configuration",
+    it_behaves_like(
+      "an action that requires an existing configuration",
       action: ->(subject) { subject.run }
     )
 

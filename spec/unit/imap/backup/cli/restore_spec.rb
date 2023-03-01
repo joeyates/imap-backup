@@ -14,7 +14,8 @@ module Imap::Backup
       allow(Configuration).to receive(:new) { config }
     end
 
-    it_behaves_like("an action that requires an existing configuration",
+    it_behaves_like(
+      "an action that requires an existing configuration",
       action: ->(subject) { subject.run }
     )
 
