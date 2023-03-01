@@ -2,6 +2,8 @@ require "support/shared_examples/an_action_that_handle_logger_options"
 
 module Imap::Backup
   describe CLI::Utils do
+    subject { described_class.new([], {quiet: true}) }
+
     let(:account) do
       instance_double(
         Account,
