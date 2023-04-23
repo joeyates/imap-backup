@@ -14,6 +14,8 @@ module Imap::Backup
     BODY_ATTRIBUTE = "BODY[]".freeze
     UID_FETCH_RETRY_CLASSES = [EOFError, Errno::ECONNRESET, IOError].freeze
     APPEND_RETRY_CLASSES = [Net::IMAP::BadResponseError].freeze
+    CREATE_RETRY_CLASSES = [Net::IMAP::BadResponseError].freeze
+    EXAMINE_RETRY_CLASSES = [Net::IMAP::BadResponseError].freeze
     PERMITTED_FLAGS = %i(Answered Draft Flagged Seen).freeze
 
     attr_reader :connection
@@ -33,7 +35,9 @@ module Imap::Backup
     end
 
     def exist?
-      examine
+      retry_on_error(errors: EXAMINE_RETRY_CLASSES) do
+        examine
+      end
       true
     rescue FolderNotFound
       false
@@ -42,7 +46,9 @@ module Imap::Backup
     def create
       return if exist?
 
-      client.create(utf7_encoded_name)
+      retry_on_error(errors: CREATE_RETRY_CLASSES) do
+        client.create(utf7_encoded_name)
+      end
     end
 
     def uid_validity

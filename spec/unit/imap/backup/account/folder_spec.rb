@@ -31,6 +31,10 @@ module Imap::Backup
     let(:responses) { [] }
     let(:append_response) { nil }
     let(:uids) { [5678, 123] }
+    let(:bad_response_error_response) do
+      response_text = Net::IMAP::ResponseText.new(42, "BOOM")
+      Net::IMAP::TaggedResponse.new("BAD", "name", response_text, "BOOM")
+    end
 
     before { allow(client).to receive(:uid_search).with(["ALL"]) { uids } }
 
@@ -169,6 +173,22 @@ module Imap::Backup
           expect(subject.exist?).to be_falsey
         end
       end
+
+      context "when the examine fails with a BadResponseError" do
+        before do
+          outcomes = [
+            -> { raise Net::IMAP::BadResponseError, bad_response_error_response },
+            -> {}
+          ]
+          allow(client).to receive(:examine) { outcomes.shift.call }
+        end
+
+        it "retries" do
+          subject.create
+
+          expect(client).to have_received(:examine).twice
+        end
+      end
     end
 
     describe "#create" do
@@ -196,6 +216,22 @@ module Imap::Backup
           expect(client).to receive(:create).with(encoded_folder_name)
 
           subject.create
+        end
+
+        context "when the create fails with a BadResponseError" do
+          before do
+            outcomes = [
+              -> { raise Net::IMAP::BadResponseError, bad_response_error_response },
+              -> {}
+            ]
+            allow(client).to receive(:create) { outcomes.shift.call }
+          end
+
+          it "retries" do
+            subject.create
+
+            expect(client).to have_received(:create).twice
+          end
         end
       end
     end
@@ -278,11 +314,7 @@ module Imap::Backup
       context "when the append fails with a BadResponseError" do
         before do
           outcomes = [
-            -> do
-              response_text = Net::IMAP::ResponseText.new(42, "BOOM")
-              response = Net::IMAP::TaggedResponse.new("BAD", "name", response_text, "BOOM")
-              raise Net::IMAP::BadResponseError, response
-            end,
+            -> { raise Net::IMAP::BadResponseError, bad_response_error_response },
             -> { append_response }
           ]
           allow(client).to receive(:append) { outcomes.shift.call }
