@@ -22,6 +22,21 @@ module Imap::Backup
 
     default_task :backup
 
+    def self.start(*args)
+      # By default, commands like `imap-backup help foo bar`
+      # are handled by listing all `foo` methods, whereas the user
+      # probably wants the detailed help for the `bar` method.
+      # Move initial "help" argument to after any subcommand,
+      # so we get help for the requested subcommand method.
+      first_argument_is_help = ARGV[0] == "help"
+      second_argument_is_subcommand = subcommands.include?(ARGV[1])
+      if first_argument_is_help && second_argument_is_subcommand
+        help, subcommand = ARGV.shift(2)
+        ARGV.unshift(subcommand, help)
+      end
+      super
+    end
+
     def self.exit_on_failure?
       true
     end
