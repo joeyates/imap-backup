@@ -96,7 +96,7 @@ RSpec.describe Email::Mboxrd::Message do
     context "when date is missing" do
       let(:message_body) { msg_no_date }
 
-      it "does no fail" do
+      it "does not fail" do
         expect { subject.to_serialized }.to_not raise_error
       end
     end
