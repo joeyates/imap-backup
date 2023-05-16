@@ -113,7 +113,7 @@ module Imap::Backup
         # NOOP
         nil
       else
-        apply_new_uid_validity value
+        apply_new_uid_validity(value)
       end
     end
 
