@@ -20,9 +20,17 @@ module Imap::Backup
 
     include Helpers
 
+    VERSION_ARGUMENTS = %w(-v --version).freeze
+
     default_task :backup
 
     def self.start(*args)
+      version_argument = ARGV & VERSION_ARGUMENTS
+      if version_argument.any?
+        new.version
+        exit 0
+      end
+
       # By default, commands like `imap-backup help foo bar`
       # are handled by listing all `foo` methods, whereas the user
       # probably wants the detailed help for the `bar` method.
@@ -227,5 +235,10 @@ module Imap::Backup
 
     desc "utils SUBCOMMAND [OPTIONS]", "Various utilities"
     subcommand "utils", Utils
+
+    desc "version", "Print the imap-backup version"
+    def version
+      Kernel.puts "imap-backup #{Imap::Backup::VERSION}"
+    end
   end
 end
