@@ -30,14 +30,20 @@ module Imap::Backup
     def initialize(path, folder)
       @path = path
       @folder = folder
+      @validated = nil
     end
 
     # Returns true if there are existing, valid files
     # false otherwise (in which case any existing files are deleted)
     def validate!
+      return if @validated
+
       optionally_migrate2to3
 
-      return true if imap.valid? && mbox.valid?
+      if imap.valid? && mbox.valid?
+        @validated = true
+        return true
+      end
 
       delete
 
