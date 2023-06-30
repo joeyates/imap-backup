@@ -21,6 +21,12 @@ Before running the test suite, it needs to be started:
 $ docker-compose up -d
 ```
 
+or, with Podman
+
+```sh
+$ podman-compose -f docker-compose.yml up -d
+```
+
 ```sh
 $ rake
 ```
