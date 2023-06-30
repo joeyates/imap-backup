@@ -70,4 +70,62 @@ RSpec.describe "imap-backup migrate", type: :aruba, docker: true do
     messages = test_server.folder_messages(folder)
     expect(messages[0]["FLAGS"]).to include(:Draft)
   end
+
+  context "when migrating from a subfolder" do
+    let(:source_folder) { "my_sub.my_folder" }
+    let(:setup) do
+      create_config(**config_options)
+      append_local(email: email, folder: source_folder, subject: "Hi")
+    end
+
+    it "copies email from subfolders on the source account" do
+      command = [
+        "imap-backup",
+        "migrate",
+        email,
+        destination_account[:username],
+        "--source-prefix=my_sub",
+        "--source-delimiter=."
+      ].join(" ")
+
+      run_command_and_stop command
+
+      messages = test_server.folder_messages(folder)
+      expected = <<~MESSAGE.gsub("\n", "\r\n")
+        From: sender@example.com
+        Subject: Hi
+
+        body
+
+      MESSAGE
+      expect(messages[0]["BODY[]"]).to eq(expected)
+    end
+  end
+
+  context "when migrating into a subfolder" do
+    let(:destination_folder) { "my_sub.my_folder" }
+
+    it "copies email to subfolders on the destination account" do
+      command = [
+        "imap-backup",
+        "migrate",
+        email,
+        destination_account[:username],
+        "--destination-prefix=my_sub",
+        "--destination-delimiter=."
+      ].join(" ")
+
+      run_command_and_stop command
+
+      messages = test_server.folder_messages(destination_folder)
+      expected = <<~MESSAGE.gsub("\n", "\r\n")
+        From: sender@example.com
+        Subject: Ciao
+
+        body
+
+      MESSAGE
+      expect(messages[0]["BODY[]"]).to eq(expected)
+    end
+  end
 end
