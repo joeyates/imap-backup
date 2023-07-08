@@ -228,7 +228,7 @@ module Imap::Backup
       before do
         allow(Uploader).to receive(:new) { uploader }
         allow(Account::Folder).to receive(:new).
-          with(subject, folder_name) { folder }
+          with(client, folder_name) { folder }
         allow(Serializer).to receive(:new).
           with(anything, folder_name) { serializer }
         allow(Pathname).to receive(:glob).

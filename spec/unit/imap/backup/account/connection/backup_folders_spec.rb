@@ -6,12 +6,10 @@ module Imap::Backup
       instance_double(
         Account,
         folders: account_folders,
-        connection: connection,
         folder_blacklist: folder_blacklist
       )
     end
     let(:client) { instance_double(Client::Default) }
-    let(:connection) { instance_double(Account::Connection) }
     let(:account_folders) { [{name: "foo"}] }
     let(:folder_blacklist) { false }
     let(:folder_names) do
@@ -31,8 +29,8 @@ module Imap::Backup
       expect(result.first).to be_a(Account::Folder)
     end
 
-    it "sets the connection" do
-      expect(result.first.connection).to eq(connection)
+    it "sets the client" do
+      expect(result.first.client).to eq(client)
     end
 
     context "when no folders are configured" do

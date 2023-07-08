@@ -6,13 +6,14 @@ module Imap::Backup
       instance_double(
         Account::Folder, "Supplied Folder",
         append: 99,
-        connection: "connection",
+        client: client,
         create: nil,
         name: "imap_folder",
         uid_validity: folder_uid_validity,
         uids: folder_uids
       )
     end
+    let(:client) { instance_double(Client::Default) }
     let(:folder_uids) { [] }
     let(:folder_uid_validity) { 123 }
     let(:serializer) do
@@ -108,7 +109,7 @@ module Imap::Backup
 
         before do
           allow(Account::Folder).to receive(:new).
-            with(folder.connection, "new name") { renamed_folder }
+            with(folder.client, "new name") { renamed_folder }
           allow(Serializer).to receive(:new).
             with(serializer.path, "new name") { updated_serializer }
         end

@@ -31,7 +31,7 @@ module Imap::Backup
           all_names & configured
         end
 
-      names.map { |name| Account::Folder.new(account.connection, name) }
+      names.map { |name| Account::Folder.new(client, name) }
     end
   end
 end

@@ -18,13 +18,11 @@ module Imap::Backup
     EXAMINE_RETRY_CLASSES = [Net::IMAP::BadResponseError].freeze
     PERMITTED_FLAGS = %i(Answered Draft Flagged Seen).freeze
 
-    attr_reader :connection
+    attr_reader :client
     attr_reader :name
 
-    delegate client: :connection
-
-    def initialize(connection, name)
-      @connection = connection
+    def initialize(client, name)
+      @client = client
       @name = name
       @uid_validity = nil
     end

@@ -72,7 +72,7 @@ module Imap::Backup
       destination_name = with_destination_prefix.join(destination_delimiter)
 
       Account::Folder.new(
-        destination.connection,
+        destination.connection.client,
         destination_name
       )
     end

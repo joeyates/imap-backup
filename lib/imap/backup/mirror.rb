@@ -94,8 +94,7 @@ module Imap::Backup
     end
 
     def destination_email
-      # TODO: is there a more elegant way to get the email?
-      folder.connection.account.username
+      folder.client.username
     end
   end
 end

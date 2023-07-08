@@ -83,7 +83,7 @@ module Imap::Backup
       Pathname.glob(glob) do |path|
         name = path.relative_path_from(base).to_s[0..-6]
         serializer = Serializer.new(account.local_path, name)
-        folder = Account::Folder.new(self, name)
+        folder = Account::Folder.new(client, name)
         yield serializer, folder
       end
     end
@@ -109,7 +109,6 @@ module Imap::Backup
       @folder_names = nil
     end
 
-    # TODO: make this private
     def client
       @client ||= Account::Connection::ClientFactory.new(account: account).run
     end

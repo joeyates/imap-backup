@@ -64,7 +64,7 @@ module Imap::Backup
       Logger.logger.debug(
         "Backup '#{serializer.folder}' renamed and restored to '#{new_name}'"
       )
-      @folder = Account::Folder.new(folder.connection, new_name)
+      @folder = Account::Folder.new(folder.client, new_name)
       folder.create
       @serializer = Serializer.new(serializer.path, new_name)
       serializer.force_uid_validity(@folder.uid_validity)
