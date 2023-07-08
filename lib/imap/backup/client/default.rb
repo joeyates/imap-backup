@@ -38,6 +38,11 @@ module Imap::Backup
       Logger.logger.debug "Login complete"
     end
 
+    def reconnect
+      disconnect
+      login
+    end
+
     def username
       account.username
     end
