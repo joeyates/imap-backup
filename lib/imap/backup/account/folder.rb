@@ -29,11 +29,6 @@ module Imap::Backup
       @uid_validity = nil
     end
 
-    # Deprecated: use #name
-    def folder
-      name
-    end
-
     def exist?
       retry_on_error(errors: EXAMINE_RETRY_CLASSES) do
         examine

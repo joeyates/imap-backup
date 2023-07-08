@@ -150,12 +150,6 @@ module Imap::Backup
       end
     end
 
-    describe "#folder" do
-      it "is the name" do
-        expect(subject.folder).to eq(folder_name)
-      end
-    end
-
     describe "#exist?" do
       context "when the folder exists" do
         it "is true" do
