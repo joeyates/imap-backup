@@ -9,7 +9,10 @@ RSpec.describe "imap-backup local folders", type: :aruba do
   before do
     create_config(**config_options)
     append_local(
-      configuration_path: configuration_path, email: account[:username], folder: "my_folder", body: "Hi"
+      configuration_path: configuration_path,
+      email: account[:username],
+      folder: "my_folder",
+      body: "Hi"
     )
 
     run_command_and_stop command
@@ -31,7 +34,9 @@ RSpec.describe "imap-backup local folders", type: :aruba do
     let(:custom_config_path) { File.join(File.expand_path("~/.imap-backup"), "foo.json") }
     let(:configuration_path) { custom_config_path }
     let(:config_options) { {path: custom_config_path, accounts: [account]} }
-    let(:command) { "imap-backup local folders #{account[:username]} --config #{custom_config_path}" }
+    let(:command) do
+      "imap-backup local folders #{account[:username]} --config #{custom_config_path}"
+    end
 
     it "lists folders" do
       expect(last_command_started).to have_output('"my_folder"')
