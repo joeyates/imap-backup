@@ -15,7 +15,9 @@ module Imap::Backup
 
     def initialize(account)
       @account = account
-      reset
+      @backup_folders = nil
+      @client = nil
+      @folder_names = nil
     end
 
     def folder_names
@@ -68,7 +70,7 @@ module Imap::Backup
           end
           FlagRefresher.new(folder, serializer).run if account.mirror_mode || refresh
         rescue Net::IMAP::ByeResponseError
-          reconnect
+          client.reconnect
           retry
         end
       end
@@ -92,21 +94,6 @@ module Imap::Backup
       local_folders do |serializer, folder|
         Uploader.new(folder, serializer).run
       end
-    end
-
-    def disconnect
-      client.disconnect if @client
-      reset
-    end
-
-    def reconnect
-      disconnect
-    end
-
-    def reset
-      @backup_folders = nil
-      @client = nil
-      @folder_names = nil
     end
 
     def client

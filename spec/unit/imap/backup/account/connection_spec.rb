@@ -29,7 +29,7 @@ module Imap::Backup
     let(:client_factory) { instance_double(Account::Connection::ClientFactory, run: client) }
     let(:client) do
       instance_double(
-        Client::Default, authenticate: nil, login: nil, disconnect: nil
+        Client::Default, authenticate: nil, login: nil, reconnect: nil
       )
     end
     let(:imap_folders) { ["backup_folder"] }
@@ -239,53 +239,6 @@ module Imap::Backup
         subject.restore
 
         expect(uploader).to have_received(:run)
-      end
-    end
-
-    describe "#reconnect" do
-      context "when the IMAP connection has been used" do
-        before { subject.client }
-
-        it "disconnects from the server" do
-          expect(client).to receive(:disconnect)
-
-          subject.reconnect
-        end
-      end
-
-      context "when the IMAP connection has not been used" do
-        it "does not disconnect from the server" do
-          expect(client).to_not receive(:disconnect)
-
-          subject.reconnect
-        end
-      end
-
-      it "causes reconnection on future access" do
-        expect(client_factory).to receive(:run)
-
-        subject.reconnect
-        subject.client
-      end
-    end
-
-    describe "#disconnect" do
-      context "when the IMAP connection has been used" do
-        it "disconnects from the server" do
-          subject.client
-
-          expect(client).to receive(:disconnect)
-
-          subject.disconnect
-        end
-      end
-
-      context "when the IMAP connection has not been used" do
-        it "does not disconnect from the server" do
-          expect(client).to_not receive(:disconnect)
-
-          subject.disconnect
-        end
       end
     end
   end
