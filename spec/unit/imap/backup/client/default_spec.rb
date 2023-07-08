@@ -1,7 +1,8 @@
 module Imap::Backup
   describe Client::Default do
-    subject { described_class.new("server", {}) }
+    subject { described_class.new("server", account, {}) }
 
+    let(:account) { instance_double(Account) }
     let(:imap) { instance_double(Net::IMAP, list: imap_folders) }
     let(:imap_folders) { [] }
 

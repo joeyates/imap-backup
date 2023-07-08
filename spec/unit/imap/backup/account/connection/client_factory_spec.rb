@@ -17,7 +17,7 @@ module Imap::Backup
 
     before do
       allow(Client::Default).to receive(:new) { client }
-      allow(client).to receive(:login).with(username, "password")
+      allow(client).to receive(:login).with(no_args)
     end
 
     it "logs in" do

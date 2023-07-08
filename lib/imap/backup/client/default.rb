@@ -11,14 +11,16 @@ module Imap::Backup
       responses uid_fetch uid_search uid_store
     )
 
-    attr_reader :args
+    attr_reader :account
+    attr_reader :options
+    attr_reader :server
     attr_accessor :state
-    attr_reader :username
 
-    def initialize(*args)
-      @args = args
+    def initialize(server, account, options)
+      @account = account
+      @options = options
+      @server = server
       @state = nil
-      @username = nil
     end
 
     def list
@@ -30,9 +32,14 @@ module Imap::Backup
       mailbox_lists.map { |ml| extract_name(ml) }
     end
 
-    def login(username, password)
-      imap.login(username, password)
-      @username = username
+    def login
+      Logger.logger.debug "Logging in: #{account.username}/#{masked_password}"
+      imap.login(account.username, account.password)
+      Logger.logger.debug "Login complete"
+    end
+
+    def username
+      account.username
     end
 
     # Track mailbox selection during delegation to Net::IMAP instance
@@ -40,7 +47,6 @@ module Imap::Backup
     def disconnect
       imap.disconnect
       self.state = nil
-      @username = nil
     end
 
     def examine(mailbox)
@@ -61,12 +67,16 @@ module Imap::Backup
     private
 
     def imap
-      @imap ||= Net::IMAP.new(*args)
+      @imap ||= Net::IMAP.new(server, options)
     end
 
     def extract_name(mailbox_list)
       utf7_encoded = mailbox_list.name
       Net::IMAP.decode_utf7(utf7_encoded)
+    end
+
+    def masked_password
+      account.password.gsub(/./, "x")
     end
 
     # 6.3.8. LIST Command
