@@ -57,22 +57,17 @@ module Imap::Backup
 
         Logger.logger.debug "[#{folder.name}] running backup"
         serializer.apply_uid_validity(folder.uid_validity)
-        begin
-          Downloader.new(
-            folder,
-            serializer,
-            multi_fetch_size: account.multi_fetch_size,
-            reset_seen_flags_after_fetch: account.reset_seen_flags_after_fetch
-          ).run
-          if account.mirror_mode
-            Logger.logger.info "Mirror mode - Deleting messages only present locally"
-            LocalOnlyMessageDeleter.new(folder, serializer).run
-          end
-          FlagRefresher.new(folder, serializer).run if account.mirror_mode || refresh
-        rescue Net::IMAP::ByeResponseError
-          client.reconnect
-          retry
+        Downloader.new(
+          folder,
+          serializer,
+          multi_fetch_size: account.multi_fetch_size,
+          reset_seen_flags_after_fetch: account.reset_seen_flags_after_fetch
+        ).run
+        if account.mirror_mode
+          Logger.logger.info "Mirror mode - Deleting messages only present locally"
+          LocalOnlyMessageDeleter.new(folder, serializer).run
         end
+        FlagRefresher.new(folder, serializer).run if account.mirror_mode || refresh
       end
     end
 

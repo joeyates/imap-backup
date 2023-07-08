@@ -29,7 +29,7 @@ module Imap::Backup
     let(:client_factory) { instance_double(Account::Connection::ClientFactory, run: client) }
     let(:client) do
       instance_double(
-        Client::Default, authenticate: nil, login: nil, reconnect: nil
+        Client::Default, authenticate: nil, login: nil
       )
     end
     let(:imap_folders) { ["backup_folder"] }
@@ -189,24 +189,6 @@ module Imap::Backup
 
             subject.run_backup
           end
-        end
-      end
-
-      context "when the IMAP session expires" do
-        before do
-          data = OpenStruct.new(data: "Session expired")
-          response = OpenStruct.new(data: data)
-          outcomes = [
-            -> { raise Net::IMAP::ByeResponseError, response },
-            -> { nil }
-          ]
-          allow(downloader).to receive(:run) { outcomes.shift.call }
-        end
-
-        it "reconnects" do
-          expect(downloader).to receive(:run).exactly(:twice)
-
-          subject.run_backup
         end
       end
 

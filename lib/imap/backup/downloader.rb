@@ -35,6 +35,9 @@ module Imap::Backup
       @multi_fetch_size = 1
       @uids = nil
       retry
+    rescue Net::IMAP::ByeResponseError
+      folder.client.reconnect
+      retry
     end
 
     private
