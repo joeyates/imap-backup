@@ -7,16 +7,18 @@ module Imap::Backup
   class Client::Default
     extend Forwardable
     def_delegators :imap, *%i(
-      append authenticate create expunge login namespace
+      append authenticate create expunge namespace
       responses uid_fetch uid_search uid_store
     )
 
     attr_reader :args
     attr_accessor :state
+    attr_reader :username
 
     def initialize(*args)
       @args = args
       @state = nil
+      @username = nil
     end
 
     def list
@@ -28,11 +30,17 @@ module Imap::Backup
       mailbox_lists.map { |ml| extract_name(ml) }
     end
 
+    def login(username, password)
+      imap.login(username, password)
+      @username = username
+    end
+
     # Track mailbox selection during delegation to Net::IMAP instance
 
     def disconnect
       imap.disconnect
       self.state = nil
+      @username = nil
     end
 
     def examine(mailbox)
