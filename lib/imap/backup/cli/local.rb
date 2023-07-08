@@ -8,8 +8,11 @@ module Imap::Backup
     desc "accounts", "List locally backed-up accounts"
     config_option
     format_option
+    quiet_option
+    verbose_option
     def accounts
-      config = load_config(**options)
+      non_logging_options = Logger.setup_logging(options)
+      config = load_config(**non_logging_options)
       names = config.accounts.map(&:username)
       case options[:format]
       when "json"
@@ -31,8 +34,11 @@ module Imap::Backup
     )
     config_option
     format_option
+    quiet_option
+    verbose_option
     def check
-      config = load_config(**options)
+      non_logging_options = Logger.setup_logging(options)
+      config = load_config(**non_logging_options)
       results = each_connection(config, emails).map do |connection|
         folders = connection.local_folders
         folder_results = folders.map do |serializer|
@@ -64,8 +70,11 @@ module Imap::Backup
     desc "folders EMAIL", "List backed up folders"
     config_option
     format_option
+    quiet_option
+    verbose_option
     def folders(email)
-      config = load_config(**options)
+      non_logging_options = Logger.setup_logging(options)
+      config = load_config(**non_logging_options)
       connection = connection(config, email)
 
       folders = connection.local_folders
@@ -83,8 +92,11 @@ module Imap::Backup
     desc "list EMAIL FOLDER", "List emails in a folder"
     config_option
     format_option
+    quiet_option
+    verbose_option
     def list(email, folder_name)
-      config = load_config(**options)
+      non_logging_options = Logger.setup_logging(options)
+      config = load_config(**non_logging_options)
       connection = connection(config, email)
 
       serializer, _folder = connection.local_folders.find do |(_s, f)|
@@ -108,8 +120,11 @@ module Imap::Backup
     DESC
     config_option
     format_option
+    quiet_option
+    verbose_option
     def show(email, folder_name, uids)
-      config = load_config(**options)
+      non_logging_options = Logger.setup_logging(options)
+      config = load_config(**non_logging_options)
       connection = connection(config, email)
 
       serializer, _folder = connection.local_folders.find do |(_s, f)|
