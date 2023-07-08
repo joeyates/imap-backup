@@ -1,9 +1,10 @@
 module Imap::Backup
   describe Account::Connection::FolderNames do
-    subject { described_class.new(client: client, account: account) }
+    subject { described_class.new(client: client) }
 
-    let(:account) { instance_double(Account, username: "username") }
-    let(:client) { instance_double(Client::Default, list: folders) }
+    let(:client) do
+      instance_double(Client::Default, list: folders, username: "username")
+    end
     let(:folders) { %w[folder] }
 
     it "returns the list of folders" do

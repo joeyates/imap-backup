@@ -12,7 +12,7 @@ module Imap::Backup
     end
 
     def run
-      all_names = Account::Connection::FolderNames.new(client: client, account: account).run
+      all_names = Account::Connection::FolderNames.new(client: client).run
 
       configured =
         case

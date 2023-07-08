@@ -3,19 +3,17 @@ module Imap::Backup
   class Account::Connection; end
 
   class Account::Connection::FolderNames
-    attr_reader :account
     attr_reader :client
 
-    def initialize(client:, account:)
+    def initialize(client:)
       @client = client
-      @account = account
     end
 
     def run
       folder_names = client.list
 
       if folder_names.empty?
-        message = "Unable to get folder list for account #{account.username}"
+        message = "Unable to get folder list for account #{client.username}"
         Logger.logger.info message
         raise message
       end

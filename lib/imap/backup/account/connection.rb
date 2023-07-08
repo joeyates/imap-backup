@@ -21,7 +21,7 @@ module Imap::Backup
     end
 
     def folder_names
-      @folder_names ||= Account::Connection::FolderNames.new(client: client, account: account).run
+      @folder_names ||= Account::Connection::FolderNames.new(client: client).run
     end
 
     def backup_folders
