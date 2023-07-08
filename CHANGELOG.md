@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 9.3.2 - 2023-06-04
+
+## Changed
+
+* Improved performance of large backups by avoiding unnecessary serialized
+  IMAP data migration and validation checks.
+
 ## 9.3.1 - 2023-05-12
 
 ## Changed
