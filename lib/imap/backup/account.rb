@@ -42,6 +42,10 @@ module Imap::Backup
       @connection ||= Account::Connection.new(self)
     end
 
+    def namespaces
+      client.namespace
+    end
+
     def valid?
       username && password ? true : false
     end

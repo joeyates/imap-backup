@@ -35,8 +35,8 @@ module Imap::Backup
     def namespaces(email)
       Imap::Backup::Logger.setup_logging options
       config = load_config(**options)
-      connection = connection(config, email)
-      namespaces = connection.namespaces
+      account = account(config, email)
+      namespaces = account.namespaces
       case options[:format]
       when "json"
         json_format_namespaces namespaces
