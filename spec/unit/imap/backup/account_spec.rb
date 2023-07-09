@@ -38,6 +38,21 @@ module Imap::Backup
       end
     end
 
+    describe "#client" do
+      let(:client_factory) { instance_double(Account::Connection::ClientFactory, run: client) }
+      let(:client) do
+        instance_double(Client::Default, authenticate: nil, login: nil)
+      end
+
+      before do
+        allow(Account::Connection::ClientFactory).to receive(:new) { client_factory }
+      end
+
+      it "calls ClientFactory" do
+        expect(subject.client).to eq(client)
+      end
+    end
+
     describe "#connection" do
       let(:result) { subject.connection }
 

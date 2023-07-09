@@ -1,4 +1,5 @@
 require "forwardable"
+require "net/imap"
 
 require "retry_on_error"
 
@@ -12,10 +13,10 @@ module Imap::Backup
     include RetryOnError
 
     BODY_ATTRIBUTE = "BODY[]".freeze
-    UID_FETCH_RETRY_CLASSES = [EOFError, Errno::ECONNRESET, IOError].freeze
-    APPEND_RETRY_CLASSES = [Net::IMAP::BadResponseError].freeze
-    CREATE_RETRY_CLASSES = [Net::IMAP::BadResponseError].freeze
-    EXAMINE_RETRY_CLASSES = [Net::IMAP::BadResponseError].freeze
+    UID_FETCH_RETRY_CLASSES = [::EOFError, ::Errno::ECONNRESET, ::IOError].freeze
+    APPEND_RETRY_CLASSES = [::Net::IMAP::BadResponseError].freeze
+    CREATE_RETRY_CLASSES = [::Net::IMAP::BadResponseError].freeze
+    EXAMINE_RETRY_CLASSES = [::Net::IMAP::BadResponseError].freeze
     PERMITTED_FLAGS = %i(Answered Draft Flagged Seen).freeze
 
     attr_reader :client

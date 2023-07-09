@@ -1,7 +1,4 @@
-require "imap/backup/client/apple_mail"
-require "imap/backup/client/default"
 require "imap/backup/account/connection/backup_folders"
-require "imap/backup/account/connection/client_factory"
 require "imap/backup/account/connection/folder_names"
 require "imap/backup/flag_refresher"
 require "imap/backup/local_only_message_deleter"
@@ -16,27 +13,26 @@ module Imap::Backup
     def initialize(account)
       @account = account
       @backup_folders = nil
-      @client = nil
       @folder_names = nil
     end
 
     def folder_names
-      @folder_names ||= Account::Connection::FolderNames.new(client: client).run
+      @folder_names ||= Account::Connection::FolderNames.new(client: account.client).run
     end
 
     def backup_folders
       @backup_folders ||=
-        Account::Connection::BackupFolders.new(client: client, account: account).run
+        Account::Connection::BackupFolders.new(client: account.client, account: account).run
     end
 
     def namespaces
-      client.namespace
+      account.client.namespace
     end
 
     def run_backup(refresh: false)
       Logger.logger.info "Running backup of account: #{account.username}"
       # start the connection so we get logging messages in the right order
-      client
+      account.client
       ensure_account_folder
       if account.mirror_mode
         # Delete serialized folders that are not to be backed up
@@ -80,7 +76,7 @@ module Imap::Backup
       Pathname.glob(glob) do |path|
         name = path.relative_path_from(base).to_s[0..-6]
         serializer = Serializer.new(account.local_path, name)
-        folder = Account::Folder.new(client, name)
+        folder = Account::Folder.new(account.client, name)
         yield serializer, folder
       end
     end
@@ -89,10 +85,6 @@ module Imap::Backup
       local_folders do |serializer, folder|
         Uploader.new(folder, serializer).run
       end
-    end
-
-    def client
-      @client ||= Account::Connection::ClientFactory.new(account: account).run
     end
 
     private

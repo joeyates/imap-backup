@@ -1,3 +1,5 @@
+require "imap/backup/client/apple_mail"
+
 describe Email::Provider::AppleMail do
   describe "#host" do
     it "returns host" do

@@ -1,11 +1,18 @@
+require "socket"
+
 require "email/provider"
+require "imap/backup/client/apple_mail"
+require "imap/backup/client/default"
 require "retry_on_error"
 
 module Imap::Backup
+  class Account; end
+  class Account::Connection; end
+
   class Account::Connection::ClientFactory
     include RetryOnError
 
-    LOGIN_RETRY_CLASSES = [EOFError, Errno::ECONNRESET, SocketError].freeze
+    LOGIN_RETRY_CLASSES = [::EOFError, ::Errno::ECONNRESET, ::SocketError].freeze
 
     attr_reader :account
 

@@ -1,3 +1,5 @@
+require "imap/backup/account/connection/client_factory"
+
 module Imap; end
 
 module Imap::Backup

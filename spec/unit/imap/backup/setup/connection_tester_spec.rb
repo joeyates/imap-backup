@@ -1,21 +1,10 @@
 module Imap::Backup
   describe Setup::ConnectionTester do
     describe "#test" do
-      subject { described_class.new("foo") }
+      subject { described_class.new(account) }
 
-      let(:connection) do
-        instance_double(Account::Connection, client: nil)
-      end
-
-      before do
-        allow(Account::Connection).to receive(:new) { connection }
-      end
-
-      it "tries to connect" do
-        expect(connection).to receive(:client)
-
-        subject.test
-      end
+      let(:account) { instance_double(Account, client: client) }
+      let(:client) { instance_double(Client::Default) }
 
       describe "success" do
         it "returns success" do
@@ -25,7 +14,7 @@ module Imap::Backup
 
       describe "failure" do
         before do
-          allow(connection).to receive(:client).and_raise(error)
+          allow(account).to receive(:client).and_raise(error)
         end
 
         context "with no connection" do
