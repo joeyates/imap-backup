@@ -11,13 +11,12 @@ module Imap::Backup
     end
 
     def run
-      if connection.nil?
-        Logger.logger.warn "Connection failed"
+      if client.nil?
         highline.ask "Press a key "
         return
       end
 
-      if imap_folders.nil?
+      if folder_names.empty?
         Logger.logger.warn "Unable to get folder list"
         highline.ask "Press a key "
         return
@@ -50,7 +49,7 @@ module Imap::Backup
     end
 
     def add_folders(menu)
-      imap_folders.each do |folder|
+      folder_names.each do |folder|
         mark = selected?(folder) ? "+" : "-"
         menu.choice("#{mark} #{folder}") do
           toggle_selection folder
@@ -69,7 +68,7 @@ module Imap::Backup
       removed = []
       config_folders = []
       account.folders.each do |f|
-        found = imap_folders.find { |folder| folder == f[:name] }
+        found = folder_names.find { |folder| folder == f[:name] }
         if found
           config_folders << f
         else
@@ -98,14 +97,15 @@ module Imap::Backup
       end
     end
 
-    def connection
-      @connection ||= Account::Connection.new(account)
-    rescue StandardError
+    def client
+      @client ||= account.client
+    rescue StandardError => e
+      Logger.logger.warn "Connection failed"
       nil
     end
 
-    def imap_folders
-      @imap_folders ||= connection.folder_names
+    def folder_names
+      @folder_names ||= client.list
     end
 
     def highline

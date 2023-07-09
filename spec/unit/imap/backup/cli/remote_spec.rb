@@ -3,15 +3,9 @@ require "support/shared_examples/an_action_that_handles_logger_options"
 
 module Imap::Backup
   describe CLI::Remote do
-    let(:connection) do
-      instance_double(
-        Account::Connection,
-        account: account,
-        folder_names: %w[foo],
-        namespaces: namespaces
-      )
-    end
-    let(:account) { instance_double(Account, username: "user") }
+    let(:account) { instance_double(Account, client: client, username: "user") }
+    let(:client) { instance_double(Client::Default, list: %w(foo)) }
+    let(:connection) { instance_double(Account::Connection, namespaces: namespaces) }
     let(:config) { instance_double(Configuration, accounts: [account]) }
     let(:namespaces) do
       OpenStruct.new(

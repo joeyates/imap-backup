@@ -1,5 +1,4 @@
 require "imap/backup/account/connection/backup_folders"
-require "imap/backup/account/connection/folder_names"
 require "imap/backup/flag_refresher"
 require "imap/backup/local_only_message_deleter"
 require "imap/backup/serializer/directory"
@@ -13,11 +12,6 @@ module Imap::Backup
     def initialize(account)
       @account = account
       @backup_folders = nil
-      @folder_names = nil
-    end
-
-    def folder_names
-      @folder_names ||= Account::Connection::FolderNames.new(client: account.client).run
     end
 
     def backup_folders

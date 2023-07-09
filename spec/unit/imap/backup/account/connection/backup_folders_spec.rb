@@ -9,17 +9,10 @@ module Imap::Backup
         folder_blacklist: folder_blacklist
       )
     end
-    let(:client) { instance_double(Client::Default) }
+    let(:client) { instance_double(Client::Default, list: %w(foo bar baz)) }
     let(:account_folders) { [{name: "foo"}] }
     let(:folder_blacklist) { false }
-    let(:folder_names) do
-      instance_double(Account::Connection::FolderNames, run: %w(foo bar baz))
-    end
     let(:result) { subject.run }
-
-    before do
-      allow(Account::Connection::FolderNames).to receive(:new) { folder_names }
-    end
 
     it "returns a folder for each configured folder" do
       expect(result.map(&:name)).to eq(%w(foo))

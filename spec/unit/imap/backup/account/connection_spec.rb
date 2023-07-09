@@ -26,21 +26,21 @@ module Imap::Backup
   describe Account::Connection do
     subject { described_class.new(account) }
 
-    let(:client_factory) { instance_double(Account::Connection::ClientFactory, run: client) }
-    let(:client) do
-      instance_double(
-        Client::Default, authenticate: nil, login: nil
-      )
-    end
     let(:imap_folders) { ["backup_folder"] }
     let(:account) do
       instance_double(
         Account,
         username: "username",
+        client: client,
         local_path: local_path,
         mirror_mode: false,
         multi_fetch_size: multi_fetch_size,
         reset_seen_flags_after_fetch: reset_seen_flags_after_fetch
+      )
+    end
+    let(:client) do
+      instance_double(
+        Client::Default, authenticate: nil, login: nil
       )
     end
     let(:local_path) { "local_path" }
@@ -68,26 +68,7 @@ module Imap::Backup
     let(:folder) { instance_double(Account::Folder, name: imap_folder) }
 
     before do
-      allow(Account::Connection::ClientFactory).to receive(:new) { client_factory }
       allow(Account::Connection::BackupFolders).to receive(:new) { backup_folders }
-    end
-
-    describe "#client" do
-      it "calls ClientFactory" do
-        expect(subject.client).to eq(client)
-      end
-    end
-
-    describe "#folder_names" do
-      let(:folder_names) { instance_double(Account::Connection::FolderNames, run: "result") }
-
-      before do
-        allow(Account::Connection::FolderNames).to receive(:new) { folder_names }
-      end
-
-      it "returns the list of folders" do
-        expect(subject.folder_names).to eq("result")
-      end
     end
 
     describe "#backup_folders" do
