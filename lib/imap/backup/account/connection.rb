@@ -1,7 +1,7 @@
 require "imap/backup/account/connection/backup_folders"
+require "imap/backup/account/folder_ensurer"
 require "imap/backup/flag_refresher"
 require "imap/backup/local_only_message_deleter"
-require "imap/backup/serializer/directory"
 
 module Imap::Backup
   class Account; end
@@ -23,7 +23,7 @@ module Imap::Backup
       Logger.logger.info "Running backup of account: #{account.username}"
       # start the connection so we get logging messages in the right order
       account.client
-      ensure_account_folder
+      Account::FolderEnsurer.new(account: account).run
       if account.mirror_mode
         # Delete serialized folders that are not to be backed up
         wanted = backup_folders.map(&:name)
@@ -60,7 +60,8 @@ module Imap::Backup
     def local_folders
       return enum_for(:local_folders) if !block_given?
 
-      ensure_account_folder
+      Account::FolderEnsurer.new(account: account).run
+
       glob = File.join(account.local_path, "**", "*.imap")
       base = Pathname.new(account.local_path)
       Pathname.glob(glob) do |path|
@@ -84,16 +85,6 @@ module Imap::Backup
         serializer = Serializer.new(account.local_path, folder.name)
         yield folder, serializer
       end
-    end
-
-    def ensure_account_folder
-      raise "The backup path for #{account.username} is not set" if !account.local_path
-
-      Utils.make_folder(
-        File.dirname(account.local_path),
-        File.basename(account.local_path),
-        Serializer::Directory::DIRECTORY_PERMISSIONS
-      )
     end
   end
 end

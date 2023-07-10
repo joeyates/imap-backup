@@ -2,24 +2,16 @@ require "ostruct"
 
 module Imap::Backup
   shared_examples "ensures the backup directory exists" do
-    context "when local_path is not set" do
-      let(:local_path) { nil }
+    let(:folder_ensurer) { instance_double(Account::FolderEnsurer, run: nil) }
 
-      it "fails" do
-        expect { action.call }.to raise_error(RuntimeError, /backup path.*?not set/)
-      end
+    before do
+      allow(Account::FolderEnsurer).to receive(:new) { folder_ensurer }
     end
 
-    context "when the directory does not exist" do
-      before do
-        allow(Utils).to receive(:make_folder)
+    it "runs FolderEnsurer" do
+      action.call
 
-        action.call
-      end
-
-      it "creates it" do
-        expect(Utils).to have_received(:make_folder)
-      end
+      expect(folder_ensurer).to have_received(:run)
     end
   end
 
@@ -196,6 +188,10 @@ module Imap::Backup
           with(anything, folder_name) { serializer }
         allow(Pathname).to receive(:glob).
           and_yield(Pathname.new(File.join(local_path, "#{folder_name}.imap")))
+      end
+
+      it_behaves_like "ensures the backup directory exists" do
+        let(:action) { -> { subject.restore } }
       end
 
       it "runs the uploader" do
