@@ -1,3 +1,4 @@
+require "imap/backup/account/backup_folders"
 require "imap/backup/account/serialized_folders"
 require "imap/backup/thunderbird/mailbox_exporter"
 
@@ -17,7 +18,7 @@ module Imap::Backup
       config = load_config(**options)
       account = account(config, email)
 
-      backup_folders = Account::Connection::BackupFolders.new(
+      backup_folders = Account::BackupFolders.new(
         client: account.client, account: account
       )
       backup_folders.each do |folder|

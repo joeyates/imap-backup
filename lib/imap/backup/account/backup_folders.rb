@@ -2,7 +2,7 @@ module Imap::Backup
   class Account; end
   class Account::Connection; end
 
-  class Account::Connection::BackupFolders
+  class Account::BackupFolders
     attr_reader :account
     attr_reader :client
 

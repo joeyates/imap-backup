@@ -49,13 +49,13 @@ module Imap::Backup
     let(:server) { SERVER }
     let(:new_uid_validity) { nil }
     let(:folder_name) { "folder_name" }
-    let(:backup_folders) { instance_double(Account::Connection::BackupFolders) }
+    let(:backup_folders) { instance_double(Account::BackupFolders) }
     let(:folder_ensurer) { instance_double(Account::FolderEnsurer, run: nil) }
     let(:mirror_mode) { false }
 
     before do
       allow(Account::FolderEnsurer).to receive(:new) { folder_ensurer }
-      allow(Account::Connection::BackupFolders).to receive(:new) { backup_folders }
+      allow(Account::BackupFolders).to receive(:new) { backup_folders }
       allow(Pathname).to receive(:glob).
         and_yield(Pathname.new(File.join(local_path, "#{folder_name}.imap")))
     end

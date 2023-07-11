@@ -1,4 +1,4 @@
-require "imap/backup/account/connection/backup_folders"
+require "imap/backup/account/backup_folders"
 require "imap/backup/account/folder_ensurer"
 require "imap/backup/account/serialized_folders"
 require "imap/backup/flag_refresher"
@@ -21,7 +21,7 @@ module Imap::Backup
       Account::FolderEnsurer.new(account: account).run
       if account.mirror_mode
         # Delete serialized folders that are not to be backed up
-        backup_folders = Account::Connection::BackupFolders.new(
+        backup_folders = Account::BackupFolders.new(
           client: account.client, account: account
         )
         wanted = backup_folders.map(&:name)
@@ -66,7 +66,7 @@ module Imap::Backup
     private
 
     def each_folder
-      backup_folders = Account::Connection::BackupFolders.new(
+      backup_folders = Account::BackupFolders.new(
         client: account.client, account: account
       )
       backup_folders.each do |folder|
