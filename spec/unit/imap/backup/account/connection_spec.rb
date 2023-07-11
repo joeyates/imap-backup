@@ -60,18 +60,6 @@ module Imap::Backup
         and_yield(Pathname.new(File.join(local_path, "#{folder_name}.imap")))
     end
 
-    describe "#backup_folders" do
-      let(:backup_folders) { instance_double(Account::Connection::BackupFolders, run: "result") }
-
-      before do
-        allow(Account::Connection::BackupFolders).to receive(:new) { backup_folders }
-      end
-
-      it "returns the list of folders" do
-        expect(subject.backup_folders).to eq("result")
-      end
-    end
-
     describe "#run_backup" do
       let(:folder) do
         instance_double(

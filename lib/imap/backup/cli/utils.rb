@@ -14,12 +14,15 @@ module Imap::Backup
     def ignore_history(email)
       Logger.setup_logging options
       config = load_config(**options)
-      connection = connection(config, email)
+      account = account(config, email)
 
-      connection.backup_folders.each do |folder|
+      backup_folders = Account::Connection::BackupFolders.new(
+        client: account.client, account: account
+      ).run
+      backup_folders.each do |folder|
         next if !folder.exist?
 
-        serializer = Serializer.new(connection.account.local_path, folder.name)
+        serializer = Serializer.new(account.local_path, folder.name)
         do_ignore_folder_history(folder, serializer)
       end
     end

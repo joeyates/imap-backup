@@ -11,12 +11,6 @@ module Imap::Backup
 
     def initialize(account)
       @account = account
-      @backup_folders = nil
-    end
-
-    def backup_folders
-      @backup_folders ||=
-        Account::Connection::BackupFolders.new(client: account.client, account: account).run
     end
 
     def run_backup(refresh: false)
@@ -26,6 +20,9 @@ module Imap::Backup
       Account::FolderEnsurer.new(account: account).run
       if account.mirror_mode
         # Delete serialized folders that are not to be backed up
+        backup_folders = Account::Connection::BackupFolders.new(
+          client: account.client, account: account
+        ).run
         wanted = backup_folders.map(&:name)
         local_folders do |serializer, _folder|
           serializer.delete if !wanted.include?(serializer.folder)
@@ -81,6 +78,9 @@ module Imap::Backup
     private
 
     def each_folder
+      backup_folders = Account::Connection::BackupFolders.new(
+        client: account.client, account: account
+      ).run
       backup_folders.each do |folder|
         serializer = Serializer.new(account.local_path, folder.name)
         yield folder, serializer
