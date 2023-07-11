@@ -118,7 +118,7 @@ module Imap::Backup
     end
 
     describe "#ignore_history" do
-      let(:backup_folders) { instance_double(Account::Connection::BackupFolders, run: [folder]) }
+      let(:backup_folders) { instance_double(Account::Connection::BackupFolders) }
       let(:folder) do
         instance_double(
           Account::Folder,
@@ -131,6 +131,7 @@ module Imap::Backup
 
       before do
         allow(Account::Connection::BackupFolders).to receive(:new) { backup_folders }
+        allow(backup_folders).to receive(:each).and_yield(folder)
       end
 
       it_behaves_like(

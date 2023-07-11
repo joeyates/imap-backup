@@ -23,7 +23,7 @@ module Imap::Backup
         # Delete serialized folders that are not to be backed up
         backup_folders = Account::Connection::BackupFolders.new(
           client: account.client, account: account
-        ).run
+        )
         wanted = backup_folders.map(&:name)
         serialized_folders = Account::SerializedFolders.new(account: account)
         serialized_folders.each do |serializer, _folder|
@@ -68,7 +68,7 @@ module Imap::Backup
     def each_folder
       backup_folders = Account::Connection::BackupFolders.new(
         client: account.client, account: account
-      ).run
+      )
       backup_folders.each do |folder|
         serializer = Serializer.new(account.local_path, folder.name)
         yield folder, serializer

@@ -12,10 +12,10 @@ module Imap::Backup
     let(:client) { instance_double(Client::Default, list: %w(foo bar baz)) }
     let(:account_folders) { [{name: "foo"}] }
     let(:folder_blacklist) { false }
-    let(:result) { subject.run }
+    let(:result) { subject.each }
 
     it "returns a folder for each configured folder" do
-      expect(result.map(&:name)).to eq(%w(foo))
+      expect(subject.map(&:name)).to eq(%w(foo))
     end
 
     it "returns Account::Folders" do

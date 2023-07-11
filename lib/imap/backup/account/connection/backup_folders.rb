@@ -11,7 +11,9 @@ module Imap::Backup
       @account = account
     end
 
-    def run
+    def each
+      return enum_for(:each) if !block_given?
+
       all_names = client.list
 
       configured =
@@ -31,7 +33,13 @@ module Imap::Backup
           all_names & configured
         end
 
-      names.map { |name| Account::Folder.new(client, name) }
+      names.each { |name| yield Account::Folder.new(client, name) }
+    end
+
+    def map
+      each.map do |folder|
+        yield folder
+      end
     end
   end
 end

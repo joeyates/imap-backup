@@ -19,7 +19,7 @@ module Imap::Backup
 
       backup_folders = Account::Connection::BackupFolders.new(
         client: account.client, account: account
-      ).run
+      )
       backup_folders.each do |folder|
         next if !folder.exist?
 

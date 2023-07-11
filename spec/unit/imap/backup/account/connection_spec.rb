@@ -49,7 +49,7 @@ module Imap::Backup
     let(:server) { SERVER }
     let(:new_uid_validity) { nil }
     let(:folder_name) { "folder_name" }
-    let(:backup_folders) { instance_double(Account::Connection::BackupFolders, run: [folder]) }
+    let(:backup_folders) { instance_double(Account::Connection::BackupFolders) }
     let(:folder_ensurer) { instance_double(Account::FolderEnsurer, run: nil) }
     let(:mirror_mode) { false }
 
@@ -81,6 +81,8 @@ module Imap::Backup
         allow(Serializer).to receive(:new).
           with(local_path, folder_name) { serializer }
         allow(FlagRefresher).to receive(:new) { flag_refresher }
+        allow(backup_folders).to receive(:map).and_yield(folder)
+        allow(backup_folders).to receive(:each).and_yield(folder)
       end
 
       it_behaves_like "ensures the backup directory exists" do
@@ -206,6 +208,7 @@ module Imap::Backup
           with(client, folder_name) { folder }
         allow(Serializer).to receive(:new).
           with(anything, folder_name) { serializer }
+        allow(backup_folders).to receive(:each).and_yield(folder)
       end
 
       it_behaves_like "ensures the backup directory exists" do
