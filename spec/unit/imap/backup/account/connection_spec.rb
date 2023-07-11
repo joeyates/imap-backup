@@ -2,12 +2,6 @@ require "ostruct"
 
 module Imap::Backup
   shared_examples "ensures the backup directory exists" do
-    let(:folder_ensurer) { instance_double(Account::FolderEnsurer, run: nil) }
-
-    before do
-      allow(Account::FolderEnsurer).to receive(:new) { folder_ensurer }
-    end
-
     it "runs FolderEnsurer" do
       action.call
 
@@ -18,14 +12,13 @@ module Imap::Backup
   describe Account::Connection do
     subject { described_class.new(account) }
 
-    let(:imap_folders) { ["backup_folder"] }
     let(:account) do
       instance_double(
         Account,
         username: "username",
         client: client,
         local_path: local_path,
-        mirror_mode: false,
+        mirror_mode: mirror_mode,
         multi_fetch_size: multi_fetch_size,
         reset_seen_flags_after_fetch: reset_seen_flags_after_fetch
       )
@@ -45,22 +38,26 @@ module Imap::Backup
     let(:serializer) do
       instance_double(
         Serializer,
-        folder: serialized_folder,
+        delete: nil,
+        folder: folder_name,
         force_uid_validity: nil,
         apply_uid_validity: new_uid_validity,
         uids: [local_uid]
       )
     end
     let(:local_uid) { "local_uid" }
-    let(:serialized_folder) { nil }
     let(:server) { SERVER }
     let(:new_uid_validity) { nil }
-    let(:imap_folder) { "imap_folder" }
+    let(:folder_name) { "folder_name" }
     let(:backup_folders) { instance_double(Account::Connection::BackupFolders, run: [folder]) }
-    let(:folder) { instance_double(Account::Folder, name: imap_folder) }
+    let(:folder_ensurer) { instance_double(Account::FolderEnsurer, run: nil) }
+    let(:mirror_mode) { false }
 
     before do
+      allow(Account::FolderEnsurer).to receive(:new) { folder_ensurer }
       allow(Account::Connection::BackupFolders).to receive(:new) { backup_folders }
+      allow(Pathname).to receive(:glob).
+        and_yield(Pathname.new(File.join(local_path, "#{folder_name}.imap")))
     end
 
     describe "#backup_folders" do
@@ -79,7 +76,7 @@ module Imap::Backup
       let(:folder) do
         instance_double(
           Account::Folder,
-          name: imap_folder,
+          name: folder_name,
           exist?: exists,
           uid_validity: uid_validity
         )
@@ -88,16 +85,53 @@ module Imap::Backup
       let(:uid_validity) { 123 }
       let(:downloader) { instance_double(Downloader, run: nil) }
       let(:multi_fetch_size) { 10 }
+      let(:flag_refresher) { instance_double(FlagRefresher, run: nil) }
 
       before do
         allow(Downloader).
           to receive(:new).with(anything, serializer, anything) { downloader }
         allow(Serializer).to receive(:new).
-          with(local_path, imap_folder) { serializer }
+          with(local_path, folder_name) { serializer }
+        allow(FlagRefresher).to receive(:new) { flag_refresher }
       end
 
       it_behaves_like "ensures the backup directory exists" do
         let(:action) { -> { subject.run_backup } }
+      end
+
+      context "when in mirror_mode" do
+        let(:mirror_mode) { true }
+        let(:local_only_message_deleter) { instance_double(LocalOnlyMessageDeleter, run: nil) }
+
+        before do
+          allow(LocalOnlyMessageDeleter).to receive(:new) { local_only_message_deleter }
+        end
+
+        it "deletes unwanted local folders" do
+          subject.run_backup
+
+          expect(local_only_message_deleter).to have_received(:run)
+        end
+
+        it "refreshes flags" do
+          subject.run_backup
+
+          expect(flag_refresher).to have_received(:run)
+        end
+      end
+
+      it "doesn't refresh flags" do
+        subject.run_backup
+
+        expect(flag_refresher).to_not have_received(:run)
+      end
+
+      context "when refresh is true" do
+        it "refreshes flags" do
+          subject.run_backup(refresh: true)
+
+          expect(flag_refresher).to have_received(:run)
+        end
       end
 
       it "passes the multi_fetch_size" do
@@ -137,8 +171,6 @@ module Imap::Backup
       end
 
       context "without supplied config_folders" do
-        let(:imap_folders) { [root_name] }
-
         before do
           allow(Serializer).to receive(:new).
             with(local_path, root_name) { serializer }
@@ -177,8 +209,8 @@ module Imap::Backup
     end
 
     describe "#restore" do
+      let(:folder) { instance_double(Account::Folder, name: folder_name) }
       let(:uploader) { instance_double(Uploader, run: nil) }
-      let(:folder_name) { "my_folder" }
 
       before do
         allow(Uploader).to receive(:new) { uploader }
@@ -186,8 +218,6 @@ module Imap::Backup
           with(client, folder_name) { folder }
         allow(Serializer).to receive(:new).
           with(anything, folder_name) { serializer }
-        allow(Pathname).to receive(:glob).
-          and_yield(Pathname.new(File.join(local_path, "#{folder_name}.imap")))
       end
 
       it_behaves_like "ensures the backup directory exists" do
