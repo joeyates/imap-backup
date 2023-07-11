@@ -99,7 +99,7 @@ module Imap::Backup
 
     def client
       @client ||= account.client
-    rescue StandardError => e
+    rescue StandardError
       Logger.logger.warn "Connection failed"
       nil
     end

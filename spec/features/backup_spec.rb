@@ -83,7 +83,6 @@ RSpec.describe "imap-backup backup", type: :aruba, docker: true do
           test_server.create_folder folder
           test_server.send_email folder, **msg3, flags: [:Draft]
           connection.run_backup
-          connection = nil
           test_server.set_flags folder, [1], [:Seen]
         end
 
@@ -106,7 +105,6 @@ RSpec.describe "imap-backup backup", type: :aruba, docker: true do
         test_server.send_email folder, **msg3
         original_folder_uid_validity
         connection.run_backup
-        connection = nil
         test_server.rename_folder folder, new_name
       end
       let(:renamed_folder) { "#{folder}-#{original_folder_uid_validity}" }
