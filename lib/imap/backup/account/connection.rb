@@ -1,5 +1,6 @@
 require "imap/backup/account/connection/backup_folders"
 require "imap/backup/account/folder_ensurer"
+require "imap/backup/account/serialized_folders"
 require "imap/backup/flag_refresher"
 require "imap/backup/local_only_message_deleter"
 
@@ -24,7 +25,8 @@ module Imap::Backup
           client: account.client, account: account
         ).run
         wanted = backup_folders.map(&:name)
-        local_folders do |serializer, _folder|
+        serialized_folders = Account::SerializedFolders.new(account: account)
+        serialized_folders.each do |serializer, _folder|
           serializer.delete if !wanted.include?(serializer.folder)
         end
       end
@@ -54,23 +56,9 @@ module Imap::Backup
       end
     end
 
-    def local_folders
-      return enum_for(:local_folders) if !block_given?
-
-      Account::FolderEnsurer.new(account: account).run
-
-      glob = File.join(account.local_path, "**", "*.imap")
-      base = Pathname.new(account.local_path)
-      Pathname.glob(glob) do |path|
-        name = path.relative_path_from(base).to_s[0..-6]
-        serializer = Serializer.new(account.local_path, name)
-        folder = Account::Folder.new(account.client, name)
-        yield serializer, folder
-      end
-    end
-
     def restore
-      local_folders do |serializer, folder|
+      serialized_folders = Account::SerializedFolders.new(account: account)
+      serialized_folders.each do |serializer, folder|
         Uploader.new(folder, serializer).run
       end
     end

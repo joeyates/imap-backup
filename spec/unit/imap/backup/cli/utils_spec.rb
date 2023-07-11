@@ -8,26 +8,11 @@ module Imap::Backup
       instance_double(
         Account,
         username: email,
-        local_path: "path"
+        local_path: "path",
+        client: client
       )
     end
-    let(:connection) do
-      instance_double(
-        Account::Connection,
-        account: account,
-        backup_folders: [folder],
-        local_folders: ["folder"]
-      )
-    end
-    let(:folder) do
-      instance_double(
-        Account::Folder,
-        exist?: true,
-        name: "name",
-        uid_validity: "uid_validity",
-        uids: %w(123 456)
-      )
-    end
+    let(:client) { instance_double(Client::Default, list: %w(foo)) }
     let(:serializer) do
       instance_double(
         Serializer,
@@ -36,14 +21,12 @@ module Imap::Backup
         append: nil
       )
     end
-    let(:exporter) { instance_double(Thunderbird::MailboxExporter, run: nil) }
     let(:email) { "foo@example.com" }
     let(:config) { instance_double(Configuration, accounts: [account]) }
 
     before do
       allow(Configuration).to receive(:exist?) { true }
       allow(Configuration).to receive(:new) { config }
-      allow(Account::Connection).to receive(:new) { connection }
       allow(Serializer).to receive(:new) { serializer }
     end
 
@@ -57,11 +40,24 @@ module Imap::Backup
       let(:install1) { instance_double(Thunderbird::Install, default: default_install) }
       let(:default_install) { "default" }
       let(:named_profile) { "named" }
+      let(:serialized_folders) { instance_double(Account::SerializedFolders) }
+      let(:folder) do
+        instance_double(
+          Account::Folder,
+          exist?: true,
+          name: "name",
+          uid_validity: "uid_validity",
+          uids: %w(123 456)
+        )
+      end
+      let(:exporter) { instance_double(Thunderbird::MailboxExporter, run: nil) }
 
       before do
         allow(Thunderbird::MailboxExporter).to receive(:new) { exporter }
         allow(Thunderbird::Profiles).to receive(:new) { profiles }
+        allow(Account::SerializedFolders).to receive(:new) { serialized_folders }
         allow(subject).to receive(:options) { options }
+        allow(serialized_folders).to receive(:each).and_yield("foo", "bar")
       end
 
       it_behaves_like(
@@ -122,6 +118,21 @@ module Imap::Backup
     end
 
     describe "#ignore_history" do
+      let(:backup_folders) { instance_double(Account::Connection::BackupFolders, run: [folder]) }
+      let(:folder) do
+        instance_double(
+          Account::Folder,
+          exist?: true,
+          name: "name",
+          uid_validity: "uid_validity",
+          uids: %w(123 456)
+        )
+      end
+
+      before do
+        allow(Account::Connection::BackupFolders).to receive(:new) { backup_folders }
+      end
+
       it_behaves_like(
         "an action that requires an existing configuration",
         action: ->(subject) do

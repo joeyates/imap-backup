@@ -4,6 +4,15 @@ module Imap::Backup
   module CLI::Helpers
     def self.included(base)
       base.class_eval do
+        def self.accounts_option
+          method_option(
+            "accounts",
+            type: :string,
+            desc: "a comma-separated list of accounts (defaults to all configured accounts)",
+            aliases: ["-a"]
+          )
+        end
+
         def self.config_option
           method_option(
             "config",

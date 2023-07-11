@@ -1,3 +1,4 @@
+require "imap/backup/account/serialized_folders"
 require "imap/backup/thunderbird/mailbox_exporter"
 
 module Imap::Backup
@@ -55,7 +56,7 @@ module Imap::Backup
       profile_name = options[:profile]
 
       config = load_config(**options)
-      connection = connection(config, email)
+      account = account(config, email)
       profile = thunderbird_profile(profile_name)
 
       if !profile
@@ -64,7 +65,8 @@ module Imap::Backup
         raise "Default Thunderbird profile not found"
       end
 
-      connection.local_folders.each do |serializer, _folder|
+      serialized_folders = Account::SerializedFolders.new(account: account)
+      serialized_folders.each do |serializer, _folder|
         Thunderbird::MailboxExporter.new(
           email, serializer, profile, force: force
         ).run
