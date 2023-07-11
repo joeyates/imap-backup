@@ -87,6 +87,15 @@ module Imap::Backup
       account
     end
 
+    def requested_accounts
+      emails = (options[:accounts] || "").split(",")
+      if emails.any?
+        config.accounts.filter { |a| emails.include?(a.username) }
+      else
+        config.accounts
+      end
+    end
+
     def connection(config, email)
       account = account(config, email)
 
