@@ -49,15 +49,6 @@ module Imap::Backup
       true
     end
 
-    def self.accounts_option
-      method_option(
-        "accounts",
-        type: :string,
-        desc: "a comma-separated list of accounts (defaults to all configured accounts)",
-        aliases: ["-a"]
-      )
-    end
-
     desc "backup [OPTIONS]", "Run the backup"
     long_desc <<~DESC
       Downloads any emails not yet present locally.

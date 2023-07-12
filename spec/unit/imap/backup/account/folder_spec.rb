@@ -2,7 +2,7 @@
 
 module Imap::Backup
   describe Account::Folder do
-    subject { described_class.new(connection, folder_name) }
+    subject { described_class.new(client, folder_name) }
 
     let(:client) do
       instance_double(
@@ -15,9 +15,6 @@ module Imap::Backup
         select: nil,
         uid_store: nil
       )
-    end
-    let(:connection) do
-      instance_double(Account::Connection, client: client)
     end
     let(:folder_name) { "Gelöscht" }
     let(:encoded_folder_name) { "Gel&APY-scht" }
@@ -147,12 +144,6 @@ module Imap::Backup
         it "succeeds" do
           subject.fetch_multi([123])
         end
-      end
-    end
-
-    describe "#folder" do
-      it "is the name" do
-        expect(subject.folder).to eq(folder_name)
       end
     end
 

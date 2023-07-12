@@ -8,9 +8,11 @@ RSpec.describe "imap-backup backup", type: :aruba, docker: true do
   let(:messages_as_mbox) do
     to_mbox_entry(**msg1) + to_mbox_entry(**msg2)
   end
-  let(:account) { test_server_connection_parameters }
-  let(:email) { account[:username] }
-  let(:config_options) { {accounts: [account]} }
+  let(:account_config) { test_server_connection_parameters }
+  let(:account) { Imap::Backup::Account.new(account_config) }
+  let(:backup) { Imap::Backup::Account::Backup.new(account: account) }
+  let(:email) { account_config[:username] }
+  let(:config_options) { {accounts: [account_config]} }
   let(:write_config) { create_config(**config_options) }
 
   let!(:pre) do
@@ -73,7 +75,6 @@ RSpec.describe "imap-backup backup", type: :aruba, docker: true do
 
     context "with the --refresh option" do
       let(:command) { "imap-backup backup --refresh" }
-      let(:connection) { Imap::Backup::Account::Connection.new(Imap::Backup::Account.new(account)) }
 
       context "with messages that have already been backed up" do
         let!(:pre) do
@@ -81,8 +82,7 @@ RSpec.describe "imap-backup backup", type: :aruba, docker: true do
           write_config
           test_server.create_folder folder
           test_server.send_email folder, **msg3, flags: [:Draft]
-          connection.run_backup
-          connection.disconnect
+          backup.run
           test_server.set_flags folder, [1], [:Seen]
         end
 
@@ -98,15 +98,13 @@ RSpec.describe "imap-backup backup", type: :aruba, docker: true do
     context "when uid_validity does not match" do
       let(:new_name) { "NEWNAME" }
       let(:original_folder_uid_validity) { test_server.folder_uid_validity(folder) }
-      let(:connection) { Imap::Backup::Account::Connection.new(Imap::Backup::Account.new(account)) }
       let!(:pre) do
         super()
         test_server.delete_folder new_name
         test_server.create_folder folder
         test_server.send_email folder, **msg3
         original_folder_uid_validity
-        connection.run_backup
-        connection.disconnect
+        backup.run
         test_server.rename_folder folder, new_name
       end
       let(:renamed_folder) { "#{folder}-#{original_folder_uid_validity}" }
@@ -134,11 +132,11 @@ RSpec.describe "imap-backup backup", type: :aruba, docker: true do
       context "when a renamed local backup exists" do
         let!(:pre) do
           super()
-          create_directory account[:local_path]
+          create_directory account_config[:local_path]
           valid_imap_data = {version: 3, uid_validity: 1, messages: []}
-          imap_path = File.join(account[:local_path], "#{renamed_folder}.imap")
+          imap_path = File.join(account_config[:local_path], "#{renamed_folder}.imap")
           File.write(imap_path, valid_imap_data.to_json)
-          mbox_path = File.join(account[:local_path], "#{renamed_folder}.mbox")
+          mbox_path = File.join(account_config[:local_path], "#{renamed_folder}.mbox")
           File.write(mbox_path, "existing mbox")
         end
 
@@ -151,12 +149,12 @@ RSpec.describe "imap-backup backup", type: :aruba, docker: true do
   end
 
   context "in mirror mode" do
-    let(:account) { test_server_connection_parameters.merge(mirror_mode: true) }
-    let(:imap_path) { File.join(account[:local_path], "Foo.imap") }
-    let(:mbox_path) { File.join(account[:local_path], "Foo.mbox") }
+    let(:account_config) { test_server_connection_parameters.merge(mirror_mode: true) }
+    let(:imap_path) { File.join(account_config[:local_path], "Foo.imap") }
+    let(:mbox_path) { File.join(account_config[:local_path], "Foo.mbox") }
 
     let!(:pre) do
-      create_directory account[:local_path]
+      create_directory account_config[:local_path]
       message = "existing mbox"
       valid_imap_data = {
         version: 3, uid_validity: 1, messages: [{uid: 1, offset: 0, length: message.length}]
@@ -181,7 +179,7 @@ RSpec.describe "imap-backup backup", type: :aruba, docker: true do
     let(:config_options) do
       {path: custom_config_path, accounts: [other_server_connection_parameters]}
     end
-    let(:account) { other_server_connection_parameters }
+    let(:account_config) { other_server_connection_parameters }
     let(:command) { "imap-backup backup --config #{custom_config_path}" }
 
     let(:setup) do

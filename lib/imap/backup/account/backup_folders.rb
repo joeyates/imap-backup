@@ -1,8 +1,7 @@
 module Imap::Backup
   class Account; end
-  class Account::Connection; end
 
-  class Account::Connection::BackupFolders
+  class Account::BackupFolders
     attr_reader :account
     attr_reader :client
 
@@ -11,8 +10,10 @@ module Imap::Backup
       @account = account
     end
 
-    def run
-      all_names = Account::Connection::FolderNames.new(client: client, account: account).run
+    def each(&block)
+      return enum_for(:each) if !block
+
+      all_names = client.list
 
       configured =
         case
@@ -31,7 +32,13 @@ module Imap::Backup
           all_names & configured
         end
 
-      names.map { |name| Account::Folder.new(account.connection, name) }
+      names.each { |name| block.call(Account::Folder.new(client, name)) }
+    end
+
+    def map(&block)
+      each.map do |folder|
+        block.call(folder)
+      end
     end
   end
 end

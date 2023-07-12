@@ -4,6 +4,15 @@ module Imap::Backup
   module CLI::Helpers
     def self.included(base)
       base.class_eval do
+        def self.accounts_option
+          method_option(
+            "accounts",
+            type: :string,
+            desc: "a comma-separated list of accounts (defaults to all configured accounts)",
+            aliases: ["-a"]
+          )
+        end
+
         def self.config_option
           method_option(
             "config",
@@ -78,22 +87,13 @@ module Imap::Backup
       account
     end
 
-    def connection(config, email)
-      account = account(config, email)
-
-      Account::Connection.new(account)
-    end
-
-    def each_connection(config, names)
-      return enum_for(:each_connection, config, names) if !block_given?
-
-      config.accounts.each do |account|
-        next if names.any? && !names.include?(account.username)
-
-        yield account.connection
+    def requested_accounts(config)
+      emails = (options[:accounts] || "").split(",")
+      if emails.any?
+        config.accounts.filter { |a| emails.include?(a.username) }
+      else
+        config.accounts
       end
-    rescue ConfigurationNotFound
-      raise "imap-backup is not configured. Run `imap-backup setup`"
     end
   end
 end

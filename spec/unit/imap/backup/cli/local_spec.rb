@@ -8,13 +8,6 @@ module Imap::Backup
         modified?: false
       )
     end
-    let(:connection) do
-      instance_double(
-        Account::Connection,
-        local_folders: local_folders
-      )
-    end
-    let(:local_folders) { [[serializer, folder]] }
     let(:folder) { instance_double(Account::Folder, name: "bar") }
     let(:serializer) do
       instance_double(
@@ -37,13 +30,14 @@ module Imap::Backup
     let(:message_subject) { "Ciao" }
     let(:email) { "foo@example.com" }
     let(:config) { instance_double(Configuration, accounts: [account]) }
+    let(:serialized_folders) { instance_double(Account::SerializedFolders) }
 
     before do
       allow(Configuration).to receive(:exist?) { true }
       allow(Configuration).to receive(:new) { config }
       allow(Kernel).to receive(:puts)
-      allow(Account::Connection).to receive(:new) { connection }
       allow(Mail).to receive(:new) { mail }
+      allow(Account::SerializedFolders).to receive(:new) { serialized_folders }
     end
 
     describe "accounts" do
@@ -60,6 +54,10 @@ module Imap::Backup
     end
 
     describe "folders" do
+      before do
+        allow(serialized_folders).to receive(:each).and_yield(serializer, folder)
+      end
+
       it_behaves_like(
         "an action that requires an existing configuration",
         action: ->(subject) { subject.folders("email") }
@@ -73,7 +71,9 @@ module Imap::Backup
     end
 
     describe "list" do
-      before { subject.list(email, "bar") }
+      before do
+        allow(serialized_folders).to receive(:find) { [serializer, folder] }
+      end
 
       it_behaves_like(
         "an action that requires an existing configuration",
@@ -81,6 +81,8 @@ module Imap::Backup
       )
 
       it "lists downloaded emails" do
+        subject.list(email, "bar")
+
         expect(Kernel).to have_received(:puts).with(/Ciao/)
       end
 
@@ -88,13 +90,17 @@ module Imap::Backup
         let(:message_subject) { "A" * 70 }
 
         it "is shortened" do
+          subject.list(email, "bar")
+
           expect(Kernel).to have_received(:puts).with(/\sA{57}\.\.\./)
         end
       end
     end
 
     describe "show" do
-      before { subject.show(email, "bar", uids.join(",")) }
+      before do
+        allow(serialized_folders).to receive(:find) { [serializer, folder] }
+      end
 
       it_behaves_like(
         "an action that requires an existing configuration",
@@ -102,6 +108,8 @@ module Imap::Backup
       )
 
       it "prints a downloaded email" do
+        subject.show(email, "bar", uids.join(","))
+
         expect(Kernel).to have_received(:puts).with("Supplied")
       end
 
@@ -117,6 +125,8 @@ module Imap::Backup
         let(:each_message) { [message, message1] }
 
         it "prints a header" do
+          subject.show(email, "bar", uids.join(","))
+
           expect(Kernel).to have_received(:puts).with(/\| UID: 123 /)
         end
       end

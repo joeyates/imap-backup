@@ -1,5 +1,7 @@
 require "os"
 
+require "imap/backup/serializer/folder_maker"
+
 module Imap::Backup
   class Serializer; end
 
@@ -16,13 +18,13 @@ module Imap::Backup
 
     def ensure_exists
       if !File.directory?(full_path)
-        Utils.make_folder(
-          path, relative, DIRECTORY_PERMISSIONS
-        )
+        Serializer::FolderMaker.new(
+          base: path, path: relative, permissions: DIRECTORY_PERMISSIONS
+        ).run
       end
 
       return if OS.windows?
-      return if Utils.mode(full_path) == DIRECTORY_PERMISSIONS
+      return if FileMode.new(filename: full_path).mode == DIRECTORY_PERMISSIONS
 
       FileUtils.chmod DIRECTORY_PERMISSIONS, full_path
     end

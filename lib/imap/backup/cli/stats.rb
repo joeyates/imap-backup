@@ -1,3 +1,5 @@
+require "imap/backup/account/backup_folders"
+
 module Imap::Backup
   class CLI::Stats < Thor
     include Thor::Actions
@@ -32,12 +34,15 @@ module Imap::Backup
 
       def stats
         config = load_config(**options)
-        connection = connection(config, email)
+        account = account(config, email)
 
-        connection.backup_folders.map do |folder|
+        backup_folders = Account::BackupFolders.new(
+          client: account.client, account: account
+        )
+        backup_folders.map do |folder|
           next if !folder.exist?
 
-          serializer = Serializer.new(connection.account.local_path, folder.name)
+          serializer = Serializer.new(account.local_path, folder.name)
           local_uids = serializer.uids
           remote_uids = folder.uids
           {

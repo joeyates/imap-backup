@@ -1,3 +1,5 @@
+require "imap/backup/local_only_message_deleter"
+
 module Imap::Backup
   describe LocalOnlyMessageDeleter do
     subject { described_class.new(folder, serializer) }

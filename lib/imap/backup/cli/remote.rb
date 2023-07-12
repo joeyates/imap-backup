@@ -12,12 +12,12 @@ module Imap::Backup
     verbose_option
     def folders(email)
       Imap::Backup::Logger.setup_logging options
-      names = names(email)
+      folder_names = folder_names(email)
       case options[:format]
       when "json"
-        json_format_names names
+        json_format_names folder_names
       else
-        list_names names
+        list_names folder_names
       end
     end
 
@@ -35,8 +35,8 @@ module Imap::Backup
     def namespaces(email)
       Imap::Backup::Logger.setup_logging options
       config = load_config(**options)
-      connection = connection(config, email)
-      namespaces = connection.namespaces
+      account = account(config, email)
+      namespaces = account.namespaces
       case options[:format]
       when "json"
         json_format_namespaces namespaces
@@ -46,11 +46,11 @@ module Imap::Backup
     end
 
     no_commands do
-      def names(email)
+      def folder_names(email)
         config = load_config(**options)
-        connection = connection(config, email)
+        account = account(config, email)
 
-        connection.folder_names
+        account.client.list
       end
 
       def json_format_names(names)

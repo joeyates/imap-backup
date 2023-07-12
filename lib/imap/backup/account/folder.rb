@@ -1,4 +1,5 @@
 require "forwardable"
+require "net/imap"
 
 require "retry_on_error"
 
@@ -12,26 +13,19 @@ module Imap::Backup
     include RetryOnError
 
     BODY_ATTRIBUTE = "BODY[]".freeze
-    UID_FETCH_RETRY_CLASSES = [EOFError, Errno::ECONNRESET, IOError].freeze
-    APPEND_RETRY_CLASSES = [Net::IMAP::BadResponseError].freeze
-    CREATE_RETRY_CLASSES = [Net::IMAP::BadResponseError].freeze
-    EXAMINE_RETRY_CLASSES = [Net::IMAP::BadResponseError].freeze
+    UID_FETCH_RETRY_CLASSES = [::EOFError, ::Errno::ECONNRESET, ::IOError].freeze
+    APPEND_RETRY_CLASSES = [::Net::IMAP::BadResponseError].freeze
+    CREATE_RETRY_CLASSES = [::Net::IMAP::BadResponseError].freeze
+    EXAMINE_RETRY_CLASSES = [::Net::IMAP::BadResponseError].freeze
     PERMITTED_FLAGS = %i(Answered Draft Flagged Seen).freeze
 
-    attr_reader :connection
+    attr_reader :client
     attr_reader :name
 
-    delegate client: :connection
-
-    def initialize(connection, name)
-      @connection = connection
+    def initialize(client, name)
+      @client = client
       @name = name
       @uid_validity = nil
-    end
-
-    # Deprecated: use #name
-    def folder
-      name
     end
 
     def exist?

@@ -1,7 +1,5 @@
 module Imap; end
 
-require "imap/backup/utils"
-require "imap/backup/account/connection"
 require "imap/backup/account/folder"
 require "imap/backup/configuration"
 require "imap/backup/downloader"

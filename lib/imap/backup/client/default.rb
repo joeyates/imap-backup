@@ -7,15 +7,19 @@ module Imap::Backup
   class Client::Default
     extend Forwardable
     def_delegators :imap, *%i(
-      append authenticate create expunge login namespace
+      append authenticate create expunge namespace
       responses uid_fetch uid_search uid_store
     )
 
-    attr_reader :args
+    attr_reader :account
+    attr_reader :options
+    attr_reader :server
     attr_accessor :state
 
-    def initialize(*args)
-      @args = args
+    def initialize(server, account, options)
+      @account = account
+      @options = options
+      @server = server
       @state = nil
     end
 
@@ -26,6 +30,21 @@ module Imap::Backup
       return [] if mailbox_lists.nil?
 
       mailbox_lists.map { |ml| extract_name(ml) }
+    end
+
+    def login
+      Logger.logger.debug "Logging in: #{account.username}/#{masked_password}"
+      imap.login(account.username, account.password)
+      Logger.logger.debug "Login complete"
+    end
+
+    def reconnect
+      disconnect
+      login
+    end
+
+    def username
+      account.username
     end
 
     # Track mailbox selection during delegation to Net::IMAP instance
@@ -53,12 +72,16 @@ module Imap::Backup
     private
 
     def imap
-      @imap ||= Net::IMAP.new(*args)
+      @imap ||= Net::IMAP.new(server, options)
     end
 
     def extract_name(mailbox_list)
       utf7_encoded = mailbox_list.name
       Net::IMAP.decode_utf7(utf7_encoded)
+    end
+
+    def masked_password
+      account.password.gsub(/./, "x")
     end
 
     # 6.3.8. LIST Command

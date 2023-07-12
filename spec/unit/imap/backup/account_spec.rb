@@ -38,26 +38,32 @@ module Imap::Backup
       end
     end
 
-    describe "#connection" do
-      let(:result) { subject.connection }
-
-      it "returns a Connection for the Account" do
-        expect(result).to be_a(Account::Connection)
-        expect(result.account).to be subject
+    describe "#client" do
+      let(:client_factory) { instance_double(Account::ClientFactory, run: client) }
+      let(:client) do
+        instance_double(Client::Default, authenticate: nil, login: nil)
       end
 
-      it "memoizes the connection" do
-        expect(subject.connection).to be result
+      before do
+        allow(Account::ClientFactory).to receive(:new) { client_factory }
       end
 
-      context "when changes are made" do
-        it "re-memoizes" do
-          memoized = result
+      it "calls ClientFactory" do
+        expect(subject.client).to eq(client)
+      end
+    end
 
-          subject.username = "changed"
+    describe "#restore" do
+      let(:restore) { instance_double(Account::Restore, run: nil) }
 
-          expect(subject.connection).to_not be memoized
-        end
+      before do
+        allow(Account::Restore).to receive(:new) { restore }
+      end
+
+      it "runs restore" do
+        subject.restore
+
+        expect(restore).to have_received(:run)
       end
     end
 

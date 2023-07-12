@@ -8,8 +8,9 @@ module Imap::Backup
     desc "accounts", "List locally backed-up accounts"
     config_option
     format_option
+    quiet_option
+    verbose_option
     def accounts
-      config = load_config(**options)
       names = config.accounts.map(&:username)
       case options[:format]
       when "json"
@@ -29,13 +30,16 @@ module Imap::Backup
       type: :boolean,
       desc: "deletes any corrupted folders - USE WITH CAUTION!"
     )
+    accounts_option
     config_option
     format_option
+    quiet_option
+    verbose_option
     def check
-      config = load_config(**options)
-      results = each_connection(config, emails).map do |connection|
-        folders = connection.local_folders
-        folder_results = folders.map do |serializer|
+      results = requested_accounts(config).map do |account|
+        serialized_folders = Account::SerializedFolders.new(account: account)
+        folder_results = serialized_folders.map do |serializer, _folder|
+          puts "serializer: #{serializer.inspect}"
           serializer.check_integrity!
           {name: serializer.folder, result: "OK"}
         rescue Serializer::FolderIntegrityError => e
@@ -50,7 +54,7 @@ module Imap::Backup
             result: message
           }
         end
-        {account: connection.account.username, folders: folder_results}
+        {account: account.username, folders: folder_results}
       end
 
       case options[:format]
@@ -64,17 +68,18 @@ module Imap::Backup
     desc "folders EMAIL", "List backed up folders"
     config_option
     format_option
+    quiet_option
+    verbose_option
     def folders(email)
-      config = load_config(**options)
-      connection = connection(config, email)
+      account = account(config, email)
 
-      folders = connection.local_folders
+      serialized_folders = Account::SerializedFolders.new(account: account)
       case options[:format]
       when "json"
-        list = folders.map { |_s, f| {name: f.name} }
+        list = serialized_folders.map { |_s, f| {name: f.name} }
         Kernel.puts list.to_json
       else
-        folders.each do |_s, f|
+        serialized_folders.each do |_s, f|
           Kernel.puts %("#{f.name}")
         end
       end
@@ -83,11 +88,13 @@ module Imap::Backup
     desc "list EMAIL FOLDER", "List emails in a folder"
     config_option
     format_option
+    quiet_option
+    verbose_option
     def list(email, folder_name)
-      config = load_config(**options)
-      connection = connection(config, email)
+      account = account(config, email)
 
-      serializer, _folder = connection.local_folders.find do |(_s, f)|
+      serialized_folders = Account::SerializedFolders.new(account: account)
+      serializer, _folder = serialized_folders.find do |_s, f|
         f.name == folder_name
       end
       raise "Folder '#{folder_name}' not found" if !serializer
@@ -108,11 +115,13 @@ module Imap::Backup
     DESC
     config_option
     format_option
+    quiet_option
+    verbose_option
     def show(email, folder_name, uids)
-      config = load_config(**options)
-      connection = connection(config, email)
+      account = account(config, email)
 
-      serializer, _folder = connection.local_folders.find do |(_s, f)|
+      serialized_folders = Account::SerializedFolders.new(account: account)
+      serializer, _folder = serialized_folders.find do |_s, f|
         f.name == folder_name
       end
       raise "Folder '#{folder_name}' not found" if !serializer
@@ -197,8 +206,11 @@ module Imap::Backup
         end
       end
 
-      def emails
-        (options[:accounts] || "").split(",")
+      def config
+        @config ||= begin
+          non_logging_options = Logger.setup_logging(options)
+          load_config(**non_logging_options)
+        end
       end
     end
   end

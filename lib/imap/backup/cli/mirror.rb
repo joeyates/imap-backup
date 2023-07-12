@@ -61,7 +61,7 @@ module Imap::Backup
         message =
           "The account '#{source_account.username}' " \
           "is not set up to make mirror backups"
-        Logger.logger.info message
+        Logger.logger.warn message
       end
 
       def config

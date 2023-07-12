@@ -1,38 +1,29 @@
 module Imap::Backup
-  describe Account::Connection::BackupFolders do
+  describe Account::BackupFolders do
     subject { described_class.new(client: client, account: account) }
 
     let(:account) do
       instance_double(
         Account,
         folders: account_folders,
-        connection: connection,
         folder_blacklist: folder_blacklist
       )
     end
-    let(:client) { instance_double(Client::Default) }
-    let(:connection) { instance_double(Account::Connection) }
+    let(:client) { instance_double(Client::Default, list: %w(foo bar baz)) }
     let(:account_folders) { [{name: "foo"}] }
     let(:folder_blacklist) { false }
-    let(:folder_names) do
-      instance_double(Account::Connection::FolderNames, run: %w(foo bar baz))
-    end
-    let(:result) { subject.run }
-
-    before do
-      allow(Account::Connection::FolderNames).to receive(:new) { folder_names }
-    end
+    let(:result) { subject.each }
 
     it "returns a folder for each configured folder" do
-      expect(result.map(&:name)).to eq(%w(foo))
+      expect(subject.map(&:name)).to eq(%w(foo))
     end
 
     it "returns Account::Folders" do
       expect(result.first).to be_a(Account::Folder)
     end
 
-    it "sets the connection" do
-      expect(result.first.connection).to eq(connection)
+    it "sets the client" do
+      expect(result.first.client).to eq(client)
     end
 
     context "when no folders are configured" do

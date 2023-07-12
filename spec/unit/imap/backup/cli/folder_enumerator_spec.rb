@@ -8,8 +8,8 @@ module Imap::Backup
     let(:imap_pathname) { Pathname.new(path) }
     let(:options) { {source: source, destination: destination} }
     let(:source) { instance_double(Account, username: "source", local_path: "path") }
-    let(:destination) { instance_double(Account, username: "destination", connection: connection) }
-    let(:connection) { instance_double(Account::Connection) }
+    let(:destination) { instance_double(Account, username: "destination", client: client) }
+    let(:client) { instance_double(Client::Default) }
     let(:result) { subject.each.first }
 
     before do

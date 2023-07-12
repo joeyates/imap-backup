@@ -5,26 +5,22 @@ module Imap::Backup
     describe "#run" do
       subject { described_class.new(account) }
 
-      let(:connection) do
-        instance_double(
-          Account::Connection, folder_names: connection_folders
-        )
-      end
       let(:account) do
         instance_double(
           Account,
-          folders: account_folders,
+          client: client,
+          folders: configured_folders,
           "folders=": nil
         )
       end
-      let(:account_folders) { [] }
-      let(:connection_folders) { [] }
+      let(:client) { instance_double(Client::Default, list: online_folders) }
+      let(:configured_folders) { [] }
+      let(:online_folders) { ["on_server"] }
       let!(:highline_streams) { prepare_highline }
       let(:input) { highline_streams[0] }
       let(:output) { highline_streams[1] }
 
       before do
-        allow(Account::Connection).to receive(:new) { connection }
         allow(Kernel).to receive(:system)
         allow(Logger.logger).to receive(:warn)
       end
@@ -44,8 +40,8 @@ module Imap::Backup
       end
 
       describe "folder listing" do
-        let(:account_folders) { [{name: "my_folder"}] }
-        let(:connection_folders) do
+        let(:configured_folders) { [{name: "my_folder"}] }
+        let(:online_folders) do
           # N.B. my_folder is already backed up
           %w(my_folder another_folder)
         end
@@ -89,10 +85,9 @@ module Imap::Backup
       end
 
       context "with missing remote folders" do
-        let(:account_folders) do
+        let(:configured_folders) do
           [{name: "on_server"}, {name: "not_on_server"}]
         end
-        let(:connection_folders) { ["on_server"] }
 
         before do
           allow(Kernel).to receive(:puts)
@@ -106,7 +101,7 @@ module Imap::Backup
       end
 
       context "when folders are not available" do
-        let(:connection_folders) { nil }
+        let(:online_folders) { [] }
 
         before do
           allow(Setup.highline).
@@ -123,8 +118,7 @@ module Imap::Backup
 
       context "with connection errors" do
         before do
-          allow(Account::Connection).
-            to receive(:new).with(account).and_raise("error")
+          allow(account).to receive(:client).and_raise("error")
           allow(Setup.highline).
             to receive(:ask) { "q" }
         end

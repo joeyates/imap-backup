@@ -1,3 +1,5 @@
+require "imap/backup/account/backup_folders"
+require "imap/backup/account/serialized_folders"
 require "imap/backup/thunderbird/mailbox_exporter"
 
 module Imap::Backup
@@ -14,12 +16,15 @@ module Imap::Backup
     def ignore_history(email)
       Logger.setup_logging options
       config = load_config(**options)
-      connection = connection(config, email)
+      account = account(config, email)
 
-      connection.backup_folders.each do |folder|
+      backup_folders = Account::BackupFolders.new(
+        client: account.client, account: account
+      )
+      backup_folders.each do |folder|
         next if !folder.exist?
 
-        serializer = Serializer.new(connection.account.local_path, folder.name)
+        serializer = Serializer.new(account.local_path, folder.name)
         do_ignore_folder_history(folder, serializer)
       end
     end
@@ -52,7 +57,7 @@ module Imap::Backup
       profile_name = options[:profile]
 
       config = load_config(**options)
-      connection = connection(config, email)
+      account = account(config, email)
       profile = thunderbird_profile(profile_name)
 
       if !profile
@@ -61,7 +66,8 @@ module Imap::Backup
         raise "Default Thunderbird profile not found"
       end
 
-      connection.local_folders.each do |serializer, _folder|
+      serialized_folders = Account::SerializedFolders.new(account: account)
+      serialized_folders.each do |serializer, _folder|
         Thunderbird::MailboxExporter.new(
           email, serializer, profile, force: force
         ).run

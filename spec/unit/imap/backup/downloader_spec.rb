@@ -7,8 +7,14 @@ module Imap::Backup
       let(:folder) do
         instance_double(
           Account::Folder,
+          client: client,
           name: "folder",
           uids: remote_uids
+        )
+      end
+      let(:client) do
+        instance_double(
+          Client::Default, authenticate: nil, login: nil, reconnect: nil
         )
       end
       let(:remote_uids) { %w(111) }
@@ -115,6 +121,24 @@ module Imap::Backup
 
         it "resets seen flags set during fetch" do
           expect(folder).to have_received(:remove_flags).with([33], [:Seen])
+        end
+      end
+
+      context "when the IMAP session expires" do
+        before do
+          data = OpenStruct.new(data: "Session expired")
+          response = OpenStruct.new(data: data)
+          outcomes = [
+            -> { raise Net::IMAP::ByeResponseError, response },
+            -> { [{uid: "111", body: body}] }
+          ]
+          allow(folder).to receive(:fetch_multi) { outcomes.shift.call }
+        end
+
+        it "reconnects" do
+          expect(serializer).to receive(:append)
+
+          subject.run
         end
       end
     end

@@ -1,11 +1,17 @@
+require "socket"
+
 require "email/provider"
+require "imap/backup/client/apple_mail"
+require "imap/backup/client/default"
 require "retry_on_error"
 
 module Imap::Backup
-  class Account::Connection::ClientFactory
+  class Account; end
+
+  class Account::ClientFactory
     include RetryOnError
 
-    LOGIN_RETRY_CLASSES = [EOFError, Errno::ECONNRESET, SocketError].freeze
+    LOGIN_RETRY_CLASSES = [::EOFError, ::Errno::ECONNRESET, ::SocketError].freeze
 
     attr_reader :account
 
@@ -23,22 +29,16 @@ module Imap::Backup
         )
         client =
           if provider.is_a?(Email::Provider::AppleMail)
-            Client::AppleMail.new(server, options)
+            Client::AppleMail.new(server, account, options)
           else
-            Client::Default.new(server, options)
+            Client::Default.new(server, account, options)
           end
-        Logger.logger.debug "Logging in: #{account.username}/#{masked_password}"
-        client.login(account.username, account.password)
-        Logger.logger.debug "Login complete"
+        client.login
         client
       end
     end
 
     private
-
-    def masked_password
-      account.password.gsub(/./, "x")
-    end
 
     def provider
       @provider ||= Email::Provider.for_address(account.username)
