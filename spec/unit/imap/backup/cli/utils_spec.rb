@@ -1,3 +1,4 @@
+require "imap/backup/serializer/folder_maker"
 require "support/shared_examples/an_action_that_handles_logger_options"
 
 module Imap::Backup

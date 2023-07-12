@@ -1,8 +1,10 @@
+require "fileutils"
 require "json"
 require "os"
 
 require "imap/backup/account"
-require "imap/backup/utils"
+require "imap/backup/file_mode"
+require "imap/backup/serializer/permission_checker"
 
 module Imap::Backup
   class Configuration
@@ -67,7 +69,10 @@ module Imap::Backup
     def data
       @data ||=
         if File.exist?(pathname)
-          Utils.check_permissions(pathname, 0o600) if !windows?
+          permission_checker = Serializer::PermissionChecker.new(
+            filename: pathname, limit: 0o600
+          )
+          permission_checker.run if !windows?
           contents = File.read(pathname)
           JSON.parse(contents, symbolize_names: true)
         else
@@ -84,7 +89,7 @@ module Imap::Backup
     end
 
     def make_private(path)
-      FileUtils.chmod(0o700, path) if Utils.mode(path) != 0o700
+      FileUtils.chmod(0o700, path) if FileMode.new(filename: path).mode != 0o700
     end
 
     def windows?

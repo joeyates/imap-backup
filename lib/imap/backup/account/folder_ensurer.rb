@@ -1,5 +1,5 @@
 require "imap/backup/serializer/directory"
-require "imap/backup/utils"
+require "imap/backup/serializer/folder_maker"
 
 module Imap::Backup
   class Account; end
@@ -14,11 +14,11 @@ module Imap::Backup
     def run
       raise "The backup path for #{account.username} is not set" if !account.local_path
 
-      Utils.make_folder(
-        File.dirname(account.local_path),
-        File.basename(account.local_path),
-        Serializer::Directory::DIRECTORY_PERMISSIONS
-      )
+      Serializer::FolderMaker.new(
+        base: File.dirname(account.local_path),
+        path: File.basename(account.local_path),
+        permissions: Serializer::Directory::DIRECTORY_PERMISSIONS
+      ).run
     end
   end
 end

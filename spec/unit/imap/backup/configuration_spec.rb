@@ -14,6 +14,7 @@ module Imap::Backup
     let(:accounts) { [account1, account2] }
     let(:account1) { Account.new({username: "username1"}) }
     let(:account2) { Account.new({username: "username2"}) }
+    let(:permission_checker) { instance_double(Serializer::PermissionChecker, run: nil) }
 
     before do
       stub_const(
@@ -23,11 +24,7 @@ module Imap::Backup
       allow(File).to receive(:directory?).with(directory) { directory_exists }
       allow(File).to receive(:exist?).and_call_original
       allow(File).to receive(:exist?).with(file_path) { file_exists }
-      allow(Utils).
-        to receive(:stat).with(directory) { 0o700 }
-      allow(Utils).
-        to receive(:stat).with(file_path) { 0o600 }
-      allow(Utils).to receive(:check_permissions) { nil }
+      allow(Serializer::PermissionChecker).to receive(:new) { permission_checker }
       allow(File).to receive(:read).and_call_original
       allow(File).to receive(:read).with(file_path) { configuration }
     end
@@ -164,8 +161,7 @@ module Imap::Backup
           let(:file_exists) { true }
 
           before do
-            allow(Utils).to receive(:check_permissions).
-              with(file_path, 0o600).and_raise("Error")
+            allow(permission_checker).to receive(:run).and_raise("Error")
           end
 
           it "fails" do

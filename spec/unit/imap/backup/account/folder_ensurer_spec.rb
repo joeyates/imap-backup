@@ -16,12 +16,16 @@ module Imap::Backup
     end
 
     context "when the directory does not exist" do
-      before { allow(Utils).to receive(:make_folder) }
+      let(:folder_maker) { instance_double(Serializer::FolderMaker, run: nil) }
+
+      before do
+        allow(Serializer::FolderMaker).to receive(:new) { folder_maker }
+      end
 
       it "creates it" do
         subject.run
 
-        expect(Utils).to have_received(:make_folder)
+        expect(folder_maker).to have_received(:run)
       end
     end
   end
