@@ -7,9 +7,8 @@ require "retry_on_error"
 
 module Imap::Backup
   class Account; end
-  class Account::Connection; end
 
-  class Account::Connection::ClientFactory
+  class Account::ClientFactory
     include RetryOnError
 
     LOGIN_RETRY_CLASSES = [::EOFError, ::Errno::ECONNRESET, ::SocketError].freeze

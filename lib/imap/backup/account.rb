@@ -1,4 +1,4 @@
-require "imap/backup/account/connection/client_factory"
+require "imap/backup/account/client_factory"
 require "imap/backup/account/restore"
 
 module Imap; end
@@ -36,7 +36,7 @@ module Imap::Backup
     end
 
     def client
-      @client ||= Account::Connection::ClientFactory.new(account: self).run
+      @client ||= Account::ClientFactory.new(account: self).run
     end
 
     def namespaces

@@ -1,5 +1,7 @@
+require "imap/backup/account/client_factory"
+
 module Imap::Backup
-  describe Account::Connection::ClientFactory do
+  describe Account::ClientFactory do
     subject { described_class.new(account: account) }
 
     let(:account) do
