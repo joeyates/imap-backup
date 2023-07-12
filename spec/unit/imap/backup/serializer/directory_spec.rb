@@ -1,3 +1,6 @@
+require "imap/backup/utils"
+require "imap/backup/serializer/directory"
+
 module Imap::Backup
   describe Serializer::Directory do
     subject { described_class.new("path", "relative") }

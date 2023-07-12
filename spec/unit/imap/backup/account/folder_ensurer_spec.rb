@@ -1,3 +1,5 @@
+require "imap/backup/account/folder_ensurer"
+
 module Imap::Backup
   RSpec.describe Account::FolderEnsurer do
     subject { described_class.new(account: account) }

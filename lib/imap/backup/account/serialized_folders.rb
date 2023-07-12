@@ -1,3 +1,5 @@
+require "imap/backup/account/folder_ensurer"
+
 module Imap::Backup
   class Account; end
 

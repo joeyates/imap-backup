@@ -2,6 +2,7 @@ require "json"
 require "os"
 
 require "imap/backup/account"
+require "imap/backup/utils"
 
 module Imap::Backup
   class Configuration

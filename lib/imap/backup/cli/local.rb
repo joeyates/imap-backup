@@ -36,7 +36,7 @@ module Imap::Backup
     quiet_option
     verbose_option
     def check
-      results = requested_accounts.map do |account|
+      results = requested_accounts(config).map do |account|
         serialized_folders = Account::SerializedFolders.new(account: account)
         folder_results = serialized_folders.map do |serializer, _folder|
           puts "serializer: #{serializer.inspect}"

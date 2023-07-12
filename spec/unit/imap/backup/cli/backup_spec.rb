@@ -3,13 +3,13 @@ module Imap::Backup
     subject { described_class.new({}) }
 
     let(:account) { instance_double(Account, username: "me@example.com") }
-    let(:config) { instance_double(Configuration, accounts: []) }
-    let(:connection) { instance_double(Account::Connection, account: account, run_backup: nil) }
+    let(:backup) { instance_double(Account::Backup, "backup", run: nil) }
 
     before do
       allow(Configuration).to receive(:exist?) { true }
+      allow(Account::Backup).to receive(:new) { backup }
       # rubocop:disable RSpec/SubjectStub
-      allow(subject).to receive(:each_connection).with(anything, []).and_yield(connection)
+      allow(subject).to receive(:requested_accounts) { [account] }
       # rubocop:enable RSpec/SubjectStub
     end
 
@@ -21,28 +21,25 @@ module Imap::Backup
     it "runs the backup for each connection" do
       subject.run
 
-      expect(connection).to have_received(:run_backup)
+      expect(backup).to have_received(:run)
     end
 
     context "when one connection fails" do
-      let(:account2) { instance_double(Account) }
-      let(:connection2) { instance_double(Account::Connection, run_backup: nil) }
+      let(:account_2) { instance_double(Account, "account_2") }
 
       before do
-        allow(connection).to receive(:run_backup).and_raise("Foo")
+        outcomes = [-> { raise "Foo"}, -> { true }]
+        allow(backup).to receive(:run) { outcomes.shift.call }
 
         # rubocop:disable RSpec/SubjectStub
-        allow(subject).
-          to receive(:each_connection).with(anything, []).
-          and_yield(connection).
-          and_yield(connection2)
+        allow(subject).to receive(:requested_accounts) { [account, account_2] }
         # rubocop:enable RSpec/SubjectStub
       end
 
       it "runs other backups" do
         subject.run
 
-        expect(connection2).to have_received(:run_backup)
+        expect(backup).to have_received(:run).twice
       end
     end
   end

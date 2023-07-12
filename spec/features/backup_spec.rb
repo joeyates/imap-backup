@@ -10,7 +10,7 @@ RSpec.describe "imap-backup backup", type: :aruba, docker: true do
   end
   let(:account_config) { test_server_connection_parameters }
   let(:account) { Imap::Backup::Account.new(account_config) }
-  let(:connection) { Imap::Backup::Account::Connection.new(account) }
+  let(:backup) { Imap::Backup::Account::Backup.new(account: account) }
   let(:email) { account_config[:username] }
   let(:config_options) { {accounts: [account_config]} }
   let(:write_config) { create_config(**config_options) }
@@ -82,7 +82,7 @@ RSpec.describe "imap-backup backup", type: :aruba, docker: true do
           write_config
           test_server.create_folder folder
           test_server.send_email folder, **msg3, flags: [:Draft]
-          connection.run_backup
+          backup.run
           test_server.set_flags folder, [1], [:Seen]
         end
 
@@ -104,7 +104,7 @@ RSpec.describe "imap-backup backup", type: :aruba, docker: true do
         test_server.create_folder folder
         test_server.send_email folder, **msg3
         original_folder_uid_validity
-        connection.run_backup
+        backup.run
         test_server.rename_folder folder, new_name
       end
       let(:renamed_folder) { "#{folder}-#{original_folder_uid_validity}" }
