@@ -10,8 +10,8 @@ module Imap::Backup
       @account = account
     end
 
-    def each
-      return enum_for(:each) if !block_given?
+    def each(&block)
+      return enum_for(:each) if !block
 
       Account::FolderEnsurer.new(account: account).run
 
@@ -21,19 +21,19 @@ module Imap::Backup
         name = path.relative_path_from(base).to_s[0..-6]
         serializer = Serializer.new(account.local_path, name)
         folder = Account::Folder.new(account.client, name)
-        yield serializer, folder
+        block.call(serializer, folder)
       end
     end
 
-    def map
+    def map(&block)
       each.map do |serializer, folder|
-        yield serializer, folder
+        block.call(serializer, folder)
       end
     end
 
-    def find
+    def find(&block)
       each.find do |serializer, folder|
-        yield serializer, folder
+        block.call(serializer, folder)
       end
     end
   end

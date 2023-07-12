@@ -20,7 +20,6 @@ module Imap::Backup
 
     describe "#run" do
       context "when an email is provided" do
-
         it "runs restore on the account" do
           subject.run
 

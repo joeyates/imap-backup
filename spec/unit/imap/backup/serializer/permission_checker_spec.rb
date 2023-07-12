@@ -5,7 +5,7 @@ module Imap::Backup
     subject { described_class.new(filename: "filename", limit: 0o345) }
 
     let(:file_mode) { instance_double(FileMode, mode: mode) }
-    let(:mode) { }
+    let(:mode) {}
 
     before do
       allow(FileMode).to receive(:new) { file_mode }

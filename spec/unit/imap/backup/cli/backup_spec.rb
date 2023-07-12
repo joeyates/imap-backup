@@ -25,14 +25,14 @@ module Imap::Backup
     end
 
     context "when one connection fails" do
-      let(:account_2) { instance_double(Account, "account_2") }
+      let(:account2) { instance_double(Account, "account2") }
 
       before do
-        outcomes = [-> { raise "Foo"}, -> { true }]
+        outcomes = [-> { raise "Foo" }, -> { true }]
         allow(backup).to receive(:run) { outcomes.shift.call }
 
         # rubocop:disable RSpec/SubjectStub
-        allow(subject).to receive(:requested_accounts) { [account, account_2] }
+        allow(subject).to receive(:requested_accounts) { [account, account2] }
         # rubocop:enable RSpec/SubjectStub
       end
 

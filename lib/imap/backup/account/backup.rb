@@ -23,9 +23,7 @@ module Imap::Backup
       account.client
 
       Account::FolderEnsurer.new(account: account).run
-      if account.mirror_mode
-        Account::LocalOnlyFolderDeleter.new(account: account).run
-      end
+      Account::LocalOnlyFolderDeleter.new(account: account).run if account.mirror_mode
       each_folder do |folder, serializer|
         begin
           next if !folder.exist?

@@ -10,8 +10,8 @@ module Imap::Backup
       @account = account
     end
 
-    def each
-      return enum_for(:each) if !block_given?
+    def each(&block)
+      return enum_for(:each) if !block
 
       all_names = client.list
 
@@ -32,12 +32,12 @@ module Imap::Backup
           all_names & configured
         end
 
-      names.each { |name| yield Account::Folder.new(client, name) }
+      names.each { |name| block.call(Account::Folder.new(client, name)) }
     end
 
-    def map
+    def map(&block)
       each.map do |folder|
-        yield folder
+        block.call(folder)
       end
     end
   end
