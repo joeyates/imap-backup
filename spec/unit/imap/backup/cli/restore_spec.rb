@@ -3,11 +3,10 @@ module Imap::Backup
   describe CLI::Restore do
     subject { described_class.new(email, options) }
 
-    let(:connection) { instance_double(Account::Connection, restore: nil) }
-    let(:account) { instance_double(Account, username: email) }
-    let(:config) { instance_double(Configuration, accounts: [account]) }
     let(:email) { "email" }
     let(:options) { {} }
+    let(:account) { instance_double(Account, username: email, restore: nil) }
+    let(:config) { instance_double(Configuration, accounts: [account]) }
 
     before do
       allow(Configuration).to receive(:exist?) { true }
@@ -21,14 +20,11 @@ module Imap::Backup
 
     describe "#run" do
       context "when an email is provided" do
-        before do
-          allow(subject).to receive(:connection).with(anything, email) { connection }
-
-          subject.run
-        end
 
         it "runs restore on the account" do
-          expect(connection).to have_received(:restore)
+          subject.run
+
+          expect(account).to have_received(:restore)
         end
       end
 
@@ -37,13 +33,13 @@ module Imap::Backup
         let(:options) { {} }
 
         before do
-          allow(subject).to receive(:each_connection).with(anything, []).and_yield(connection)
-
-          subject.run
+          allow(subject).to receive(:requested_accounts) { [account] }
         end
 
         it "runs restore on each account" do
-          expect(connection).to have_received(:restore)
+          subject.run
+
+          expect(account).to have_received(:restore)
         end
       end
 
@@ -54,7 +50,7 @@ module Imap::Backup
         it "fails" do
           expect do
             subject.run
-          end.to raise_error(RuntimeError, /Pass either an email or the --accounts option/)
+          end.to raise_error(RuntimeError, /Missing EMAIL parameter/)
         end
       end
 
@@ -63,14 +59,13 @@ module Imap::Backup
         let(:options) { {accounts: "email2"} }
 
         before do
-          allow(subject).to receive(:each_connection).
-            with(anything, ["email2"]).and_yield(connection)
-
-          subject.run
+          allow(subject).to receive(:requested_accounts) { [account] }
         end
 
         it "runs restore on each account" do
-          expect(connection).to have_received(:restore)
+          subject.run
+
+          expect(account).to have_received(:restore)
         end
       end
     end

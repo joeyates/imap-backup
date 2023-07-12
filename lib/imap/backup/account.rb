@@ -1,4 +1,5 @@
 require "imap/backup/account/connection/client_factory"
+require "imap/backup/account/restore"
 
 module Imap; end
 
@@ -38,12 +39,13 @@ module Imap::Backup
       @client ||= Account::Connection::ClientFactory.new(account: self).run
     end
 
-    def connection
-      @connection ||= Account::Connection.new(self)
-    end
-
     def namespaces
       client.namespace
+    end
+
+    def restore
+      restore = Account::Restore.new(account: self)
+      restore.run
     end
 
     def valid?

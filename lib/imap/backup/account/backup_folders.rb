@@ -1,6 +1,5 @@
 module Imap::Backup
   class Account; end
-  class Account::Connection; end
 
   class Account::BackupFolders
     attr_reader :account

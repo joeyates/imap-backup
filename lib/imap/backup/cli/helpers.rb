@@ -95,23 +95,5 @@ module Imap::Backup
         config.accounts
       end
     end
-
-    def connection(config, email)
-      account = account(config, email)
-
-      Account::Connection.new(account)
-    end
-
-    def each_connection(config, names)
-      return enum_for(:each_connection, config, names) if !block_given?
-
-      config.accounts.each do |account|
-        next if names.any? && !names.include?(account.username)
-
-        yield account.connection
-      end
-    rescue ConfigurationNotFound
-      raise "imap-backup is not configured. Run `imap-backup setup`"
-    end
   end
 end

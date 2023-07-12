@@ -13,8 +13,8 @@ module Imap::Backup
     subject { WithHelpers.new(options) }
 
     let(:email) { "email@example.com" }
-    let(:account1) { instance_double(Account, username: email, connection: "c1") }
-    let(:account2) { instance_double(Account, username: "foo", connection: "c2") }
+    let(:account1) { instance_double(Account, username: email) }
+    let(:account2) { instance_double(Account, username: "foo") }
     let(:accounts) { [account1, account2] }
     let(:config) { instance_double(Configuration, accounts: accounts) }
     let(:options) { {} }
@@ -86,24 +86,19 @@ module Imap::Backup
       end
     end
 
-    describe ".connection" do
-      it "returns a connection" do
-        result = subject.connection(config, email)
+    describe ".requested_accounts" do
+      let(:options) { {accounts: email} }
 
-        expect(result).to be_a(Account::Connection)
+      it "returns requested accounts" do
+        expect(subject.requested_accounts(config)).to eq([account1])
       end
 
-      it "returns the connection for any account with a matching username" do
-        result = subject.connection(config, email)
+      context "when no accounts are requested" do
+        let(:options) { {} }
 
-        expect(result.account).to eq(account1)
-      end
-    end
-
-    describe ".each_connection" do
-      it "yields each connection" do
-        expect { |b| subject.each_connection(config, [email, "foo"], &b) }.
-          to yield_successive_args("c1", "c2")
+        it "returns all configured accounts" do
+          expect(subject.requested_accounts(config)).to eq(accounts)
+        end
       end
     end
   end

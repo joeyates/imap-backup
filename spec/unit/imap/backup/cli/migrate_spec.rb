@@ -7,8 +7,7 @@ module Imap::Backup
     let(:options) { {} }
     let(:config) { instance_double(Configuration, accounts: [account1, account2]) }
     let(:account1) { instance_double(Account, username: "source", local_path: "path") }
-    let(:account2) { instance_double(Account, username: "destination", connection: connection) }
-    let(:connection) { instance_double(Account::Connection) }
+    let(:account2) { instance_double(Account, username: "destination") }
     let(:serializer) { instance_double(Serializer) }
     let(:folder) { instance_double(Account::Folder) }
     let(:migrator) { instance_double(Migrator, run: nil) }
