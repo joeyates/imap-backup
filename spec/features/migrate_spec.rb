@@ -3,6 +3,7 @@ require "features/helper"
 RSpec.describe "imap-backup migrate", type: :aruba, docker: true do
   let(:email) { "me@example.com" }
   let(:folder) { "my_folder" }
+  let(:source_folder) { folder }
   let(:source_account) do
     {
       username: email,
@@ -14,11 +15,11 @@ RSpec.describe "imap-backup migrate", type: :aruba, docker: true do
 
   let!(:setup) do
     create_config(**config_options)
-    append_local(email: email, folder: folder, subject: "Ciao", flags: [:Draft, :$CUSTOM])
+    append_local(email: email, folder: source_folder, subject: "Ciao", flags: [:Draft, :$CUSTOM])
   end
 
   after do
-    test_server.delete_folder folder
+    test_server.delete_folder source_folder
     test_server.disconnect
   end
 
@@ -73,10 +74,6 @@ RSpec.describe "imap-backup migrate", type: :aruba, docker: true do
 
   context "when migrating from a subfolder" do
     let(:source_folder) { "my_sub.my_folder" }
-    let(:setup) do
-      create_config(**config_options)
-      append_local(email: email, folder: source_folder, subject: "Hi")
-    end
 
     it "copies email from subfolders on the source account" do
       command = [
@@ -93,7 +90,7 @@ RSpec.describe "imap-backup migrate", type: :aruba, docker: true do
       messages = test_server.folder_messages(folder)
       expected = <<~MESSAGE.gsub("\n", "\r\n")
         From: sender@example.com
-        Subject: Hi
+        Subject: Ciao
 
         body
 
