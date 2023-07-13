@@ -140,6 +140,20 @@ module Imap::Backup
       end
     end
 
+    describe "#check_integrity!" do
+      let(:mbox_exists) { true }
+      let(:mbox_messages) { [] }
+
+      before do
+        allow(mbox).to receive(:exist?) { mbox_exists }
+        allow(imap).to receive(:messages) { mbox_messages }
+      end
+
+      it "returns nil" do
+        expect(subject.check_integrity!).to be nil
+      end
+    end
+
     describe "#apply_uid_validity" do
       let(:result) { subject.apply_uid_validity("new") }
       let(:action) { -> { result } }
