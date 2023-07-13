@@ -36,7 +36,7 @@ module Imap::Backup
     # Returns true if there are existing, valid files
     # false otherwise (in which case any existing files are deleted)
     def validate!
-      return if @validated
+      return true if @validated
 
       optionally_migrate2to3
 

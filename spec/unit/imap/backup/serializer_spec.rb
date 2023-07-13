@@ -126,6 +126,20 @@ module Imap::Backup
       allow(Serializer::Mbox).to receive(:new) { mbox }
     end
 
+    describe "#validate!" do
+      it "returns true" do
+        expect(subject.validate!).to be true
+      end
+
+      context "when called repeatedly" do
+        it "returns true" do
+          subject.validate!
+
+          expect(subject.validate!).to be true
+        end
+      end
+    end
+
     describe "#apply_uid_validity" do
       let(:result) { subject.apply_uid_validity("new") }
       let(:action) { -> { result } }
