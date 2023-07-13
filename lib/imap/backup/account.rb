@@ -42,6 +42,10 @@ module Imap::Backup
       client.namespace
     end
 
+    def capabilities
+      client.capability
+    end
+
     def restore
       restore = Account::Restore.new(account: self)
       restore.run
