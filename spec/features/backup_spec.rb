@@ -1,4 +1,6 @@
 require "features/helper"
+require "imap/backup/account"
+require "imap/backup/account/backup"
 
 RSpec.describe "imap-backup backup", type: :aruba, docker: true do
   include_context "message-fixtures"
