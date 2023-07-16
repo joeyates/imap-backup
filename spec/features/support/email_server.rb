@@ -65,10 +65,15 @@ class TestEmailServer
   end
 
   def folders
+    # Reconnect if necessary to avoid '#<IOError: closed stream>'
+    reconnect
     imap.list(root_folder, "*")
   end
 
   def create_folder(folder)
+    # Reconnect if necessary to avoid '#<IOError: closed stream>'
+    reconnect
+
     return if folder_exists?(folder)
 
     imap.create(folder)
