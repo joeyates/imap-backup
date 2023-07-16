@@ -57,14 +57,9 @@ end
 
 module Imap::Backup
   shared_examples "a method sets up the folder directory" do
-    let(:directory) { instance_double(Serializer::Directory, ensure_exists: nil) }
-
-    before do
-      allow(Serializer::Directory).to receive(:new) { directory }
-      action.call
-    end
-
     it "ensures the folder's containing directory exists" do
+      action.call
+
       expect(directory).to have_received(:ensure_exists).at_least(:once)
     end
 
@@ -72,6 +67,8 @@ module Imap::Backup
       let(:folder_name) { "a:b/sub" }
 
       it "creates it using valid characters" do
+        action.call
+
         expect(Serializer::Directory).
           to have_received(:new).
           with(anything, "a%3a;b").
@@ -120,10 +117,12 @@ module Imap::Backup
     let(:folder_name) { "folder/sub" }
     let(:folder_path) { File.expand_path(File.join("folder_path", folder_name)) }
     let(:existing_uid_validity) { nil }
+    let(:directory) { instance_double(Serializer::Directory, ensure_exists: nil) }
 
     before do
       allow(Serializer::Imap).to receive(:new) { imap }
       allow(Serializer::Mbox).to receive(:new) { mbox }
+      allow(Serializer::Directory).to receive(:new) { directory }
     end
 
     describe "#validate!" do
