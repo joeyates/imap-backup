@@ -151,7 +151,7 @@ RSpec.describe "imap-backup backup", type: :aruba, docker: true do
   end
 
   context "in mirror mode" do
-    let(:account_config) { test_server_connection_parameters.merge(mirror_mode: true) }
+    let(:account_config) { super().merge(mirror_mode: true) }
     let(:imap_path) { File.join(account_config[:local_path], "Foo.imap") }
     let(:mbox_path) { File.join(account_config[:local_path], "Foo.mbox") }
 
