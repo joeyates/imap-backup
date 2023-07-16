@@ -41,7 +41,7 @@ module Imap::Backup
       let(:install1) { instance_double(Thunderbird::Install, default: default_install) }
       let(:default_install) { "default" }
       let(:named_profile) { "named" }
-      let(:serialized_folders) { instance_double(Account::SerializedFolders) }
+      let(:serialized_folders) { instance_double(Account::SerializedFolders, none?: false) }
       let(:folder) do
         instance_double(
           Account::Folder,

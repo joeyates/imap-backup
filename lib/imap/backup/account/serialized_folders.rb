@@ -4,6 +4,8 @@ module Imap::Backup
   class Account; end
 
   class Account::SerializedFolders
+    include Enumerable
+
     attr_reader :account
 
     def initialize(account:)
@@ -13,11 +15,7 @@ module Imap::Backup
     def each(&block)
       return enum_for(:each) if !block
 
-      Account::FolderEnsurer.new(account: account).run
-
-      glob = File.join(account.local_path, "**", "*.imap")
-      base = Pathname.new(account.local_path)
-      Pathname.glob(glob) do |path|
+      glob.each do |path|
         name = path.relative_path_from(base).to_s[0..-6]
         serializer = Serializer.new(account.local_path, name)
         folder = Account::Folder.new(account.client, name)
@@ -25,15 +23,18 @@ module Imap::Backup
       end
     end
 
-    def map(&block)
-      each.map do |serializer, folder|
-        block.call(serializer, folder)
-      end
+    private
+
+    def base
+      @base ||= Pathname.new(account.local_path)
     end
 
-    def find(&block)
-      each.find do |serializer, folder|
-        block.call(serializer, folder)
+    def glob
+      @glob ||= begin
+        Account::FolderEnsurer.new(account: account).run
+
+        pattern = File.join(account.local_path, "**", "*.imap")
+        Pathname.glob(pattern)
       end
     end
   end
