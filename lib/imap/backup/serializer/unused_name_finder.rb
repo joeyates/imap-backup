@@ -1,3 +1,5 @@
+module Imap; end
+
 module Imap::Backup
   class Serializer::UnusedNameFinder
     attr_reader :serializer

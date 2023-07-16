@@ -1,5 +1,7 @@
 require "imap/backup"
 
+module Imap; end
+
 module Imap::Backup
   module CLI::Helpers
     def self.included(base)

@@ -1,3 +1,5 @@
+module Imap; end
+
 module Imap::Backup
   class FlagRefresher
     attr_reader :folder

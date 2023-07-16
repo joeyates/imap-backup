@@ -1,5 +1,7 @@
 require "email/mboxrd/message"
 
+module Imap; end
+
 module Imap::Backup
   class Serializer::Message
     attr_accessor :uid

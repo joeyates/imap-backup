@@ -6,6 +6,8 @@ require "imap/backup/account"
 require "imap/backup/file_mode"
 require "imap/backup/serializer/permission_checker"
 
+module Imap; end
+
 module Imap::Backup
   class Configuration
     CONFIGURATION_DIRECTORY = File.expand_path("~/.imap-backup")

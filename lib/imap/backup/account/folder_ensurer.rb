@@ -1,6 +1,8 @@
 require "imap/backup/serializer/directory"
 require "imap/backup/serializer/folder_maker"
 
+module Imap; end
+
 module Imap::Backup
   class Account; end
 

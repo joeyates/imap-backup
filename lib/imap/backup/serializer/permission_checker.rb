@@ -1,3 +1,5 @@
+module Imap; end
+
 module Imap::Backup
   class Serializer::PermissionChecker
     attr_reader :filename

@@ -1,5 +1,7 @@
 require "imap/backup/version"
 
+module Imap; end
+
 module Imap::Backup
   class Setup; end
 

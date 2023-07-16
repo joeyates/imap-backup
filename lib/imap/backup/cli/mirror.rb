@@ -1,6 +1,8 @@
 require "imap/backup/cli/folder_enumerator"
 require "imap/backup/mirror"
 
+module Imap; end
+
 module Imap::Backup
   class CLI::Mirror < Thor
     include Thor::Actions

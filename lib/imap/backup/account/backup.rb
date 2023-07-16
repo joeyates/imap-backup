@@ -5,6 +5,8 @@ require "imap/backup/downloader"
 require "imap/backup/flag_refresher"
 require "imap/backup/local_only_message_deleter"
 
+module Imap; end
+
 module Imap::Backup
   class Account; end
 

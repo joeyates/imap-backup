@@ -3,6 +3,8 @@ require "net/imap"
 
 require "retry_on_error"
 
+module Imap; end
+
 module Imap::Backup
   class Account; end
 

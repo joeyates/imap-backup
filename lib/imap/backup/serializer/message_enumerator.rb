@@ -1,3 +1,5 @@
+module Imap; end
+
 module Imap::Backup
   class Serializer::MessageEnumerator
     attr_reader :imap

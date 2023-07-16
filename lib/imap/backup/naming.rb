@@ -1,3 +1,5 @@
+module Imap; end
+
 module Imap::Backup
   class Naming
     INVALID_FILENAME_CHARACTERS = ":%;".freeze

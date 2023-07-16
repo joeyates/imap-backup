@@ -1,3 +1,5 @@
+module Imap; end
+
 module Imap::Backup
   class LocalOnlyMessageDeleter
     attr_reader :folder

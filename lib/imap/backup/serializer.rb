@@ -10,6 +10,8 @@ require "imap/backup/serializer/message_enumerator"
 require "imap/backup/serializer/version2_migrator"
 require "imap/backup/serializer/unused_name_finder"
 
+module Imap; end
+
 module Imap::Backup
   class Serializer
     def self.folder_path_for(path:, folder:)

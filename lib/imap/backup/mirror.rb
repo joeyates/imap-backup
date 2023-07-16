@@ -1,5 +1,7 @@
 require "imap/backup/mirror/map"
 
+module Imap; end
+
 module Imap::Backup
   class Mirror
     attr_reader :serializer

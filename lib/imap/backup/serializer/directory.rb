@@ -2,6 +2,8 @@ require "os"
 
 require "imap/backup/serializer/folder_maker"
 
+module Imap; end
+
 module Imap::Backup
   class Serializer; end
 

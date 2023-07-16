@@ -1,3 +1,5 @@
+module Imap; end
+
 module Imap::Backup
   class FileMode
     attr_reader :filename

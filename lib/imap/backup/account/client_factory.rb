@@ -5,6 +5,8 @@ require "imap/backup/client/apple_mail"
 require "imap/backup/client/default"
 require "retry_on_error"
 
+module Imap; end
+
 module Imap::Backup
   class Account; end
 

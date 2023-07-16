@@ -1,6 +1,8 @@
 require "imap/backup/cli/folder_enumerator"
 require "imap/backup/migrator"
 
+module Imap; end
+
 module Imap::Backup
   class CLI::Migrate < Thor
     include Thor::Actions

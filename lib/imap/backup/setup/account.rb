@@ -2,6 +2,8 @@ require "imap/backup/setup/account/header"
 require "imap/backup/setup/backup_path"
 require "imap/backup/setup/email"
 
+module Imap; end
+
 module Imap::Backup
   class Setup; end
 

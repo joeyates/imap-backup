@@ -1,3 +1,5 @@
+module Imap; end
+
 module Imap::Backup
   class CLI::Restore < Thor
     include Thor::Actions

@@ -1,5 +1,7 @@
 require "json"
 
+module Imap; end
+
 module Imap::Backup
   class Serializer::Imap
     CURRENT_VERSION = 3

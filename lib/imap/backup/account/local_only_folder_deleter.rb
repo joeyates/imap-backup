@@ -1,6 +1,8 @@
 require "imap/backup/account/backup_folders"
 require "imap/backup/account/serialized_folders"
 
+module Imap; end
+
 module Imap::Backup
   class Account; end
 

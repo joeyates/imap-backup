@@ -1,3 +1,5 @@
+module Imap; end
+
 module Imap::Backup
   class Migrator
     attr_reader :folder

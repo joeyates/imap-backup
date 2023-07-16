@@ -1,3 +1,5 @@
+module Imap; end
+
 module Imap::Backup
   class Serializer::Mbox
     attr_reader :folder_path

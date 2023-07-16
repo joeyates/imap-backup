@@ -1,6 +1,8 @@
 require "thunderbird/local_folder"
 require "thunderbird/profiles"
 
+module Imap; end
+
 module Imap::Backup
   class Thunderbird::MailboxExporter
     EXPORT_PREFIX = "imap-backup".freeze

@@ -4,6 +4,8 @@ require "email/provider"
 require "imap/backup/account"
 require "imap/backup/setup/helpers"
 
+module Imap; end
+
 module Imap::Backup
   class Setup
     class << self

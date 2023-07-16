@@ -1,5 +1,7 @@
 require "imap/backup/account/backup_folders"
 
+module Imap; end
+
 module Imap::Backup
   class CLI::Stats < Thor
     include Thor::Actions

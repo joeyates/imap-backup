@@ -1,5 +1,7 @@
 require "fileutils"
 
+module Imap; end
+
 module Imap::Backup
   class Serializer; end
 

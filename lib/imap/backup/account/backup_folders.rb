@@ -1,3 +1,5 @@
+module Imap; end
+
 module Imap::Backup
   class Account; end
 

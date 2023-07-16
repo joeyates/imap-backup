@@ -4,6 +4,8 @@ require "singleton"
 require "imap/backup/configuration"
 require "text/sanitizer"
 
+module Imap; end
+
 module Imap::Backup
   class Logger
     include Singleton

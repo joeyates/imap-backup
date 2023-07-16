@@ -1,5 +1,7 @@
 require "json"
 
+module Imap; end
+
 module Imap::Backup
   class Serializer::Version2Migrator
     attr_reader :folder_path
