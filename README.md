@@ -100,6 +100,54 @@ For more information about a command, run
 imap-backup help COMMAND
 ```
 
+# Performace
+
+There are a couple of performance tweaks that you can use
+to improve backup speed.
+
+These are activated via two settings:
+
+* Global setting "Delay download writes"
+* Account setting "Multi-fetch size"
+
+As with all performance tweaks, there are trade-offs.
+If you are using a small virtual server or Raspberry Pi
+to run your backups, you will probably want to leave
+the deafult settings.
+If, on the other hand, you are using a computer with a
+fair bit of RAM, and you are dealing with a *lot* of email,
+then changing these settings may be worthwhile.
+
+## Delay download writes
+
+This setting affects all account backups.
+
+When not set, each message is written to disk, one at a time.
+Doing so means the message itself is appended to the MBox file,
+but more importantly, the JSON metadata is rewritten to disk
+from scratch.
+
+When in use, all of a mailboxes unbackupped messages are
+downloaded first, and then written to disk just once.
+
+This speeds up backup as the metadata file is not rewritten
+after each message is added, but it potentially uses much more memory.
+
+## Multi-fetch Size
+
+By default, during backup, each message is downloaded one-by-one.
+
+Using this setting, you can download chunks of emails at a time,
+potentially speeding up the process.
+
+If you're not using "Delayed downlaod writes",
+using multi-fetch *will* mean that the backup process will use
+more memory - equivalent to the size of the greater number
+of messages downloaded at a time.
+
+This behaviour may also exceed limits on your email provider,
+so it's best to check before cranking it up!
+
 # Troubleshooting
 
 If you have problems:

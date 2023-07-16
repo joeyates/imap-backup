@@ -43,6 +43,12 @@ or
 $ rspec --tag ~docker
 ```
 
+# Performance Specs
+
+```sh
+PERFORMANCE=1 rspec --order=defined
+```
+
 ### Debugging
 
 The feature specs are run 'out of process' via the Aruba gem.
