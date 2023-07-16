@@ -66,8 +66,8 @@ module Imap::Backup
       File.open(local_folder.full_path, "w") do |f|
         serializer.messages.each do |message|
           timestamp = Time.now.strftime("%a %b %d %H:%M:%S %Y")
-          thunderbird_fom_line = "From - #{timestamp}"
-          output = "#{thunderbird_fom_line}\n#{message.body}\n"
+          thunderbird_from_line = "From - #{timestamp}"
+          output = "#{thunderbird_from_line}\n#{message.body}\n"
           f.write output
         end
       end
