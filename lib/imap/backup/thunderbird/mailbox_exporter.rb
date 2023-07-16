@@ -18,6 +18,13 @@ module Imap::Backup
     end
 
     def run
+      if !profile_set_up
+        error "The Thunderbird profile '#{profile.title}' " \
+              "has not been set up. " \
+              "Please set it up before trying to export"
+        return false
+      end
+
       local_folder_ok = local_folder.set_up
       if !local_folder_ok
         error "Failed to set up local folder"
@@ -37,6 +44,10 @@ module Imap::Backup
     end
 
     private
+
+    def profile_set_up
+      File.exist?(profile.local_folders_path)
+    end
 
     def check_local_folder
       return false if !local_folder.exists?

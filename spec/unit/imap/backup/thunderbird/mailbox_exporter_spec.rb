@@ -1,6 +1,6 @@
 module Imap::Backup
   describe Thunderbird::MailboxExporter do
-    subject { described_class.new("email", serializer, "profile", **args) }
+    subject { described_class.new("email", serializer, profile, **args) }
 
     let(:args) { {} }
     let(:serializer) do
@@ -16,6 +16,14 @@ module Imap::Backup
         body: "Ciao"
       )
     end
+    let(:profile) do
+      instance_double(
+        Thunderbird::Profile,
+        local_folders_path: "local_folders_path",
+        title: "profile_title"
+      )
+    end
+    let(:profile_local_folders_exists) { true }
     let(:local_folder) do
       instance_double(
         Thunderbird::LocalFolder,
@@ -33,6 +41,8 @@ module Imap::Backup
     let(:file) { instance_double(File, write: nil) }
 
     before do
+      allow(File).to receive(:exist?).and_call_original
+      allow(File).to receive(:exist?).with("local_folders_path") { profile_local_folders_exists }
       allow(File).to receive(:open).with("full_path", "w").and_yield(file)
       allow(File).to receive(:unlink)
       allow(Thunderbird::LocalFolder).to receive(:new) { local_folder }
@@ -41,6 +51,14 @@ module Imap::Backup
 
     describe "#run" do
       let!(:result) { subject.run }
+
+      context "when the account is not set up" do
+        let(:profile_local_folders_exists) { false }
+
+        it "refuses to run" do
+          expect(result).to be false
+        end
+      end
 
       context "when the destination folder cannot be set up" do
         let(:set_up_result) { false }

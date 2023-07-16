@@ -21,17 +21,20 @@ RSpec.describe "imap-backup utils export-to-thunderbird", type: :aruba, docker: 
     PROFILES
     File.write(path, content)
   end
+  let(:create_local_folders) { create_directory local_folders_path }
   let(:write_serialized_folder) do
     create_local_folder email: account[:username], folder: "Foo", uid_validity: 1
     append_local email: account[:username], folder: "Foo", body: "Email content"
   end
   let(:profile_path) { "Profiles/qioxtndq.default" }
+  let(:local_folders_path) { File.join(root_path, profile_path, "Mail/Local Folders") }
   let(:folder_path) do
-    File.join(root_path, profile_path, "Mail/Local Folders/imap-backup.sbd", "#{email}.sbd", "Foo")
+    File.join(local_folders_path, "imap-backup.sbd", "#{email}.sbd", "Foo")
   end
   let!(:setup) do
     create_config(**config_options)
     write_thunderbird_profiles_ini
+    create_local_folders
     write_serialized_folder
   end
 
@@ -71,8 +74,11 @@ RSpec.describe "imap-backup utils export-to-thunderbird", type: :aruba, docker: 
       )
     end
 
-    it "works" do
+    it "exports emails" do
       run_command_and_stop "imap-backup utils export-to-thunderbird #{email} -c #{custom_config_path}"
+
+      content = File.read(folder_path)
+      expect(content).to include("Email content")
     end
   end
 end
