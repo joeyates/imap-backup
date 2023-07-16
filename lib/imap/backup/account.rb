@@ -30,7 +30,6 @@ module Imap::Backup
       @multi_fetch_size = options[:multi_fetch_size]
       @reset_seen_flags_after_fetch = options[:reset_seen_flags_after_fetch]
       @client = nil
-      @connection = nil
       @changes = {}
       @marked_for_deletion = false
     end
@@ -159,7 +158,6 @@ module Imap::Backup
       end
 
       @client = nil
-      @connection = nil
       instance_variable_set(key, value)
     end
   end
