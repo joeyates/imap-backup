@@ -53,5 +53,26 @@ RSpec.describe "imap-backup utils export-to-thunderbird", type: :aruba, docker: 
     end
   end
 
-  context "when a config path is supplied"
+  context "when a config path is supplied" do
+    let(:custom_config_path) { File.join(File.expand_path("~/.imap-backup"), "foo.json") }
+    let(:config_options) { {accounts: [account], path: custom_config_path} }
+    let(:write_serialized_folder) do
+      create_local_folder(
+        email: account[:username],
+        folder: "Foo",
+        uid_validity: 1,
+        configuration_path: custom_config_path
+      )
+      append_local(
+        email: account[:username],
+        folder: "Foo",
+        body: "Email content",
+        configuration_path: custom_config_path
+      )
+    end
+
+    it "works" do
+      run_command_and_stop "imap-backup utils export-to-thunderbird #{email} -c #{custom_config_path}"
+    end
+  end
 end
