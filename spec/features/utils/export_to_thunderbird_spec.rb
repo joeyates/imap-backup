@@ -22,24 +22,17 @@ RSpec.describe "imap-backup utils export-to-thunderbird", type: :aruba, docker: 
     File.write(path, content)
   end
   let(:write_serialized_folder) do
-    create_directory account[:local_path]
-    message = "Email content"
-    valid_imap_data = {
-      version: 3, uid_validity: 1, messages: [{uid: 1, offset: 0, length: message.length}]
-    }
-    imap_path = File.join(account[:local_path], "Foo.imap")
-    mbox_path = File.join(account[:local_path], "Foo.mbox")
-    File.write(imap_path, valid_imap_data.to_json)
-    File.write(mbox_path, message)
+    create_local_folder email: account[:username], folder: "Foo", uid_validity: 1
+    append_local email: account[:username], folder: "Foo", body: "Email content"
   end
   let(:profile_path) { "Profiles/qioxtndq.default" }
   let(:folder_path) do
     File.join(root_path, profile_path, "Mail/Local Folders/imap-backup.sbd", "#{email}.sbd", "Foo")
   end
   let!(:setup) do
+    create_config(**config_options)
     write_thunderbird_profiles_ini
     write_serialized_folder
-    create_config(**config_options)
   end
 
   it "exports emails" do
