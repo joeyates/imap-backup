@@ -19,7 +19,10 @@ module Imap::Backup
 
     def run
       local_folder_ok = local_folder.set_up
-      return false if !local_folder_ok
+      if !local_folder_ok
+        error "Failed to set up local folder"
+        return false
+      end
 
       skip_for_msf = check_msf
       return false if skip_for_msf
@@ -27,6 +30,7 @@ module Imap::Backup
       skip_for_local_folder = check_local_folder
       return false if skip_for_local_folder
 
+      info "Exporting account '#{email}' to folder '#{local_folder.full_path}'"
       copy_messages
 
       true
@@ -38,11 +42,11 @@ module Imap::Backup
       return false if !local_folder.exists?
 
       if force
-        Kernel.puts "Overwriting '#{local_folder.path}' as --force option was supplied"
+        info "Overwriting '#{local_folder.path}' as --force option was supplied"
         return false
       end
 
-      Kernel.puts "Skipping export of '#{serializer.folder}' as '#{local_folder.path}' exists"
+      warning "Skipping export of '#{serializer.folder}' as '#{local_folder.full_path}' exists"
       true
     end
 
@@ -50,12 +54,12 @@ module Imap::Backup
       return false if !local_folder.msf_exists?
 
       if force
-        Kernel.puts "Deleting '#{local_folder.msf_path}' as --force option was supplied"
+        info "Deleting '#{local_folder.msf_path}' as --force option was supplied"
         File.unlink local_folder.msf_path
         return false
       end
 
-      Kernel.puts(
+      warning(
         "Skipping export of '#{serializer.folder}' " \
         "as '#{local_folder.msf_path}' exists"
       )
@@ -79,6 +83,18 @@ module Imap::Backup
         prefixed_folder_path = File.join(top_level_folders, serializer.folder)
         Thunderbird::LocalFolder.new(profile, prefixed_folder_path)
       end
+    end
+
+    def error(message)
+      Logger.logger.error("[Thunderbird::MailboxExporter] #{message}")
+    end
+
+    def info(message)
+      Logger.logger.info("[Thunderbird::MailboxExporter] #{message}")
+    end
+
+    def warning(message)
+      Logger.logger.warn("[Thunderbird::MailboxExporter] #{message}")
     end
   end
 end
