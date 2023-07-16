@@ -13,7 +13,7 @@ RSpec.describe "imap-backup utils export-to-thunderbird", type: :aruba, docker: 
     content = <<~PROFILES
       [Install0]
       Name=default
-      Default=Profiles/qioxtndq.default
+      Default=#{profile_path}
 
       [Profile1]
       IsRelative=1
