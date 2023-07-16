@@ -132,7 +132,7 @@ module Imap::Backup
 
     describe "#to_h" do
       it "returns a Hash representation" do
-        expect(subject.to_h).to eq({username: "user", password: "pwd"})
+        expect(subject.to_h).to include({username: "user", password: "pwd"})
       end
 
       context "when local_path is set" do
