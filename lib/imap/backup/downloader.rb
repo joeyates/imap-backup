@@ -24,7 +24,7 @@ module Imap::Backup
     end
 
     def run
-      debug "#{uids.count} new messages"
+      info("#{uids.count} new messages") if uids.any?
 
       uids.each_slice(multi_fetch_size).with_index do |block, i|
         multifetch_failed = download_block(block, i)
