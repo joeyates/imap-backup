@@ -11,8 +11,6 @@ services:
     - MAILNAME=example.com
     - MAIL_ADDRESS=address@example.com
     - MAIL_PASS=pass
-    volumes:
-      - db:/var/lib/pgsql/data
   other-imap:
     image: antespi/docker-imap-devel:latest
     container_name: other-imap
