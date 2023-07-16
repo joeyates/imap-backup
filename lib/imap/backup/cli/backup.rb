@@ -14,8 +14,7 @@ module Imap::Backup
 
     no_commands do
       def run
-        non_logging_options = Logger.setup_logging(options)
-        config = load_config(**non_logging_options)
+        config = load_config(**options)
         requested_accounts(config).each do |account|
           backup = Account::Backup.new(account: account, refresh: refresh)
           backup.run
