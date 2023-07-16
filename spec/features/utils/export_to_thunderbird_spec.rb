@@ -75,7 +75,10 @@ RSpec.describe "imap-backup utils export-to-thunderbird", type: :aruba, docker: 
     end
 
     it "exports emails" do
-      run_command_and_stop "imap-backup utils export-to-thunderbird #{email} -c #{custom_config_path}"
+      run_command_and_stop \
+        "imap-backup utils export-to-thunderbird " \
+        "#{email} " \
+        "-c #{custom_config_path}"
 
       content = File.read(folder_path)
       expect(content).to include("Email content")
