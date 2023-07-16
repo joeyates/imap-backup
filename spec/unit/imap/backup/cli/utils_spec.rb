@@ -9,7 +9,7 @@ module Imap::Backup
       instance_double(
         Account,
         username: email,
-        local_path: "path",
+        local_path: "account_path",
         client: client
       )
     end

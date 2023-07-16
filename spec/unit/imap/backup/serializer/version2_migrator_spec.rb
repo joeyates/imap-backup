@@ -1,6 +1,6 @@
 module Imap::Backup
   describe Serializer::Version2Migrator do
-    subject { described_class.new("path") }
+    subject { described_class.new("migrator_path") }
 
     let(:mailbox_exists) { true }
     let(:mailbox_messages) { ["From me"] }
@@ -14,11 +14,11 @@ module Imap::Backup
 
     before do
       allow(File).to receive(:exist?).and_call_original
-      allow(File).to receive(:exist?).with("path.mbox") { mailbox_exists }
-      allow(File).to receive(:exist?).with("path.imap") { metadata_exists }
+      allow(File).to receive(:exist?).with("migrator_path.mbox") { mailbox_exists }
+      allow(File).to receive(:exist?).with("migrator_path.imap") { metadata_exists }
       allow(File).to receive(:read).and_call_original
-      allow(File).to receive(:read).with("path.imap") { metadata_content }
-      allow(File).to receive(:open).with("path.mbox", "rb").and_yield(file)
+      allow(File).to receive(:read).with("migrator_path.imap") { metadata_content }
+      allow(File).to receive(:open).with("migrator_path.mbox", "rb").and_yield(file)
       allow(file).to receive(:gets).and_return(*mailbox_messages, nil)
       allow(Serializer::Imap).to receive(:new) { imap }
     end

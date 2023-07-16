@@ -97,7 +97,7 @@ module Imap::Backup
   end
 
   describe Serializer do
-    subject { described_class.new("path", folder_name) }
+    subject { described_class.new("serializer_path", folder_name) }
 
     let(:imap) do
       instance_double(
@@ -118,7 +118,7 @@ module Imap::Backup
       )
     end
     let(:folder_name) { "folder/sub" }
-    let(:folder_path) { File.expand_path(File.join("path", folder_name)) }
+    let(:folder_path) { File.expand_path(File.join("folder_path", folder_name)) }
     let(:existing_uid_validity) { nil }
 
     before do
@@ -183,7 +183,7 @@ module Imap::Backup
       context "when the new value is different from the old value" do
         let(:existing_uid_validity) { "existing" }
         let(:unused_name_finder) { instance_double(Serializer::UnusedNameFinder, run: "new_name") }
-        let(:new_folder_path) { File.expand_path(File.join("path/new_name")) }
+        let(:new_folder_path) { File.expand_path(File.join("serializer_path/new_name")) }
 
         before do
           allow(Serializer::UnusedNameFinder).to receive(:new) { unused_name_finder }

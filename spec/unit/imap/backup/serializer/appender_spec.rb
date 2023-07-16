@@ -1,6 +1,6 @@
 module Imap::Backup
   describe Serializer::Appender do
-    subject { described_class.new(folder: "path", imap: imap, mbox: mbox) }
+    subject { described_class.new(folder: "appender_path", imap: imap, mbox: mbox) }
 
     let(:imap) { instance_double(Serializer::Imap, uid_validity: existing_uid_validity) }
     let(:mbox) do

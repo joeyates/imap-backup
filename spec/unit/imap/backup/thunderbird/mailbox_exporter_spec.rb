@@ -23,7 +23,7 @@ module Imap::Backup
         full_path: "full_path",
         msf_exists?: msf_exists,
         msf_path: "msf_path",
-        path: "path",
+        path: "thunderbird_path",
         set_up: set_up_result
       )
     end

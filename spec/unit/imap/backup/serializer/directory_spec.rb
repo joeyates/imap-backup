@@ -2,7 +2,7 @@ require "imap/backup/serializer/directory"
 
 module Imap::Backup
   describe Serializer::Directory do
-    subject { described_class.new("path", "relative") }
+    subject { described_class.new("directory_path", "relative") }
 
     let(:windows) { false }
     let(:file_mode) { instance_double(FileMode, mode: 0o600) }
