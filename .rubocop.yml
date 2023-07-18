@@ -28,6 +28,9 @@ Layout/LineLength:
   Max: 100
 Layout/SpaceAroundMethodCallOperator:
    Enabled: true
+Layout/SpaceAroundOperators:
+  Enabled: true
+  EnforcedStyleForExponentOperator: space
 Layout/SpaceBeforeBrackets:
   Enabled: true
 
@@ -189,6 +192,8 @@ Style/Documentation:
   Enabled: false
 Style/DocumentDynamicEvalDefinition:
   Enabled: true
+Style/DoubleNegation:
+  Enabled: false
 Style/EmptyCaseCondition:
   Enabled: false
 Style/EmptyMethod:

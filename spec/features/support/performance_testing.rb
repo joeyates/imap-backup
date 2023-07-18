@@ -8,5 +8,5 @@ RSpec.configure do |config|
 end
 
 Aruba.configure do |config|
-  config.exit_timeout = 600 if !!ENV["PERFORMANCE"]
+  config.exit_timeout = 6 * 60 * 60 if !!ENV["PERFORMANCE"]
 end

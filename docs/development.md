@@ -49,6 +49,9 @@ $ rspec --tag ~docker
 PERFORMANCE=1 rspec --order=defined
 ```
 
+Beware: the performance spec (just backup for now) takes a very
+long time to run, approximately 24 hours!
+
 ### Debugging
 
 The feature specs are run 'out of process' via the Aruba gem.
