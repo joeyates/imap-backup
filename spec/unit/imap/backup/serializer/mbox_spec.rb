@@ -10,8 +10,11 @@ module Imap::Backup
     before do
       allow(File).to receive(:exist?).and_call_original
       allow(File).to receive(:exist?).with(pathname) { exists }
+      allow(File).to receive(:open).and_call_original
       allow(File).to receive(:open).with(pathname, "ab").and_yield(file)
+      allow(File).to receive(:read).and_call_original
       allow(File).to receive(:read).with(pathname) { existing.to_json }
+      allow(File).to receive(:stat).and_call_original
       allow(File).to receive(:unlink).and_call_original
       allow(File).to receive(:unlink).with(pathname)
     end
@@ -106,15 +109,18 @@ module Imap::Backup
       end
     end
 
-    describe "#rewind" do
+    describe "#rollback" do
+      let(:stat) { instance_double(File::Stat, size: 123) }
+
       before do
+        allow(File).to receive(:stat) { stat }
         allow(File).to receive(:open).
           with(pathname, File::RDWR | File::CREAT, 0o644).
           and_yield(file)
       end
 
       it "truncates the mailbox" do
-        subject.rewind(123)
+        subject.transaction { subject.rollback }
 
         expect(file).to have_received(:truncate).with(123)
       end
