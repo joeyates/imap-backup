@@ -12,6 +12,7 @@ module Imap::Backup
         local_path: "local_path",
         mirror_mode: mirror_mode,
         multi_fetch_size: 42,
+        delay_download_writes: false,
         reset_seen_flags_after_fetch: reset_seen_flags_after_fetch
       )
     end
