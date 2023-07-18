@@ -3,9 +3,25 @@ module Imap; end
 module Imap::Backup
   class Serializer::Mbox
     attr_reader :folder_path
+    attr_reader :savepoint
 
     def initialize(folder_path)
       @folder_path = folder_path
+      @savepoint = nil
+    end
+
+    def transaction(&block)
+      fail_in_transaction!(message: "Nested transactions are not supported")
+
+      @savepoint = {length: length}
+      block.call
+      @savepoint = nil
+    end
+
+    def rollback
+      fail_outside_transaction!
+
+      rewind(@savepoint[:length])
     end
 
     def valid?
@@ -31,6 +47,10 @@ module Imap::Backup
       File.unlink(pathname)
     end
 
+    def exist?
+      File.exist?(pathname)
+    end
+
     def length
       return nil if !exist?
 
@@ -51,18 +71,24 @@ module Imap::Backup
       end
     end
 
+    def touch
+      File.open(pathname, "a") {}
+    end
+
+    private
+
     def rewind(length)
       File.open(pathname, File::RDWR | File::CREAT, 0o644) do |f|
         f.truncate(length)
       end
     end
 
-    def touch
-      File.open(pathname, "a") {}
+    def fail_in_transaction!(message: "Method not supported inside trasactions")
+      raise message if savepoint
     end
 
-    def exist?
-      File.exist?(pathname)
+    def fail_outside_transaction!
+      raise "This method can only be called inside a transaction" if !savepoint
     end
   end
 end

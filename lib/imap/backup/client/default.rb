@@ -9,7 +9,7 @@ module Imap::Backup
   class Client::Default
     extend Forwardable
     def_delegators :imap, *%i(
-      append authenticate create expunge namespace
+      append authenticate capability create expunge namespace
       responses uid_fetch uid_search uid_store
     )
 

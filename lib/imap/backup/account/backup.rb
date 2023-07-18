@@ -38,12 +38,19 @@ module Imap::Backup
 
         Logger.logger.debug "[#{folder.name}] running backup"
         serializer.apply_uid_validity(folder.uid_validity)
-        Downloader.new(
+        downloader = Downloader.new(
           folder,
           serializer,
           multi_fetch_size: account.multi_fetch_size,
           reset_seen_flags_after_fetch: account.reset_seen_flags_after_fetch
-        ).run
+        )
+        if account.delay_download_writes
+          serializer.transaction do
+            downloader.run
+          end
+        else
+          downloader.run
+        end
         if account.mirror_mode
           Logger.logger.info "Mirror mode - Deleting messages only present locally"
           LocalOnlyMessageDeleter.new(folder, serializer).run

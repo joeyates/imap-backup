@@ -14,7 +14,7 @@ module Imap::Backup
       @mbox = mbox
     end
 
-    def run(uid:, message:, flags:)
+    def single(uid:, message:, flags:)
       raise "Can't add messages without uid_validity" if !imap.uid_validity
 
       uid = uid.to_i
@@ -26,29 +26,43 @@ module Imap::Backup
         return
       end
 
-      do_append uid, message, flags
+      rollback_on_error do
+        do_append uid, message, flags
+      rescue StandardError => e
+        raise <<-ERROR.gsub(/^\s*/m, "")
+          [#{folder}] failed to append message #{uid}:
+          #{message}. #{e}:
+          #{e.backtrace.join("\n")}"
+        ERROR
+      end
+    end
+
+    def multi(appends)
+      rollback_on_error do
+        appends.each do |a|
+          do_append a[:uid], a[:message], a[:flags]
+        end
+      end
     end
 
     private
 
     def do_append(uid, message, flags)
       mboxrd_message = Email::Mboxrd::Message.new(message)
-      initial = mbox.length || 0
-      mbox_appended = false
-      begin
-        serialized = mboxrd_message.to_serialized
-        mbox.append serialized
-        mbox_appended = true
-        imap.append uid, serialized.length, flags
-      rescue StandardError => e
-        mbox.rewind(initial) if mbox_appended
+      serialized = mboxrd_message.to_serialized
+      mbox.append serialized
+      imap.append uid, serialized.length, flags: flags
+    end
 
-        error = <<-ERROR.gsub(/^\s*/m, "")
-          [#{folder}] failed to append message #{uid}:
-          #{message}. #{e}:
-          #{e.backtrace.join("\n")}"
-        ERROR
-        Logger.logger.warn error
+    def rollback_on_error(&block)
+      imap.transaction do
+        mbox.transaction do
+          block.call
+        rescue StandardError => e
+          Logger.logger.error e
+          imap.rollback
+          mbox.rollback
+        end
       end
     end
   end

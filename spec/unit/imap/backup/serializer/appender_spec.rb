@@ -2,25 +2,24 @@ module Imap::Backup
   describe Serializer::Appender do
     subject { described_class.new(folder: "appender_path", imap: imap, mbox: mbox) }
 
-    let(:imap) { instance_double(Serializer::Imap, uid_validity: existing_uid_validity) }
+    let(:imap) do
+      instance_double(Serializer::Imap, uid_validity: existing_uid_validity, rollback: nil)
+    end
     let(:mbox) do
-      instance_double(
-        Serializer::Mbox,
-        append: nil,
-        length: 1,
-        rewind: nil
-      )
+      instance_double(Serializer::Mbox, append: nil, rollback: nil)
     end
     let(:existing_uid_validity) { "42" }
     let(:mboxrd_message) do
       instance_double(Email::Mboxrd::Message, to_serialized: "serialized")
     end
     let(:found_message) { nil }
-    let(:command) { subject.run(uid: 99, message: "Hi", flags: [:MyFlag]) }
+    let(:command) { subject.single(uid: 99, message: "Hi", flags: [:MyFlag]) }
 
     before do
       allow(imap).to receive(:get) { found_message }
+      allow(imap).to receive(:transaction).and_yield
       allow(imap).to receive(:append)
+      allow(mbox).to receive(:transaction).and_yield
       allow(Email::Mboxrd::Message).to receive(:new) { mboxrd_message }
     end
 
@@ -45,7 +44,7 @@ module Imap::Backup
     it "appends the message flags to the metadata" do
       command
 
-      expect(imap).to have_received(:append).with(anything, anything, [:MyFlag])
+      expect(imap).to have_received(:append).with(anything, anything, flags: [:MyFlag])
     end
 
     context "when appending to the mailbox causes an error" do
@@ -60,7 +59,7 @@ module Imap::Backup
       it "leaves the metadata file unchanged" do
         command
 
-        expect(imap).to_not have_received(:append)
+        expect(imap).to have_received(:rollback)
       end
     end
 
@@ -76,7 +75,7 @@ module Imap::Backup
       it "resets the mailbox to the previous position" do
         command
 
-        expect(mbox).to have_received(:rewind)
+        expect(mbox).to have_received(:rollback)
       end
     end
 

@@ -23,6 +23,22 @@ module Imap::Backup
       end
     end
 
+    desc "capabilities EMAIL", "List server capabilities"
+    long_desc <<~DESC
+      Lists the IMAP capabilities supported by the IMAP server.
+    DESC
+    config_option
+    format_option
+    quiet_option
+    verbose_option
+    def capabilities(email)
+      Imap::Backup::Logger.setup_logging options
+      config = load_config(**options)
+      account = account(config, email)
+      capabilities = account.capabilities
+      Kernel.puts capabilities.join(", ")
+    end
+
     desc "namespaces EMAIL", "List account namespaces"
     long_desc <<~DESC
       Lists namespaces defined for an email account.

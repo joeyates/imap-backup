@@ -12,12 +12,13 @@ module ConfigurationHelpers
     File.expand_path("~/.imap-backup")
   end
 
-  def create_config(accounts:, path: nil)
+  def create_config(accounts:, delay_download_writes: :unset, path: nil)
     path ||= File.join(config_path, "config.json")
     save_data = {
       version: Imap::Backup::Configuration::VERSION,
       accounts: accounts
     }
+    save_data[:delay_download_writes] = delay_download_writes if delay_download_writes != :unset
     FileUtils.mkdir_p config_path
     FileUtils.chmod 0o700, config_path
     File.open(path, "w") { |f| f.write(JSON.pretty_generate(save_data)) }
