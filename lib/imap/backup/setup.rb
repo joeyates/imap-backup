@@ -72,9 +72,10 @@ module Imap::Backup
     end
 
     def toggle_delay_download_writes(menu)
-      modified = config.delay_download_writes_modified ? " *" : ""
-      menu_item = "toggle delay of download writes#{modified}"
       new_value = config.delay_download_writes ? false : true
+      modified = config.delay_download_writes_modified ? " *" : ""
+      change = config.delay_download_writes ? "don't delay" : "delay"
+      menu_item = "#{change} download writes#{modified}"
       menu.choice(menu_item) do
         config.delay_download_writes = new_value
       end
