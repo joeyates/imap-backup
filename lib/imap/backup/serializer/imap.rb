@@ -15,6 +15,26 @@ module Imap::Backup
       @uid_validity = nil
       @messages = nil
       @version = nil
+      @savepoint = nil
+    end
+
+    def transaction(&block)
+      fail_in_transaction!(message: "Serializer::Imap: nested transactions are not supported")
+
+      ensure_loaded
+      @savepoint = {messages: messages.dup, uid_validity: uid_validity}
+
+      block.call
+
+      @savepoint = nil
+      save
+    end
+
+    def rollback
+      fail_outside_transaction!
+
+      @messages = @savepoint[:messages]
+      @uid_validity = @savepoint[:uid_validity]
     end
 
     def pathname
@@ -33,7 +53,7 @@ module Imap::Backup
       true
     end
 
-    def append(uid, length, flags = [])
+    def append(uid, length, flags: [])
       offset =
         if messages.empty?
           0
@@ -109,14 +129,16 @@ module Imap::Backup
     end
 
     def save
+      return if @savepoint
+
       ensure_loaded
 
       raise "Cannot save metadata without a uid_validity" if !uid_validity
 
       data = {
-        version: @version,
-        uid_validity: @uid_validity,
-        messages: @messages.map(&:to_h)
+        version: version,
+        uid_validity: uid_validity,
+        messages: messages.map(&:to_h)
       }
       content = data.to_json
       File.open(pathname, "w") { |f| f.write content }
@@ -161,6 +183,14 @@ module Imap::Backup
 
     def mbox
       @mbox ||= Serializer::Mbox.new(folder_path)
+    end
+
+    def fail_in_transaction!(message: "Serializer::Imap: method not supported inside trasactions")
+      raise message if @savepoint
+    end
+
+    def fail_outside_transaction!
+      raise "This method can only be called inside a transaction" if !@savepoint
     end
   end
 end
