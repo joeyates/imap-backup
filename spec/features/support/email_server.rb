@@ -115,6 +115,20 @@ class TestEmailServer
     imap.append(folder, message, flags, nil)
   end
 
+  def send_multiple_emails(folder, count: 1000, batch: 100, **options)
+    flags = options.delete(:flags)
+    message = message_as_server_message(**options)
+    literal = Net::IMAP::Literal.new(message)
+    (1..count).each_slice(batch) do |items|
+      args = []
+      args.push(flags) if flags
+      1.upto(items.count) do
+        args.push(literal)
+      end
+      imap.__send__(:send_command, "APPEND", folder, *args)
+    end
+  end
+
   def delete_email(folder, uid)
     set_flags(folder, [uid], [:Deleted])
     imap.expunge
