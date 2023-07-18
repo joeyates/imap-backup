@@ -28,16 +28,36 @@ module Imap::Backup
 
     attr_reader :folder
     attr_reader :path
+    attr_reader :dirty
 
     def initialize(path, folder)
       @path = path
       @folder = folder
       @validated = nil
+      @dirty = nil
+    end
+
+    def transaction(&block)
+      fail_in_transaction!(:transaction, message: "nested transactions are not supported")
+
+      validate!
+      @dirty = {append: []}
+
+      block.call
+
+      if dirty[:append].any?
+        appender = Serializer::Appender.new(folder: sanitized, imap: imap, mbox: mbox)
+        appender.multi(dirty[:append])
+      end
+
+      @dirty = nil
     end
 
     # Returns true if there are existing, valid files
     # false otherwise (in which case any existing files are deleted)
     def validate!
+      fail_in_transaction!(:validate!)
+
       return true if @validated
 
       optionally_migrate2to3
@@ -53,6 +73,8 @@ module Imap::Backup
     end
 
     def check_integrity!
+      fail_in_transaction!(:check_integrity!)
+
       if !imap.valid?
         message = ".imap file '#{imap.pathname}' is corrupt"
         raise FolderIntegrityError, message
@@ -104,6 +126,8 @@ module Imap::Backup
     end
 
     def delete
+      fail_in_transaction!(:delete)
+
       imap.delete
       @imap = nil
       mbox.delete
@@ -111,6 +135,7 @@ module Imap::Backup
     end
 
     def apply_uid_validity(value)
+      fail_in_transaction!(:apply_uid_validity)
       validate!
 
       case
@@ -126,19 +151,26 @@ module Imap::Backup
     end
 
     def force_uid_validity(value)
+      fail_in_transaction!(:force_uid_validity)
       validate!
 
       internal_force_uid_validity(value)
     end
 
     def append(uid, message, flags)
-      validate!
+      if dirty
+        dirty[:append] << {uid: uid, message: message, flags: flags}
+      else
+        validate!
 
-      appender = Serializer::Appender.new(folder: sanitized, imap: imap, mbox: mbox)
-      appender.run(uid: uid, message: message, flags: flags)
+        appender = Serializer::Appender.new(folder: sanitized, imap: imap, mbox: mbox)
+        appender.single(uid: uid, message: message, flags: flags)
+      end
     end
 
     def update(uid, flags: nil)
+      fail_in_transaction!(:update)
+
       message = imap.get(uid)
       return if !message
 
@@ -147,17 +179,21 @@ module Imap::Backup
     end
 
     def each_message(required_uids = nil, &block)
+      fail_in_transaction!(:each_message)
+
+      return enum_for(:each_message, required_uids) if !block
+
       required_uids ||= uids
 
       validate!
-
-      return enum_for(:each_message, required_uids) if !block
 
       enumerator = Serializer::MessageEnumerator.new(imap: imap)
       enumerator.run(uids: required_uids, &block)
     end
 
     def filter(&block)
+      fail_in_transaction!(:filter)
+
       temp_name = Serializer::UnusedNameFinder.new(serializer: self).run
       temp_folder_path = self.class.folder_path_for(path: path, folder: temp_name)
       new_mbox = Serializer::Mbox.new(temp_folder_path)
@@ -167,7 +203,7 @@ module Imap::Backup
       enumerator = Serializer::MessageEnumerator.new(imap: imap)
       enumerator.run(uids: uids) do |message|
         keep = block.call(message)
-        appender.run(uid: message.uid, message: message.body, flags: message.flags) if keep
+        appender.single(uid: message.uid, message: message.body, flags: message.flags) if keep
       end
       imap.delete
       new_imap.rename imap.folder_path
@@ -250,6 +286,14 @@ module Imap::Backup
       new_name = Serializer::UnusedNameFinder.new(serializer: self).run
       rename new_name
       new_name
+    end
+
+    def fail_in_transaction!(method, message: "not supported inside trasactions")
+      raise "Serializer##{method} #{message}" if dirty
+    end
+
+    def fail_outside_transaction!(method)
+      raise "Serializer##{method} can only be called inside a transaction" if !dirty
     end
   end
 end

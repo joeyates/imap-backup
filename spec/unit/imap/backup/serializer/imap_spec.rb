@@ -73,7 +73,7 @@ module Imap::Backup
 
     describe "#append" do
       context "when the metadata file exists" do
-        before { subject.append(123, 300, [:MyFlag]) }
+        before { subject.append(123, 300, flags: [:MyFlag]) }
 
         it "loads the existing metadata" do
           existing = subject.get(42)
@@ -100,7 +100,7 @@ module Imap::Backup
           before do
             subject.uid_validity = 999
 
-            subject.append(123, 300, [:MyFlag])
+            subject.append(123, 300, flags: [:MyFlag])
           end
 
           it "appends the UID" do
