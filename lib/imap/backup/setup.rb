@@ -39,6 +39,7 @@ module Imap::Backup
         MENU
         account_items menu
         add_account_item menu
+        toggle_delay_download_writes menu
         if config.modified?
           menu.choice("save and exit") do
             config.save
@@ -67,6 +68,15 @@ module Imap::Backup
       menu.choice("add account") do
         username = Asker.email
         edit_account username
+      end
+    end
+
+    def toggle_delay_download_writes(menu)
+      modified = config.delay_download_writes_modified ? " *" : ""
+      menu_item = "toggle delay of download writes#{modified}"
+      new_value = config.delay_download_writes ? false : true
+      menu.choice(menu_item) do
+        config.delay_download_writes = new_value
       end
     end
 

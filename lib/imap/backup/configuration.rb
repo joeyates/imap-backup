@@ -14,6 +14,8 @@ module Imap::Backup
     VERSION = "2.0".freeze
 
     attr_reader :pathname
+    attr_reader :delay_download_writes
+    attr_reader :delay_download_writes_modified
 
     def self.default_pathname
       File.join(CONFIGURATION_DIRECTORY, "config.json")
@@ -25,6 +27,8 @@ module Imap::Backup
 
     def initialize(path: nil)
       @pathname = path || self.class.default_pathname
+      @delay_download_writes = false
+      @delay_download_writes_modified = false
     end
 
     def path
@@ -39,7 +43,8 @@ module Imap::Backup
       remove_deleted_accounts
       save_data = {
         version: VERSION,
-        accounts: accounts.map(&:to_h)
+        accounts: accounts.map(&:to_h),
+        delay_download_writes: delay_download_writes
       }
       File.open(pathname, "w") { |f| f.write(JSON.pretty_generate(save_data)) }
       FileUtils.chmod(0o600, pathname) if !windows?
@@ -49,12 +54,25 @@ module Imap::Backup
     def accounts
       @accounts ||= begin
         ensure_loaded!
-        data[:accounts].map { |data| Account.new(data) }
+        accounts = data[:accounts].map do |attr|
+          Account.new(attr)
+        end
+        inject_global_attributes(accounts)
       end
+    end
+
+    def delay_download_writes=(value)
+      ensure_loaded!
+
+      @delay_download_writes = value
+      @delay_download_writes_modified = true
+      inject_global_attributes(accounts)
     end
 
     def modified?
       ensure_loaded!
+
+      return true if delay_download_writes_modified
 
       accounts.any? { |a| a.modified? || a.marked_for_deletion? }
     end
@@ -65,6 +83,7 @@ module Imap::Backup
       return true if @data
 
       data
+      @delay_download_writes = data[:delay_download_writes]
       true
     end
 
@@ -83,11 +102,19 @@ module Imap::Backup
     end
 
     def remove_modified_flags
+      @delay_download_writes_modified = false
       accounts.each(&:clear_changes)
     end
 
     def remove_deleted_accounts
       accounts.reject!(&:marked_for_deletion?)
+    end
+
+    def inject_global_attributes(accounts)
+      accounts.map do |a|
+        a.delay_download_writes = delay_download_writes
+        a
+      end
     end
 
     def make_private(path)

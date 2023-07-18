@@ -35,7 +35,9 @@ module Imap::Backup
         accounts: accounts,
         path: "/base/path",
         save: nil,
-        modified?: config_modified
+        modified?: config_modified,
+        delay_download_writes_modified: false,
+        delay_download_writes: false
       )
     end
     let(:config_modified) { false }
