@@ -5,7 +5,7 @@ require "features/helper"
 
 RSpec.describe "imap-backup backup performance", type: :aruba, docker: true, performance: true do
   # Use an exponential scale so we can plot on a logarithmic scale
-  counts = 0.upto(0).map { |p| (Math::E ** p).round }
+  counts = 0.upto(12).map { |p| (Math::E ** p).round }
   runs = 4
   results = []
 
