@@ -3,10 +3,12 @@ require "features/helper"
 RSpec.describe "imap-backup utils ignore-history", type: :aruba, docker: true do
   include_context "message-fixtures"
 
-  let(:account) { test_server_connection_parameters }
-  let(:email) { account[:username] }
+  let(:account_config) do
+    test_server_connection_parameters.merge(folders: [{name: folder}])
+  end
+  let(:email) { account_config[:username] }
   let(:folder) { "my_folder" }
-  let(:config_options) { {accounts: [account]} }
+  let(:config_options) { {accounts: [account_config]} }
   let(:expected_mbox_content) do
     <<~MESSAGE
       From fake@email.com
@@ -46,7 +48,7 @@ RSpec.describe "imap-backup utils ignore-history", type: :aruba, docker: true do
 
   context "when a config path is supplied" do
     let(:custom_config_path) { File.join(File.expand_path("~/.imap-backup"), "foo.json") }
-    let(:config_options) { {path: custom_config_path, accounts: [account]} }
+    let(:config_options) { super().merge(path: custom_config_path) }
 
     it "creates the required dummy messages" do
       run_command_and_stop(

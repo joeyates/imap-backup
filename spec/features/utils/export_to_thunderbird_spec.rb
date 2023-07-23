@@ -3,9 +3,12 @@ require "features/helper"
 RSpec.describe "imap-backup utils export-to-thunderbird", type: :aruba, docker: true do
   include_context "message-fixtures"
 
-  let(:account) { test_server_connection_parameters }
-  let(:email) { account[:username] }
-  let(:config_options) { {accounts: [account]} }
+  let(:account_config) do
+    test_server_connection_parameters.merge(folders: [{name: folder}])
+  end
+  let(:email) { account_config[:username] }
+  let(:folder) { "Foo" }
+  let(:config_options) { {accounts: [account_config]} }
   let(:root_path) { File.expand_path("~/.thunderbird") }
   let(:write_thunderbird_profiles_ini) do
     FileUtils.mkdir_p root_path
@@ -23,13 +26,13 @@ RSpec.describe "imap-backup utils export-to-thunderbird", type: :aruba, docker: 
   end
   let(:create_local_folders) { create_directory local_folders_path }
   let(:write_serialized_folder) do
-    create_local_folder email: account[:username], folder: "Foo", uid_validity: 1
-    append_local email: account[:username], folder: "Foo", body: "Email content"
+    create_local_folder email: email, folder: folder, uid_validity: 1
+    append_local email: email, folder: folder, body: "Email content"
   end
   let(:profile_path) { "Profiles/qioxtndq.default" }
   let(:local_folders_path) { File.join(root_path, profile_path, "Mail/Local Folders") }
   let(:folder_path) do
-    File.join(local_folders_path, "imap-backup.sbd", "#{email}.sbd", "Foo")
+    File.join(local_folders_path, "imap-backup.sbd", "#{email}.sbd", folder)
   end
   let!(:setup) do
     create_config(**config_options)
@@ -58,17 +61,17 @@ RSpec.describe "imap-backup utils export-to-thunderbird", type: :aruba, docker: 
 
   context "when a config path is supplied" do
     let(:custom_config_path) { File.join(File.expand_path("~/.imap-backup"), "foo.json") }
-    let(:config_options) { {accounts: [account], path: custom_config_path} }
+    let(:config_options) { super().merge(path: custom_config_path) }
     let(:write_serialized_folder) do
       create_local_folder(
-        email: account[:username],
-        folder: "Foo",
+        email: email,
+        folder: folder,
         uid_validity: 1,
         configuration_path: custom_config_path
       )
       append_local(
-        email: account[:username],
-        folder: "Foo",
+        email: email,
+        folder: folder,
         body: "Email content",
         configuration_path: custom_config_path
       )

@@ -12,7 +12,8 @@ RSpec.describe "imap-backup mirror", type: :aruba, docker: true do
   let(:config_options) do
     {
       accounts: [
-        test_server_connection_parameters, other_server_connection_parameters
+        test_server_connection_parameters.merge(folders: [{name: folder}]),
+        other_server_connection_parameters
       ]
     }
   end
@@ -156,14 +157,7 @@ RSpec.describe "imap-backup mirror", type: :aruba, docker: true do
 
   context "when a config path is supplied" do
     let(:custom_config_path) { File.join(File.expand_path("~/.imap-backup"), "foo.json") }
-    let(:config_options) do
-      {
-        path: custom_config_path,
-        accounts: [
-          test_server_connection_parameters, other_server_connection_parameters
-        ]
-      }
-    end
+    let(:config_options) { super().merge(path: custom_config_path) }
     let(:command) do
       "imap-backup mirror " \
         "#{test_server_connection_parameters[:username]} " \
