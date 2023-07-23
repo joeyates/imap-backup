@@ -12,7 +12,7 @@ module Imap::Backup
         local_path: "local_path",
         mirror_mode: mirror_mode,
         multi_fetch_size: 42,
-        delay_download_writes: false,
+        download_strategy: "direct",
         reset_seen_flags_after_fetch: reset_seen_flags_after_fetch
       )
     end
@@ -45,6 +45,7 @@ module Imap::Backup
       allow(LocalOnlyMessageDeleter).to receive(:new) { local_only_message_deleter }
       allow(Account::FolderEnsurer).to receive(:new) { folder_ensurer }
       allow(Serializer).to receive(:new) { serializer }
+      allow(serializer).to receive(:transaction).and_yield
       allow(backup_folders).to receive(:each).and_yield(folder)
     end
 

@@ -15,7 +15,7 @@ module Imap::Backup
     attr_reader :mirror_mode
     attr_reader :server
     attr_reader :connection_options
-    attr_accessor :delay_download_writes
+    attr_accessor :download_strategy
     attr_reader :reset_seen_flags_after_fetch
     attr_reader :changes
 
@@ -28,7 +28,7 @@ module Imap::Backup
       @mirror_mode = options[:mirror_mode]
       @server = options[:server]
       @connection_options = options[:connection_options]
-      @delay_download_writes = true
+      @download_strategy = "all"
       @multi_fetch_size_orignal = options[:multi_fetch_size]
       @reset_seen_flags_after_fetch = options[:reset_seen_flags_after_fetch]
       @client = nil
@@ -81,7 +81,6 @@ module Imap::Backup
       h[:mirror_mode] = true if @mirror_mode
       h[:server] = @server if @server
       h[:connection_options] = @connection_options if @connection_options
-      h[:delay_download_writes] = delay_download_writes
       h[:multi_fetch_size] = multi_fetch_size
       if @reset_seen_flags_after_fetch
         h[:reset_seen_flags_after_fetch] = @reset_seen_flags_after_fetch

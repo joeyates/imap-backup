@@ -75,13 +75,13 @@ module Imap::Backup
       File.open(pathname, "a") {}
     end
 
-    private
-
     def rewind(length)
       File.open(pathname, File::RDWR | File::CREAT, 0o644) do |f|
         f.truncate(length)
       end
     end
+
+    private
 
     def fail_in_transaction!(message: "Method not supported inside trasactions")
       raise message if savepoint

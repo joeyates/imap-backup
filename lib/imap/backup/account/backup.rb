@@ -1,6 +1,8 @@
 require "imap/backup/account/folder_ensurer"
 require "imap/backup/account/local_only_folder_deleter"
 require "imap/backup/account/serialized_folders"
+require "imap/backup/serializer/delayed_metadata_serializer"
+require "imap/backup/serializer/delayed_writes_serializer"
 require "imap/backup/downloader"
 require "imap/backup/flag_refresher"
 require "imap/backup/local_only_message_deleter"
@@ -37,20 +39,33 @@ module Imap::Backup
         end
 
         Logger.logger.debug "[#{folder.name}] running backup"
+
         serializer.apply_uid_validity(folder.uid_validity)
+
+        download_serializer =
+          case account.download_strategy
+          when "direct"
+            serializer
+          when "delay_metadata"
+            Serializer::DelayedMetadataSerializer.new(serializer: serializer)
+          when "delay_all"
+            Serializer::DelayedWritesSerializer.new(serializer: serializer)
+          end
+
         downloader = Downloader.new(
           folder,
-          serializer,
+          download_serializer,
           multi_fetch_size: account.multi_fetch_size,
           reset_seen_flags_after_fetch: account.reset_seen_flags_after_fetch
         )
-        if account.delay_download_writes
-          serializer.transaction do
-            downloader.run
-          end
-        else
+        # rubocop:disable Lint/RescueException
+        download_serializer.transaction do
           downloader.run
+        rescue Exception
+          download_serializer.rollback
+          raise
         end
+        # rubocop:enable Lint/RescueException
         if account.mirror_mode
           Logger.logger.info "Mirror mode - Deleting messages only present locally"
           LocalOnlyMessageDeleter.new(folder, serializer).run
