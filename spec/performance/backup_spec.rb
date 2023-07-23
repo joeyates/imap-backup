@@ -1,16 +1,18 @@
 require "json"
 require "features/helper"
+require "imap/backup/configuration"
 
 # rubocop:disable RSpec/BeforeAfterAll
 
 RSpec.describe "imap-backup backup performance", type: :aruba, docker: true, performance: true do
-  # Use an exponential scale so we can plot on a logarithmic scale
+  # Use exponentially-spaced values so we get an even plot on a logarithmic scale
   counts = 0.upto(12).map { |p| (Math::E ** p).round }
   runs = 4
   results = []
 
   before(:all) do
-    test_server.folders.map(&:name).each do |folder|
+    existing = test_server.folders.map(&:name)
+    existing.each do |folder|
       next if !folder.start_with?("bulk-")
 
       test_server.delete_folder folder
@@ -25,10 +27,10 @@ RSpec.describe "imap-backup backup performance", type: :aruba, docker: true, per
 
   counts.each do |message_count|
     count_runs = {count: message_count}
-    [false, true].each do |delay|
+    Imap::Backup::Configuration::DOWNLOAD_STRATEGIES.each do |strategy|
       run_times = []
       1.upto(runs) do |run|
-        context "with #{message_count} emails, delay_download_writes: #{delay}, run #{run}" do
+        context "with #{message_count} emails, download_strategy: #{strategy[:key]}, run #{run}" do
           let(:account_config) do
             test_server_connection_parameters.merge(
               folders: [{name: folder}],
@@ -38,7 +40,7 @@ RSpec.describe "imap-backup backup performance", type: :aruba, docker: true, per
           let(:multi_fetch_size) { 25 }
           let(:folder) { "bulk-#{message_count}" }
           let(:config_options) do
-            {accounts: [account_config], delay_download_writes: delay}
+            {accounts: [account_config], download_strategy: strategy[:key]}
           end
           let(:t_start_run) { Time.now }
           let(:t_finish_run) { Time.now }
@@ -63,13 +65,18 @@ RSpec.describe "imap-backup backup performance", type: :aruba, docker: true, per
           end
         end
       end
-      key = delay ? :with : :without
-      count_runs[key] = run_times
+      count_runs[strategy[:key]] = run_times
     end
     results << count_runs
   end
 
   after(:all) do
+    existing = test_server.folders.map(&:name)
+    existing.each do |folder|
+      next if !folder.start_with?("bulk-")
+
+      test_server.delete_folder folder
+    end
     test_server.disconnect
     puts results.to_json
   end
