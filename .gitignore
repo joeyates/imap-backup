@@ -4,6 +4,7 @@ Gemfile.lock
 coverage
 /doc
 pkg
+/.rspec_status
 vendor
 /tmp
 /.yardoc/
