@@ -26,48 +26,53 @@ RSpec.describe "imap-backup backup performance", type: :aruba, docker: true, per
   end
 
   counts.each do |message_count|
-    count_runs = {count: message_count}
-    Imap::Backup::Configuration::DOWNLOAD_STRATEGIES.each do |strategy|
-      run_times = []
-      1.upto(runs) do |run|
-        context "with #{message_count} emails, download_strategy: #{strategy[:key]}, run #{run}" do
-          let(:account_config) do
-            test_server_connection_parameters.merge(
-              folders: [{name: folder}],
-              multi_fetch_size: multi_fetch_size
-            )
-          end
-          let(:multi_fetch_size) { 25 }
-          let(:folder) { "bulk-#{message_count}" }
-          let(:config_options) do
-            {accounts: [account_config], download_strategy: strategy[:key]}
-          end
-          let(:t_start_run) { Time.now }
-          let(:t_finish_run) { Time.now }
+    context "with #{message_count} emails" do
+      count_runs = {count: message_count}
+      Imap::Backup::Configuration::DOWNLOAD_STRATEGIES.each do |strategy|
+        context "with #{strategy[:key]} download strategy" do
+          run_times = []
+          1.upto(runs) do |run|
+            context "with run #{run}" do
+              let(:account_config) do
+                test_server_connection_parameters.merge(
+                  folders: [{name: folder}],
+                  multi_fetch_size: multi_fetch_size
+                )
+              end
+              let(:multi_fetch_size) { 25 }
+              let(:folder) { "bulk-#{message_count}" }
+              let(:config_options) do
+                {accounts: [account_config], download_strategy: strategy[:key]}
+              end
+              let(:t_start_run) { Time.now }
+              let(:t_finish_run) { Time.now }
 
-          before do
-            create_config(**config_options)
-          end
+              before do
+                create_config(**config_options)
+              end
 
-          after do
-            test_server.disconnect
-          end
+              after do
+                test_server.disconnect
+              end
 
-          specify "run" do
-            t_start_run
-            run_command_and_stop "imap-backup backup"
-            t_finish_run
-            time_taken = t_finish_run - t_start_run
-            run_times << time_taken
-            email = account_config[:username]
-            metadata = imap_parsed(email, folder)
-            expect(metadata[:messages].count).to eq(message_count)
+              specify "time" do
+                t_start_run
+                run_command_and_stop "imap-backup backup"
+                t_finish_run
+                time_taken = t_finish_run - t_start_run
+                run_times << time_taken
+                puts last_command_started.output
+                email = account_config[:username]
+                metadata = imap_parsed(email, folder)
+                expect(metadata[:messages].count).to eq(message_count)
+              end
+            end
           end
+          count_runs[strategy[:key]] = run_times
         end
       end
-      count_runs[strategy[:key]] = run_times
+      results << count_runs
     end
-    results << count_runs
   end
 
   after(:all) do
