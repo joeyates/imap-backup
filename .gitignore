@@ -1,10 +1,9 @@
-*.gem
-.bundle
-Gemfile.lock
-coverage
+/.bundle
+/coverage
 /doc
-pkg
+/Gemfile.lock
+/pkg
 /.rspec_status
-vendor
 /tmp
+/vendor
 /.yardoc/
