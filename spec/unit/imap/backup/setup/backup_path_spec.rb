@@ -1,5 +1,5 @@
 module Imap::Backup
-  describe Setup::BackupPath do
+  RSpec.describe Setup::BackupPath do
     include HighLineTestHelpers
 
     subject { described_class.new(account: account, config: config) }

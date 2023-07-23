@@ -1,5 +1,5 @@
 module Imap::Backup
-  describe CLI::Setup do
+  RSpec.describe CLI::Setup do
     subject { described_class.new({}) }
 
     let(:setup) { instance_double(Setup, run: nil) }

@@ -1,5 +1,5 @@
 module Imap::Backup
-  describe CLI::Migrate do
+  RSpec.describe CLI::Migrate do
     subject { described_class.new(source, destination, **options) }
 
     let(:source) { "source" }

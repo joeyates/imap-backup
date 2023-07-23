@@ -1,4 +1,4 @@
-shared_examples "a method that checks for invalid serialization" do
+RSpec.shared_examples "a method that checks for invalid serialization" do
   require "imap/backup/serializer/version2_migrator"
 
   context "with version 2 metadata files" do
@@ -56,7 +56,7 @@ shared_examples "a method that checks for invalid serialization" do
 end
 
 module Imap::Backup
-  shared_examples "a method sets up the folder directory" do
+  RSpec.shared_examples "a method sets up the folder directory" do
     it "ensures the folder's containing directory exists" do
       action.call
 
@@ -77,7 +77,7 @@ module Imap::Backup
     end
   end
 
-  shared_examples "a method that sanitizes folder paths" do
+  RSpec.shared_examples "a method that sanitizes folder paths" do
     let(:folder_name) { "a:b/%;::" }
 
     it "sanitizes the .imap path" do
@@ -93,7 +93,7 @@ module Imap::Backup
     end
   end
 
-  describe Serializer do
+  RSpec.describe Serializer do
     subject { described_class.new("serializer_path", folder_name) }
 
     let(:imap) do

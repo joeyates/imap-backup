@@ -1,7 +1,7 @@
 require "imap/backup/account/local_only_folder_deleter"
 
 module Imap::Backup
-  describe Account::LocalOnlyFolderDeleter do
+  RSpec.describe Account::LocalOnlyFolderDeleter do
     subject { described_class.new(account: account) }
 
     let(:account) { instance_double(Account, client: nil) }

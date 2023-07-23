@@ -4,7 +4,7 @@ require "os"
 # rubocop:disable RSpec/PredicateMatcher
 
 module Imap::Backup
-  describe Configuration do
+  RSpec.describe Configuration do
     let(:directory) { "/base/path" }
     let(:file_path) { File.join(directory, "/config.json") }
     let(:file_exists) { true }

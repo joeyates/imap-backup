@@ -1,5 +1,5 @@
 module Imap::Backup
-  describe Setup::ConnectionTester do
+  RSpec.describe Setup::ConnectionTester do
     describe "#test" do
       subject { described_class.new(account) }
 

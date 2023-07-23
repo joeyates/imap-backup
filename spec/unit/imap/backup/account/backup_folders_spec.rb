@@ -1,5 +1,5 @@
 module Imap::Backup
-  describe Account::BackupFolders do
+  RSpec.describe Account::BackupFolders do
     subject { described_class.new(client: client, account: account) }
 
     let(:account) do

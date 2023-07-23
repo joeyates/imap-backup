@@ -1,7 +1,7 @@
 require "imap/backup/serializer/directory"
 
 module Imap::Backup
-  describe Serializer::Directory do
+  RSpec.describe Serializer::Directory do
     subject { described_class.new("directory_path", "relative") }
 
     let(:windows) { false }

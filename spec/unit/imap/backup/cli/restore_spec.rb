@@ -1,6 +1,6 @@
 # rubocop:disable RSpec/SubjectStub
 module Imap::Backup
-  describe CLI::Restore do
+  RSpec.describe CLI::Restore do
     subject { described_class.new(email, options) }
 
     let(:email) { "email" }

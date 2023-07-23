@@ -1,5 +1,5 @@
 module Imap::Backup
-  describe CLI::Backup do
+  RSpec.describe CLI::Backup do
     subject { described_class.new({}) }
 
     let(:account) { instance_double(Account, username: "me@example.com") }

@@ -1,5 +1,5 @@
 module Imap::Backup
-  describe Setup::Account::Header do
+  RSpec.describe Setup::Account::Header do
     subject { described_class.new(menu: menu, account: account) }
 
     let(:menu) { HighLine::Menu.new }

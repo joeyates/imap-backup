@@ -1,5 +1,5 @@
 module Imap::Backup
-  describe CLI::Local do
+  RSpec.describe CLI::Local do
     let(:account) do
       instance_double(
         Account,

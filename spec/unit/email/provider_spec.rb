@@ -1,4 +1,4 @@
-describe Email::Provider do
+RSpec.describe Email::Provider do
   describe ".for_address" do
     context "with known providers" do
       [

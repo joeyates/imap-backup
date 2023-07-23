@@ -1,5 +1,5 @@
 module Imap::Backup
-  describe Downloader do
+  RSpec.describe Downloader do
     describe "#run" do
       subject { described_class.new(folder, serializer, **options) }
 

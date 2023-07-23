@@ -2,7 +2,7 @@ require "imap/backup/serializer/folder_maker"
 require "support/shared_examples/an_action_that_handles_logger_options"
 
 module Imap::Backup
-  describe CLI::Utils do
+  RSpec.describe CLI::Utils do
     subject { described_class.new([], {quiet: true}) }
 
     let(:account) do

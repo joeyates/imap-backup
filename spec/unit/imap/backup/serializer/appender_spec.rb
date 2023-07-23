@@ -1,5 +1,5 @@
 module Imap::Backup
-  describe Serializer::Appender do
+  RSpec.describe Serializer::Appender do
     subject { described_class.new(folder: "appender_path", imap: imap, mbox: mbox) }
 
     let(:imap) do

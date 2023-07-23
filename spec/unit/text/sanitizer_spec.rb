@@ -1,4 +1,4 @@
-describe Text::Sanitizer do
+RSpec.describe Text::Sanitizer do
   require "stringio"
 
   subject { described_class.new(output) }

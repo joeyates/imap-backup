@@ -1,5 +1,5 @@
 module Imap::Backup
-  describe Serializer::Mbox do
+  RSpec.describe Serializer::Mbox do
     subject { described_class.new(folder_path) }
 
     let(:folder_path) { "folder_path" }

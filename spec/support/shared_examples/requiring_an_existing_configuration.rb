@@ -1,5 +1,5 @@
 module Imap::Backup
-  shared_examples "an action that doesn't require an existing configuration" do |action:|
+  RSpec.shared_examples "an action that doesn't require an existing configuration" do |action:|
     before do
       allow(Configuration).to receive(:exist?) { false }
     end
@@ -11,7 +11,7 @@ module Imap::Backup
     end
   end
 
-  shared_examples "an action that requires an existing configuration" do |action:|
+  RSpec.shared_examples "an action that requires an existing configuration" do |action:|
     before do
       allow(Configuration).to receive(:exist?) { false }
     end

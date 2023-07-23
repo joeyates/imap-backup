@@ -2,7 +2,7 @@ require "ostruct"
 require "support/shared_examples/an_action_that_handles_logger_options"
 
 module Imap::Backup
-  describe CLI::Remote do
+  RSpec.describe CLI::Remote do
     let(:account) do
       instance_double(Account, client: client, namespaces: namespaces, username: "user")
     end

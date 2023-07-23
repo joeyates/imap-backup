@@ -1,5 +1,5 @@
 module Imap::Backup
-  describe Setup::FolderChooser do
+  RSpec.describe Setup::FolderChooser do
     include HighLineTestHelpers
 
     describe "#run" do

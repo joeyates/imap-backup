@@ -1,7 +1,7 @@
 # rubocop:disable RSpec/PredicateMatcher
 
 module Imap::Backup
-  describe Account::Folder do
+  RSpec.describe Account::Folder do
     subject { described_class.new(client, folder_name) }
 
     let(:client) do
