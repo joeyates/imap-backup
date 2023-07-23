@@ -30,8 +30,8 @@ module Imap::Backup
         do_append uid, message, flags
       rescue StandardError => e
         raise <<-ERROR.gsub(/^\s*/m, "")
-          [#{folder}] failed to append message #{uid}:
-          #{message}. #{e}:
+          [#{folder}] failed to append message #{uid}: #{message}.
+          #{e}:
           #{e.backtrace.join("\n")}"
         ERROR
       end
