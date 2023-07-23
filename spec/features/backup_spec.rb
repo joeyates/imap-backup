@@ -212,7 +212,7 @@ RSpec.describe "imap-backup backup", type: :aruba, docker: true do
       {
         server: "localhost",
         username: "inexistent@example.com",
-        password: "pizza",
+        password: "pizza"
       }
     end
 
