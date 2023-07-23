@@ -21,10 +21,11 @@ module Imap::Backup
           backup = Account::Backup.new(account: account, refresh: refresh)
           backup.run
         rescue StandardError => e
-          message =
-            "Backup for account '#{account.username}' " \
-            "failed with error #{e}"
-          Logger.logger.warn message
+          message = <<~ERROR
+            Backup for account '#{account.username}' failed with error #{e}
+            #{e.backtrace.join("\n")}
+          ERROR
+          Logger.logger.error message
           next
         end
       end
