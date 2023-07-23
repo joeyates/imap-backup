@@ -28,8 +28,6 @@ RSpec.describe "imap-backup backup", type: :aruba, docker: true do
     test_server.send_email folder, **msg1
     test_server.send_email folder, **msg2
     write_config
-
-    run_command_and_stop command
   end
 
   after do
@@ -38,6 +36,8 @@ RSpec.describe "imap-backup backup", type: :aruba, docker: true do
   end
 
   it "downloads messages" do
+    run_command_and_stop command
+
     expect(mbox_content(email, folder)).to eq(messages_as_mbox)
   end
 
@@ -46,20 +46,28 @@ RSpec.describe "imap-backup backup", type: :aruba, docker: true do
     let(:folder_uids) { test_server.folder_uids(folder) }
 
     it "saves IMAP metadata in a JSON file" do
+      run_command_and_stop command
+
       expect { imap_metadata }.to_not raise_error
     end
 
     it "saves a file version" do
+      run_command_and_stop command
+
       expect(imap_metadata[:version].to_s).to match(/^[0-9.]$/)
     end
 
     it "records IMAP ids" do
+      run_command_and_stop command
+
       uids = imap_metadata[:messages].map { |m| m[:uid] }
 
       expect(uids).to eq(folder_uids)
     end
 
     it "records message offsets in the mbox file" do
+      run_command_and_stop command
+
       offsets = imap_metadata[:messages].map { |m| m[:offset] }
       expected = [0, to_mbox_entry(**msg1).length]
 
@@ -67,6 +75,8 @@ RSpec.describe "imap-backup backup", type: :aruba, docker: true do
     end
 
     it "records message lengths in the mbox file" do
+      run_command_and_stop command
+
       lengths = imap_metadata[:messages].map { |m| m[:length] }
       expected = [to_mbox_entry(**msg1).length, to_mbox_entry(**msg2).length]
 
@@ -74,6 +84,8 @@ RSpec.describe "imap-backup backup", type: :aruba, docker: true do
     end
 
     it "records uid_validity" do
+      run_command_and_stop command
+
       expect(imap_metadata[:uid_validity]).to eq(test_server.folder_uid_validity(folder))
     end
 
@@ -91,6 +103,8 @@ RSpec.describe "imap-backup backup", type: :aruba, docker: true do
         end
 
         it "updates flags" do
+          run_command_and_stop command
+
           imap_content = imap_parsed(email, folder)
           message3 = imap_content[:messages].first
           flags = message3[:flags].reject { |f| f == "Recent" }
@@ -118,18 +132,26 @@ RSpec.describe "imap-backup backup", type: :aruba, docker: true do
       end
 
       it "renames the old backup" do
+        run_command_and_stop command
+
         expect(mbox_content(email, renamed_folder)).to eq(to_mbox_entry(**msg3))
       end
 
       it "renames the old metadata file" do
+        run_command_and_stop command
+
         expect(imap_parsed(email, renamed_folder)).to be_a Hash
       end
 
       it "downloads messages" do
+        run_command_and_stop command
+
         expect(mbox_content(email, folder)).to eq(messages_as_mbox)
       end
 
       it "creates a metadata file" do
+        run_command_and_stop command
+
         expect(imap_parsed(email, folder)).to be_a Hash
       end
 
@@ -145,6 +167,8 @@ RSpec.describe "imap-backup backup", type: :aruba, docker: true do
         end
 
         it "renames the renamed backup to a uniquely name" do
+          run_command_and_stop command
+
           renamed = "#{folder}-#{original_folder_uid_validity}-1"
           expect(mbox_content(email, renamed)).to eq(to_mbox_entry(**msg3))
         end
@@ -169,10 +193,14 @@ RSpec.describe "imap-backup backup", type: :aruba, docker: true do
 
     context "with folders that are not being backed up" do
       it "deletes .imap files" do
+        run_command_and_stop command
+
         expect(File.exist?(imap_path)).to be false
       end
 
       it "deletes .mbox files" do
+        run_command_and_stop command
+
         expect(File.exist?(mbox_path)).to be false
       end
     end
