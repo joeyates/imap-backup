@@ -62,6 +62,11 @@ module Imap::Backup
           Logger.logger.error e
           imap.rollback
           mbox.rollback
+        rescue SignalException => e
+          Logger.logger.error e
+          imap.rollback
+          mbox.rollback
+          raise
         end
       end
     end
