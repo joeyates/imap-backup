@@ -206,6 +206,30 @@ RSpec.describe "imap-backup backup", type: :aruba, docker: true do
     end
   end
 
+  context "when a backup fails" do
+    let(:config_options) { {accounts: [bad_config, account_config]} }
+    let(:bad_config) do
+      {
+        server: "localhost",
+        username: "inexistent@example.com",
+        password: "pizza",
+      }
+    end
+
+    it "exits with a failure status" do
+      run_command_and_stop command, fail_on_error: false
+
+      puts last_command_started.output
+      expect(last_command_started).to have_exit_status(111)
+    end
+
+    it "completes other backups" do
+      run_command_and_stop command, fail_on_error: false
+
+      expect(mbox_content(email, folder)).to eq(messages_as_mbox)
+    end
+  end
+
   context "when a config path is supplied" do
     let(:custom_config_path) { File.join(File.expand_path("~/.imap-backup"), "foo.json") }
     let(:config_options) do
