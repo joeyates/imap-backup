@@ -1,5 +1,5 @@
 module Imap::Backup
-  describe Uploader do
+  RSpec.describe Uploader do
     subject { described_class.new(folder, serializer) }
 
     let(:folder) do

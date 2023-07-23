@@ -1,4 +1,4 @@
-shared_context "message-fixtures" do
+RSpec.shared_context "message-fixtures" do
   let(:uid1) { 123 }
   let(:uid2) { 345 }
   let(:uid3) { 567 }

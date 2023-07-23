@@ -1,6 +1,6 @@
 require "imap/backup/client/apple_mail"
 
-describe Email::Provider::AppleMail do
+RSpec.describe Email::Provider::AppleMail do
   describe "#host" do
     it "returns host" do
       expect(subject.host).to eq("imap.mail.me.com")

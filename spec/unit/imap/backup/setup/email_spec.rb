@@ -1,5 +1,5 @@
 module Imap::Backup
-  describe Setup::Email do
+  RSpec.describe Setup::Email do
     subject { described_class.new(account: account, config: config) }
 
     let(:account) do

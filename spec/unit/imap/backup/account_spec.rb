@@ -1,5 +1,5 @@
 module Imap::Backup
-  describe Account do
+  RSpec.describe Account do
     subject { described_class.new(options) }
 
     let(:options) { {username: "user", password: "pwd"} }

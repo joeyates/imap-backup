@@ -1,7 +1,7 @@
 require "imap/backup/serializer/permission_checker"
 
 module Imap::Backup
-  describe Serializer::PermissionChecker do
+  RSpec.describe Serializer::PermissionChecker do
     subject { described_class.new(filename: "filename", limit: 0o345) }
 
     let(:file_mode) { instance_double(FileMode, mode: mode) }

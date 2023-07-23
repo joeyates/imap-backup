@@ -1,5 +1,5 @@
 module Imap::Backup
-  describe Setup::Asker do
+  RSpec.describe Setup::Asker do
     subject { described_class.new(highline) }
 
     let(:highline) { double }

@@ -27,7 +27,7 @@ msg_no_from_but_sender = <<~NOT_SENDER
   Sender: FistName LastName <me@example.com>
 NOT_SENDER
 
-describe Email::Mboxrd::Message do
+RSpec.describe Email::Mboxrd::Message do
   subject { described_class.new(message_body) }
 
   let(:from) { "me@example.com" }

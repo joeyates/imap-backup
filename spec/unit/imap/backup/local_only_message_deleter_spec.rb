@@ -1,7 +1,7 @@
 require "imap/backup/local_only_message_deleter"
 
 module Imap::Backup
-  describe LocalOnlyMessageDeleter do
+  RSpec.describe LocalOnlyMessageDeleter do
     subject { described_class.new(folder, serializer) }
 
     let(:serializer) { instance_double(Serializer, uids: [1, 2]) }

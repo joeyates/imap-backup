@@ -1,5 +1,5 @@
 module Imap::Backup
-  describe CLI::Mirror do
+  RSpec.describe CLI::Mirror do
     subject { described_class.new(source_email, destination_email, **options) }
 
     let(:source_email) { "source" }

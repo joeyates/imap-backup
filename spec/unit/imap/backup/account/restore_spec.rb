@@ -1,7 +1,7 @@
 require "imap/backup/account/restore"
 
 module Imap::Backup
-  describe Account::Restore do
+  RSpec.describe Account::Restore do
     subject { described_class.new(account: account) }
 
     let(:account) { "account" }

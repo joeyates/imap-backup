@@ -1,4 +1,4 @@
-describe Email::Provider::Base do
+RSpec.describe Email::Provider::Base do
   describe "#options" do
     it "returns options" do
       expect(subject.options).to be_a(Hash)

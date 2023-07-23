@@ -1,7 +1,7 @@
 require "net/imap"
 
 module Imap::Backup
-  describe Logger do
+  RSpec.describe Logger do
     describe ".setup_logging" do
       around do |example|
         logger_previous = described_class.logger.level

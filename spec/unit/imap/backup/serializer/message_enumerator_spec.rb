@@ -1,5 +1,5 @@
 module Imap::Backup
-  describe Serializer::MessageEnumerator do
+  RSpec.describe Serializer::MessageEnumerator do
     subject { described_class.new(imap: imap) }
 
     let(:imap) { instance_double(Serializer::Imap, get: message) }

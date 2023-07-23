@@ -1,5 +1,5 @@
 module Imap::Backup
-  describe Serializer::UnusedNameFinder do
+  RSpec.describe Serializer::UnusedNameFinder do
     subject { described_class.new(serializer: serializer) }
 
     let(:serializer) do

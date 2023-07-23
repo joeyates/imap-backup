@@ -1,5 +1,5 @@
 module Imap::Backup
-  describe Serializer::Version2Migrator do
+  RSpec.describe Serializer::Version2Migrator do
     subject { described_class.new("migrator_path") }
 
     let(:mailbox_exists) { true }

@@ -1,7 +1,7 @@
 require "imap/backup/cli/folder_enumerator"
 
 module Imap::Backup
-  describe CLI::FolderEnumerator do
+  RSpec.describe CLI::FolderEnumerator do
     subject { described_class.new(**options) }
 
     let(:path) { "folder_enumerator_path/foo.imap" }

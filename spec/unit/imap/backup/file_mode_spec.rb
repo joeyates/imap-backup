@@ -1,7 +1,7 @@
 require "imap/backup/file_mode"
 
 module Imap::Backup
-  describe FileMode do
+  RSpec.describe FileMode do
     subject { described_class.new(filename: filename) }
 
     let(:filename) { "filename" }

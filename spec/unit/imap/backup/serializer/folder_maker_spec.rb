@@ -1,7 +1,7 @@
 require "imap/backup/serializer/folder_maker"
 
 module Imap::Backup
-  describe Serializer::FolderMaker do
+  RSpec.describe Serializer::FolderMaker do
     subject { described_class.new(base: base, path: path, permissions: permissions) }
 
     let(:base) { "base" }

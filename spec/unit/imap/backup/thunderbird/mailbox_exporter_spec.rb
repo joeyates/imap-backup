@@ -1,5 +1,5 @@
 module Imap::Backup
-  describe Thunderbird::MailboxExporter do
+  RSpec.describe Thunderbird::MailboxExporter do
     subject { described_class.new("email", serializer, profile, **args) }
 
     let(:args) { {} }

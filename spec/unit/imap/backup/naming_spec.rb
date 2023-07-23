@@ -1,7 +1,7 @@
 require "imap/backup/naming"
 
 module Imap::Backup
-  describe Naming do
+  RSpec.describe Naming do
     describe ".to_local_path" do
       it "returns a String" do
         expect(described_class.to_local_path("ciao")).to be_a(String)

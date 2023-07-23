@@ -1,4 +1,4 @@
-describe Email::Provider::Purelymail do
+RSpec.describe Email::Provider::Purelymail do
   describe "#host" do
     it "returns host" do
       expect(subject.host).to eq("mailserver.purelymail.com")
