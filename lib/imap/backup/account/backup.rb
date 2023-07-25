@@ -61,9 +61,14 @@ module Imap::Backup
         # rubocop:disable Lint/RescueException
         download_serializer.transaction do
           downloader.run
-        rescue Exception
+        rescue Exception => e
+          message = <<~ERROR
+            #{self.class} error #{e}
+            #{e.backtrace.join("\n")}
+          ERROR
+          Logger.logger.error message
           download_serializer.rollback
-          raise
+          raise e
         end
         # rubocop:enable Lint/RescueException
         if account.mirror_mode
