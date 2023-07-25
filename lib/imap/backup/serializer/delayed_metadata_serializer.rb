@@ -20,40 +20,23 @@ module Imap::Backup
     def transaction(&block)
       tsx.fail_in_transaction!(:transaction, message: "nested transactions are not supported")
 
-      tsx.start
-      tsx.data = {metadata: [], mbox: {length: mbox.length}}
-
-      block.call
-
-      commit
-
-      tsx.clear
-    end
-
-    def commit
-      tsx.fail_outside_transaction!(:commit)
-
       # rubocop:disable Lint/RescueException
-      imap.transaction do
-        tsx.data[:metadata].each do |m|
-          imap.append m[:uid], m[:length], flags: m[:flags]
+      tsx.begin({metadata: []}) do
+        mbox.transaction do
+          block.call
+
+          commit
+        rescue Exception => e
+          message = <<~ERROR
+            #{self.class} error #{e}
+            #{e.backtrace.join("\n")}
+          ERROR
+          Logger.logger.error message
+          mbox.rollback
+          raise e
         end
-      rescue Exception => e
-        imap.rollback
-        rollback
-        raise e
       end
       # rubocop:enable Lint/RescueException
-      tsx.data[:metadata] = []
-      tsx.data[:mbox][:length] = mbox.length
-    end
-
-    def rollback
-      tsx.fail_outside_transaction!(:rollback)
-
-      mbox.rewind(tsx.data[:mbox][:length])
-
-      tsx.clear
     end
 
     def append(uid, message, flags)
@@ -65,6 +48,17 @@ module Imap::Backup
     end
 
     private
+
+    def commit
+      imap.transaction do
+        tsx.data[:metadata].each do |m|
+          imap.append m[:uid], m[:length], flags: m[:flags]
+        end
+      rescue Exception => e
+        imap.rollback
+        raise e
+      end
+    end
 
     def mbox
       @mbox ||= Serializer::Mbox.new(serializer.folder_path)

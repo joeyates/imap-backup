@@ -21,29 +21,22 @@ module Imap::Backup
     def transaction(&block)
       tsx.fail_in_transaction!(:transaction, message: "nested transactions are not supported")
 
-      tsx.start
-      tsx.data = {messages: [], mbox: {length: mbox.length}}
+      tsx.begin({messages: []}) do
+        block.call
 
-      block.call
-
-      commit
-
-      tsx.clear
-    end
-
-    def commit
-      tsx.fail_outside_transaction!(:commit)
-
-      appender = Serializer::Appender.new(folder: sanitized, imap: imap, mbox: mbox)
-      appender.multi(tsx.data[:messages])
-      tsx.data[:messages] = []
-      tsx.data[:mbox][:length] = mbox.length
+        commit if tsx.data
+      rescue Exception => e
+        message = <<~ERROR
+          #{self.class} error #{e}
+          #{e.backtrace.join("\n")}
+        ERROR
+        Logger.logger.error message
+        raise e
+      end
     end
 
     def rollback
       tsx.fail_outside_transaction!(:rollback)
-
-      mbox.rewind(tsx.data[:mbox][:length])
 
       tsx.clear
     end
@@ -55,6 +48,14 @@ module Imap::Backup
     end
 
     private
+
+    def commit
+      tsx.fail_outside_transaction!(:commit)
+
+      appender = Serializer::Appender.new(folder: sanitized, imap: imap, mbox: mbox)
+      appender.multi(tsx.data[:messages])
+      tsx.data[:messages] = []
+    end
 
     def mbox
       @mbox ||= Serializer::Mbox.new(serializer.folder_path)

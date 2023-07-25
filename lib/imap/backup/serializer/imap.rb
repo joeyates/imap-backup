@@ -25,13 +25,14 @@ module Imap::Backup
       tsx.fail_in_transaction!(:transaction, message: "nested transactions are not supported")
 
       ensure_loaded
-      tsx.start
-      tsx.data = {savepoint: {messages: messages.dup, uid_validity: uid_validity}}
+      tsx.begin({savepoint: {messages: messages.dup, uid_validity: uid_validity}}) do
+        block.call
 
-      block.call
-
-      tsx.clear
-      save
+        save_internal(version: version, uid_validity: uid_validity, messages: messages) if tsx.data
+      rescue Exception => e
+        rollback
+        raise e
+      end
     end
 
     def rollback
@@ -139,6 +140,12 @@ module Imap::Backup
 
       ensure_loaded
 
+      save_internal(version: version, uid_validity: uid_validity, messages: messages)
+    end
+
+    private
+
+    def save_internal(version:, uid_validity:, messages:)
       raise "Cannot save metadata without a uid_validity" if !uid_validity
 
       data = {
@@ -149,8 +156,6 @@ module Imap::Backup
       content = data.to_json
       File.open(pathname, "w") { |f| f.write content }
     end
-
-    private
 
     def ensure_loaded
       return if loaded

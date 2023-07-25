@@ -3,36 +3,27 @@ module Imap; end
 module Imap::Backup
   class Serializer::Transaction
     attr_reader :owner
+    attr_reader :data
 
     def initialize(owner:)
       @data = nil
       @owner = owner
-      @running = false
+      @in_transaction = false
     end
 
-    def start
-      @running = true
+    def begin(data, &block)
+      @data = data
+      @in_transaction = true
+      block.call
+      @in_transaction = false
     end
 
     def clear
       @data = nil
-      @running = false
-    end
-
-    def data
-      raise "#{self.class} not started" if !in_transaction?
-
-      @data
-    end
-
-    def data=(value)
-      raise "#{self.class} not started" if !in_transaction?
-
-      @data = value
     end
 
     def in_transaction?
-      @running
+      @in_transaction
     end
 
     def fail_in_transaction!(method, message: "not supported inside trasactions")
