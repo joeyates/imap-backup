@@ -44,7 +44,7 @@ module Imap::Backup
       mboxrd_message = Email::Mboxrd::Message.new(message)
       serialized = mboxrd_message.to_serialized
       tsx.data[:metadata] << {uid: uid, length: serialized.length, flags: flags}
-      mbox.append(message)
+      mbox.append(serialized)
     end
 
     private
