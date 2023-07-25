@@ -30,7 +30,6 @@ RSpec.describe "imap-backup backup performance", type: :aruba, docker: true, per
       count_runs = {count: message_count}
       Imap::Backup::Configuration::DOWNLOAD_STRATEGIES.each do |strategy|
         context "with #{strategy[:key]} download strategy" do
-          run_times = []
           1.upto(runs) do |run|
             context "with run #{run}" do
               let(:account_config) do
@@ -60,15 +59,14 @@ RSpec.describe "imap-backup backup performance", type: :aruba, docker: true, per
                 run_command_and_stop "imap-backup backup"
                 t_finish_run
                 time_taken = t_finish_run - t_start_run
-                run_times << time_taken
-                puts last_command_started.output
+                count_runs[strategy[:key]] ||= []
+                count_runs[strategy[:key]] << time_taken
                 email = account_config[:username]
                 metadata = imap_parsed(email, folder)
                 expect(metadata[:messages].count).to eq(message_count)
               end
             end
           end
-          count_runs[strategy[:key]] = run_times
         end
       end
       results << count_runs
