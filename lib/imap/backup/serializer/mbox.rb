@@ -15,6 +15,7 @@ module Imap::Backup
     def transaction(&block)
       tsx.fail_in_transaction!(:transaction, message: "nested transactions are not supported")
 
+      # rubocop:disable Lint/RescueException
       tsx.begin({savepoint: {length: length}}) do
         block.call
       rescue Exception => e
@@ -26,6 +27,7 @@ module Imap::Backup
         rollback
         raise e
       end
+      # rubocop:enable Lint/RescueException
     end
 
     def rollback

@@ -50,6 +50,7 @@ module Imap::Backup
     private
 
     def commit
+      # rubocop:disable Lint/RescueException
       imap.transaction do
         tsx.data[:metadata].each do |m|
           imap.append m[:uid], m[:length], flags: m[:flags]
@@ -58,6 +59,7 @@ module Imap::Backup
         imap.rollback
         raise e
       end
+      # rubocop:enable Lint/RescueException
     end
 
     def mbox
