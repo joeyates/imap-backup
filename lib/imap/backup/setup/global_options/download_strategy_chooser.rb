@@ -81,6 +81,11 @@ class Imap::Backup::Setup::GlobalOptions
           whole contents of any folder that might be encountered. It is about
           5% faster than the previous setting for large (>100k messages) folders.
 
+          # Other Performance Settings
+
+          Another configuration which affects backup performance is the
+          `multi_fetch_size` account-level setting.
+
         HELP
         highline.ask "Press a key "
       end
