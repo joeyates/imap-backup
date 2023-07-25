@@ -14,11 +14,12 @@ module ConfigurationHelpers
 
   def create_config(accounts:, download_strategy: :unset, path: nil)
     path ||= File.join(config_path, "config.json")
+    strategy = download_strategy == :unset ? "delay_metadata" : download_strategy
     save_data = {
       version: Imap::Backup::Configuration::VERSION,
-      accounts: accounts
+      accounts: accounts,
+      download_strategy: strategy
     }
-    save_data[:download_strategy] = download_strategy if download_strategy != :unset
     FileUtils.mkdir_p config_path
     FileUtils.chmod 0o700, config_path
     File.open(path, "w") { |f| f.write(JSON.pretty_generate(save_data)) }

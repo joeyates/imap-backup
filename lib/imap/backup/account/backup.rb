@@ -47,6 +47,8 @@ module Imap::Backup
             serializer
           when "delay_metadata"
             Serializer::DelayedMetadataSerializer.new(serializer: serializer)
+          else
+            raise "Unknown download strategy '#{account.download_strategy}'"
           end
 
         downloader = Downloader.new(

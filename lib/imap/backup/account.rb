@@ -28,7 +28,7 @@ module Imap::Backup
       @mirror_mode = options[:mirror_mode]
       @server = options[:server]
       @connection_options = options[:connection_options]
-      @download_strategy = "all"
+      @download_strategy = options[:download_strategy]
       @multi_fetch_size_orignal = options[:multi_fetch_size]
       @reset_seen_flags_after_fetch = options[:reset_seen_flags_after_fetch]
       @client = nil

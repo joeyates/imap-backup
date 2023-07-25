@@ -107,11 +107,7 @@ module Imap::Backup
           contents = File.read(pathname)
           data = JSON.parse(contents, symbolize_names: true)
           data[:download_strategy] =
-            case
-            when data[:download_strategy] == true
-              # Clean-up for users of v11.0.0.rc1
-              "all"
-            when DOWNLOAD_STRATEGIES.find { |s| s[:key] == data[:download_strategy] }
+            if DOWNLOAD_STRATEGIES.find { |s| s[:key] == data[:download_strategy] }
               data[:download_strategy]
             else
               DEFAULT_STRATEGY
