@@ -1,6 +1,7 @@
 require "json"
 
 require "imap/backup/serializer/message"
+require "imap/backup/serializer/transaction"
 
 module Imap; end
 
@@ -17,26 +18,29 @@ module Imap::Backup
       @uid_validity = nil
       @messages = nil
       @version = nil
-      @savepoint = nil
+      @tsx = nil
     end
 
     def transaction(&block)
-      fail_in_transaction!(message: "Serializer::Imap: nested transactions are not supported")
+      tsx.fail_in_transaction!(:transaction, message: "nested transactions are not supported")
 
       ensure_loaded
-      @savepoint = {messages: messages.dup, uid_validity: uid_validity}
+      tsx.start
+      tsx.data = {savepoint: {messages: messages.dup, uid_validity: uid_validity}}
 
       block.call
 
-      @savepoint = nil
+      tsx.clear
       save
     end
 
     def rollback
-      fail_outside_transaction!
+      tsx.fail_outside_transaction!(:rollback)
 
-      @messages = @savepoint[:messages]
-      @uid_validity = @savepoint[:uid_validity]
+      @messages = tsx.data[:savepoint][:messages]
+      @uid_validity = tsx.data[:savepoint][:uid_validity]
+
+      tsx.clear
     end
 
     def pathname
@@ -131,7 +135,7 @@ module Imap::Backup
     end
 
     def save
-      return if @savepoint
+      return if tsx.in_transaction?
 
       ensure_loaded
 
@@ -187,12 +191,8 @@ module Imap::Backup
       @mbox ||= Serializer::Mbox.new(folder_path)
     end
 
-    def fail_in_transaction!(message: "Serializer::Imap: method not supported inside trasactions")
-      raise message if @savepoint
-    end
-
-    def fail_outside_transaction!
-      raise "This method can only be called inside a transaction" if !@savepoint
+    def tsx
+      @tsx ||= Serializer::Transaction.new(owner: self)
     end
   end
 end
