@@ -2,6 +2,7 @@ require "highline"
 
 require "email/provider"
 require "imap/backup/account"
+require "imap/backup/setup/global_options"
 require "imap/backup/setup/helpers"
 
 module Imap; end
@@ -39,7 +40,7 @@ module Imap::Backup
         MENU
         account_items menu
         add_account_item menu
-        toggle_delay_download_writes menu
+        modify_global_options menu
         if config.modified?
           menu.choice("save and exit") do
             config.save
@@ -47,7 +48,8 @@ module Imap::Backup
           end
           menu.choice("exit without saving changes") { throw :done }
         else
-          menu.choice("quit") { throw :done }
+          menu.choice("(q) quit") { throw :done }
+          menu.hidden("quit") { throw :done }
         end
       end
     end
@@ -71,13 +73,10 @@ module Imap::Backup
       end
     end
 
-    def toggle_delay_download_writes(menu)
-      new_value = config.delay_download_writes ? false : true
-      modified = config.delay_download_writes_modified ? " *" : ""
-      change = config.delay_download_writes ? "don't delay" : "delay"
-      menu_item = "#{change} download writes#{modified}"
-      menu.choice(menu_item) do
-        config.delay_download_writes = new_value
+    def modify_global_options(menu)
+      changed = config.modified? ? " *" : ""
+      menu.choice("modify global options#{changed}") do
+        GlobalOptions.new(config: config, highline: Setup.highline).run
       end
     end
 

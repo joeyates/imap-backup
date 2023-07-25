@@ -11,11 +11,17 @@ module Imap; end
 module Imap::Backup
   class Configuration
     CONFIGURATION_DIRECTORY = File.expand_path("~/.imap-backup")
-    VERSION = "2.0".freeze
+    VERSION = "2.1".freeze
+    DEFAULT_STRATEGY = "delay_metadata".freeze
+    DOWNLOAD_STRATEGIES = [
+      {key: "direct", description: "write straight to disk"},
+      {key: DEFAULT_STRATEGY, description: "delay writing metadata"}
+    ].freeze
 
     attr_reader :pathname
-    attr_reader :delay_download_writes
-    attr_reader :delay_download_writes_modified
+    attr_reader :download_strategy
+    attr_reader :download_strategy_original
+    attr_reader :download_strategy_modified
 
     def self.default_pathname
       File.join(CONFIGURATION_DIRECTORY, "config.json")
@@ -27,8 +33,9 @@ module Imap::Backup
 
     def initialize(path: nil)
       @pathname = path || self.class.default_pathname
-      @delay_download_writes = false
-      @delay_download_writes_modified = false
+      @download_strategy = nil
+      @download_strategy_original = nil
+      @download_strategy_modified = false
     end
 
     def path
@@ -44,7 +51,7 @@ module Imap::Backup
       save_data = {
         version: VERSION,
         accounts: accounts.map(&:to_h),
-        delay_download_writes: delay_download_writes
+        download_strategy: download_strategy
       }
       File.open(pathname, "w") { |f| f.write(JSON.pretty_generate(save_data)) }
       FileUtils.chmod(0o600, pathname) if !windows?
@@ -61,18 +68,20 @@ module Imap::Backup
       end
     end
 
-    def delay_download_writes=(value)
+    def download_strategy=(value)
+      raise "Unknown strategy '#{value}'" if !DOWNLOAD_STRATEGIES.find { |s| s[:key] == value }
+
       ensure_loaded!
 
-      @delay_download_writes = value
-      @delay_download_writes_modified = true
+      @download_strategy = value
+      @download_strategy_modified = value != download_strategy_original
       inject_global_attributes(accounts)
     end
 
     def modified?
       ensure_loaded!
 
-      return true if delay_download_writes_modified
+      return true if download_strategy_modified
 
       accounts.any? { |a| a.modified? || a.marked_for_deletion? }
     end
@@ -83,7 +92,8 @@ module Imap::Backup
       return true if @data
 
       data
-      @delay_download_writes = data[:delay_download_writes]
+      @download_strategy = data[:download_strategy]
+      @download_strategy_original = data[:download_strategy]
       true
     end
 
@@ -95,14 +105,21 @@ module Imap::Backup
           )
           permission_checker.run if !windows?
           contents = File.read(pathname)
-          JSON.parse(contents, symbolize_names: true)
+          data = JSON.parse(contents, symbolize_names: true)
+          data[:download_strategy] =
+            if DOWNLOAD_STRATEGIES.find { |s| s[:key] == data[:download_strategy] }
+              data[:download_strategy]
+            else
+              DEFAULT_STRATEGY
+            end
+          data
         else
           {accounts: []}
         end
     end
 
     def remove_modified_flags
-      @delay_download_writes_modified = false
+      @download_strategy_modified = false
       accounts.each(&:clear_changes)
     end
 
@@ -112,7 +129,7 @@ module Imap::Backup
 
     def inject_global_attributes(accounts)
       accounts.map do |a|
-        a.delay_download_writes = delay_download_writes
+        a.download_strategy = download_strategy
         a
       end
     end

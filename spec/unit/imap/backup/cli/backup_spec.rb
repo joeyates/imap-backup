@@ -37,9 +37,20 @@ module Imap::Backup
       end
 
       it "runs other backups" do
-        subject.run
+        # rubocop:disable Lint/SuppressedException
+        begin
+          subject.run
+        rescue SystemExit
+        end
+        # rubocop:enable Lint/SuppressedException
 
         expect(backup).to have_received(:run).twice
+      end
+
+      it "exits with an error" do
+        expect do
+          subject.run
+        end.to raise_exception(SystemExit)
       end
     end
   end

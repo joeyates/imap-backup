@@ -1,5 +1,8 @@
 require "json"
 
+require "imap/backup/serializer/message"
+require "imap/backup/serializer/transaction"
+
 module Imap; end
 
 module Imap::Backup
@@ -15,26 +18,32 @@ module Imap::Backup
       @uid_validity = nil
       @messages = nil
       @version = nil
-      @savepoint = nil
+      @tsx = nil
     end
 
     def transaction(&block)
-      fail_in_transaction!(message: "Serializer::Imap: nested transactions are not supported")
+      tsx.fail_in_transaction!(:transaction, message: "nested transactions are not supported")
 
       ensure_loaded
-      @savepoint = {messages: messages.dup, uid_validity: uid_validity}
+      # rubocop:disable Lint/RescueException
+      tsx.begin({savepoint: {messages: messages.dup, uid_validity: uid_validity}}) do
+        block.call
 
-      block.call
-
-      @savepoint = nil
-      save
+        save_internal(version: version, uid_validity: uid_validity, messages: messages) if tsx.data
+      rescue Exception => e
+        rollback
+        raise e
+      end
+      # rubocop:enable Lint/RescueException
     end
 
     def rollback
-      fail_outside_transaction!
+      tsx.fail_outside_transaction!(:rollback)
 
-      @messages = @savepoint[:messages]
-      @uid_validity = @savepoint[:uid_validity]
+      @messages = tsx.data[:savepoint][:messages]
+      @uid_validity = tsx.data[:savepoint][:uid_validity]
+
+      tsx.clear
     end
 
     def pathname
@@ -129,10 +138,16 @@ module Imap::Backup
     end
 
     def save
-      return if @savepoint
+      return if tsx.in_transaction?
 
       ensure_loaded
 
+      save_internal(version: version, uid_validity: uid_validity, messages: messages)
+    end
+
+    private
+
+    def save_internal(version:, uid_validity:, messages:)
       raise "Cannot save metadata without a uid_validity" if !uid_validity
 
       data = {
@@ -143,8 +158,6 @@ module Imap::Backup
       content = data.to_json
       File.open(pathname, "w") { |f| f.write content }
     end
-
-    private
 
     def ensure_loaded
       return if loaded
@@ -185,12 +198,8 @@ module Imap::Backup
       @mbox ||= Serializer::Mbox.new(folder_path)
     end
 
-    def fail_in_transaction!(message: "Serializer::Imap: method not supported inside trasactions")
-      raise message if @savepoint
-    end
-
-    def fail_outside_transaction!
-      raise "This method can only be called inside a transaction" if !@savepoint
+    def tsx
+      @tsx ||= Serializer::Transaction.new(owner: self)
     end
   end
 end

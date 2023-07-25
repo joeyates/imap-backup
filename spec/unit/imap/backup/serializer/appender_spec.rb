@@ -13,7 +13,7 @@ module Imap::Backup
       instance_double(Email::Mboxrd::Message, to_serialized: "serialized")
     end
     let(:found_message) { nil }
-    let(:command) { subject.single(uid: 99, message: "Hi", flags: [:MyFlag]) }
+    let(:command) { subject.append(uid: 99, message: "Hi", flags: [:MyFlag]) }
 
     before do
       allow(imap).to receive(:get) { found_message }

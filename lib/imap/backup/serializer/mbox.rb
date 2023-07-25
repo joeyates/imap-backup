@@ -1,3 +1,5 @@
+require "imap/backup/serializer/transaction"
+
 module Imap; end
 
 module Imap::Backup
@@ -7,21 +9,32 @@ module Imap::Backup
 
     def initialize(folder_path)
       @folder_path = folder_path
-      @savepoint = nil
+      @tsx = nil
     end
 
     def transaction(&block)
-      fail_in_transaction!(message: "Nested transactions are not supported")
+      tsx.fail_in_transaction!(:transaction, message: "nested transactions are not supported")
 
-      @savepoint = {length: length}
-      block.call
-      @savepoint = nil
+      # rubocop:disable Lint/RescueException
+      tsx.begin({savepoint: {length: length}}) do
+        block.call
+      rescue Exception => e
+        message = <<~ERROR
+          #{self.class} error #{e}
+          #{e.backtrace.join("\n")}
+        ERROR
+        Logger.logger.error message
+        rollback
+        raise e
+      end
+      # rubocop:enable Lint/RescueException
     end
 
     def rollback
-      fail_outside_transaction!
+      tsx.fail_outside_transaction!(:rollback)
 
-      rewind(@savepoint[:length])
+      rewind(tsx.data[:savepoint][:length])
+      tsx.clear
     end
 
     def valid?
@@ -83,12 +96,8 @@ module Imap::Backup
       end
     end
 
-    def fail_in_transaction!(message: "Method not supported inside trasactions")
-      raise message if savepoint
-    end
-
-    def fail_outside_transaction!
-      raise "This method can only be called inside a transaction" if !savepoint
+    def tsx
+      @tsx ||= Serializer::Transaction.new(owner: self)
     end
   end
 end

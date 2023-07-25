@@ -14,7 +14,7 @@ module Imap::Backup
       @mbox = mbox
     end
 
-    def single(uid:, message:, flags:)
+    def append(uid:, message:, flags:)
       raise "Can't add messages without uid_validity" if !imap.uid_validity
 
       uid = uid.to_i
@@ -27,31 +27,23 @@ module Imap::Backup
       end
 
       rollback_on_error do
-        do_append uid, message, flags
+        serialized = to_serialized(message)
+        mbox.append serialized
+        imap.append uid, serialized.length, flags: flags
       rescue StandardError => e
         raise <<-ERROR.gsub(/^\s*/m, "")
-          [#{folder}] failed to append message #{uid}:
-          #{message}. #{e}:
+          [#{folder}] failed to append message #{uid}: #{message}.
+          #{e}:
           #{e.backtrace.join("\n")}"
         ERROR
       end
     end
 
-    def multi(appends)
-      rollback_on_error do
-        appends.each do |a|
-          do_append a[:uid], a[:message], a[:flags]
-        end
-      end
-    end
-
     private
 
-    def do_append(uid, message, flags)
+    def to_serialized(message)
       mboxrd_message = Email::Mboxrd::Message.new(message)
-      serialized = mboxrd_message.to_serialized
-      mbox.append serialized
-      imap.append uid, serialized.length, flags: flags
+      mboxrd_message.to_serialized
     end
 
     def rollback_on_error(&block)
@@ -62,6 +54,11 @@ module Imap::Backup
           Logger.logger.error e
           imap.rollback
           mbox.rollback
+        rescue SignalException => e
+          Logger.logger.error e
+          imap.rollback
+          mbox.rollback
+          raise
         end
       end
     end

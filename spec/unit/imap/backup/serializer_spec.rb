@@ -225,7 +225,7 @@ module Imap::Backup
       end
 
       let(:action) { -> { subject.append("uid", "message", []) } }
-      let(:appender) { instance_double(Serializer::Appender, single: nil) }
+      let(:appender) { instance_double(Serializer::Appender, append: nil) }
 
       it_behaves_like "a method that checks for invalid serialization"
       it_behaves_like "a method sets up the folder directory"
@@ -233,7 +233,7 @@ module Imap::Backup
       it "runs the Appender" do
         subject.append("uid", "message", [])
 
-        expect(appender).to have_received(:single)
+        expect(appender).to have_received(:append)
       end
     end
 
@@ -297,7 +297,7 @@ module Imap::Backup
     end
 
     describe "#filter" do
-      let(:appender) { instance_double(Serializer::Appender, single: nil) }
+      let(:appender) { instance_double(Serializer::Appender, append: nil) }
       let(:old_imap) do
         instance_double(
           Serializer::Imap, "Old Imap",
@@ -334,7 +334,7 @@ module Imap::Backup
       end
 
       it "adds messages" do
-        expect(appender).to have_received(:single)
+        expect(appender).to have_received(:append)
       end
 
       it "deletes the old imap" do
@@ -357,7 +357,7 @@ module Imap::Backup
         let(:keep) { false }
 
         it "skips the message" do
-          expect(appender).to_not have_received(:single)
+          expect(appender).to_not have_received(:append)
         end
       end
     end
