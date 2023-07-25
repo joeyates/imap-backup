@@ -21,6 +21,7 @@ module Imap::Backup
     def transaction(&block)
       tsx.fail_in_transaction!(:transaction, message: "nested transactions are not supported")
 
+      tsx.start
       tsx.data = {messages: [], mbox: {length: mbox.length}}
 
       block.call
