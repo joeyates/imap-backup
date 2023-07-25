@@ -15,8 +15,7 @@ module Imap::Backup
     DEFAULT_STRATEGY = "delay_metadata".freeze
     DOWNLOAD_STRATEGIES = [
       {key: "direct", description: "write straight to disk"},
-      {key: DEFAULT_STRATEGY, description: "delay writing metadata"},
-      {key: "delay_all", description: "delay all writes"}
+      {key: DEFAULT_STRATEGY, description: "delay writing metadata"}
     ].freeze
 
     attr_reader :pathname

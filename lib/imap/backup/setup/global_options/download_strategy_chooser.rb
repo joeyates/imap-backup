@@ -72,15 +72,6 @@ class Imap::Backup::Setup::GlobalOptions
           is **much** faster for large folders (potentially >30 times for
           folders with >100k messages) and is less wearing on the disk.
 
-          # delay all writes
-
-          With this setting, both messages and metadata are held in memory
-          and are written to disk when all messages have been downloaded.
-
-          This choice is suitable for machines with enough memory to store the
-          whole contents of any folder that might be encountered. It is about
-          5% faster than the previous setting for large (>100k messages) folders.
-
           # Other Performance Settings
 
           Another configuration which affects backup performance is the

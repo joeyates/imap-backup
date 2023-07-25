@@ -2,7 +2,6 @@ require "imap/backup/account/folder_ensurer"
 require "imap/backup/account/local_only_folder_deleter"
 require "imap/backup/account/serialized_folders"
 require "imap/backup/serializer/delayed_metadata_serializer"
-require "imap/backup/serializer/delayed_writes_serializer"
 require "imap/backup/downloader"
 require "imap/backup/flag_refresher"
 require "imap/backup/local_only_message_deleter"
@@ -48,8 +47,6 @@ module Imap::Backup
             serializer
           when "delay_metadata"
             Serializer::DelayedMetadataSerializer.new(serializer: serializer)
-          when "delay_all"
-            Serializer::DelayedWritesSerializer.new(serializer: serializer)
           end
 
         downloader = Downloader.new(

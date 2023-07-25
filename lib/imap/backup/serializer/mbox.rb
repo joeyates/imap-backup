@@ -45,14 +45,6 @@ module Imap::Backup
       end
     end
 
-    def multiappend(messages)
-      File.open(pathname, "ab") do |file|
-        messages.each do |m|
-          file.write m
-        end
-      end
-    end
-
     def read(offset, length)
       File.open(pathname, "rb") do |f|
         f.seek offset

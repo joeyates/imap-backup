@@ -141,7 +141,7 @@ module Imap::Backup
       validate!
 
       appender = Serializer::Appender.new(folder: sanitized, imap: imap, mbox: mbox)
-      appender.single(uid: uid, message: message, flags: flags)
+      appender.append(uid: uid, message: message, flags: flags)
     end
 
     def update(uid, flags: nil)
@@ -173,7 +173,7 @@ module Imap::Backup
       enumerator = Serializer::MessageEnumerator.new(imap: imap)
       enumerator.run(uids: uids) do |message|
         keep = block.call(message)
-        appender.single(uid: message.uid, message: message.body, flags: message.flags) if keep
+        appender.append(uid: message.uid, message: message.body, flags: message.flags) if keep
       end
       imap.delete
       new_imap.rename imap.folder_path

@@ -14,7 +14,7 @@ module Imap::Backup
       @mbox = mbox
     end
 
-    def single(uid:, message:, flags:)
+    def append(uid:, message:, flags:)
       raise "Can't add messages without uid_validity" if !imap.uid_validity
 
       uid = uid.to_i
@@ -36,17 +36,6 @@ module Imap::Backup
           #{e}:
           #{e.backtrace.join("\n")}"
         ERROR
-      end
-    end
-
-    def multi(appends)
-      rollback_on_error do
-        messages = appends.map do |a|
-          serialized = to_serialized(a[:message])
-          imap.append a[:uid], serialized.length, flags: a[:flags]
-          serialized
-        end
-        mbox.multiappend messages
       end
     end
 
