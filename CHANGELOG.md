@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 11.0.0 - 2023-07-25
+
+### Changed
+
+* Default downloading strategy now delays writing metadata until
+  the whole folder has been downloaded. For very large mailboxes
+  (e.g. with >100k messages) this results in an approximately
+  30x speedup in download times. The strategy can be chosen in the setup
+  program, under 'global options';
+* When any account backup fails, the program now exits with a non-zero
+  exit code.
+
 ## 10.0.0 - 2023-07-16
 
 * Improved logging output for Thunderbird exports,
