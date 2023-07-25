@@ -38,9 +38,6 @@ module Imap::Backup
       block.call
     end
 
-    def commit
-    end
-
     def rollback
     end
 
