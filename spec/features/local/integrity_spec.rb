@@ -76,7 +76,7 @@ RSpec.describe "imap-backup local check", type: :aruba do
       run!
 
       expect(last_command_started).
-        to have_output(/has offsets past the end of \.mbox file/)
+        to have_output(/is shorter than indicated by \.imap file/)
     end
   end
 
@@ -88,34 +88,22 @@ RSpec.describe "imap-backup local check", type: :aruba do
       run!
 
       expect(last_command_started).
-        to have_output(/Mbox file '.*?' contains unexpected trailing data/)
+        to have_output(/is longer than indicated by \.imap file/)
     end
   end
 
   context "when an email in an mbox do not start at the expected offsets" do
     it "indicates that the local folder backup is corrupt" do
       imap = JSON.parse(File.read(imap_pathname))
+      imap["messages"][0]["length"] -= 1
       imap["messages"][1]["offset"] -= 1
+      imap["messages"][1]["length"] += 1
       File.write(imap_pathname, imap.to_json)
 
       run!
 
       expect(last_command_started).
         to have_output(/Message 2 not found at expected offset/)
-    end
-  end
-
-  context "when the last email in an mbox is incomplete" do
-    it "indicates that the local folder backup is corrupt" do
-      mbox = File.read(mbox_pathname)
-      File.open(mbox_pathname, File::RDWR | File::CREAT, 0o644) do |f|
-        f.truncate(mbox.length - 5)
-      end
-
-      run!
-
-      expect(last_command_started).
-        to have_output(/Message 2 is incomplete/)
     end
   end
 

@@ -140,12 +140,16 @@ module Imap::Backup
     end
 
     describe "#check_integrity!" do
-      let(:mbox_exists) { true }
-      let(:mbox_messages) { [] }
+      let(:checker) { instance_double(Serializer::IntegrityChecker, run: nil) }
 
       before do
-        allow(mbox).to receive(:exist?) { mbox_exists }
-        allow(imap).to receive(:messages) { mbox_messages }
+        allow(Serializer::IntegrityChecker).to receive(:new) { checker }
+      end
+
+      it "runs the checker" do
+        subject.check_integrity!
+
+        expect(checker).to have_received(:run)
       end
 
       it "returns nil" do

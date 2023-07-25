@@ -3,6 +3,7 @@ require "forwardable"
 require "email/mboxrd/message"
 require "imap/backup/naming"
 require "imap/backup/serializer/appender"
+require "imap/backup/serializer/integrity_checker"
 require "imap/backup/serializer/imap"
 require "imap/backup/serializer/mbox"
 require "imap/backup/serializer/message_enumerator"
@@ -19,8 +20,6 @@ module Imap::Backup
     end
 
     extend Forwardable
-
-    class FolderIntegrityError < StandardError; end
 
     def_delegator :mbox, :pathname, :mbox_pathname
     def_delegators :imap, :get, :messages, :uid_validity, :uids, :update_uid
@@ -59,54 +58,7 @@ module Imap::Backup
     end
 
     def check_integrity!
-      if !imap.valid?
-        message = ".imap file '#{imap.pathname}' is corrupt"
-        raise FolderIntegrityError, message
-      end
-
-      if !mbox.exist?
-        message = ".mbox file '#{mbox.pathname}' is missing"
-        raise FolderIntegrityError, message
-      end
-
-      return if imap.messages.empty?
-
-      offsets = imap.messages.map(&:offset)
-
-      if offsets != offsets.sort
-        message = ".imap file '#{imap.pathname}' has offset data which is out of order"
-        raise FolderIntegrityError, message
-      end
-
-      if mbox.length < offsets[-1]
-        message =
-          ".imap file '#{imap.pathname}' has offsets past the end " \
-          "of .mbox file '#{mbox.pathname}'"
-        raise FolderIntegrityError, message
-      end
-
-      imap.messages.each do |m|
-        text = mbox.read(m.offset, m.length)
-        if text.length < m.length
-          message = "Message #{m.uid} is incomplete in file '#{mbox.pathname}'"
-          raise FolderIntegrityError, message
-        end
-
-        next if text.start_with?("From ")
-
-        message =
-          "Message #{m.uid} not found at expected offset #{m.offset} " \
-          "in file '#{mbox.pathname}'"
-        raise FolderIntegrityError, message
-      end
-
-      last = imap.messages.last
-      expected_length = last.offset + last.length
-      actual_length = mbox.length
-      return if actual_length == expected_length
-
-      message = "Mbox file '#{mbox.pathname}' contains unexpected trailing data"
-      raise FolderIntegrityError, message
+      IntegrityChecker.new(imap: imap, mbox: mbox).run
     end
 
     def delete
