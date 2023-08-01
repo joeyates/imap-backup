@@ -36,7 +36,6 @@ module Imap::Backup
       tsx.fail_outside_transaction!(:rollback)
 
       rewind(tsx.data[:savepoint][:length])
-      tsx.clear
     end
 
     def valid?
