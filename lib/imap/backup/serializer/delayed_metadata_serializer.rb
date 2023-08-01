@@ -20,23 +20,13 @@ module Imap::Backup
     def transaction(&block)
       tsx.fail_in_transaction!(:transaction, message: "nested transactions are not supported")
 
-      # rubocop:disable Lint/RescueException
       tsx.begin({metadata: []}) do
         mbox.transaction do
           block.call
 
           commit
-        rescue Exception => e
-          message = <<~ERROR
-            #{self.class} error #{e}
-            #{e.backtrace.join("\n")}
-          ERROR
-          Logger.logger.error message
-          mbox.rollback
-          raise e
         end
       end
-      # rubocop:enable Lint/RescueException
     end
 
     def append(uid, message, flags)

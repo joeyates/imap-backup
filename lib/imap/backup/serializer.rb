@@ -37,9 +37,6 @@ module Imap::Backup
       block.call
     end
 
-    def rollback
-    end
-
     # Returns true if there are existing, valid files
     # false otherwise (in which case any existing files are deleted)
     def validate!

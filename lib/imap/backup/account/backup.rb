@@ -72,7 +72,6 @@ module Imap::Backup
         multi_fetch_size: account.multi_fetch_size,
         reset_seen_flags_after_fetch: account.reset_seen_flags_after_fetch
       )
-      # rubocop:disable Lint/RescueException
       download_serializer.transaction do
         downloader.run
       rescue StandardError => e
@@ -81,14 +80,8 @@ module Imap::Backup
           #{e.backtrace.join("\n")}
         ERROR
         Logger.logger.error message
-        download_serializer.rollback
-        raise e
-      rescue SignalException => e
-        Logger.logger.error "#{self.class} handling #{e.class}"
-        download_serializer.rollback
         raise e
       end
-      # rubocop:enable Lint/RescueException
       if account.mirror_mode
         Logger.logger.info "Mirror mode - Deleting messages only present locally"
         LocalOnlyMessageDeleter.new(folder, serializer).run
