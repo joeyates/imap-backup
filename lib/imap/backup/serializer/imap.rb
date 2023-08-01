@@ -31,6 +31,7 @@ module Imap::Backup
 
         save_internal(version: version, uid_validity: uid_validity, messages: messages) if tsx.data
       rescue Exception => e
+        Logger.logger.error "#{self.class} handling #{e.class}"
         rollback
         raise e
       end

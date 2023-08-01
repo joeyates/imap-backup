@@ -56,6 +56,7 @@ module Imap::Backup
           imap.append m[:uid], m[:length], flags: m[:flags]
         end
       rescue Exception => e
+        Logger.logger.error "#{self.class} handling #{e.class}"
         imap.rollback
         raise e
       end
