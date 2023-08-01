@@ -1,4 +1,5 @@
 require "imap/backup/account/serialized_folders"
+require "imap/backup/cli/local/check"
 
 module Imap; end
 
@@ -40,32 +41,8 @@ module Imap::Backup
     quiet_option
     verbose_option
     def check
-      results = requested_accounts(config).map do |account|
-        serialized_folders = Account::SerializedFolders.new(account: account)
-        folder_results = serialized_folders.map do |serializer, _folder|
-          serializer.check_integrity!
-          {name: serializer.folder, result: "OK"}
-        rescue Serializer::FolderIntegrityError => e
-          message = e.to_s
-          if options[:delete_corrupt]
-            serializer.delete
-            message << " and has been deleted"
-          end
-
-          {
-            name: serializer.folder,
-            result: message
-          }
-        end
-        {account: account.username, folders: folder_results}
-      end
-
-      case options[:format]
-      when "json"
-        print_check_results_as_json(results)
-      else
-        print_check_results_as_text(results)
-      end
+      non_logging_options = Imap::Backup::Logger.setup_logging(options)
+      Check.new(non_logging_options).run
     end
 
     desc "folders EMAIL", "List backed up folders"
@@ -140,19 +117,6 @@ module Imap::Backup
     end
 
     no_commands do
-      def print_check_results_as_json(results)
-        Kernel.puts results.to_json
-      end
-
-      def print_check_results_as_text(results)
-        results.each do |account_results|
-          Kernel.puts "Account: #{account_results[:account]}"
-          account_results[:folders].each do |folder_results|
-            Kernel.puts "\t#{folder_results[:name]}: #{folder_results[:result]}"
-          end
-        end
-      end
-
       def list_emails_as_json(serializer)
         emails = serializer.each_message.map do |message|
           {
