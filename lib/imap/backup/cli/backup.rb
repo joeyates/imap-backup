@@ -19,7 +19,12 @@ module Imap::Backup
       def run
         config = load_config(**options)
         exit_code = nil
-        requested_accounts(config).each do |account|
+        accounts = requested_accounts(config)
+        if accounts.none?
+          Logger.logger.warn "No matching accounts found to backup"
+          return
+        end
+        accounts.each do |account|
           backup = Account::Backup.new(account: account, refresh: refresh)
           backup.run
         rescue StandardError => e
