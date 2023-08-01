@@ -30,6 +30,10 @@ module Imap::Backup
       backup_folders = Account::BackupFolders.new(
         client: account.client, account: account
       )
+      if backup_folders.none?
+        Logger.logger.warn "Account #{account.username}: No folders found to backup"
+        return
+      end
       backup_folders.each do |folder|
         backup_folder folder
       end

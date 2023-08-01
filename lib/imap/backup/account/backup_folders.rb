@@ -4,6 +4,8 @@ module Imap::Backup
   class Account; end
 
   class Account::BackupFolders
+    include Enumerable
+
     attr_reader :account
     attr_reader :client
 

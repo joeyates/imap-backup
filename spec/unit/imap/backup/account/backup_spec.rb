@@ -16,7 +16,7 @@ module Imap::Backup
         reset_seen_flags_after_fetch: reset_seen_flags_after_fetch
       )
     end
-    let(:backup_folders) { instance_double(Account::BackupFolders) }
+    let(:backup_folders) { instance_double(Account::BackupFolders, none?: false) }
     let(:client) { instance_double(Client::Default) }
     let(:downloader) { instance_double(Downloader, run: nil) }
     let(:folder) do
