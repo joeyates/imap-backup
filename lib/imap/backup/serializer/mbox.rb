@@ -18,11 +18,6 @@ module Imap::Backup
       tsx.begin({savepoint: {length: length}}) do
         block.call
       rescue StandardError => e
-        message = <<~ERROR
-          #{self.class} error #{e}
-          #{e.backtrace.join("\n")}
-        ERROR
-        Logger.logger.error message
         rollback
         raise e
       rescue SignalException => e
