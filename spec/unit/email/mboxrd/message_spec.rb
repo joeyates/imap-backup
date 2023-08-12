@@ -123,12 +123,6 @@ RSpec.describe Email::Mboxrd::Message do
   end
 
   describe "From" do
-    before do
-      # call original for these tests because we want to test the behaviour of
-      # class-under-test given different behaviour of the Mail parser
-      allow(Mail).to receive(:new).and_call_original
-    end
-
     context "when original message 'from' is missing" do
       let(:message_body) { msg_no_from }
 
