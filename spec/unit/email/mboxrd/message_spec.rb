@@ -32,26 +32,33 @@ RSpec.describe Email::Mboxrd::Message do
 
   let(:from) { "me@example.com" }
   let(:date) { DateTime.new(2012, 12, 13, 18, 23, 45) }
-  let(:message_body) do
-    instance_double(String, clone: cloned_message_body, force_encoding: nil)
-  end
-  let(:cloned_message_body) do
-    "Foo\nBar\nFrom at the beginning of the line\n>>From quoted"
-  end
+  let(:message_body) { msg_good }
   let(:msg_good) do
     <<~GOOD
       Delivered-To: you@example.com
-      From: Foo <foo@example.com>
+      From: Foo <#{from}>
       To: FirstName LastName <you@example.com>
       Date: #{date.rfc822}
       Subject: Re: no subject
+      From at the beginning of a line.
+      Text
+      >>From quoted
     GOOD
+  end
+
+  let(:msg_no_date) do
+    <<~BAD
+      Delivered-To: you@example.com
+      From: Foo <#{from}>
+      To: FirstName LastName <you@example.com>
+      Subject: Re: no subject
+    BAD
   end
 
   let(:msg_bad_date) do
     <<~BAD
       Delivered-To: you@example.com
-      From: Foo <foo@example.com>
+      From: Foo <#{from}>
       To: FirstName LastName <you@example.com>
       Date: Mon,5 May 2014 08:97:99 GMT
       Subject: Re: no subject
@@ -73,12 +80,6 @@ RSpec.describe Email::Mboxrd::Message do
   end
 
   describe "#to_serialized" do
-    let(:mail) { instance_double(Mail::Message, from: [from], date: date) }
-
-    before do
-      allow(Mail).to receive(:new).with(cloned_message_body) { mail }
-    end
-
     it "adds a 'From ' line at the start" do
       expected = "From #{from} #{date.asctime}\n"
       expect(subject.to_serialized).to start_with(expected)
@@ -93,7 +94,7 @@ RSpec.describe Email::Mboxrd::Message do
     end
 
     context "when date is missing" do
-      let(:date) { nil }
+      let(:message_body) { msg_no_date }
 
       it "does no fail" do
         expect { subject.to_serialized }.to_not raise_error
