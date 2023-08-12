@@ -28,7 +28,9 @@ module Email::Mboxrd
     end
 
     def to_serialized
-      "From #{from}\n" + mboxrd_body
+      from_line = "From #{from}\n"
+      body = mboxrd_body.dup.force_encoding(Encoding::UTF_8)
+      from_line + body
     end
 
     def date

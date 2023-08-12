@@ -29,13 +29,6 @@ module Imap::Backup
 
       download_serializer.transaction do
         downloader.run
-      rescue StandardError => e
-        message = <<~ERROR
-          #{self.class} error #{e}
-          #{e.backtrace.join("\n")}
-        ERROR
-        Logger.logger.error message
-        raise e
       end
 
       clean_up
