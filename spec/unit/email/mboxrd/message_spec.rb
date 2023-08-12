@@ -100,6 +100,26 @@ RSpec.describe Email::Mboxrd::Message do
         expect { subject.to_serialized }.to_not raise_error
       end
     end
+
+    context "when the body has erroneous encoding" do
+      let(:msg_bad_encoding) do
+        <<~BAD_ENCODING.force_encoding(Encoding::ISO_8859_1).force_encoding(Encoding::ASCII_8BIT)
+          Delivered-To: you@example.com
+          From: Foo <füü@example.com>
+          To: FirstName LastName <you@example.com>
+          Date: #{date.rfc822}
+          Subject: Re: no subject
+          ü
+          \x01
+          \xDE
+        BAD_ENCODING
+      end
+      let(:message_body) { msg_bad_encoding }
+
+      it "argh" do
+        subject.to_serialized
+      end
+    end
   end
 
   describe "From" do
