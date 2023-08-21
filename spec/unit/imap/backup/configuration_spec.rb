@@ -172,6 +172,16 @@ module Imap::Backup
         end
       end
     end
+
+    describe "#download_strategy" do
+      context "when the configuration file is missing" do
+        let(:file_exists) { false }
+
+        it "defaults to delayed metadata" do
+          expect(subject.download_strategy).to eq "delay_metadata"
+        end
+      end
+    end
   end
 end
 

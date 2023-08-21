@@ -19,9 +19,6 @@ module Imap::Backup
     ].freeze
 
     attr_reader :pathname
-    attr_reader :download_strategy
-    attr_reader :download_strategy_original
-    attr_reader :download_strategy_modified
 
     def self.default_pathname
       File.join(CONFIGURATION_DIRECTORY, "config.json")
@@ -68,14 +65,26 @@ module Imap::Backup
       end
     end
 
+    def download_strategy
+      ensure_loaded!
+
+      @download_strategy
+    end
+
     def download_strategy=(value)
       raise "Unknown strategy '#{value}'" if !DOWNLOAD_STRATEGIES.find { |s| s[:key] == value }
 
       ensure_loaded!
 
       @download_strategy = value
-      @download_strategy_modified = value != download_strategy_original
+      @download_strategy_modified = value != @download_strategy_original
       inject_global_attributes(accounts)
+    end
+
+    def download_strategy_modified
+      ensure_loaded!
+
+      @download_strategy_modified
     end
 
     def modified?
@@ -114,7 +123,7 @@ module Imap::Backup
             end
           data
         else
-          {accounts: []}
+          {accounts: [], download_strategy: DEFAULT_STRATEGY}
         end
     end
 
