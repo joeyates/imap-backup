@@ -36,13 +36,13 @@ module Imap::Backup
     it "shows the menu" do
       subject.run
 
-      expect(output.string).to match %r{Global Options}
+      expect(output.string).to match(/Global Options/)
     end
 
     it "shows the current download strategy" do
       subject.run
 
-      expect(output.string).to match %r{currently: 'delay writing metadata'}
+      expect(output.string).to match(/currently: 'delay writing metadata'/)
     end
 
     context "when the download strategy has been modified" do
@@ -51,7 +51,7 @@ module Imap::Backup
       it "shows a modified indicator" do
         subject.run
 
-        expect(output.string).to match %r{currently: 'delay writing metadata'\) \*}
+        expect(output.string).to match(/currently: 'delay writing metadata'\) \*/)
       end
     end
 
@@ -64,4 +64,3 @@ module Imap::Backup
     end
   end
 end
-

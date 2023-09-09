@@ -29,7 +29,7 @@ module Imap::Backup
     it "shows the menu" do
       subject.run
 
-      expect(output.string).to match %r{Choose a Download Strategy}
+      expect(output.string).to match(/Choose a Download Strategy/)
     end
 
     it "accepts choices" do
@@ -49,4 +49,3 @@ module Imap::Backup
     end
   end
 end
-
