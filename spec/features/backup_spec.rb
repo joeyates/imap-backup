@@ -218,6 +218,7 @@ RSpec.describe "imap-backup backup", type: :aruba, docker: true do
         password: "pizza"
       }
     end
+    let(:command) { "bash -c 'imap-backup backup 2>&1 1>/dev/null'" }
 
     it "exits with a failure status" do
       run_command_and_stop command, fail_on_error: false
