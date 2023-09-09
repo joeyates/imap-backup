@@ -7,11 +7,9 @@ class Imap::Backup::Setup; end
 class Imap::Backup::Setup::GlobalOptions
   class DownloadStrategyChooser
     attr_reader :config
-    attr_reader :highline
 
-    def initialize(config:, highline:)
+    def initialize(config:)
       @config = config
-      @highline = highline
     end
 
     def run
@@ -80,6 +78,10 @@ class Imap::Backup::Setup::GlobalOptions
         HELP
         highline.ask "Press a key "
       end
+    end
+
+    def highline
+      Imap::Backup::Setup.highline
     end
   end
 end

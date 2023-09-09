@@ -8,11 +8,9 @@ module Imap::Backup
 
   class Setup::GlobalOptions
     attr_reader :config
-    attr_reader :highline
 
-    def initialize(config:, highline:)
+    def initialize(config:)
       @config = config
-      @highline = highline
     end
 
     def run
@@ -46,8 +44,12 @@ module Imap::Backup
       current = strategies.find { |s| s[:key] == config.download_strategy }
       changed = config.download_strategy_modified ? " *" : ""
       menu.choice("change download strategy (currently: '#{current[:description]}')#{changed}") do
-        DownloadStrategyChooser.new(config: config, highline: Setup.highline).run
+        DownloadStrategyChooser.new(config: config).run
       end
+    end
+
+    def highline
+      Imap::Backup::Setup.highline
     end
   end
 end

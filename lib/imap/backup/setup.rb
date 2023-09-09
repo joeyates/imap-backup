@@ -76,7 +76,7 @@ module Imap::Backup
     def modify_global_options(menu)
       changed = config.modified? ? " *" : ""
       menu.choice("modify global options#{changed}") do
-        GlobalOptions.new(config: config, highline: Setup.highline).run
+        GlobalOptions.new(config: config).run
       end
     end
 
