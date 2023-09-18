@@ -2,7 +2,7 @@
 
 While switching e-mail provider (from provider `A` to `B`),
 you might want to keep the same address (`mymail@domain.com`),
-and restrieve all your existing e-mails on your new server `B`.
+and copy all your existing e-mails to your new server `B`.
 `imap-backup` can do that too!
 
 1. Backup your e-mails: use [`imap-backup setup`](/docs/commands/setup.md)
@@ -36,7 +36,7 @@ and restrieve all your existing e-mails on your new server `B`.
 
 1. Set up a new account giving access to the new provider `B`
   using `imap-backup setup`.
-1. Now you can use `imap-backup migrate`, optionnally adapting
+1. Now you can use `imap-backup migrate`, optionally adapting
   [delimiters and prefixes configuration](/docs/delimiters-and-prefixes.md)
   if need be:
 

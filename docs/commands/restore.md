@@ -35,7 +35,7 @@ No.
 Emails are identified by folder and a specific email id. Any email that
 is already on the server is skipped.
 
-## How to restore e-mails to a new service while keeping the same e-mail address?
+## How do I restore e-mails to a new service while keeping the same e-mail address?
 
 If you are switching to a new e-mail provider,
 but want to keep your existing e-mail address,

@@ -21,11 +21,11 @@ to another account (the "destination").
 
 # FAQ
 
-## How to use delimiters and prefixes?
+## How do I use delimiters and prefixes?
 
 For details of the delimiter and prefix options,
 see [the note about delimiters and prefixes](/docs/delimiters-and-prefixes.md).
 
-## How to migrate to a new server while keeping the same e-mail address?
+## How do I migrate to a new server while keeping the same e-mail address?
 
 See [this note on the topic](/docs/migrate-server-keep-address.md).
