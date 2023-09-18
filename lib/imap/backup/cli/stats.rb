@@ -35,6 +35,7 @@ module Imap::Backup
       end
 
       def stats
+        Logger.logger.debug("[Stats] loading configuration")
         config = load_config(**options)
         account = account(config, email)
 
@@ -46,6 +47,7 @@ module Imap::Backup
 
           serializer = Serializer.new(account.local_path, folder.name)
           local_uids = serializer.uids
+          Logger.logger.debug("[Stats] fetching email list for '#{folder.name}'")
           remote_uids = folder.uids
           {
             folder: folder.name,

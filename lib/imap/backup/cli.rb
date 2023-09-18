@@ -211,9 +211,14 @@ module Imap::Backup
 
     desc "stats EMAIL [OPTIONS]", "Print stats for each account folder"
     long_desc <<~DESC
-      For each account folder, lists emails that are yet to be downloaded "server",
-      are downloaded (exist on server and locally) "both" and those which
-      are only present in the backup (as they have been deleted on the server) "local".
+      For each account folder, lists three counts of emails:
+
+      1. "server" - those yet to be downloaded,
+
+      2. "both" - those that exist on server and are backed up,
+
+      3. "local" - those which are only present in the backup (as they have been deleted
+        on the server).
     DESC
     config_option
     format_option
