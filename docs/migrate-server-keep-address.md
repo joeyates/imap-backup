@@ -5,14 +5,18 @@ you might want to keep the same address (`mymail@domain.com`),
 and copy all your existing e-mails to your new server `B`.
 `imap-backup` can do that too!
 
+It is best to use [`imap-backup migrate`](/docs/commands/migrate.md)
+and not [`imap-backup restore`](/docs/commands/restore.md) here because
+`migrate` simply copies emails to folders with the same name as the ones
+they were downloaded from, while `restore` changes the names of restored
+folders if folders with the same name already exist on the destination server.
+
 1. Backup your e-mails: use [`imap-backup setup`](/docs/commands/setup.md)
   to setup connection to your old provider `A`,
   then launch [`imap-backup backup`](/docs/commands/backup.md).
 1. Actually switch your e-mail service provider (update your DNS MX and all that...).
-1. It is best to use [`imap-backup migrate`](/docs/commands/migrate.md)
-  and not [`imap-backup restore`](/docs/commands/restore.md) here,
-  but both the source and the destination have the same address...
-  You need to manually rename your old account first:
+1. As both the source and the destination have the same address,
+  you need to manually rename your old account first:
 
     1. Modify your configuration file manually
       (i.e. not via `imap-backup setup`) and
