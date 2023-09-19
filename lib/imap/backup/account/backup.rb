@@ -20,7 +20,7 @@ module Imap::Backup
     def run
       Logger.logger.info "Running backup of account: #{account.username}"
       # start the connection so we get logging messages in the right order
-      account.client
+      account.client.login
 
       Account::FolderEnsurer.new(account: account).run
       Account::LocalOnlyFolderDeleter.new(account: account).run if account.mirror_mode

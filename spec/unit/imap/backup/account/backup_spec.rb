@@ -17,7 +17,7 @@ module Imap::Backup
       )
     end
     let(:backup_folders) { instance_double(Account::BackupFolders, none?: false) }
-    let(:client) { instance_double(Client::Default) }
+    let(:client) { instance_double(Client::Default, login: nil) }
     let(:downloader) { instance_double(Downloader, run: nil) }
     let(:folder) do
       instance_double(
