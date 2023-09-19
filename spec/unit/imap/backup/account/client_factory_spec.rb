@@ -22,27 +22,8 @@ module Imap::Backup
       allow(client).to receive(:login).with(no_args)
     end
 
-    it "logs in" do
-      result
-
-      expect(client).to have_received(:login)
-    end
-
-    it "returns the IMAP connection" do
-      expect(result).to eq(client)
-    end
-
-    context "when the first login attempt fails" do
-      before do
-        outcomes = [-> { raise EOFError }, -> { true }]
-        allow(client).to receive(:login) { outcomes.shift.call }
-      end
-
-      it "retries" do
-        subject.run
-
-        expect(client).to have_received(:login).twice
-      end
+    it "returns the AutomaticLoginWrapper" do
+      expect(result).to be_a(Client::AutomaticLoginWrapper)
     end
 
     context "when the provider is Apple" do
@@ -54,7 +35,7 @@ module Imap::Backup
       end
 
       it "returns the Apple client" do
-        expect(result).to eq(apple_client)
+        expect(result.client).to eq(apple_client)
       end
     end
   end

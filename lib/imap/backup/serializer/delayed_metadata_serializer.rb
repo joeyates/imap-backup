@@ -33,7 +33,7 @@ module Imap::Backup
       tsx.fail_outside_transaction!(:append)
       mboxrd_message = Email::Mboxrd::Message.new(message)
       serialized = mboxrd_message.to_serialized
-      tsx.data[:metadata] << {uid: uid, length: serialized.length, flags: flags}
+      tsx.data[:metadata] << {uid: uid, length: serialized.bytesize, flags: flags}
       mbox.append(serialized)
     end
 

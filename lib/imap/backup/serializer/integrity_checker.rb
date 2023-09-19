@@ -15,6 +15,9 @@ module Imap::Backup
     end
 
     def run
+      Logger.logger.debug(
+        "[IntegrityChecker] checking '#{imap.pathname}' against '#{mbox.pathname}'"
+      )
       if !imap.valid?
         message = ".imap file '#{imap.pathname}' is corrupt"
         raise Serializer::FolderIntegrityError, message
@@ -56,14 +59,18 @@ module Imap::Backup
     def check_mbox_length!
       last = imap.messages[-1]
 
-      if mbox.length < last.offset + last.length
+      expected = last.offset + last.length
+      Logger.logger.debug(
+        "[IntegrityChecker] mbox length is #{mbox.length}, expected length is #{expected}"
+      )
+      if mbox.length < expected
         message =
           ".mbox file '#{mbox.pathname}' is shorter than indicated by " \
           ".imap file '#{imap.pathname}'"
         raise Serializer::FolderIntegrityError, message
       end
 
-      if mbox.length > last.offset + last.length
+      if mbox.length > expected
         message =
           ".mbox file '#{mbox.pathname}' is longer than indicated by " \
           ".imap file '#{imap.pathname}'"
@@ -77,6 +84,11 @@ module Imap::Backup
 
         next if text.start_with?("From ")
 
+        Logger.logger.debug(
+          "[IntegrityChecker] looking for message with UID #{m.uid} " \
+          "at offset #{m.offset}, " \
+          "mbox starts with '#{text[0..200]}', expecting 'From '"
+        )
         message =
           "Message #{m.uid} not found at expected offset #{m.offset} " \
           "in file '#{mbox.pathname}'"

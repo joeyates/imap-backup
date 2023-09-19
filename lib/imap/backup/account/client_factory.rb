@@ -2,8 +2,8 @@ require "socket"
 
 require "email/provider"
 require "imap/backup/client/apple_mail"
+require "imap/backup/client/automatic_login_wrapper"
 require "imap/backup/client/default"
-require "retry_on_error"
 
 module Imap; end
 
@@ -11,10 +11,6 @@ module Imap::Backup
   class Account; end
 
   class Account::ClientFactory
-    include RetryOnError
-
-    LOGIN_RETRY_CLASSES = [::EOFError, ::Errno::ECONNRESET, ::SocketError].freeze
-
     attr_reader :account
 
     def initialize(account:)
@@ -24,20 +20,17 @@ module Imap::Backup
     end
 
     def run
-      retry_on_error(errors: LOGIN_RETRY_CLASSES) do
-        options = provider_options
-        Logger.logger.debug(
-          "Creating IMAP instance: #{server}, options: #{options.inspect}"
-        )
-        client =
-          if provider.is_a?(Email::Provider::AppleMail)
-            Client::AppleMail.new(server, account, options)
-          else
-            Client::Default.new(server, account, options)
-          end
-        client.login
-        client
-      end
+      options = provider_options
+      Logger.logger.debug(
+        "Creating IMAP instance: #{server}, options: #{options.inspect}"
+      )
+      client =
+        if provider.is_a?(Email::Provider::AppleMail)
+          Client::AppleMail.new(server, account, options)
+        else
+          Client::Default.new(server, account, options)
+        end
+      Client::AutomaticLoginWrapper.new(client: client)
     end
 
     private

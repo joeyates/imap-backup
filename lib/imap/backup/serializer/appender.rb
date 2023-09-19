@@ -29,7 +29,7 @@ module Imap::Backup
       rollback_on_error do
         serialized = to_serialized(message)
         mbox.append serialized
-        imap.append uid, serialized.length, flags: flags
+        imap.append uid, serialized.bytesize, flags: flags
       rescue StandardError => e
         raise <<-ERROR.gsub(/^\s*/m, "")
           [#{folder}] failed to append message #{uid}: #{message}.

@@ -92,7 +92,7 @@ RSpec.describe "imap-backup local check", type: :aruba do
     end
   end
 
-  context "when an email in an mbox do not start at the expected offsets" do
+  context "when an email in an mbox does not start at the expected offsets" do
     it "indicates that the local folder backup is corrupt" do
       imap = JSON.parse(File.read(imap_pathname))
       imap["messages"][0]["length"] -= 1
