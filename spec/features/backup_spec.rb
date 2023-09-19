@@ -223,7 +223,6 @@ RSpec.describe "imap-backup backup", type: :aruba, docker: true do
     it "exits with a failure status" do
       run_command_and_stop command, fail_on_error: false
 
-      puts last_command_started.output
       expect(last_command_started).to have_exit_status(111)
     end
 
