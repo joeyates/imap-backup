@@ -239,6 +239,7 @@ RSpec.describe "imap-backup backup", type: :aruba, docker: true do
       {path: custom_config_path, accounts: [other_server_connection_parameters]}
     end
     let(:account_config) { other_server_connection_parameters }
+    let(:folder) { "other_public.my-stuff" }
     let(:command) { "imap-backup backup --config #{custom_config_path}" }
 
     let(:setup) do
