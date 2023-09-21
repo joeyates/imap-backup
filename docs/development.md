@@ -63,18 +63,22 @@ use `last_command_started.output`.
 
 ```ruby
 require "net/imap"
+require_relative "spec/features/support/30_email_server_helpers"
 
-imap = Net::IMAP.new("localhost", {port: 8993, ssl: {verify_mode: 0}})
-username = "address@example.com"
-imap.login(username, "pass")
+include EmailServerHelpers
 
-message = "From: #{username}\nSubject: Some Subject\n\nHello!\n"
-response = imap.append("INBOX", message, nil, nil)
+test_connection = test_server_connection_parameters
 
-imap.examine("INBOX")
-uids = imap.uid_search(["ALL"]).sort
+test_imap = Net::IMAP.new(test_connection[:server], test_connection[:connection_options])
+test_imap.login(test_connection[:username], test_connection[:password])
 
-fetch_data_items = imap.uid_fetch(uids, ["BODY[]"])
+message = "From: #{test_connection[:username]}\nSubject: Some Subject\n\nHello!\n"
+response = test_imap.append("INBOX", message, nil, nil)
+
+test_imap.examine("INBOX")
+uids = test_imap.uid_search(["ALL"]).sort
+
+fetch_data_items = test_imap.uid_fetch(uids, ["BODY[]"])
 ```
 
 # Contributing
