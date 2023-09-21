@@ -30,7 +30,7 @@ module Imap::Backup
       Pathname.glob(glob) do |path|
         name = source_folder_name(path)
         serializer = Serializer.new(source_local_path, name)
-        folder = destination_folder_for(name)
+        folder = destination_folder_for_path(name)
         yield serializer, folder
       end
     end
@@ -55,8 +55,8 @@ module Imap::Backup
         end
     end
 
-    def destination_folder_for(name)
-      parts = name.split(source_delimiter)
+    def destination_folder_for_path(name)
+      parts = name.split("/")
       no_source_prefix =
         if source_prefix_clipped != "" && parts.first == source_prefix_clipped
           parts[1..]

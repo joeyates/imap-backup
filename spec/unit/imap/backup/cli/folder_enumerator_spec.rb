@@ -64,9 +64,9 @@ module Imap::Backup
 
     context "when source_delimiter is supplied" do
       let(:options) { super().merge(source_delimiter: ".") }
-      let(:path) { "folder_enumerator_path/src.foo.imap" }
+      let(:path) { "folder_enumerator_path/src/foo.imap" }
 
-      it "handle the delimiter" do
+      it "handles the delimiter" do
         expect(result[1].name).to eq("src/foo")
       end
     end
@@ -82,7 +82,7 @@ module Imap::Backup
 
     context "when the source_prefix ends with the delimiter" do
       let(:options) { super().merge(source_delimiter: ":", source_prefix: "src:") }
-      let(:path) { "folder_enumerator_path/src:foo.imap" }
+      let(:path) { "folder_enumerator_path/src/foo.imap" }
 
       it "removes the delimiter" do
         expect(result[1].name).to eq("foo")
