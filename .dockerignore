@@ -2,3 +2,8 @@
 /jgy-*
 /.#.*
 /.emacs.*
+/.github
+/docs
+/container
+/tmp
+/Gemfile.lock
