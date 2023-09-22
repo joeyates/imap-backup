@@ -18,13 +18,13 @@ controlled by Docker Compose.
 Before running the test suite, it needs to be started:
 
 ```sh
-$ docker-compose up -d
+$ docker-compose -f dev/docker-compose.yml up -d
 ```
 
 or, with Podman
 
 ```sh
-$ podman-compose -f docker-compose.yml up -d
+$ podman-compose -f dev/docker-compose.yml up -d
 ```
 
 ```sh
