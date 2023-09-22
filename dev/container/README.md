@@ -12,15 +12,15 @@ compatibility problems.
 Do the following from the project's root directory:
 
 ```sh
-RUBY_VERSION=[VERSION] ID=$(id -u) docker-compose --file container/compose.yml build
-RUBY_VERSION=[VERSION] ID=$(id -u) docker-compose --file container/compose.yml up -d
+RUBY_VERSION=[VERSION] ID=$(id -u) docker-compose --file dev/container/compose.yml build
+RUBY_VERSION=[VERSION] ID=$(id -u) docker-compose --file dev/container/compose.yml up -d
 docker attach imap-backup
 ```
 
 ...and stop the server afterwards:
 
 ```sh
-RUBY_VERSION=[VERSION] ID=$(id -u) docker-compose --file container/compose.yml down
+RUBY_VERSION=[VERSION] ID=$(id -u) docker-compose --file dev/container/compose.yml down
 ```
 
 # Setup Project
@@ -45,12 +45,12 @@ imap-backup help
 
 # Connecting to the Test IMAP Server
 
-An example file `container/config.json` is supplied.
+An example file `dev/container/config.json` is supplied.
 
 The folowing should produce a list of folders
 
 ```sh
-imap-backup remote folders address@example.com -c container/config.json
+imap-backup remote folders address@example.com -c dev/container/config.json
 ```
 
 You can use the test helpers to interact with the test IMAP servers:

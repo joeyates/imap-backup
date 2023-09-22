@@ -6,16 +6,17 @@
 
 # Development
 
-A setup for developing under any available Ruby version is
-available in the container directory.
+A Dockerfile is available to allow testing with all available Ruby versions,
+see the `dev/container` directory.
 
 # Testing
 
 ## Feature Specs
 
-Specs under `specs/features` are integration specs run against a local IMAP server
-controlled by Docker Compose.
-Before running the test suite, it needs to be started:
+Specs under `specs/features` are integration specs run against
+two local IMAP servers controlled by Docker Compose.
+
+Start them before running the test suite
 
 ```sh
 $ docker-compose -f dev/docker-compose.yml up -d
@@ -75,11 +76,6 @@ uids = imap.uid_search(["ALL"]).sort
 
 fetch_data_items = imap.uid_fetch(uids, ["BODY[]"])
 ```
-
-# Older Ruby Versions
-
-Dockerfiles are available for all the supported Ruby versions,
-see the `container` directory.
 
 # Contributing
 

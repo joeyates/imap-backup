@@ -36,4 +36,4 @@ services:
     - DOCKER_PORT_OTHER_IMAP=993
     - HOME=/app
     volumes:
-      - ..:/app
+      - ../..:/app
