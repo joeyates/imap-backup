@@ -12,16 +12,19 @@ RSpec.describe "imap-backup migrate", type: :aruba, docker: true do
   end
   let(:destination_account) { test_server_connection_parameters }
   let(:destination_folder) { folder }
+  let(:destination_server) { test_server }
   let(:config_options) { {accounts: [source_account, destination_account]} }
 
   let!(:setup) do
     create_config(**config_options)
-    append_local(email: email, folder: source_folder, subject: "Ciao", flags: [:Draft, :$CUSTOM])
+    append_local(
+      email: email, folder: source_folder.gsub(".", "/"), subject: "Ciao", flags: [:Draft, :$CUSTOM]
+    )
   end
 
   after do
-    test_server.delete_folder source_folder
-    test_server.disconnect
+    destination_server.delete_folder source_folder
+    destination_server.disconnect
   end
 
   context "when a config path is supplied" do
@@ -69,7 +72,7 @@ RSpec.describe "imap-backup migrate", type: :aruba, docker: true do
   it "copies flags" do
     run_command_and_stop "imap-backup migrate #{email} #{destination_account[:username]}"
 
-    messages = test_server.folder_messages(destination_folder)
+    messages = destination_server.folder_messages(destination_folder)
     expect(messages[0]["FLAGS"]).to include(:Draft)
   end
 
@@ -88,7 +91,7 @@ RSpec.describe "imap-backup migrate", type: :aruba, docker: true do
 
       run_command_and_stop command
 
-      messages = test_server.folder_messages(destination_folder)
+      messages = destination_server.folder_messages(destination_folder)
       expected = <<~MESSAGE.gsub("\n", "\r\n")
         From: sender@example.com
         Subject: Ciao
@@ -115,7 +118,61 @@ RSpec.describe "imap-backup migrate", type: :aruba, docker: true do
 
       run_command_and_stop command
 
-      messages = test_server.folder_messages(destination_folder)
+      messages = destination_server.folder_messages(destination_folder)
+      expected = <<~MESSAGE.gsub("\n", "\r\n")
+        From: sender@example.com
+        Subject: Ciao
+
+        body
+
+      MESSAGE
+      expect(messages[0]["BODY[]"]).to eq(expected)
+    end
+  end
+
+  context "when the source server has a namespace prefix" do
+    let(:source_account) { other_server_connection_parameters }
+    let(:source_folder) { "other_public.my_folder" }
+    let(:email) { source_account[:username] }
+    let(:destination_account) { test_server_connection_parameters }
+    let(:config_options) { {accounts: [source_account, destination_account]} }
+
+    it "copies email to the destination account" do
+      command = [
+        "imap-backup",
+        "migrate",
+        email,
+        destination_account[:username],
+        "--source-prefix=other_public",
+        "--source-delimiter=."
+      ].join(" ")
+
+      run_command_and_stop command
+
+      messages = destination_server.folder_messages(destination_folder)
+      expected = <<~MESSAGE.gsub("\n", "\r\n")
+        From: sender@example.com
+        Subject: Ciao
+
+        body
+
+      MESSAGE
+      expect(messages[0]["BODY[]"]).to eq(expected)
+    end
+
+    specify "automatic namespaces work" do
+      command = [
+        "imap-backup",
+        "migrate",
+        email,
+        destination_account[:username],
+        "--automatic-namespaces"
+      ].join(" ")
+
+      run_command_and_stop command
+      puts last_command_started.output
+
+      messages = destination_server.folder_messages(destination_folder)
       expected = <<~MESSAGE.gsub("\n", "\r\n")
         From: sender@example.com
         Subject: Ciao
@@ -132,6 +189,7 @@ RSpec.describe "imap-backup migrate", type: :aruba, docker: true do
     let(:email) { source_account[:username] }
     let(:destination_account) { other_server_connection_parameters }
     let(:destination_folder) { "other_public.my_folder" }
+    let(:destination_server) { other_server }
     let(:config_options) { {accounts: [source_account, destination_account]} }
 
     it "copies email to the destination account" do
@@ -146,7 +204,29 @@ RSpec.describe "imap-backup migrate", type: :aruba, docker: true do
 
       run_command_and_stop command
 
-      messages = other_server.folder_messages(destination_folder)
+      messages = destination_server.folder_messages(destination_folder)
+      expected = <<~MESSAGE.gsub("\n", "\r\n")
+        From: sender@example.com
+        Subject: Ciao
+
+        body
+
+      MESSAGE
+      expect(messages[0]["BODY[]"]).to eq(expected)
+    end
+
+    specify "automatic namespaces work" do
+      command = [
+        "imap-backup",
+        "migrate",
+        email,
+        destination_account[:username],
+        "--automatic-namespaces"
+      ].join(" ")
+
+      run_command_and_stop command
+
+      messages = destination_server.folder_messages(destination_folder)
       expected = <<~MESSAGE.gsub("\n", "\r\n")
         From: sender@example.com
         Subject: Ciao

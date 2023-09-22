@@ -83,19 +83,39 @@ module Imap::Backup
       All emails which have been backed up for the "source account" (SOURCE_EMAIL) are
       uploaded to the "destination account" (DESTINATION_EMAIL).
 
-      When one or other account has namespaces (i.e. prefixes like "INBOX"),
-      use the `--source-prefix=` and/or `--destination-prefix=` options.
+      Some configuration may be necessary, as follows:
 
-      When one or other account uses a delimiter other than `/` (i.e. `.`),
-      use the `--source-delimiter=` and/or `--destination-delimiter=` options.
+      Some IMAP servers use namespaces (i.e. prefixes like "INBOX"),
+      while others, while others concatenate the names of subfolders
+      with a charater ("delimiter") other than "/".
 
-      If you you want to delete existing emails in destination folders,
+      In these cases there are two choices.
+
+      You can use the `--automatic-namespaces` option.
+      This wil query the source and detination servers for their
+      namespace configuration and will adapt paths accordingly.
+      This option requires that both the source and destination
+      servers are available and work with the provided parameters
+      and authentication.
+
+      If automatic configuration does not work as desired, there are the
+      `--source-prefix=`, `--source-delimiter=`,
+      `--destination-prefix=` and `--destination-delimiter=` parameters.
+      To check what values you should use, check the output of the
+      `imap-backup remote namespaces EMAIL` command.
+
+      Finally, if you want to delete existing emails in destination folders,
       use the `--reset` option. In this case, all existing emails are
       deleted before uploading the migrated emails.
     DESC
     config_option
     quiet_option
     verbose_option
+    method_option(
+      "automatic-namespaces",
+      type: :boolean,
+      desc: "automatically choose delimiters and prefixes"
+    )
     method_option(
       "destination-delimiter",
       type: :string,

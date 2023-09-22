@@ -63,9 +63,11 @@ module Imap::Backup
     end
 
     %i[
+      automatic_namespaces
+      config
       destination_delimiter
       destination_prefix
-      config
+      reset
       source_delimiter
       source_prefix
     ].each do |option|
@@ -73,6 +75,16 @@ module Imap::Backup
         opts = options.merge(option => "foo")
         described_class.new(source, destination, **opts)
       end
+    end
+
+    context "when the automatic_namespaces option is given" do
+      it "uses the values from the servers"
+      it "fails if delims or prefixes are given"
+    end
+
+    context "when the automatic_namespaces option is not given" do
+      it "defaults to delims and prefixes"
+      it "uses supplied delims and prefixes"
     end
   end
 end
