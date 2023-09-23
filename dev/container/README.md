@@ -47,7 +47,7 @@ imap-backup help
 
 An example file `dev/container/config.json` is supplied.
 
-The folowing should produce a list of folders
+The following should produce a list of folders
 
 ```sh
 imap-backup remote folders address@example.com -c dev/container/config.json
