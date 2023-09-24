@@ -10,17 +10,37 @@ module Imap::Backup
     autoload :Backup, "imap/backup/cli/backup"
     autoload :Folders, "imap/backup/cli/folders"
     autoload :Local, "imap/backup/cli/local"
-    autoload :Migrate, "imap/backup/cli/migrate"
-    autoload :Mirror, "imap/backup/cli/mirror"
     autoload :Remote, "imap/backup/cli/remote"
     autoload :Restore, "imap/backup/cli/restore"
     autoload :Setup, "imap/backup/cli/setup"
     autoload :Stats, "imap/backup/cli/stats"
+    autoload :Transfer, "imap/backup/cli/transfer"
     autoload :Utils, "imap/backup/cli/utils"
 
     include Helpers
 
     VERSION_ARGUMENTS = %w(-v --version).freeze
+
+    NAMESPACE_CONFIGURATION_DESCRIPTION = <<~DESC.freeze
+      Some IMAP servers use namespaces (i.e. prefixes like "INBOX"),
+      while others, while others concatenate the names of subfolders
+      with a charater ("delimiter") other than "/".
+
+      In these cases there are two choices.
+
+      You can use the `--automatic-namespaces` option.
+      This wil query the source and detination servers for their
+      namespace configuration and will adapt paths accordingly.
+      This option requires that both the source and destination
+      servers are available and work with the provided parameters
+      and authentication.
+
+      If automatic configuration does not work as desired, there are the
+      `--source-prefix=`, `--source-delimiter=`,
+      `--destination-prefix=` and `--destination-delimiter=` parameters.
+      To check what values you should use, check the output of the
+      `imap-backup remote namespaces EMAIL` command.
+    DESC
 
     default_task :backup
 
@@ -83,19 +103,22 @@ module Imap::Backup
       All emails which have been backed up for the "source account" (SOURCE_EMAIL) are
       uploaded to the "destination account" (DESTINATION_EMAIL).
 
-      When one or other account has namespaces (i.e. prefixes like "INBOX"),
-      use the `--source-prefix=` and/or `--destination-prefix=` options.
+      Some configuration may be necessary, as follows:
 
-      When one or other account uses a delimiter other than `/` (i.e. `.`),
-      use the `--source-delimiter=` and/or `--destination-delimiter=` options.
+      #{NAMESPACE_CONFIGURATION_DESCRIPTION}
 
-      If you you want to delete existing emails in destination folders,
+      Finally, if you want to delete existing emails in destination folders,
       use the `--reset` option. In this case, all existing emails are
       deleted before uploading the migrated emails.
     DESC
     config_option
     quiet_option
     verbose_option
+    method_option(
+      "automatic-namespaces",
+      type: :boolean,
+      desc: "automatically choose delimiters and prefixes"
+    )
     method_option(
       "destination-delimiter",
       type: :string,
@@ -126,7 +149,7 @@ module Imap::Backup
     )
     def migrate(source_email, destination_email)
       non_logging_options = Imap::Backup::Logger.setup_logging(options)
-      Migrate.new(source_email, destination_email, **non_logging_options).run
+      Transfer.new(:migrate, source_email, destination_email, non_logging_options).run
     end
 
     desc(
@@ -140,7 +163,7 @@ module Imap::Backup
       If a folder list is configured for the SOURCE_EMAIL account,
       only the folders indicated by the setting are copied.
 
-      First, runs the download of the SOURCE_EMAIL account.
+      First, it runs the download of the SOURCE_EMAIL account.
       If the SOURCE_EMAIL account is **not** configured to be in 'mirror' mode,
       a warning is printed.
 
@@ -152,6 +175,11 @@ module Imap::Backup
     config_option
     quiet_option
     verbose_option
+    method_option(
+      "automatic-namespaces",
+      type: :boolean,
+      desc: "automatically choose delimiters and prefixes"
+    )
     method_option(
       "destination-delimiter",
       type: :string,
@@ -176,7 +204,7 @@ module Imap::Backup
     )
     def mirror(source_email, destination_email)
       non_logging_options = Imap::Backup::Logger.setup_logging(options)
-      Mirror.new(source_email, destination_email, **non_logging_options).run
+      Transfer.new(:mirror, source_email, destination_email, non_logging_options).run
     end
 
     desc "remote SUBCOMMAND [OPTIONS]", "View info about online accounts"

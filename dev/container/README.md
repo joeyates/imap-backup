@@ -34,7 +34,13 @@ rm Gemfile.lock
 bundle install
 ```
 
-# Invoking `imap-backup`
+# Run tests
+
+```sh
+rake
+```
+
+# Invoke `imap-backup`
 
 As the `BUNDLE_BINSTUBS` environment variable is set,
 you can invoke imap-backup directly
@@ -43,7 +49,7 @@ you can invoke imap-backup directly
 imap-backup help
 ```
 
-# Connecting to the Test IMAP Server
+# Connect to the Test IMAP Server
 
 An example file `dev/container/config.json` is supplied.
 

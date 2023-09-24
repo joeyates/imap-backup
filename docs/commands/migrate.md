@@ -17,7 +17,9 @@ to another account (the "destination").
 * `--destination-delimiter` - the separator between the elements of folder
   names on the destination server, defaults to `/`,
 * `--destination-prefix` - optionally, a prefix element to add before names
-  on the destination server.
+  on the destination server,
+* `--automatic-namespaces` - works out the 4 parameters above by querying
+  the source and destination IMAP servers.
 
 # FAQ
 

@@ -44,21 +44,21 @@ RSpec.describe "imap-backup stats", type: :aruba, docker: true do
       "imap-backup stats #{account[:username]} --config #{custom_config_path} --quiet"
     end
     let(:setup) do
-      other_server.create_folder "ciao"
-      other_server.send_email "ciao", **msg1
+      other_server.create_folder "other_public.ciao"
+      other_server.send_email "other_public.ciao", **msg1
       other_server.disconnect
       create_config(**config_options)
     end
 
     after do
-      other_server.delete_folder "ciao"
+      other_server.delete_folder "other_public.ciao"
       other_server.disconnect
     end
 
     it "lists statistics" do
       run_command_and_stop command
 
-      expect(last_command_started).to have_output(/ciao\s+\|\s+1\|\s+0\|\s+0/)
+      expect(last_command_started).to have_output(/other_public\.ciao\s+\|\s+1\|\s+0\|\s+0/)
     end
   end
 end

@@ -3,7 +3,7 @@ version: "3"
 
 services:
   imap:
-    image: antespi/docker-imap-devel:latest
+    image: ghcr.io/joeyates/docker-imap-devel@sha256:6d6a64c32e2c583222d75286aa46a04ada5aea76efa36117815bf0e19d5063b6
     container_name: imap
     ports:
     - "8993:993"
@@ -12,7 +12,7 @@ services:
     - MAIL_ADDRESS=address@example.com
     - MAIL_PASS=pass
   other-imap:
-    image: antespi/docker-imap-devel:latest
+    image: ghcr.io/joeyates/docker-imap-devel@sha256:6d6a64c32e2c583222d75286aa46a04ada5aea76efa36117815bf0e19d5063b6
     container_name: other-imap
     ports:
     - "9993:993"
@@ -20,3 +20,4 @@ services:
     - MAILNAME=other.org
     - MAIL_ADDRESS=email@other.org
     - MAIL_PASS=pass
+    - DOVECOT_PUBLIC_NAMESPACE_PREFIX=other_public

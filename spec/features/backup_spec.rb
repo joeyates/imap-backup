@@ -213,9 +213,12 @@ RSpec.describe "imap-backup backup", type: :aruba, docker: true do
     let(:config_options) { {accounts: [bad_config, account_config]} }
     let(:bad_config) do
       {
-        server: "localhost",
+        server: ENV.fetch("DOCKER_HOST_IMAP", "localhost"),
         username: "inexistent@example.com",
-        password: "pizza"
+        password: "pizza",
+        connection_options: {
+          ssl: {verify_mode: 0}
+        }
       }
     end
     let(:command) { "bash -c 'imap-backup backup 2>&1 1>/dev/null'" }
@@ -239,6 +242,7 @@ RSpec.describe "imap-backup backup", type: :aruba, docker: true do
       {path: custom_config_path, accounts: [other_server_connection_parameters]}
     end
     let(:account_config) { other_server_connection_parameters }
+    let(:folder) { "other_public.my-stuff" }
     let(:command) { "imap-backup backup --config #{custom_config_path}" }
 
     let(:setup) do
