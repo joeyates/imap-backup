@@ -1,5 +1,8 @@
+require "imap/backup/cli/backup"
+require "imap/backup/cli/helpers"
 require "imap/backup/cli/folder_enumerator"
 require "imap/backup/migrator"
+require "imap/backup/mirror"
 
 module Imap; end
 
@@ -8,7 +11,7 @@ module Imap::Backup
     include Thor::Actions
     include CLI::Helpers
 
-    ACTIONS = %i(migrate).freeze
+    ACTIONS = %i(migrate mirror).freeze
 
     attr_reader :action
     attr_accessor :automatic_namespaces
@@ -24,9 +27,9 @@ module Imap::Backup
 
     def initialize(action, source_email, destination_email, options)
       super([])
+      @action = action
       @source_email = source_email
       @destination_email = destination_email
-      @action = action
       @options = options
       @automatic_namespaces = nil
       @config_path = nil
@@ -39,14 +42,22 @@ module Imap::Backup
 
     no_commands do
       def run
+        raise "Unknown action '#{action}'" if !ACTIONS.include?(action)
+
         process_options!
+        prepare_mirror if action == :mirror
+
         folders.each do |serializer, folder|
-          Migrator.new(serializer, folder, reset: reset).run
+          case action
+          when :migrate
+            Migrator.new(serializer, folder, reset: reset).run
+          when :mirror
+            Mirror.new(serializer, folder).run
+          end
         end
       end
 
       def process_options!
-        raise "Unknown action '#{action}'" if !ACTIONS.include?(action)
         self.automatic_namespaces = options[:automatic_namespaces] || false
         self.config_path = options[:config]
         self.destination_delimiter = options[:destination_delimiter]
@@ -104,6 +115,21 @@ module Imap::Backup
         self.destination_prefix ||= ""
         self.source_delimiter ||= "/"
         self.source_prefix ||= ""
+      end
+
+      def prepare_mirror
+        warn_if_source_account_is_not_in_mirror_mode
+
+        CLI::Backup.new(config: config_path, accounts: source_email).run
+      end
+
+      def warn_if_source_account_is_not_in_mirror_mode
+        return if source_account.mirror_mode
+
+        message =
+          "The account '#{source_account.username}' " \
+          "is not set up to make mirror backups"
+        Logger.logger.warn message
       end
 
       def config

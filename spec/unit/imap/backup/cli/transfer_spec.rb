@@ -2,23 +2,43 @@ require "imap/backup/cli/transfer"
 
 module Imap::Backup
   RSpec.describe CLI::Transfer do
-    subject { described_class.new(:migrate, source, destination, options) }
+    subject { described_class.new(action, source, destination, options) }
 
+    let(:action) { :migrate }
     let(:source) { "source" }
     let(:destination) { "destination" }
     let(:options) { {} }
-    let(:config) { instance_double(Configuration, accounts: [account1, account2]) }
-    let(:account1) { instance_double(Account, username: "source", local_path: "account1_path") }
-    let(:account2) { instance_double(Account, username: "destination") }
+    let(:config) do
+      instance_double(Configuration, accounts: [source_account, destination_account])
+    end
+    let(:source_account) do
+      instance_double(
+        Account, "Source Account",
+        local_path: "account1_path",
+        mirror_mode: source_mirror_mode,
+        username: "source"
+      )
+    end
+    let(:source_mirror_mode) { true }
+    let(:destination_account) do
+      instance_double(
+        Account, "Destination Account",
+        username: "destination"
+      )
+    end
     let(:serializer) { instance_double(Serializer) }
     let(:folder) { instance_double(Account::Folder) }
     let(:migrator) { instance_double(Migrator, run: nil) }
+    let(:mirror) { instance_double(Mirror, run: nil) }
+    let(:backup) { instance_double(CLI::Backup, "backup_1", run: nil) }
     let(:folder_enumerator) { instance_double(CLI::FolderEnumerator) }
 
     before do
       allow(Configuration).to receive(:exist?) { true }
       allow(Configuration).to receive(:new) { config }
+      allow(CLI::Backup).to receive(:new) { backup }
       allow(Migrator).to receive(:new) { migrator }
+      allow(Mirror).to receive(:new) { mirror }
       allow(CLI::FolderEnumerator).to receive(:new) { folder_enumerator }
       allow(folder_enumerator).to receive(:each).and_yield(serializer, folder)
     end
@@ -28,10 +48,41 @@ module Imap::Backup
       action: ->(subject) { subject.run }
     )
 
-    it "migrates each folder" do
-      subject.run
+    context "when in migrate mode" do
+      it "migrates each folder" do
+        subject.run
 
-      expect(migrator).to have_received(:run)
+        expect(migrator).to have_received(:run)
+      end
+    end
+
+    context "when in mirror mode" do
+      let(:action) { :mirror }
+      let(:backup) { instance_double(CLI::Backup, "backup_1", run: nil) }
+
+      context "when the source account is not in mirror mode" do
+        let(:source_mirror_mode) { false }
+
+        before { allow(Logger.logger).to receive(:warn) }
+
+        it "warns" do
+          subject.run
+
+          expect(Logger.logger).to have_received(:warn).with(/not set up/)
+        end
+      end
+
+      it "runs backup on the source" do
+        subject.run
+
+        expect(backup).to have_received(:run)
+      end
+
+      it "mirrors each folder" do
+        subject.run
+
+        expect(mirror).to have_received(:run)
+      end
     end
 
     context "when source and destination emails are the same" do
@@ -80,13 +131,99 @@ module Imap::Backup
     end
 
     context "when the automatic_namespaces option is given" do
-      it "uses the values from the servers"
-      it "fails if delims or prefixes are given"
+      let(:options) { {automatic_namespaces: true} }
+      let(:source_client) do
+        instance_double(
+          Client::Default, "Source Client",
+          namespace: source_namespace
+        )
+      end
+      let(:source_namespace) do
+        Net::IMAP::Namespaces.new(
+          [
+            Net::IMAP::Namespace.new("source_prefix", "%")
+          ]
+        )
+      end
+      let(:destination_client) do
+        instance_double(
+          Client::Default, "Destination Client",
+          namespace: destination_namespace
+        )
+      end
+      let(:destination_namespace) do
+        Net::IMAP::Namespaces.new(
+          [
+            Net::IMAP::Namespace.new("destination_prefix", "@")
+          ]
+        )
+      end
+
+      before do
+        allow(source_account).to receive(:client) { source_client }
+        allow(destination_account).to receive(:client) { destination_client }
+      end
+
+      it "uses the values from the servers" do
+        subject.run
+
+        expect(CLI::FolderEnumerator).to have_received(:new).
+          with(
+            hash_including(
+              {
+                source_prefix: "source_prefix",
+                source_delimiter: "%",
+                destination_prefix: "destination_prefix",
+                destination_delimiter: "@"
+              }
+            )
+          )
+      end
+
+      %i(source_prefix source_delimiter destination_prefix destination_delimiter).
+        each do |parameter|
+        context "when a #{parameter} is given" do
+          let(:options) { {:automatic_namespaces => true, parameter => "x"} }
+
+          it "fails" do
+            expect do
+              subject.run
+            end.to raise_error(RuntimeError, /incompatible/)
+          end
+        end
+      end
     end
 
     context "when the automatic_namespaces option is not given" do
-      it "defaults to delims and prefixes"
-      it "uses supplied delims and prefixes"
+      [
+        [:source_prefix, ""],
+        [:source_delimiter, "/"],
+        [:destination_prefix, ""],
+        [:destination_delimiter, "/"]
+      ].each do |parameter, default|
+        context "when no #{parameter} is supplied" do
+          it "defaults to '#{default}'" do
+            subject.run
+
+            expect(CLI::FolderEnumerator).to have_received(:new).
+              with(hash_including({parameter => default}))
+          end
+        end
+      end
+
+      %i(source_prefix source_delimiter destination_prefix destination_delimiter).
+        each do |parameter|
+        context "when #{parameter} is supplied" do
+          let(:options) { {parameter => "x"} }
+
+          it "uses the supplied value" do
+            subject.run
+
+            expect(CLI::FolderEnumerator).to have_received(:new).
+              with(hash_including({parameter => "x"}))
+          end
+        end
+      end
     end
   end
 end

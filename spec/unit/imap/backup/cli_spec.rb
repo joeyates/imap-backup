@@ -1,3 +1,9 @@
+require "imap/backup/cli/backup"
+require "imap/backup/cli/restore"
+require "imap/backup/cli/setup"
+require "imap/backup/cli/stats"
+require "imap/backup/cli/transfer"
+
 module Imap::Backup
   require "support/shared_examples/an_action_that_handles_logger_options"
 
@@ -34,16 +40,16 @@ module Imap::Backup
     end
 
     describe "#migrate" do
-      let(:migrate) { instance_double(CLI::Migrate, run: nil) }
+      let(:transfer) { instance_double(CLI::Transfer, run: nil) }
 
       before do
-        allow(CLI::Migrate).to receive(:new) { migrate }
+        allow(CLI::Transfer).to receive(:new) { transfer }
       end
 
-      it "runs migrate" do
+      it "runs transfer" do
         subject.invoke(:migrate, %w[source destination])
 
-        expect(migrate).to have_received(:run)
+        expect(transfer).to have_received(:run)
       end
 
       it_behaves_like(
@@ -53,26 +59,22 @@ module Imap::Backup
         end
       ) do
         it "does not pass the option to the class" do
-          if RUBY_VERSION < "3"
-            expect(CLI::Migrate).to have_received(:new).with("source", "destination", {})
-          else
-            expect(CLI::Migrate).to have_received(:new).with("source", "destination")
-          end
+          expect(CLI::Transfer).to have_received(:new).with(:migrate, "source", "destination", {})
         end
       end
     end
 
     describe "#mirror" do
-      let(:mirror) { instance_double(CLI::Mirror, run: nil) }
+      let(:transfer) { instance_double(CLI::Transfer, run: nil) }
 
       before do
-        allow(CLI::Mirror).to receive(:new) { mirror }
+        allow(CLI::Transfer).to receive(:new) { transfer }
       end
 
-      it "runs mirror" do
+      it "runs transfer" do
         subject.invoke(:mirror, %w[source destination])
 
-        expect(mirror).to have_received(:run)
+        expect(transfer).to have_received(:run)
       end
 
       it_behaves_like(
@@ -82,11 +84,7 @@ module Imap::Backup
         end
       ) do
         it "does not pass the option to the class" do
-          if RUBY_VERSION < "3"
-            expect(CLI::Mirror).to have_received(:new).with("source", "destination", {})
-          else
-            expect(CLI::Mirror).to have_received(:new).with("source", "destination")
-          end
+          expect(CLI::Transfer).to have_received(:new).with(:mirror, "source", "destination", {})
         end
       end
     end
