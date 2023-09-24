@@ -30,6 +30,7 @@ RSpec.describe "imap-backup mirror", type: :aruba, docker: true do
     test_server.create_folder source_folder
     test_server.send_email source_folder, **msg1, flags: [:Seen]
     create_config(**config_options)
+    FileUtils.rm_rf test_server_connection_parameters[:local_path]
   end
 
   after do
