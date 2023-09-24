@@ -8,46 +8,49 @@ module Imap::Backup
     include Thor::Actions
     include CLI::Helpers
 
-    attr_reader :automatic_namespaces
+    attr_accessor :automatic_namespaces
+    attr_accessor :config_path
     attr_accessor :destination_delimiter
     attr_reader :destination_email
     attr_accessor :destination_prefix
-    attr_reader :config_path
-    attr_reader :reset
+    attr_reader :options
+    attr_accessor :reset
     attr_accessor :source_delimiter
     attr_reader :source_email
     attr_accessor :source_prefix
 
-    def initialize(
-      source_email,
-      destination_email,
-      automatic_namespaces: false,
-      config: nil,
-      destination_delimiter: nil,
-      destination_prefix: nil,
-      reset: false,
-      source_delimiter: nil,
-      source_prefix: nil
-    )
+    def initialize(source_email, destination_email, options)
       super([])
-      @automatic_namespaces = automatic_namespaces
-      @destination_delimiter = destination_delimiter
-      @destination_email = destination_email
-      @destination_prefix = destination_prefix
-      @config_path = config
-      @reset = reset
-      @source_delimiter = source_delimiter
       @source_email = source_email
-      @source_prefix = source_prefix
+      @destination_email = destination_email
+      @options = options
+      @automatic_namespaces = nil
+      @config_path = nil
+      @destination_delimiter = nil
+      @destination_prefix = nil
+      @reset = nil
+      @source_delimiter = nil
+      @source_prefix = nil
     end
 
     no_commands do
       def run
-        check_accounts!
-        choose_prefixes_and_delimiters!
+        process_options!
         folders.each do |serializer, folder|
           Migrator.new(serializer, folder, reset: reset).run
         end
+      end
+
+      def process_options!
+        automatic_namespaces = options[:automatic_namespaces] || false
+        config_path = options[:config]
+        destination_delimiter = options[:destination_delimiter]
+        destination_prefix = options[:destination_prefix]
+        source_delimiter = options[:source_delimiter]
+        source_prefix = options[:source_prefix]
+        reset = options[:reset] || false
+        check_accounts!
+        choose_prefixes_and_delimiters!
       end
 
       def check_accounts!

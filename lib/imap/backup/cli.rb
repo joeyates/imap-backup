@@ -146,7 +146,7 @@ module Imap::Backup
     )
     def migrate(source_email, destination_email)
       non_logging_options = Imap::Backup::Logger.setup_logging(options)
-      Migrate.new(source_email, destination_email, **non_logging_options).run
+      Migrate.new(source_email, destination_email, non_logging_options).run
     end
 
     desc(
