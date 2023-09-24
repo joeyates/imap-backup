@@ -4,10 +4,13 @@ require "imap/backup/migrator"
 module Imap; end
 
 module Imap::Backup
-  class CLI::Migrate < Thor
+  class CLI::Transfer < Thor
     include Thor::Actions
     include CLI::Helpers
 
+    ACTIONS = %i(migrate).freeze
+
+    attr_reader :action
     attr_accessor :automatic_namespaces
     attr_accessor :config_path
     attr_accessor :destination_delimiter
@@ -19,10 +22,11 @@ module Imap::Backup
     attr_reader :source_email
     attr_accessor :source_prefix
 
-    def initialize(source_email, destination_email, options)
+    def initialize(action, source_email, destination_email, options)
       super([])
       @source_email = source_email
       @destination_email = destination_email
+      @action = action
       @options = options
       @automatic_namespaces = nil
       @config_path = nil
@@ -42,13 +46,14 @@ module Imap::Backup
       end
 
       def process_options!
-        automatic_namespaces = options[:automatic_namespaces] || false
-        config_path = options[:config]
-        destination_delimiter = options[:destination_delimiter]
-        destination_prefix = options[:destination_prefix]
-        source_delimiter = options[:source_delimiter]
-        source_prefix = options[:source_prefix]
-        reset = options[:reset] || false
+        raise "Unknown action '#{action}'" if !ACTIONS.include?(action)
+        self.automatic_namespaces = options[:automatic_namespaces] || false
+        self.config_path = options[:config]
+        self.destination_delimiter = options[:destination_delimiter]
+        self.destination_prefix = options[:destination_prefix]
+        self.source_delimiter = options[:source_delimiter]
+        self.source_prefix = options[:source_prefix]
+        self.reset = options[:reset] || false
         check_accounts!
         choose_prefixes_and_delimiters!
       end

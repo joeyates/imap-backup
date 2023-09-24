@@ -1,6 +1,8 @@
+require "imap/backup/cli/transfer"
+
 module Imap::Backup
-  RSpec.describe CLI::Migrate do
-    subject { described_class.new(source, destination, options) }
+  RSpec.describe CLI::Transfer do
+    subject { described_class.new(:migrate, source, destination, options) }
 
     let(:source) { "source" }
     let(:destination) { "destination" }
@@ -73,7 +75,7 @@ module Imap::Backup
     ].each do |option|
       it "accepts a #{option} option" do
         opts = options.merge(option => "foo")
-        described_class.new(source, destination, **opts)
+        described_class.new(:migrate, source, destination, **opts)
       end
     end
 

@@ -10,12 +10,12 @@ module Imap::Backup
     autoload :Backup, "imap/backup/cli/backup"
     autoload :Folders, "imap/backup/cli/folders"
     autoload :Local, "imap/backup/cli/local"
-    autoload :Migrate, "imap/backup/cli/migrate"
     autoload :Mirror, "imap/backup/cli/mirror"
     autoload :Remote, "imap/backup/cli/remote"
     autoload :Restore, "imap/backup/cli/restore"
     autoload :Setup, "imap/backup/cli/setup"
     autoload :Stats, "imap/backup/cli/stats"
+    autoload :Transfer, "imap/backup/cli/transfer"
     autoload :Utils, "imap/backup/cli/utils"
 
     include Helpers
@@ -146,7 +146,7 @@ module Imap::Backup
     )
     def migrate(source_email, destination_email)
       non_logging_options = Imap::Backup::Logger.setup_logging(options)
-      Migrate.new(source_email, destination_email, non_logging_options).run
+      Transfer.new(:migrate, source_email, destination_email, non_logging_options).run
     end
 
     desc(
