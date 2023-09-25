@@ -1,7 +1,9 @@
+require "retry_on_error"
 require_relative "10_server_message_helpers"
 
 class TestEmailServer
   include ServerMessageHelpers
+  include RetryOnError
 
   REQUESTED_ATTRIBUTES = [BODY_ATTRIBUTE, "FLAGS"].freeze
 
@@ -49,24 +51,18 @@ class TestEmailServer
   end
 
   def folders
-    # Reconnect if necessary to avoid '#<IOError: closed stream>'
-    reconnect
-    imap.list(root_folder, "*")
+    retry_on_error(errors: [::IOError], limit: 2, on_error: -> { reconnect }) do
+      imap.list(root_folder, "*")
+    end
   end
 
   def create_folder(folder)
-    # Reconnect if necessary to avoid '#<IOError: closed stream>'
-    reconnect
-
     return if folder_exists?(folder)
 
     imap.create(folder)
   end
 
   def delete_folder(folder)
-    # Reconnect if necessary to avoid '#<IOError: closed stream>'
-    reconnect
-
     return if !folder_exists?(folder)
 
     # N.B. If we are deleting the currently selected folder
@@ -129,7 +125,9 @@ class TestEmailServer
   end
 
   def examine(folder)
-    imap.examine(folder)
+    retry_on_error(errors: [::IOError], limit: 2, on_error: -> { reconnect }) do
+      imap.examine(folder)
+    end
   end
 
   def folder_uid_validity(folder)
