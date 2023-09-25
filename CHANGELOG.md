@@ -5,12 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## Next
+## 12.1.0 - 2023-09-25
 
 ### Added
 
-* An option to automatically selct source and destination prefixes and delimiters
-  for the `migrate` and `mirror` commands.
+* An `--automatic-namespaces` option to automatically select
+  source and destination prefixes and delimiters for
+  the `migrate` and `mirror` commands.
 
 ## 12.0.0 - 2023-09-16
 
