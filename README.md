@@ -113,7 +113,7 @@ These are activated via two settings:
 As with all performance tweaks, there are trade-offs.
 If you are using a small virtual server or Raspberry Pi
 to run your backups, you will probably want to leave
-the deafult settings.
+the default settings.
 If, on the other hand, you are using a computer with a
 fair bit of RAM, and you are dealing with a *lot* of email,
 then changing these settings may be worthwhile.
@@ -122,16 +122,17 @@ then changing these settings may be worthwhile.
 
 This setting affects all account backups.
 
-When not set, each message is written to disk, one at a time.
-Doing so means the message itself is appended to the MBox file,
-but more importantly, the JSON metadata is rewritten to disk
-from scratch.
+By default, `imap-backup` uses the "delay metadata" strategy.
+As messages are being backed-up, the message *text*
+is written to disk, while the related metadata is stored in memory.
 
-When in use, all of a mailboxes unbackupped messages are
-downloaded first, and then written to disk just once.
+While this uses a little more memory, it avoids rewiting a growing JSON
+file for every message, speeding things up and reducing disk wear.
 
-This speeds up backup as the metadata file is not rewritten
-after each message is added, but it potentially uses much more memory.
+The alternative strategy, called "direct", writes everything to disk
+as it is received. This method is slower, but has the advantage
+of using slightly less memory, which may be important on very
+resource-limited systems, like Raspberry Pis.
 
 ## Multi-fetch Size
 
@@ -140,12 +141,11 @@ By default, during backup, each message is downloaded one-by-one.
 Using this setting, you can download chunks of emails at a time,
 potentially speeding up the process.
 
-If you're not using "Delayed downlaod writes",
-using multi-fetch *will* mean that the backup process will use
-more memory - equivalent to the size of the greater number
-of messages downloaded at a time.
+Using multi-fetch *will* mean that the backup process will use
+more memory - equivalent to the size of the groups of messages
+that are downloaded.
 
-This behaviour may also exceed limits on your email provider,
+This behaviour may also exceed the rate limits on your email provider,
 so it's best to check before cranking it up!
 
 # Troubleshooting
