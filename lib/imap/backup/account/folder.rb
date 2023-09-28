@@ -99,7 +99,6 @@ module Imap::Backup
       flags = message.flags & PERMITTED_FLAGS
       retry_on_error(errors: APPEND_RETRY_CLASSES, limit: 3) do
         response = client.append(utf7_encoded_name, body, flags, date)
-        flags = message.flags & PERMITTED_FLAGS
         extract_uid(response)
       end
     end
