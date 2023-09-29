@@ -1,3 +1,4 @@
+require "net/imap"
 require "retry_on_error"
 require_relative "10_server_message_helpers"
 
