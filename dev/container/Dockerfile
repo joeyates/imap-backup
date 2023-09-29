@@ -3,8 +3,8 @@ FROM ruby:$RUBY_VERSION-buster
 
 # Install dependencies
 RUN \
-  apt update && \
-  apt install --yes libffi-dev
+  apt-get update && \
+  apt-get install --yes libffi-dev
 
 # Show full path in prompt
 RUN echo 'PS1='\''imap-backup:$(pwd)>'\''' > /etc/bash.bashrc
