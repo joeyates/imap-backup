@@ -12,15 +12,17 @@ compatibility problems.
 Do the following from the project's root directory:
 
 ```sh
-RUBY_VERSION=[VERSION] ID=$(id -u) docker-compose --file dev/container/compose.yml build
-RUBY_VERSION=[VERSION] ID=$(id -u) docker-compose --file dev/container/compose.yml up -d
+export RUBY_VERSION=[VERSION]
+export ID=$(id -u)
+docker-compose --file dev/container/compose.yml build
+docker-compose --file dev/container/compose.yml up -d
 docker attach imap-backup
 ```
 
 ...and stop the server afterwards:
 
 ```sh
-RUBY_VERSION=[VERSION] ID=$(id -u) docker-compose --file dev/container/compose.yml down
+docker-compose --file dev/container/compose.yml down
 ```
 
 # Setup Project
