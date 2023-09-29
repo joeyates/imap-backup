@@ -4,8 +4,20 @@
     {
       "username": "address@example.com",
       "password": "pass",
-      "local_path": "tmp/imap-backup",
+      "local_path": "tmp/imap-backup/address_example.com",
       "server": "imap",
+      "connection_options": {
+        "port": 993,
+        "ssl": {
+          "verify_mode": 0
+        }
+      }
+    },
+    {
+      "username": "email@other.org",
+      "password": "pass",
+      "local_path": "tmp/imap-backup/email_other.com",
+      "server": "other-imap",
       "connection_options": {
         "port": 993,
         "ssl": {
