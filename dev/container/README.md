@@ -66,7 +66,7 @@ You can use the test helpers to interact with the test IMAP servers:
 ```sh
 $ pry
 > require "rspec"
-> require_relative "spec/features/support/email_server"
+> require_relative "spec/features/support/30_email_server_helpers"
 > include EmailServerHelpers
 > test_server.send_email("INBOX", uid: 123, from: "address@example.org", subject: "Test 1", body: "body 1\nHi")
 ```
