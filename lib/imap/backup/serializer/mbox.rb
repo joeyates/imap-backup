@@ -53,7 +53,7 @@ module Imap::Backup
     def delete
       return if !exist?
 
-      File.unlink(pathname)
+      FileUtils.rm(pathname)
     end
 
     def exist?

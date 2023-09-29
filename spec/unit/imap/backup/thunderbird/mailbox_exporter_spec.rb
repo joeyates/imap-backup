@@ -44,7 +44,8 @@ module Imap::Backup
       allow(File).to receive(:exist?).and_call_original
       allow(File).to receive(:exist?).with("local_folders_path") { profile_local_folders_exists }
       allow(File).to receive(:open).with("full_path", "w").and_yield(file)
-      allow(File).to receive(:unlink)
+      allow(FileUtils).to receive(:rm).and_call_original
+      allow(FileUtils).to receive(:rm).with("msf_path")
       allow(Thunderbird::LocalFolder).to receive(:new) { local_folder }
       allow(Kernel).to receive(:puts)
     end
@@ -79,7 +80,7 @@ module Imap::Backup
           let(:args) { {force: true} }
 
           it "deletes the file" do
-            expect(File).to have_received(:unlink).with("msf_path")
+            expect(FileUtils).to have_received(:rm).with("msf_path")
           end
         end
 

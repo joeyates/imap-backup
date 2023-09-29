@@ -15,8 +15,8 @@ module Imap::Backup
       allow(File).to receive(:read).and_call_original
       allow(File).to receive(:read).with(pathname) { existing.to_json }
       allow(File).to receive(:stat).and_call_original
-      allow(File).to receive(:unlink).and_call_original
-      allow(File).to receive(:unlink).with(pathname)
+      allow(FileUtils).to receive(:rm).and_call_original
+      allow(FileUtils).to receive(:rm).with(pathname)
     end
 
     describe "#valid?" do
@@ -48,7 +48,7 @@ module Imap::Backup
         it "deletes the file" do
           subject.delete
 
-          expect(File).to have_received(:unlink)
+          expect(FileUtils).to have_received(:rm)
         end
       end
 
@@ -58,7 +58,7 @@ module Imap::Backup
         it "does nothing" do
           subject.delete
 
-          expect(File).to_not have_received(:unlink)
+          expect(FileUtils).to_not have_received(:rm)
         end
       end
     end

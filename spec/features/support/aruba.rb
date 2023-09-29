@@ -109,15 +109,8 @@ RSpec.configure do |config|
   config.include ConfigurationHelpers, type: :aruba
   config.include LocalHelpers, type: :aruba
 
-  config.before(:suite) do
-    FileUtils.rm_rf "./tmp/home"
-  end
-
   config.before(:example, type: :aruba) do
+    FileUtils.rm_rf "./tmp/home" if File.directory?("./tmp/home")
     set_environment_variable("COVERAGE", "aruba")
-  end
-
-  config.after do
-    FileUtils.rm_rf "./tmp/home"
   end
 end

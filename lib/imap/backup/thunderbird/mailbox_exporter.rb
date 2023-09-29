@@ -68,7 +68,7 @@ module Imap::Backup
 
       if force
         info "Deleting '#{local_folder.msf_path}' as --force option was supplied"
-        File.unlink local_folder.msf_path
+        FileUtils.rm local_folder.msf_path
         return false
       end
 
