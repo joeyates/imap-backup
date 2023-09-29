@@ -179,7 +179,7 @@ module Imap::Backup
       Logger.logger.info <<~MESSAGE
         Local metadata for folder '#{folder_path}' is currently stored in the version 2 format.
 
-        This will now be transformed into the version 3 format.
+        Migrating to the version 3 format...
       MESSAGE
 
       migrator.run
