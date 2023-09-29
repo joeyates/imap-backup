@@ -1,6 +1,6 @@
 require "features/helper"
 
-RSpec.describe "imap-backup remote folders", type: :aruba, docker: true do
+RSpec.describe "imap-backup remote folders", :docker, type: :aruba do
   let(:account) { test_server_connection_parameters }
   let(:config_options) { {accounts: [account]} }
   let(:command) { "imap-backup remote folders #{account[:username]}" }

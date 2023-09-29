@@ -11,9 +11,12 @@ module Imap::Backup
     let(:directory_exists) { true }
     let(:configuration) { data.to_json }
     let(:data) { {accounts: accounts.map(&:to_h)} }
-    let(:accounts) { [account1, account2] }
-    let(:account1) { Account.new({username: "username1"}) }
-    let(:account2) { Account.new({username: "username2"}) }
+    let(:accounts) do
+      [
+        Account.new({username: "username1"}),
+        Account.new({username: "username2"})
+      ]
+    end
     let(:permission_checker) { instance_double(Serializer::PermissionChecker, run: nil) }
 
     before do

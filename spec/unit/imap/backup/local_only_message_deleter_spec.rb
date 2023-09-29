@@ -6,14 +6,14 @@ module Imap::Backup
 
     let(:serializer) { instance_double(Serializer, uids: [1, 2]) }
     let(:folder) { instance_double(Account::Folder, uids: [2]) }
-    let(:message1) { instance_double(Serializer::Message, uid: 1) }
-    let(:message2) { instance_double(Serializer::Message, uid: 2) }
+    let(:message_one) { instance_double(Serializer::Message, uid: 1) }
+    let(:message_two) { instance_double(Serializer::Message, uid: 2) }
     let(:responses) { [] }
 
     before do
       allow(serializer).to receive(:filter) do |&block|
-        responses << block.call(message1)
-        responses << block.call(message2)
+        responses << block.call(message_one)
+        responses << block.call(message_two)
       end
     end
 

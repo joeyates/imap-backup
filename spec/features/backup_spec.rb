@@ -2,13 +2,13 @@ require "features/helper"
 require "imap/backup/account"
 require "imap/backup/account/backup"
 
-RSpec.describe "imap-backup backup", type: :aruba, docker: true do
+RSpec.describe "imap-backup backup", :docker, type: :aruba do
   include_context "message-fixtures"
 
   let(:backup_folders) { [{name: folder}] }
   let(:folder) { "my-stuff" }
   let(:messages_as_mbox) do
-    to_mbox_entry(**msg1) + to_mbox_entry(**msg2)
+    to_mbox_entry(**message_one) + to_mbox_entry(**message_two)
   end
   let(:account_config) do
     test_server_connection_parameters.merge(
@@ -28,8 +28,8 @@ RSpec.describe "imap-backup backup", type: :aruba, docker: true do
   let(:command) { "imap-backup backup" }
   let!(:setup) do
     test_server.create_folder folder
-    test_server.send_email folder, **msg1
-    test_server.send_email folder, **msg2
+    test_server.send_email folder, **message_one
+    test_server.send_email folder, **message_two
     write_config
   end
 
@@ -72,7 +72,7 @@ RSpec.describe "imap-backup backup", type: :aruba, docker: true do
       run_command_and_stop command
 
       offsets = imap_metadata[:messages].map { |m| m[:offset] }
-      expected = [0, to_mbox_entry(**msg1).length]
+      expected = [0, to_mbox_entry(**message_one).length]
 
       expect(offsets).to eq(expected)
     end
@@ -81,7 +81,7 @@ RSpec.describe "imap-backup backup", type: :aruba, docker: true do
       run_command_and_stop command
 
       lengths = imap_metadata[:messages].map { |m| m[:length] }
-      expected = [to_mbox_entry(**msg1).length, to_mbox_entry(**msg2).length]
+      expected = [to_mbox_entry(**message_one).length, to_mbox_entry(**message_two).length]
 
       expect(lengths).to eq(expected)
     end
@@ -100,7 +100,7 @@ RSpec.describe "imap-backup backup", type: :aruba, docker: true do
           super()
           write_config
           test_server.create_folder folder
-          test_server.send_email folder, **msg3, flags: [:Draft]
+          test_server.send_email folder, **message_three, flags: [:Draft]
           backup.run
           test_server.set_flags folder, [1], [:Seen]
         end
@@ -123,7 +123,7 @@ RSpec.describe "imap-backup backup", type: :aruba, docker: true do
         super()
         test_server.delete_folder new_name
         test_server.create_folder folder
-        test_server.send_email folder, **msg3
+        test_server.send_email folder, **message_three
         original_folder_uid_validity
         backup.run
         test_server.rename_folder folder, new_name
@@ -137,7 +137,7 @@ RSpec.describe "imap-backup backup", type: :aruba, docker: true do
       it "renames the old backup" do
         run_command_and_stop command
 
-        expect(mbox_content(email, renamed_folder)).to eq(to_mbox_entry(**msg3))
+        expect(mbox_content(email, renamed_folder)).to eq(to_mbox_entry(**message_three))
       end
 
       it "renames the old metadata file" do
@@ -173,7 +173,7 @@ RSpec.describe "imap-backup backup", type: :aruba, docker: true do
           run_command_and_stop command
 
           renamed = "#{folder}-#{original_folder_uid_validity}-1"
-          expect(mbox_content(email, renamed)).to eq(to_mbox_entry(**msg3))
+          expect(mbox_content(email, renamed)).to eq(to_mbox_entry(**message_three))
         end
       end
     end
@@ -247,7 +247,7 @@ RSpec.describe "imap-backup backup", type: :aruba, docker: true do
 
     let(:setup) do
       other_server.create_folder folder
-      other_server.send_email folder, **msg1
+      other_server.send_email folder, **message_one
       write_config
     end
 
@@ -260,7 +260,7 @@ RSpec.describe "imap-backup backup", type: :aruba, docker: true do
       run_command_and_stop command
 
       content = mbox_content(email, folder, configuration_path: custom_config_path)
-      messages_as_mbox = to_mbox_entry(**msg1)
+      messages_as_mbox = to_mbox_entry(**message_one)
       expect(content).to eq(messages_as_mbox)
     end
   end

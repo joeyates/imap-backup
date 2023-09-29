@@ -1,11 +1,11 @@
 class CliCoverage
   def self.conditionally_activate
-    return if !ENV["COVERAGE"]
+    return if !ENV.key?("COVERAGE")
 
     require "simplecov"
 
     # Collect coverage separately
-    SimpleCov.command_name "#{ENV['COVERAGE']} #{ARGV.join(' ')} coverage"
+    SimpleCov.command_name "#{ENV.fetch('COVERAGE')} #{ARGV.join(' ')} coverage"
 
     # Silence output
     SimpleCov.formatter = SimpleCov::Formatter::SimpleFormatter

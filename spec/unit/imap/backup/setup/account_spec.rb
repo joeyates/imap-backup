@@ -291,7 +291,7 @@ module Imap::Backup
           end
 
           it "does not fail" do
-            subject.run
+            expect { subject.run }.to_not raise_error
           end
 
           it "reports the problem" do

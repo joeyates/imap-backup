@@ -1,6 +1,6 @@
 require "features/helper"
 
-RSpec.describe "imap-backup mirror", type: :aruba, docker: true do
+RSpec.describe "imap-backup mirror", :docker, type: :aruba do
   include_context "message-fixtures"
 
   let(:source_folder) { "my_folder" }
@@ -30,7 +30,7 @@ RSpec.describe "imap-backup mirror", type: :aruba, docker: true do
     test_server.delete_folder source_folder
     other_server.delete_folder destination_folder
     test_server.create_folder source_folder
-    test_server.send_email source_folder, **msg1, flags: [:Seen]
+    test_server.send_email source_folder, **message_one, flags: [:Seen]
     create_config(**config_options)
     FileUtils.rm_rf test_server_connection_parameters[:local_path]
   end
@@ -47,7 +47,7 @@ RSpec.describe "imap-backup mirror", type: :aruba, docker: true do
 
     content = mbox_content(test_server_connection_parameters[:username], source_folder)
 
-    expect(content).to eq(to_mbox_entry(**msg1))
+    expect(content).to eq(to_mbox_entry(**message_one))
   end
 
   it "creates the destination folder" do
@@ -62,7 +62,7 @@ RSpec.describe "imap-backup mirror", type: :aruba, docker: true do
     messages = other_server.folder_messages(destination_folder).map do |m|
       server_message_to_body(m)
     end
-    expect(messages).to eq([message_as_server_message(**msg1)])
+    expect(messages).to eq([message_as_server_message(**message_one)])
   end
 
   it "sets flags" do
@@ -85,7 +85,7 @@ RSpec.describe "imap-backup mirror", type: :aruba, docker: true do
   context "when there are emails on the destination server" do
     before do
       other_server.create_folder destination_folder
-      other_server.send_email destination_folder, **msg2
+      other_server.send_email destination_folder, **message_two
     end
 
     it "deletes them" do
@@ -94,7 +94,7 @@ RSpec.describe "imap-backup mirror", type: :aruba, docker: true do
       messages = other_server.folder_messages(destination_folder).map do |m|
         server_message_to_body(m)
       end
-      expect(messages).to eq([message_as_server_message(**msg1)])
+      expect(messages).to eq([message_as_server_message(**message_one)])
     end
   end
 
@@ -118,8 +118,8 @@ RSpec.describe "imap-backup mirror", type: :aruba, docker: true do
     before do
       # msg1 on both, msg2 on source
       other_server.create_folder destination_folder
-      other_server.send_email destination_folder, **msg1
-      test_server.send_email source_folder, **msg2
+      other_server.send_email destination_folder, **message_one
+      test_server.send_email source_folder, **message_two
       mirror_file
     end
 
@@ -129,13 +129,14 @@ RSpec.describe "imap-backup mirror", type: :aruba, docker: true do
       messages = other_server.folder_messages(destination_folder).map do |m|
         server_message_to_body(m)
       end
-      expect(messages).to eq([message_as_server_message(**msg1), message_as_server_message(**msg2)])
+      expect(messages).to eq([message_as_server_message(**message_one),
+                              message_as_server_message(**message_two)])
     end
 
     context "when flags have changed" do
       before do
         other_server.create_folder destination_folder
-        other_server.send_email destination_folder, **msg1, flags: [:Draft]
+        other_server.send_email destination_folder, **message_one, flags: [:Draft]
         mirror_file
       end
 
@@ -150,7 +151,7 @@ RSpec.describe "imap-backup mirror", type: :aruba, docker: true do
 
     context "when there are emails on the destination server that are not on the source server" do
       before do
-        other_server.send_email destination_folder, **msg3
+        other_server.send_email destination_folder, **message_three
       end
 
       it "deletes them" do
@@ -161,8 +162,8 @@ RSpec.describe "imap-backup mirror", type: :aruba, docker: true do
         end
         expect(messages).to eq(
           [
-            message_as_server_message(**msg1),
-            message_as_server_message(**msg2)
+            message_as_server_message(**message_one),
+            message_as_server_message(**message_two)
           ]
         )
       end
@@ -187,7 +188,7 @@ RSpec.describe "imap-backup mirror", type: :aruba, docker: true do
       messages = other_server.folder_messages(destination_folder).map do |m|
         server_message_to_body(m)
       end
-      expect(messages).to eq([message_as_server_message(**msg1)])
+      expect(messages).to eq([message_as_server_message(**message_one)])
     end
   end
 end

@@ -13,9 +13,9 @@ module Imap::Backup
     subject { WithHelpers.new(options) }
 
     let(:email) { "email@example.com" }
-    let(:account1) { instance_double(Account, username: email) }
-    let(:account2) { instance_double(Account, username: "foo") }
-    let(:accounts) { [account1, account2] }
+    let(:first_account) { instance_double(Account, username: email) }
+    let(:second_account) { instance_double(Account, username: "foo") }
+    let(:accounts) { [first_account, second_account] }
     let(:config) { instance_double(Configuration, accounts: accounts) }
     let(:options) { {} }
 
@@ -38,7 +38,9 @@ module Imap::Backup
         let(:params) { {path: "foo"} }
 
         it "loads che configuration for that path" do
-          subject.load_config(**options)
+          expect do
+            subject.load_config(**options)
+          end.to_not raise_error
         end
       end
 
@@ -72,11 +74,11 @@ module Imap::Backup
 
     describe ".account" do
       it "returns any account with a matching username" do
-        expect(subject.account(config, email)).to eq(account1)
+        expect(subject.account(config, email)).to eq(first_account)
       end
 
       context "when no match is found" do
-        let(:accounts) { [account2] }
+        let(:accounts) { [second_account] }
 
         it "fails" do
           expect do
@@ -90,7 +92,7 @@ module Imap::Backup
       let(:options) { {accounts: email} }
 
       it "returns requested accounts" do
-        expect(subject.requested_accounts(config)).to eq([account1])
+        expect(subject.requested_accounts(config)).to eq([first_account])
       end
 
       context "when no accounts are requested" do

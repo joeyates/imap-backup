@@ -126,7 +126,9 @@ module Imap::Backup
     ].each do |option|
       it "accepts a #{option} option" do
         opts = options.merge(option => "foo")
-        described_class.new(:migrate, source, destination, **opts)
+        expect do
+          described_class.new(:migrate, source, destination, **opts)
+        end.to_not raise_error
       end
     end
 

@@ -31,16 +31,6 @@ module Imap::Backup
       expect(FileUtils).to have_received(:chmod).with(0o222, "base/sub/path")
     end
 
-    context "when the path exists" do
-      let(:exists) { true }
-
-      it "does nothing" do
-        subject.run
-
-        expect(FileUtils).to_not have_received(:mkdir_p).with("base/sub/path")
-      end
-    end
-
     context "when an empty path is supplied" do
       let(:path) { "" }
 

@@ -201,7 +201,7 @@ module Imap::Backup
 
         it "exits" do
           # N.B. this will hang forever if save does not cause an exit
-          subject.run
+          expect { subject.run }.to_not raise_error
         end
 
         it "saves the configuration" do
@@ -220,7 +220,7 @@ module Imap::Backup
 
         it "exits" do
           # N.B. this will hang forever if quit does not cause an exit
-          subject.run
+          expect { subject.run }.to_not raise_error
         end
 
         it "doesn't save the configuration" do

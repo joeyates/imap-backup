@@ -8,20 +8,20 @@ RSpec.describe "imap-backup local show", type: :aruba do
   let(:config_options) { {accounts: [account]} }
   let!(:setup) do
     create_config(**config_options)
-    append_local email: account[:username], folder: "my_folder", **msg1, uid: 99
+    append_local email: account[:username], folder: "my_folder", **message_one, uid: 99
   end
 
   it "shows the email" do
     run_command_and_stop "imap-backup local show #{email} my_folder 99"
 
-    expect(last_command_started).to have_output(to_serialized(**msg1))
+    expect(last_command_started).to have_output(to_serialized(**message_one))
   end
 
   context "when JSON is requested" do
     it "shows the email" do
       run_command_and_stop "imap-backup local show #{email} my_folder 99 --format json"
 
-      expected = /"body":"#{to_serialized(**msg1)}\n"/
+      expected = /"body":"#{to_serialized(**message_one)}\n"/
       expect(last_command_started).to have_output(expected)
     end
   end
@@ -36,7 +36,7 @@ RSpec.describe "imap-backup local show", type: :aruba do
         configuration_path: custom_config_path,
         email: account[:username],
         folder: "my_folder",
-        **msg1,
+        **message_one,
         uid: 99
       )
     end
@@ -47,7 +47,7 @@ RSpec.describe "imap-backup local show", type: :aruba do
         "imap-backup local show #{email} my_folder 99 --config #{custom_config_path}"
       )
 
-      expect(last_command_started).to have_output(to_serialized(**msg1))
+      expect(last_command_started).to have_output(to_serialized(**message_one))
     end
   end
 end

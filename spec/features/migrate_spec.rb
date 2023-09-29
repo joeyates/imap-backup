@@ -1,6 +1,6 @@
 require "features/helper"
 
-RSpec.describe "imap-backup migrate", type: :aruba, docker: true do
+RSpec.describe "imap-backup migrate", :docker, type: :aruba do
   let(:email) { "me@example.com" }
   let(:folder) { "my_folder" }
   let(:source_folder) { folder }

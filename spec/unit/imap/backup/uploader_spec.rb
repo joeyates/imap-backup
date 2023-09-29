@@ -59,7 +59,7 @@ module Imap::Backup
     it "handles append failures" do
       allow(folder).to receive(:append).and_raise(RuntimeError)
 
-      subject.run
+      expect { subject.run }.to_not raise_error
     end
 
     context "with messages that are present on server" do

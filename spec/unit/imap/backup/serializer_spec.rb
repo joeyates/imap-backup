@@ -153,7 +153,7 @@ module Imap::Backup
       end
 
       it "returns nil" do
-        expect(subject.check_integrity!).to be nil
+        expect(subject.check_integrity!).to be_nil
       end
     end
 

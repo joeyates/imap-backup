@@ -1,6 +1,6 @@
 require "features/helper"
 
-RSpec.describe "imap-backup utils ignore-history", type: :aruba, docker: true do
+RSpec.describe "imap-backup utils ignore-history", :docker, type: :aruba do
   include_context "message-fixtures"
 
   let(:account_config) do
@@ -22,7 +22,7 @@ RSpec.describe "imap-backup utils ignore-history", type: :aruba, docker: true do
   let!(:setup) do
     test_server.delete_folder folder
     test_server.create_folder folder
-    test_server.send_email folder, **msg1
+    test_server.send_email folder, **message_one
     create_config(**config_options)
   end
 

@@ -116,8 +116,10 @@ RSpec.describe Email::Mboxrd::Message do
       end
       let(:message_body) { msg_bad_encoding }
 
-      it "argh" do
-        subject.to_serialized
+      it "does not fail" do
+        expect do
+          subject.to_serialized
+        end.to_not raise_error
       end
     end
   end

@@ -45,7 +45,7 @@ module Imap::Backup
       let(:folder_uids) { [99] }
 
       it "works normally" do
-        subject.run
+        expect { subject.run }.to_not raise_error
       end
 
       context "when `reset` is true" do
@@ -65,7 +65,7 @@ module Imap::Backup
       end
 
       it "continues to work" do
-        subject.run
+        expect { subject.run }.to_not raise_error
       end
     end
   end

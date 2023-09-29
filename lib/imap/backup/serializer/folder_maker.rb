@@ -20,7 +20,7 @@ module Imap::Backup
       parts = path.split("/")
       return if parts.empty?
 
-      FileUtils.mkdir_p(full_path) if !File.exist?(full_path)
+      FileUtils.mkdir_p(full_path)
       full = base
       parts.each do |part|
         full = File.join(full, part)

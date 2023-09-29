@@ -53,7 +53,7 @@ module Imap::Backup
       end
 
       it "does not fail" do
-        command
+        expect { command }.to_not raise_error
       end
 
       it "leaves the metadata file unchanged" do
@@ -69,7 +69,7 @@ module Imap::Backup
       end
 
       it "does not fail" do
-        command
+        expect { command }.to_not raise_error
       end
 
       it "resets the mailbox to the previous position" do

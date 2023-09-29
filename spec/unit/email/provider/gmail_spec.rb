@@ -1,4 +1,3 @@
-# rubocop:disable RSpec/FilePath, Lint/RedundantCopDisableDirective
 RSpec.describe Email::Provider::GMail do
   describe "#host" do
     it "returns host" do
@@ -6,4 +5,3 @@ RSpec.describe Email::Provider::GMail do
     end
   end
 end
-# rubocop:enable RSpec/FilePath, Lint/RedundantCopDisableDirective

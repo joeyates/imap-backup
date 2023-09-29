@@ -125,7 +125,9 @@ module Imap::Backup
         end
 
         it "succeeds" do
-          subject.fetch_multi([123])
+          expect do
+            subject.fetch_multi([123])
+          end.to_not raise_error
         end
       end
 
@@ -142,7 +144,9 @@ module Imap::Backup
         end
 
         it "succeeds" do
-          subject.fetch_multi([123])
+          expect do
+            subject.fetch_multi([123])
+          end.to_not raise_error
         end
       end
     end
@@ -402,7 +406,7 @@ module Imap::Backup
         end
 
         it "returns an empty array" do
-          expect(result).to be nil
+          expect(result).to be_nil
         end
       end
     end

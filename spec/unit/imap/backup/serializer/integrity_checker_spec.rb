@@ -22,7 +22,7 @@ module Imap::Backup
     let(:body1) { "From #{'a' * 95}" }
 
     it "returns nil" do
-      expect(subject.run).to be nil
+      expect(subject.run).to be_nil
     end
 
     context "when the folder is empty" do
@@ -30,7 +30,7 @@ module Imap::Backup
       let(:body1) { "" }
 
       it "returns nil" do
-        expect(subject.run).to be nil
+        expect(subject.run).to be_nil
       end
 
       context "when the mbox is not empty" do

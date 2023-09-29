@@ -68,14 +68,14 @@ module Imap::Backup
     end
 
     describe "#password" do
-      let(:password1) { "password" }
-      let(:password2) { "password" }
+      let(:first_password) { "password" }
+      let(:second_password) { "password" }
       let(:answers) { [true, false] }
 
       before do
         i = 0
-        allow(highline).to receive(:ask).with("password: ") { password1 }
-        allow(highline).to receive(:ask).with("repeat password: ") { password2 }
+        allow(highline).to receive(:ask).with("password: ") { first_password }
+        allow(highline).to receive(:ask).with("repeat password: ") { second_password }
         allow(highline).to receive(:agree) do
           answer = answers[i]
           i += 1
@@ -96,11 +96,11 @@ module Imap::Backup
       end
 
       it "returns the password" do
-        expect(subject.password).to eq(password1)
+        expect(subject.password).to eq(first_password)
       end
 
       context "with different answers" do
-        let(:password2) { "secret" }
+        let(:second_password) { "secret" }
 
         it "asks to continue" do
           expect(highline).to receive(:agree).

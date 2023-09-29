@@ -30,13 +30,6 @@ Gem::Specification.new do |gem|
   gem.add_runtime_dependency "thor", "~> 1.1"
   gem.add_runtime_dependency "thunderbird", ">= 0.0.0"
 
-  gem.add_development_dependency "aruba", ">= 0.0.0"
-  gem.add_development_dependency "pry-byebug"
-  gem.add_development_dependency "rspec", ">= 3.0.0"
-  gem.add_development_dependency "rubocop-rspec"
-  gem.add_development_dependency "simplecov"
-  gem.add_development_dependency "yard"
-
   gem.metadata = {
     "rubygems_mfa_required" => "true"
   }

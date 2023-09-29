@@ -1,6 +1,6 @@
 require "features/helper"
 
-RSpec.describe "imap-backup restore", type: :aruba, docker: true do
+RSpec.describe "imap-backup restore", :docker, type: :aruba do
   include_context "message-fixtures"
 
   let(:account_config) do
@@ -8,10 +8,10 @@ RSpec.describe "imap-backup restore", type: :aruba, docker: true do
   end
   let(:folder) { "my-stuff" }
   let(:messages_as_mbox) do
-    to_mbox_entry(**msg1) + to_mbox_entry(**msg2)
+    to_mbox_entry(**message_one) + to_mbox_entry(**message_two)
   end
   let(:messages_as_server_messages) do
-    [message_as_server_message(**msg1), message_as_server_message(**msg2)]
+    [message_as_server_message(**message_one), message_as_server_message(**message_two)]
   end
   let(:uid_validity) { 1234 }
   let(:email) { test_server_connection_parameters[:username] }
@@ -21,9 +21,9 @@ RSpec.describe "imap-backup restore", type: :aruba, docker: true do
   let!(:setup) do
     create_config(**config_options)
     create_local_folder email: email, folder: folder, uid_validity: uid_validity
-    append_local email: email, folder: folder, flags: [:Flagged], **msg1
+    append_local email: email, folder: folder, flags: [:Flagged], **message_one
     append_local(
-      email: email, folder: folder, flags: [:Draft, :$NON_SYSTEM_FLAG], **msg2
+      email: email, folder: folder, flags: [:Draft, :$NON_SYSTEM_FLAG], **message_two
     )
 
     run_command_and_stop("imap-backup restore #{email}")
@@ -62,7 +62,7 @@ RSpec.describe "imap-backup restore", type: :aruba, docker: true do
   end
 
   context "when the folder exists" do
-    let(:email3) { test_server.send_email folder, **msg3 }
+    let(:email3) { test_server.send_email folder, **message_three }
 
     context "when the uid_validity matches" do
       let(:pre) do
@@ -72,9 +72,9 @@ RSpec.describe "imap-backup restore", type: :aruba, docker: true do
       end
       let(:messages_as_server_messages) do
         [
-          message_as_server_message(**msg3),
-          message_as_server_message(**msg1),
-          message_as_server_message(**msg2)
+          message_as_server_message(**message_three),
+          message_as_server_message(**message_one),
+          message_as_server_message(**message_two)
         ]
       end
       let(:uid_validity) { test_server.folder_uid_validity(folder) }
@@ -124,7 +124,7 @@ RSpec.describe "imap-backup restore", type: :aruba, docker: true do
           messages = test_server.folder_messages(folder).map do |m|
             server_message_to_body(m)
           end
-          expect(messages).to eq([message_as_server_message(**msg3)])
+          expect(messages).to eq([message_as_server_message(**message_three)])
         end
 
         it "creates the new folder" do
@@ -188,7 +188,7 @@ RSpec.describe "imap-backup restore", type: :aruba, docker: true do
         email: email,
         folder: folder,
         flags: [:Flagged],
-        **msg1
+        **message_one
       )
     end
 

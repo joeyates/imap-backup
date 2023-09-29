@@ -21,7 +21,7 @@ module Imap::Backup
 
         if success
           it "succeeds" do
-            subject.run
+            expect { subject.run }.to_not raise_error
           end
         else
           it "fails" do
@@ -36,7 +36,7 @@ module Imap::Backup
 
     context "with non-existent files" do
       it "succeeds" do
-        subject.run
+        expect { subject.run }.to_not raise_error
       end
     end
   end

@@ -1,6 +1,6 @@
 require "features/helper"
 
-RSpec.describe "imap-backup stats", type: :aruba, docker: true do
+RSpec.describe "imap-backup stats", :docker, type: :aruba do
   include_context "message-fixtures"
 
   let(:account) { test_server_connection_parameters }
@@ -9,7 +9,7 @@ RSpec.describe "imap-backup stats", type: :aruba, docker: true do
   let(:config_options) { {accounts: [account]} }
   let!(:setup) do
     test_server.create_folder folder
-    test_server.send_email folder, **msg1
+    test_server.send_email folder, **message_one
     test_server.disconnect
     create_config(**config_options)
   end
@@ -45,7 +45,7 @@ RSpec.describe "imap-backup stats", type: :aruba, docker: true do
     end
     let(:setup) do
       other_server.create_folder "other_public.ciao"
-      other_server.send_email "other_public.ciao", **msg1
+      other_server.send_email "other_public.ciao", **message_one
       other_server.disconnect
       create_config(**config_options)
     end
