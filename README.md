@@ -7,6 +7,15 @@
 
 Backup, restore and migrate email accounts.
 
+# Quick Start
+
+```sh
+brew install imap-backup # for macOS
+gem install imap-backup # for Linux
+imap-backup setup
+imap-backup
+```
+
 # Modes
 
 There are two types of backups:
