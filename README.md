@@ -66,7 +66,9 @@ imap-backup setup
 
 ## GMail
 
-To use imap-backup with GMail, you will need to enable 'App passwords' on your account.
+To use imap-backup with GMail, Office 365 and other services that require
+OAuth2 authentication, you can use [email-oauth2-proxy](https://github.com/simonrob/email-oauth2-proxy)
+to handle authentication, and then connect to the proxy on a local port.
 
 # Backup
 
