@@ -1,3 +1,5 @@
+require "json"
+
 require "imap/backup/account/client_factory"
 require "imap/backup/account/restore"
 

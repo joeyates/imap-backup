@@ -1,3 +1,5 @@
+require "json"
+
 module Imap; end
 
 module Imap::Backup
