@@ -1,3 +1,5 @@
+require "imap/backup/setup/asker"
+
 module Imap::Backup
   RSpec.describe Setup::Asker do
     subject { described_class.new(highline) }

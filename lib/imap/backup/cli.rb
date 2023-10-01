@@ -1,4 +1,5 @@
 require "thor"
+
 require "imap/backup/logger"
 
 module Imap; end
@@ -234,7 +235,7 @@ module Imap::Backup
     verbose_option
     def setup
       non_logging_options = Imap::Backup::Logger.setup_logging(options)
-      Setup.new(non_logging_options).run
+      CLI::Setup.new(non_logging_options).run
     end
 
     desc "stats EMAIL [OPTIONS]", "Print stats for each account folder"

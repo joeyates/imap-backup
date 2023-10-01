@@ -1,3 +1,5 @@
+require "imap/backup/setup/connection_tester"
+
 module Imap::Backup
   RSpec.describe Setup::ConnectionTester do
     describe "#test" do

@@ -1,3 +1,5 @@
+require "imap/backup/cli/backup"
+
 module Imap::Backup
   RSpec.describe CLI::Backup do
     subject { described_class.new({}) }
@@ -8,9 +10,7 @@ module Imap::Backup
     before do
       allow(Configuration).to receive(:exist?) { true }
       allow(Account::Backup).to receive(:new) { backup }
-      # rubocop:disable RSpec/SubjectStub
       allow(subject).to receive(:requested_accounts) { [account] }
-      # rubocop:enable RSpec/SubjectStub
     end
 
     it_behaves_like(
@@ -31,9 +31,7 @@ module Imap::Backup
         outcomes = [-> { raise "Foo" }, -> { true }]
         allow(backup).to receive(:run) { outcomes.shift.call }
 
-        # rubocop:disable RSpec/SubjectStub
         allow(subject).to receive(:requested_accounts) { [account, account2] }
-        # rubocop:enable RSpec/SubjectStub
       end
 
       it "runs other backups" do

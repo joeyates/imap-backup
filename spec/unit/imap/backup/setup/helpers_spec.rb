@@ -1,3 +1,5 @@
+require "imap/backup/setup/helpers"
+
 module Imap::Backup
   RSpec.describe Setup::Helpers do
     describe "#title_prefix" do

@@ -1,3 +1,8 @@
+require "imap/backup/setup/account"
+require "imap/backup/setup/asker"
+require "imap/backup/setup/connection_tester"
+require "imap/backup/setup/folder_chooser"
+
 module Imap::Backup
   RSpec.describe Setup::Account do
     subject { described_class.new(config, account, highline) }

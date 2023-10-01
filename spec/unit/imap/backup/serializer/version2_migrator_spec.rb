@@ -1,3 +1,6 @@
+require "imap/backup/serializer/version2_migrator"
+require "imap/backup/serializer/imap"
+
 module Imap::Backup
   RSpec.describe Serializer::Version2Migrator do
     subject { described_class.new("migrator_path") }

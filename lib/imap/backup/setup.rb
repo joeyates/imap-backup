@@ -2,6 +2,9 @@ require "highline"
 
 require "email/provider"
 require "imap/backup/account"
+require "imap/backup/setup/account"
+require "imap/backup/setup/asker"
+require "imap/backup/setup/connection_tester"
 require "imap/backup/setup/global_options"
 require "imap/backup/setup/helpers"
 

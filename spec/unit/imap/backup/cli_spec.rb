@@ -1,8 +1,4 @@
-require "imap/backup/cli/backup"
-require "imap/backup/cli/restore"
-require "imap/backup/cli/setup"
-require "imap/backup/cli/stats"
-require "imap/backup/cli/transfer"
+require "imap/backup/cli"
 
 module Imap::Backup
   require "support/shared_examples/an_action_that_handles_logger_options"

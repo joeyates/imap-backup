@@ -1,3 +1,7 @@
+require "imap/backup/uploader"
+require "imap/backup/account/folder"
+require "imap/backup/serializer"
+
 module Imap::Backup
   RSpec.describe Uploader do
     subject { described_class.new(folder, serializer) }

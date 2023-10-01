@@ -1,3 +1,11 @@
+require "imap/backup/cli/local"
+
+require "mail"
+
+require "imap/backup/account/folder"
+require "imap/backup/serializer"
+require "imap/backup/serializer/message"
+
 module Imap::Backup
   RSpec.describe CLI::Local do
     let(:account) do
@@ -20,7 +28,7 @@ module Imap::Backup
     let(:each_message) { [message] }
     let(:message) do
       instance_double(
-        Imap::Backup::Serializer::Message,
+        Serializer::Message,
         uid: 123,
         date: Date.today,
         subject: message_subject,

@@ -1,6 +1,10 @@
+require "thor"
+
 module Imap; end
 
 module Imap::Backup
+  class CLI < Thor; end
+
   class CLI::FolderEnumerator
     attr_reader :destination
     attr_reader :destination_delimiter

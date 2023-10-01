@@ -1,3 +1,5 @@
+require "imap/backup/setup/backup_path"
+
 module Imap::Backup
   RSpec.describe Setup::BackupPath do
     include HighLineTestHelpers

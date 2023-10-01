@@ -1,3 +1,5 @@
+require "imap/backup/setup/global_options/download_strategy_chooser"
+
 module Imap::Backup
   RSpec.describe Setup::GlobalOptions::DownloadStrategyChooser do
     include HighLineTestHelpers

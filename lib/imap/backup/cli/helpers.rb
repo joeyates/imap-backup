@@ -1,8 +1,10 @@
-require "imap/backup"
+require "thor"
 
 module Imap; end
 
 module Imap::Backup
+  class CLI < Thor; end
+
   module CLI::Helpers
     def self.included(base)
       base.class_eval do

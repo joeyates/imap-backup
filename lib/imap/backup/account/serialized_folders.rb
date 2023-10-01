@@ -1,4 +1,6 @@
+require "imap/backup/account/folder"
 require "imap/backup/account/folder_ensurer"
+require "imap/backup/serializer"
 
 module Imap; end
 
