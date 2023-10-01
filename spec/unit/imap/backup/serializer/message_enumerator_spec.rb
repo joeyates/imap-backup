@@ -1,3 +1,6 @@
+require "imap/backup/serializer/message_enumerator"
+require "imap/backup/serializer/imap"
+
 module Imap::Backup
   RSpec.describe Serializer::MessageEnumerator do
     subject { described_class.new(imap: imap) }

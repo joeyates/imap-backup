@@ -1,7 +1,12 @@
-SimpleCov.coverage_dir(File.join(__dir__, "coverage"))
-
 SimpleCov.start do
+  command_name ENV.fetch("SIMPLECOV_COMMAND_NAME")
+
+  # Ensure SimpleCov doesn't filter out all out code
+  root __dir__
+
   add_filter "/spec/"
+
+  coverage_dir(File.join(__dir__, "coverage"))
 
   enable_coverage :branch
 end

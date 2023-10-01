@@ -1,3 +1,7 @@
+require "imap/backup/serializer/appender"
+require "imap/backup/serializer/imap"
+require "imap/backup/serializer/mbox"
+
 module Imap::Backup
   RSpec.describe Serializer::Appender do
     subject { described_class.new(folder: "appender_path", imap: imap, mbox: mbox) }

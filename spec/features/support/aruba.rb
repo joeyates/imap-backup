@@ -1,5 +1,6 @@
 require "aruba/rspec"
 
+require "imap/backup/serializer"
 require "imap/backup/serializer/mbox"
 
 Aruba.configure do |config|

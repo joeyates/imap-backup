@@ -1,3 +1,5 @@
+require "imap/backup/configuration_not_found"
+
 module Imap::Backup
   RSpec.shared_examples "an action that doesn't require an existing configuration" do |action:|
     before do

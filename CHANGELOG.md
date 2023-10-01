@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## next - date
+
+### Changed
+
+* Fixed a bug where the setup connection tester was not actually
+  attempting a connection.
+
 ## 13.0.0 - 2023-09-30
 
 ### Removed

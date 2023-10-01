@@ -1,6 +1,13 @@
+require "thor"
+
+require "imap/backup/cli/helpers"
+require "imap/backup/setup"
+
 module Imap; end
 
 module Imap::Backup
+  class CLI < Thor; end
+
   class CLI::Setup < Thor
     include Thor::Actions
     include CLI::Helpers

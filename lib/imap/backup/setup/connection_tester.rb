@@ -11,7 +11,7 @@ module Imap::Backup
     end
 
     def test
-      account.client
+      account.client.login
       "Connection successful"
     rescue Net::IMAP::NoResponseError
       "No response"

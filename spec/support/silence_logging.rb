@@ -1,3 +1,5 @@
+require "imap/backup/logger"
+
 def silence_logging
   RSpec.configure do |config|
     config.before do

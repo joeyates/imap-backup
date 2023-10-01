@@ -1,5 +1,7 @@
-# rubocop:disable RSpec/PredicateMatcher
+require "imap/backup/account/folder"
+require "imap/backup/serializer/message"
 
+# rubocop:disable RSpec/PredicateMatcher
 module Imap::Backup
   RSpec.describe Account::Folder do
     subject { described_class.new(client, folder_name) }
@@ -412,5 +414,4 @@ module Imap::Backup
     end
   end
 end
-
 # rubocop:enable RSpec/PredicateMatcher

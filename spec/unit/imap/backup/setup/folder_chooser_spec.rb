@@ -1,3 +1,5 @@
+require "imap/backup/setup/folder_chooser"
+
 module Imap::Backup
   RSpec.describe Setup::FolderChooser do
     include HighLineTestHelpers

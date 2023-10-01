@@ -1,10 +1,15 @@
+require "thor"
+
 require "imap/backup/account/backup_folders"
 require "imap/backup/account/serialized_folders"
+require "imap/backup/cli/helpers"
 require "imap/backup/thunderbird/mailbox_exporter"
 
 module Imap; end
 
 module Imap::Backup
+  class CLI < Thor; end
+
   class CLI::Utils < Thor
     include Thor::Actions
     include CLI::Helpers

@@ -1,9 +1,14 @@
+require "thor"
+
 require "imap/backup/account/serialized_folders"
+require "imap/backup/cli/helpers"
 require "imap/backup/cli/local/check"
 
 module Imap; end
 
 module Imap::Backup
+  class CLI < Thor; end
+
   class CLI::Local < Thor
     include Thor::Actions
     include CLI::Helpers

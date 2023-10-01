@@ -1,3 +1,7 @@
+require "imap/backup/thunderbird/mailbox_exporter"
+require "imap/backup/serializer"
+require "imap/backup/serializer/message"
+
 module Imap::Backup
   RSpec.describe Thunderbird::MailboxExporter do
     subject { described_class.new("email", serializer, profile, **args) }

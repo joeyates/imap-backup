@@ -1,3 +1,5 @@
+require "imap/backup/setup/account/header"
+
 module Imap::Backup
   RSpec.describe Setup::Account::Header do
     subject { described_class.new(menu: menu, account: account) }
