@@ -4,9 +4,15 @@ module Imap::Backup
       subject { described_class.new(account) }
 
       let(:account) { instance_double(Account, client: client) }
-      let(:client) { instance_double(Client::Default) }
+      let(:client) { instance_double(Client::Default, login: nil) }
 
       describe "success" do
+        it "attempts to login" do
+          subject.test
+
+          expect(client).to have_received(:login)
+        end
+
         it "returns success" do
           expect(subject.test).to match(/successful/)
         end
@@ -14,7 +20,7 @@ module Imap::Backup
 
       describe "failure" do
         before do
-          allow(account).to receive(:client).and_raise(error)
+          allow(client).to receive(:login).and_raise(error)
         end
 
         context "with no connection" do
