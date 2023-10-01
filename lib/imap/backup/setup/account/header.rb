@@ -1,3 +1,5 @@
+require "json"
+
 require "imap/backup/setup/helpers"
 
 module Imap; end
