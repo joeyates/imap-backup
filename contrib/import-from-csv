@@ -1,0 +1,181 @@
+#!/usr/bin/env ruby
+
+# This script is an example of how to bulk import accounts
+# into imap-backup.
+# Please adapt it to your specific needs.
+# Change COLUMNS, below, to indicate how to map your CSV
+# to the values in an Account.
+
+require "bundler/inline"
+
+gemfile do
+  source "https://rubygems.org"
+
+  gem "imap-backup", ">= 12.0.0"
+  gem "optparse"
+end
+
+# The keys in COLUMNS are Account attributes, the values indicate
+# what value to set that attribute to.
+
+# Modify COLUMNS by changing the **values** (not the keys):
+# * A *symbol* value means "my CSV has a column with this header",
+# * A *string* means "use this value for all accounts",
+# * `nil` means "do not set anything".
+
+# There *must* be values for at least username, password and server.
+# Notes about specific attributes:
+# * connection_options: if supplied this column must contain valid JSON,
+# * folders: if supplied this column must contain a JSON array of names
+#   of folder names.
+COLUMNS = {
+  username: :email,
+  password: :password,
+  server: "localhost",
+  connection_options: :connection_options,
+  folders: :folders,
+  local_path: nil,
+  mirror_mode: nil,
+  multi_fetch_size: nil
+}.freeze
+
+class Options
+  attr_reader :config_path
+  attr_reader :csv_path
+  attr_reader :verbose
+  attr_reader :quiet
+
+  def parse!
+    options = {}
+    OptionParser.new do |opts|
+      opts.banner = <<~BANNER
+        Usage: #{$PROGRAM_NAME} [options]"
+
+        Merge email accounts from a CSV file into an imap-backup configuration file.
+
+      BANNER
+
+      opts.on("--config=CONFIG", "The path to an existing (or new) imap-backup config file") do |v|
+        options[:config] = v
+      end
+      opts.on("--csv=CSV", "The path to a CSV file with IMAP accounts to import") do |v|
+        options[:csv] = v
+      end
+      opts.on("-q", "--quiet", "Do not print any output") do
+        options[:quiet] = true
+      end
+      opts.on("-v", "--[no-]verbose", "Run verbosely") do |v|
+        options[:verbose] = v
+      end
+    end.parse!
+
+    raise "Please supply a --config PATH option" if !options.key?(:config)
+    raise "Please supply a --csv PATH option" if !options.key?(:csv)
+
+    @config_path = options[:config]
+    @csv_path = options[:csv]
+    @verbose = options[:verbose]
+    @quiet = options[:quiet]
+    raise "The CSV file '#{csv_path}' does not exist" if !File.exist?(csv_path)
+  end
+
+  def for_logging
+    {verbose: verbose, quiet: quiet}
+  end
+end
+
+class Accounts
+  require "csv"
+
+  attr_reader :columns
+  attr_reader :path
+  attr_reader :table
+
+  REQUIRED_COLUMNS = %i(username password server).freeze
+
+  def initialize(path:, columns:)
+    @columns = columns
+    @path = path
+    @table = nil
+  end
+
+  def load!
+    @table = CSV.read(path, headers: :first_row)
+    check_columns!
+  end
+
+  def each(&block)
+    return enum_for(:each) if !block
+
+    table.each do |row|
+      account = to_account(row)
+      block.call(account)
+    end
+  end
+
+  private
+
+  def check_columns!
+    missing = REQUIRED_COLUMNS - columns.keys
+    raise "Missing column(s) #{missing.inspect} in configured COLUMNS" if missing.any?
+  end
+
+  def to_account(row)
+    account = Imap::Backup::Account.new({})
+    columns.each.with_object(account) do |(k, v), acc|
+      value = get_value(row, k, v)
+      acc.send(:"#{k}=", value) if value
+    end
+  end
+
+  def get_value(row, attribute, setting)
+    return nil if setting.nil?
+
+    value =
+      case setting
+      when Symbol
+        row[setting.to_s]
+      when String
+        setting
+      end
+
+    if attribute == :folders
+      JSON.parse(value).map { |f| {name: f} }
+    else
+      value
+    end
+  end
+end
+
+options = Options.new
+options.parse!
+
+Imap::Backup::Logger.setup_logging(options.for_logging)
+
+Imap::Backup::Logger.logger.info("Importing CSV '#{options.csv_path}'")
+
+accounts = Accounts.new(path: options.csv_path, columns: COLUMNS)
+accounts.load!
+
+Imap::Backup::Logger.logger.info("Loading imap-backup configuration '#{options.config_path}'")
+
+config = Imap::Backup::Configuration.new(path: options.config_path)
+
+accounts.each do |account|
+  username = account.username
+  Imap::Backup::Logger.logger.info("Importing account '#{username}'")
+  Imap::Backup::Logger.logger.debug("Checking credentials for '#{username}'")
+  account.client.login
+  Imap::Backup::Logger.logger.debug("Looking up '#{username}' in the existing accounts")
+  index = config.accounts.find_index { |a| a.username == username }
+  if index
+    Imap::Backup::Logger.logger.debug("Account '#{username}' is already present, replacing")
+    config.accounts[index] = account
+  else
+    Imap::Backup::Logger.logger.debug("Account '#{username}' is not present, adding")
+    config.accounts << account
+  end
+end
+
+Imap::Backup::Logger.logger.info("Saving configuration file '#{options.config_path}'")
+config.save

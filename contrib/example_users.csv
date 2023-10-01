@@ -1,0 +1,2 @@
+email,password,connection_options,folders
+address@example.com,pass,"{""port"":8993,""ssl"":{""verify_mode"":0}}","[""INBOX""]"
