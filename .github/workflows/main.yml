@@ -21,7 +21,7 @@ jobs:
           - '3.2'
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
@@ -35,7 +35,7 @@ jobs:
         echo "COVERAGE=$(cat coverage/coverage_percent.txt)%" >> $GITHUB_ENV
     - name: Create Coverage Badge
       if: ${{ github.ref == 'refs/heads/main' && matrix.ruby == '3.0' }}
-      uses: schneegans/dynamic-badges-action@v1.0.0
+      uses: schneegans/dynamic-badges-action@v1.6.0
       with:
         auth: ${{ secrets.BADGES_GIST_ACCESS }}
         gistID: b54fe758bfb405c04bef72dad293d707
