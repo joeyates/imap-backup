@@ -34,7 +34,7 @@ jobs:
       run: |
         echo "COVERAGE=$(cat coverage/coverage_percent.txt)%" >> $GITHUB_ENV
     - name: Create Coverage Badge
-      if: ${{ github.ref == 'refs/heads/main' && matrix.ruby == '3.0' }}
+      if: ${{ github.ref == 'refs/heads/main' && matrix.ruby == '3.2' }}
       uses: schneegans/dynamic-badges-action@v1.6.0
       with:
         auth: ${{ secrets.BADGES_GIST_ACCESS }}
