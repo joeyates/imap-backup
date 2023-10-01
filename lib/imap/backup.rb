@@ -10,9 +10,3 @@ require "imap/backup/setup/asker"
 require "imap/backup/setup/connection_tester"
 require "imap/backup/setup/folder_chooser"
 require "imap/backup/version"
-
-module Imap; end
-
-module Imap::Backup
-  class ConfigurationNotFound < StandardError; end
-end
