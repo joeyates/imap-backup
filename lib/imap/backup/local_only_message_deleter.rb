@@ -1,3 +1,5 @@
+require "imap/backup/logger"
+
 module Imap; end
 
 module Imap::Backup
@@ -16,6 +18,8 @@ module Imap::Backup
     def run
       local_only_uids = serializer.uids - folder.uids
       return if local_only_uids.empty?
+
+      Logger.logger.info "Deleting messages only present locally"
 
       serializer.filter do |message|
         !local_only_uids.include?(message.uid)
