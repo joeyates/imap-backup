@@ -10,7 +10,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 
 * Fixed a bug where the setup connection tester was not actually
-  attempting a connection.
+  attempting a connection;
+* Fixed a bug where unseen messages were being marked as seen on iCloud.
 
 ## 13.0.0 - 2023-09-30
 
