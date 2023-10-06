@@ -26,6 +26,8 @@ module Imap::Backup
           block.call
 
           commit
+
+          serializer.reload
         end
       end
     end

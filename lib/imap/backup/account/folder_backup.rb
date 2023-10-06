@@ -52,10 +52,7 @@ module Imap::Backup
     end
 
     def clean_up
-      if account.mirror_mode
-        Logger.logger.info "Mirror mode - Deleting messages only present locally"
-        LocalOnlyMessageDeleter.new(folder, serializer).run
-      end
+      LocalOnlyMessageDeleter.new(folder, serializer).run if account.mirror_mode
       FlagRefresher.new(folder, serializer).run if account.mirror_mode || refresh
     end
 
