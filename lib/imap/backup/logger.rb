@@ -1,7 +1,6 @@
 require "logger"
 require "singleton"
 
-require "imap/backup/configuration"
 require "text/sanitizer"
 
 module Imap; end

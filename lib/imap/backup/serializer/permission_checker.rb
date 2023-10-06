@@ -1,3 +1,5 @@
+require "imap/backup/file_mode"
+
 module Imap; end
 
 module Imap::Backup

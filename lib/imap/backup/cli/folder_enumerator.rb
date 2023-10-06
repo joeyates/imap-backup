@@ -1,4 +1,8 @@
 require "thor"
+require "pathname"
+
+require "imap/backup/account/folder"
+require "imap/backup/serializer"
 
 module Imap; end
 

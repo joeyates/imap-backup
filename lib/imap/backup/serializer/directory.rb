@@ -1,5 +1,6 @@
 require "os"
 
+require "imap/backup/file_mode"
 require "imap/backup/serializer/folder_maker"
 
 module Imap; end

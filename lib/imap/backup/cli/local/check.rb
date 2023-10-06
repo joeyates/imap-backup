@@ -1,3 +1,9 @@
+require "thor"
+
+require "imap/backup/account/serialized_folders"
+require "imap/backup/cli/helpers"
+require "imap/backup/serializer/integrity_checker"
+
 module Imap; end
 
 module Imap::Backup

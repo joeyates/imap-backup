@@ -1,5 +1,7 @@
 require "thor"
 
+require "imap/backup/configuration"
+
 module Imap; end
 
 module Imap::Backup

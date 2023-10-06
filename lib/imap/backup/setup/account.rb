@@ -1,6 +1,8 @@
 require "imap/backup/setup/account/header"
 require "imap/backup/setup/backup_path"
+require "imap/backup/setup/connection_tester"
 require "imap/backup/setup/email"
+require "imap/backup/setup/folder_chooser"
 
 module Imap; end
 

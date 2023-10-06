@@ -1,6 +1,7 @@
 require "json"
 
 require "imap/backup/serializer/message"
+require "imap/backup/serializer/mbox"
 require "imap/backup/serializer/transaction"
 
 module Imap; end

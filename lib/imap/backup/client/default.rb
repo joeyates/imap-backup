@@ -1,6 +1,8 @@
 require "forwardable"
 require "net/imap"
 
+require "imap/backup/logger"
+
 module Imap; end
 
 module Imap::Backup

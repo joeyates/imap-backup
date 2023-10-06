@@ -1,6 +1,7 @@
 require "imap/backup/cli/backup"
 require "imap/backup/cli/helpers"
 require "imap/backup/cli/folder_enumerator"
+require "imap/backup/logger"
 require "imap/backup/migrator"
 require "imap/backup/mirror"
 

@@ -1,3 +1,5 @@
+require "imap/backup/serializer"
+
 module Imap; end
 
 module Imap::Backup

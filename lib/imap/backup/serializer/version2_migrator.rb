@@ -1,5 +1,7 @@
 require "json"
 
+require "imap/backup/serializer/imap"
+
 module Imap; end
 
 module Imap::Backup

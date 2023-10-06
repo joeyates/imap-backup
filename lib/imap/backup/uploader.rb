@@ -1,3 +1,7 @@
+require "imap/backup/account/folder"
+require "imap/backup/logger"
+require "imap/backup/serializer"
+
 module Imap; end
 
 module Imap::Backup

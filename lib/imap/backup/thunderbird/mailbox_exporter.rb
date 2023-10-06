@@ -1,5 +1,6 @@
 require "thunderbird/local_folder"
-require "thunderbird/profiles"
+
+require "imap/backup/logger"
 
 module Imap; end
 

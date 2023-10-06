@@ -9,7 +9,6 @@ module Imap::Backup
     require "imap/backup/cli/helpers"
 
     autoload :Backup, "imap/backup/cli/backup"
-    autoload :Folders, "imap/backup/cli/folders"
     autoload :Local, "imap/backup/cli/local"
     autoload :Remote, "imap/backup/cli/remote"
     autoload :Restore, "imap/backup/cli/restore"

@@ -1,3 +1,5 @@
+require "imap/backup/account/folder"
+
 module Imap; end
 
 module Imap::Backup

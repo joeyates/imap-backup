@@ -1,8 +1,11 @@
 require "thor"
+require "thunderbird/profiles"
 
 require "imap/backup/account/backup_folders"
 require "imap/backup/account/serialized_folders"
 require "imap/backup/cli/helpers"
+require "imap/backup/logger"
+require "imap/backup/serializer"
 require "imap/backup/thunderbird/mailbox_exporter"
 
 module Imap; end

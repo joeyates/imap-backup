@@ -1,3 +1,4 @@
+require "email/mboxrd/message"
 require "imap/backup/serializer/imap"
 require "imap/backup/serializer/mbox"
 require "imap/backup/serializer/transaction"

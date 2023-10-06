@@ -2,6 +2,8 @@ require "imap/backup/serializer/delayed_metadata_serializer"
 require "imap/backup/downloader"
 require "imap/backup/flag_refresher"
 require "imap/backup/local_only_message_deleter"
+require "imap/backup/logger"
+require "imap/backup/serializer"
 
 module Imap; end
 

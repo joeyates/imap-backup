@@ -1,3 +1,5 @@
+require "email/mboxrd/message"
+
 module Imap; end
 
 module Imap::Backup
