@@ -137,7 +137,7 @@ module Imap::Backup
     def unseen(uids)
       messages = uids.map(&:to_s).join(",")
       examine
-      client.uid_search([messages, "UNSEEN"])
+      client.uid_search(["UID", messages, "UNSEEN"])
     rescue NoMethodError
       # Apple Mail returns an empty response when searches have no results
       []
