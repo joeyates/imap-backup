@@ -383,7 +383,7 @@ module Imap::Backup
       let(:result) { subject.unseen([42, 99]) }
 
       before do
-        allow(client).to receive(:uid_search).with(["42,99", "UNSEEN"]) { [42] }
+        allow(client).to receive(:uid_search).with(["UID", "42,99", "UNSEEN"]) { [42] }
       end
 
       it "returns UIDs of unseen messages" do
@@ -392,7 +392,9 @@ module Imap::Backup
 
       context "when the unseen search fails" do
         before do
-          allow(client).to receive(:uid_search).with([anything, "UNSEEN"]).and_raise(NoMethodError)
+          allow(client).to receive(:uid_search).
+            with([anything, anything, "UNSEEN"]).
+            and_raise(NoMethodError)
         end
 
         it "returns an empty array" do
@@ -402,7 +404,7 @@ module Imap::Backup
 
       context "when the folder doesn't exist" do
         before do
-          allow(client).to receive(:uid_search).with([anything, "UNSEEN"]).and_raise(FolderNotFound)
+          allow(client).to receive(:uid_search).with([anything, anything, "UNSEEN"]).and_raise(FolderNotFound)
         end
 
         it "returns an empty array" do
