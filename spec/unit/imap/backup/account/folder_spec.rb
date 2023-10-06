@@ -406,7 +406,7 @@ module Imap::Backup
 
       context "when the folder doesn't exist" do
         before do
-          allow(client).to receive(:uid_search).with([anything, anything, "UNSEEN"]).and_raise(FolderNotFound)
+          allow(client).to receive(:examine).and_raise(FolderNotFound)
         end
 
         it "returns an empty array" do
