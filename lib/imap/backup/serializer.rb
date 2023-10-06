@@ -62,9 +62,8 @@ module Imap::Backup
 
     def delete
       imap.delete
-      @imap = nil
       mbox.delete
-      @mbox = nil
+      reload
     end
 
     def apply_uid_validity(value)
@@ -130,8 +129,7 @@ module Imap::Backup
       new_imap.rename imap.folder_path
       mbox.delete
       new_mbox.rename mbox.folder_path
-      @imap = nil
-      @mbox = nil
+      reload
     end
 
     def folder_path
@@ -140,6 +138,11 @@ module Imap::Backup
 
     def sanitized
       @sanitized ||= Naming.to_local_path(folder)
+    end
+
+    def reload
+      @imap = nil
+      @mbox = nil
     end
 
     private
