@@ -81,7 +81,7 @@ module Imap::Backup
       inject_global_attributes(accounts)
     end
 
-    def download_strategy_modified
+    def download_strategy_modified?
       ensure_loaded!
 
       @download_strategy_modified
@@ -90,7 +90,7 @@ module Imap::Backup
     def modified?
       ensure_loaded!
 
-      return true if download_strategy_modified
+      return true if download_strategy_modified?
 
       accounts.any? { |a| a.modified? || a.marked_for_deletion? }
     end

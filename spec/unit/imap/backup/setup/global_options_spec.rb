@@ -10,7 +10,7 @@ module Imap::Backup
       instance_double(
         Configuration,
         download_strategy: "delay_metadata",
-        download_strategy_modified: download_strategy_modified
+        download_strategy_modified?: download_strategy_modified
       )
     end
     let!(:highline_streams) { prepare_highline }
