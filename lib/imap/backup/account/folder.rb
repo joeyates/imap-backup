@@ -1,6 +1,8 @@
 require "forwardable"
+require "logger"
 require "net/imap"
 
+require "imap/backup/logger"
 require "retry_on_error"
 
 module Imap; end
@@ -31,12 +33,19 @@ module Imap::Backup
     end
 
     def exist?
+      previous_level = Imap::Backup::Logger.logger.level
+      previous_debug = Net::IMAP.debug
+      Imap::Backup::Logger.logger.level = ::Logger::Severity::UNKNOWN
+      Net::IMAP.debug = false
       retry_on_error(errors: EXAMINE_RETRY_CLASSES) do
         examine
       end
       true
     rescue FolderNotFound
       false
+    ensure
+      Imap::Backup::Logger.logger.level = previous_level
+      Net::IMAP.debug = previous_debug
     end
 
     def create
@@ -68,7 +77,7 @@ module Imap::Backup
         'This is caused by `@responses["SEARCH"] being unset/undefined. ' \
         "Among others, Apple Mail servers send empty responses when " \
         "folders are empty, causing this error."
-      Logger.logger.warn message
+      Imap::Backup::Logger.logger.warn message
       []
     end
 
@@ -150,7 +159,8 @@ module Imap::Backup
     def examine
       client.examine(utf7_encoded_name)
     rescue Net::IMAP::NoResponseError
-      Logger.logger.warn "Folder '#{name}' does not exist on server"
+      Imap::Backup::Logger.logger.warn "Folder '#{name}' does not exist on server"
+      Imap::Backup::Logger.logger.warn caller.join("\n")
       raise FolderNotFound, "Folder '#{name}' does not exist on server"
     end
 
