@@ -35,10 +35,12 @@ module Imap::Backup
         accounts: accounts,
         path: "/base/path",
         save: nil,
-        modified?: config_modified
+        modified?: config_modified,
+        download_strategy_modified?: download_strategy_modified
       )
     end
     let(:config_modified) { false }
+    let(:download_strategy_modified) { false }
     let!(:highline_streams) { prepare_highline }
     let(:input) { highline_streams[0] }
     let(:output) { highline_streams[1] }
@@ -75,6 +77,16 @@ module Imap::Backup
             it "includes '#{choice}'" do
               expect(output.string).to include(choice)
             end
+          end
+        end
+
+        context "when the download strategy has been changed" do
+          let(:download_strategy_modified) { true }
+
+          before { subject.run }
+
+          it "indicates the state" do
+            expect(output.string).to match(/modify global options \*/)
           end
         end
       end
