@@ -51,8 +51,13 @@ module Imap::Backup
           method_option(
             "verbose",
             type: :boolean,
-            desc: "increase the amount of logging",
-            aliases: ["-v"]
+            desc:
+              "increase the amount of logging. " \
+              "Without this option, the program gives minimal output. " \
+              "Using this option once gives more detailed output. " \
+              "Whereas, using this option twice also shows all IMAP network calls",
+            aliases: ["-v"],
+            repeatable: true
           )
         end
       end
