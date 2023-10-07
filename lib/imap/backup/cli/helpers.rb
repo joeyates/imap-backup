@@ -1,6 +1,7 @@
 require "thor"
 
 require "imap/backup/configuration"
+require "imap/backup/configuration_not_found"
 
 module Imap; end
 

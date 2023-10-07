@@ -1,3 +1,4 @@
+require "imap/backup/configuration"
 require "imap/backup/configuration_not_found"
 
 module Imap::Backup
