@@ -140,7 +140,7 @@ class Accounts
       end
 
     if attribute == :folders
-      JSON.parse(value).map { |f| {name: f} }
+      JSON.parse(value)
     else
       value
     end
