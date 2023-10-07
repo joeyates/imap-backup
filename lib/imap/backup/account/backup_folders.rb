@@ -24,7 +24,7 @@ module Imap::Backup
       configured =
         case
         when account.folders&.any?
-          account.folders.map { |af| af[:name] }
+          account.folders
         when account.folder_blacklist
           []
         else

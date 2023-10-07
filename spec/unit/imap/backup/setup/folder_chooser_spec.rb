@@ -42,7 +42,7 @@ module Imap::Backup
       end
 
       describe "folder listing" do
-        let(:configured_folders) { [{name: "my_folder"}] }
+        let(:configured_folders) { ["my_folder"] }
         let(:online_folders) do
           # N.B. my_folder is already backed up
           %w(my_folder another_folder)
@@ -69,7 +69,7 @@ module Imap::Backup
 
           specify "are added to the account" do
             expect(account).to have_received(:"folders=").
-              with([{name: "my_folder"}, {name: "another_folder"}])
+              with(%w(my_folder another_folder))
           end
         end
 
@@ -87,9 +87,7 @@ module Imap::Backup
       end
 
       context "with missing remote folders" do
-        let(:configured_folders) do
-          [{name: "on_server"}, {name: "not_on_server"}]
-        end
+        let(:configured_folders) { %w(on_server not_on_server) }
 
         before do
           allow(Kernel).to receive(:puts)
@@ -98,7 +96,7 @@ module Imap::Backup
 
         specify "are removed from the account" do
           expect(account).to have_received(:"folders=").
-            with([{name: "on_server"}])
+            with(["on_server"])
         end
       end
 

@@ -5,7 +5,7 @@ require "imap/backup/account/backup"
 RSpec.describe "imap-backup backup", :docker, type: :aruba do
   include_context "message-fixtures"
 
-  let(:backup_folders) { [{name: folder}] }
+  let(:backup_folders) { [folder] }
   let(:folder) { "my-stuff" }
   let(:messages_as_mbox) do
     to_mbox_entry(**message_one) + to_mbox_entry(**message_two)
@@ -13,7 +13,7 @@ RSpec.describe "imap-backup backup", :docker, type: :aruba do
   let(:account_config) do
     test_server_connection_parameters.merge(
       download_strategy: "delay_metadata",
-      folders: [{name: folder}]
+      folders: [folder]
     )
   end
   let(:account) { Imap::Backup::Account.new(account_config) }

@@ -3,9 +3,7 @@ require "features/helper"
 RSpec.describe "imap-backup restore", :docker, type: :aruba do
   include_context "message-fixtures"
 
-  let(:account_config) do
-    test_server_connection_parameters.merge(folders: [{name: folder}])
-  end
+  let(:account_config) { test_server_connection_parameters.merge(folders: [folder]) }
   let(:folder) { "my-stuff" }
   let(:messages_as_mbox) do
     to_mbox_entry(**message_one) + to_mbox_entry(**message_two)

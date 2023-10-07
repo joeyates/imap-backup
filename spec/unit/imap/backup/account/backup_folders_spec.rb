@@ -10,7 +10,7 @@ module Imap::Backup
       )
     end
     let(:client) { instance_double(Client::Default, list: %w(foo bar baz)) }
-    let(:account_folders) { [{name: "foo"}] }
+    let(:account_folders) { ["foo"] }
     let(:folder_blacklist) { false }
     let(:result) { subject.each }
 

@@ -9,8 +9,7 @@ module Imap::Backup
     let(:file_path) { File.join(directory, "/config.json") }
     let(:file_exists) { true }
     let(:directory_exists) { true }
-    let(:configuration) { data.to_json }
-    let(:data) { {accounts: accounts.map(&:to_h)} }
+    let(:configuration) { {accounts: accounts.map(&:to_h)}.to_json }
     let(:accounts) do
       [
         Account.new({username: "username1"}),
@@ -30,6 +29,8 @@ module Imap::Backup
       allow(Serializer::PermissionChecker).to receive(:new) { permission_checker }
       allow(File).to receive(:read).and_call_original
       allow(File).to receive(:read).with(file_path) { configuration }
+      allow(FileUtils).to receive(:chmod)
+      allow(FileUtils).to receive(:mkdir_p)
     end
 
     describe ".exist?" do
@@ -80,11 +81,8 @@ module Imap::Backup
       let(:file) { instance_double(File, write: nil) }
 
       before do
-        allow(FileUtils).to receive(:mkdir_p)
-        allow(FileUtils).to receive(:chmod)
         allow(File).to receive(:open).and_call_original
         allow(File).to receive(:open).with(file_path, "w").and_yield(file)
-        allow(JSON).to receive(:pretty_generate) { "JSON output" }
       end
 
       it "creates the config directory" do
@@ -94,7 +92,13 @@ module Imap::Backup
       end
 
       it "saves the configuration" do
-        expect(file).to receive(:write).with("JSON output")
+        expect(file).to receive(:write).with(/^\{/)
+
+        subject.save
+      end
+
+      it "saves the version" do
+        expect(file).to receive(:write).with(/"version": "[\d\.]+"/)
 
         subject.save
       end
@@ -103,8 +107,7 @@ module Imap::Backup
         allow(subject.accounts[0]).to receive(:to_h) { "Account1" }
         allow(subject.accounts[1]).to receive(:to_h) { "Account2" }
 
-        expect(JSON).to receive(:pretty_generate).
-          with(hash_including({accounts: %w[Account1 Account2]}))
+        expect(file).to receive(:write).with(/"accounts": \[\s+"Account1",\s+"Account2"\s+\]/)
 
         subject.save
       end
@@ -183,6 +186,31 @@ module Imap::Backup
         it "defaults to delayed metadata" do
           expect(subject.download_strategy).to eq "delay_metadata"
         end
+      end
+    end
+
+    context "when a version 2.1 file is present" do
+      let(:file) { instance_double(File, write: nil) }
+      let(:configuration) do
+        {version: "2.1", accounts: [{username: "account", folders: [{name: "foo"}]}]}.to_json
+      end
+
+      before do
+        allow(File).to receive(:open).and_call_original
+        allow(File).to receive(:open).with(file_path, "w").and_yield(file)
+      end
+
+      it "changes account folders from an array of hashes to an array" do
+        subject.save
+
+        expect(file).to have_received(:write).
+          with(
+            /
+            "folders":\s+\[\s+
+              "foo"\s+
+            \]
+            /x
+          )
       end
     end
   end
