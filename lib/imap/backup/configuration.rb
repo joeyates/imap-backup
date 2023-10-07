@@ -11,7 +11,8 @@ module Imap; end
 module Imap::Backup
   class Configuration
     CONFIGURATION_DIRECTORY = File.expand_path("~/.imap-backup")
-    VERSION = "2.1".freeze
+    VERSION_2_1 = "2.1".freeze
+    VERSION = "2.2".freeze
     DEFAULT_STRATEGY = "delay_metadata".freeze
     DOWNLOAD_STRATEGIES = [
       {key: "direct", description: "write straight to disk"},
@@ -121,10 +122,28 @@ module Imap::Backup
             else
               DEFAULT_STRATEGY
             end
-          data
+          if data[:version] == VERSION_2_1
+            dehashify_folders(data)
+          else
+            data
+          end
         else
           {accounts: [], download_strategy: DEFAULT_STRATEGY}
         end
+    end
+
+    def dehashify_folders(data)
+      data[:version] = VERSION
+
+      data[:accounts].each do |account|
+        next if !account.key?(:folders)
+
+        folders = account[:folders]
+        names = folders.map { |f| f[:name] }
+        account[:folders] = names
+      end
+
+      data
     end
 
     def remove_modified_flags
