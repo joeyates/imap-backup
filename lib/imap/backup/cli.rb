@@ -19,8 +19,6 @@ module Imap::Backup
 
     include Helpers
 
-    VERSION_ARGUMENTS = %w(-v --version).freeze
-
     NAMESPACE_CONFIGURATION_DESCRIPTION = <<~DESC.freeze
       Some IMAP servers use namespaces (i.e. prefixes like "INBOX"),
       while others, while others concatenate the names of subfolders
@@ -44,9 +42,8 @@ module Imap::Backup
 
     default_task :backup
 
-    def self.start(*args)
-      version_argument = ARGV & VERSION_ARGUMENTS
-      if version_argument.any?
+    def self.start(args)
+      if args.include?("--version")
         new.version
         exit 0
       end
