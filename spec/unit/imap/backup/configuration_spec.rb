@@ -9,8 +9,7 @@ module Imap::Backup
     let(:file_path) { File.join(directory, "/config.json") }
     let(:file_exists) { true }
     let(:directory_exists) { true }
-    let(:configuration) { data.to_json }
-    let(:data) { {accounts: accounts.map(&:to_h)} }
+    let(:configuration) { {accounts: accounts.map(&:to_h)}.to_json }
     let(:accounts) do
       [
         Account.new({username: "username1"}),

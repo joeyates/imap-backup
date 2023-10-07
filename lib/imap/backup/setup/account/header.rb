@@ -78,7 +78,7 @@ module Imap::Backup
       list =
         case
         when items.any?
-          items.map { |f| f[:name] }.join(", ")
+          items.join(", ")
         when !account.folder_blacklist
           "(all folders)"
         else

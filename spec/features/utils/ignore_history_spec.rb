@@ -3,9 +3,7 @@ require "features/helper"
 RSpec.describe "imap-backup utils ignore-history", :docker, type: :aruba do
   include_context "message-fixtures"
 
-  let(:account_config) do
-    test_server_connection_parameters.merge(folders: [{name: folder}])
-  end
+  let(:account_config) { test_server_connection_parameters.merge(folders: [folder]) }
   let(:email) { account_config[:username] }
   let(:folder) { "my_folder" }
   let(:config_options) { {accounts: [account_config]} }

@@ -13,7 +13,7 @@ RSpec.describe "imap-backup mirror", :docker, type: :aruba do
   let(:config_options) do
     {
       accounts: [
-        test_server_connection_parameters.merge(folders: [{name: source_folder}]),
+        test_server_connection_parameters.merge(folders: [source_folder]),
         other_server_connection_parameters
       ]
     }

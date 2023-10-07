@@ -11,7 +11,7 @@ module Imap::Backup
         username: "user@example.com",
         password: existing_password,
         local_path: "/backup/path",
-        folders: [{name: "my_folder"}],
+        folders: ["my_folder"],
         mirror_mode: mirror_mode,
         server: "imap.example.com",
         connection_options: connection_options,

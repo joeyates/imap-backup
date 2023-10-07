@@ -11,8 +11,7 @@ RSpec.describe "imap-backup backup performance", :docker, :performance, type: :a
   results = []
 
   before(:all) do
-    existing = test_server.folders.map(&:name)
-    existing.each do |folder|
+    test_server.folders.each do |folder|
       next if !folder.start_with?("bulk-")
 
       test_server.delete_folder folder
@@ -34,7 +33,7 @@ RSpec.describe "imap-backup backup performance", :docker, :performance, type: :a
             context "with run #{run}" do
               let(:account_config) do
                 test_server_connection_parameters.merge(
-                  folders: [{name: folder}],
+                  folders: [folder],
                   multi_fetch_size: multi_fetch_size
                 )
               end
@@ -74,8 +73,7 @@ RSpec.describe "imap-backup backup performance", :docker, :performance, type: :a
   end
 
   after(:all) do
-    existing = test_server.folders.map(&:name)
-    existing.each do |folder|
+    test_server.folders.each do |folder|
       next if !folder.start_with?("bulk-")
 
       test_server.delete_folder folder
