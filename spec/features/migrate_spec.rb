@@ -170,7 +170,6 @@ RSpec.describe "imap-backup migrate", :docker, type: :aruba do
       ].join(" ")
 
       run_command_and_stop command
-      puts last_command_started.output
 
       messages = destination_server.folder_messages(destination_folder)
       expected = <<~MESSAGE.gsub("\n", "\r\n")

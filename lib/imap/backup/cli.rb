@@ -19,8 +19,6 @@ module Imap::Backup
 
     include Helpers
 
-    VERSION_ARGUMENTS = %w(-v --version).freeze
-
     NAMESPACE_CONFIGURATION_DESCRIPTION = <<~DESC.freeze
       Some IMAP servers use namespaces (i.e. prefixes like "INBOX"),
       while others, while others concatenate the names of subfolders
@@ -44,9 +42,8 @@ module Imap::Backup
 
     default_task :backup
 
-    def self.start(*args)
-      version_argument = ARGV & VERSION_ARGUMENTS
-      if version_argument.any?
+    def self.start(args)
+      if args.include?("--version")
         new.version
         exit 0
       end
@@ -171,6 +168,10 @@ module Imap::Backup
       a new file is created alongside the normal backup files (.imap and .mbox)
       This file has a '.mirror' extension. This file contains a mapping of
       the known UIDs on the source account to those on the destination account.
+
+      Some configuration may be necessary, as follows:
+
+      #{NAMESPACE_CONFIGURATION_DESCRIPTION}
     DESC
     config_option
     quiet_option

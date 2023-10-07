@@ -29,19 +29,23 @@ module Imap::Backup
       end
 
       context "when logger-related options are passed" do
-        let(:options) { {ciao: true, quiet: true, verbose: true} }
+        let(:options) { {ciao: true, quiet: true, verbose: [true]} }
 
         it "excludes them and returns other options" do
           expect(result).to eq({ciao: true})
         end
       end
 
-      context "when verbose is passed" do
-        let(:options) { {verbose: true} }
+      context "when one verbose flag is passed" do
+        let(:options) { {verbose: [true]} }
 
         it "sets logger level to debug" do
           expect(described_class.logger.level).to eq(::Logger::Severity::DEBUG)
         end
+      end
+
+      context "when two verbose flags are passed" do
+        let(:options) { {verbose: [true, true]} }
 
         it "sets the Net::IMAP debug flag" do
           expect(Net::IMAP.debug).to be true
@@ -61,7 +65,7 @@ module Imap::Backup
       end
 
       context "when quiet and verbose are passed" do
-        let(:options) { {quiet: true, verbose: true} }
+        let(:options) { {quiet: true, verbose: [true]} }
 
         it "sets logger level to unknown" do
           expect(described_class.logger.level).to eq(::Logger::Severity::UNKNOWN)

@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## next - next
+
+### Changed
+
+* Split verbosity into two levels. The first gives local verbose logging,
+  the second shows communications with the IMAP server.
+
 ## 13.3.0 - 2023-10-06
 
 ### Changed

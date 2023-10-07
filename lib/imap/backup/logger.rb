@@ -16,19 +16,20 @@ module Imap::Backup
     def self.setup_logging(options = {})
       copy = options.clone
       quiet = copy.delete(:quiet)
-      verbose = copy.delete(:verbose)
+      verbose = copy.delete(:verbose) || []
+      verbose_count = count(verbose)
       level =
         case
         when quiet
           ::Logger::Severity::UNKNOWN
-        when verbose
+        when verbose_count >= 2
           ::Logger::Severity::DEBUG
         else
           ::Logger::Severity::INFO
         end
       logger.level = level
-      debug = level == ::Logger::Severity::DEBUG
-      Net::IMAP.debug = debug
+
+      Net::IMAP.debug = (verbose_count >= 3)
 
       copy
     end
@@ -41,6 +42,10 @@ module Imap::Backup
     ensure
       sanitizer.flush
       $stderr = previous_stderr
+    end
+
+    def self.count(verbose)
+      verbose.reduce(1) { |acc, v| acc + (v ? 1 : -1) }
     end
 
     attr_reader :logger
