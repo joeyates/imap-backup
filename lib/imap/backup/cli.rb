@@ -168,6 +168,10 @@ module Imap::Backup
       a new file is created alongside the normal backup files (.imap and .mbox)
       This file has a '.mirror' extension. This file contains a mapping of
       the known UIDs on the source account to those on the destination account.
+
+      Some configuration may be necessary, as follows:
+
+      #{NAMESPACE_CONFIGURATION_DESCRIPTION}
     DESC
     config_option
     quiet_option
