@@ -1,6 +1,7 @@
 require "thor"
 
 require "imap/backup/logger"
+require "imap/backup/version"
 
 module Imap; end
 
