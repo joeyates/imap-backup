@@ -1,3 +1,5 @@
+require "net/imap"
+
 module Imap; end
 
 module Imap::Backup
