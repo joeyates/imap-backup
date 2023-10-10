@@ -58,14 +58,20 @@ If you want to use imap-backup directly from the source code, see [here](docs/in
 
 # Setup
 
-As a first step, you need to add accounts via a menu-driven command
-line program:
+Normally you will want to backup a number of email accounts.
+Doing so requires the creation of a config file.
+
+You do this via a menu-driven command line program:
 
 Run:
 
 ```sh
 imap-backup setup
 ```
+
+As an alternative, if you only want to backup a single account,
+you can pass all the necessary parameters directly to the `direct` command
+(see the [direct](docs/commands/direct.md) docs).
 
 ## GMail
 
@@ -89,6 +95,7 @@ and exported via [`utils export-to-thunderbird`](docs/commands/utils-export-to-t
 # Commands
 
 * [`backup`](docs/commands/backup.md)
+* [`direct`](docs/commands/direct.md)
 * [`local accounts`](docs/commands/local-accounts.md)
 * [`local check`](docs/commands/local-check.md)
 * [`local folders`](docs/commands/local-folders.md)
