@@ -1,3 +1,5 @@
+require "imap/backup/logger"
+
 module Imap::Backup
   RSpec.shared_examples "an action that handles Logger options" do |action:, &block|
     before do
