@@ -2,7 +2,7 @@
 [![Build Status](https://github.com/joeyates/imap-backup/actions/workflows/main.yml/badge.svg)][CI Status]
 ![Coverage](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/joeyates/b54fe758bfb405c04bef72dad293d707/raw/coverage.json)
 ![License](https://img.shields.io/github/license/joeyates/imap-backup?color=brightgreen&label=License)
-![Stars](https://img.shields.io/github/stars/joeyates/imap-backup?style=social)
+[![Stars](https://img.shields.io/github/stars/joeyates/imap-backup?style=social)][GitHub Stars]
 
 # imap-backup
 
@@ -185,6 +185,7 @@ made in each release.
 * [CI Status]
 
 [Source Code]: https://github.com/joeyates/imap-backup "Source code at GitHub"
+[GitHub Stars]: https://github.com/joeyates/imap-backup/stargazers "GitHub Stars"
 [Code Documentation]: https://rubydoc.info/gems/imap-backup/frames "Code Documentation at Rubydoc.info"
 [Rubygem]: https://rubygems.org/gems/imap-backup "Ruby gem at rubygems.org"
 [CI Status]: https://github.com/joeyates/imap-backup/actions/workflows/main.yml
