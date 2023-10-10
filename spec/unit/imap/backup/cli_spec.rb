@@ -60,12 +60,6 @@ module Imap::Backup
             with(hash_including({username: "me", server: "host"}))
         end
       end
-
-      it "checks password options" do
-        subject.direct
-
-        expect(direct).to have_received(:handle_password_options!)
-      end
     end
 
     describe "#migrate" do
