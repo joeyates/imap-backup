@@ -11,6 +11,7 @@ module Imap::Backup
       expect(Logger).to have_received(:setup_logging)
     end
 
+    # block holds other examples
     block&.call
   end
 end
