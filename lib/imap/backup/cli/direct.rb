@@ -9,6 +9,9 @@ module Imap::Backup
     no_commands do
       def run
       end
+
+      def check_password_options!
+      end
     end
   end
 end

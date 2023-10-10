@@ -202,7 +202,9 @@ module Imap::Backup
     verbose_option
     def direct
       non_logging_options = Imap::Backup::Logger.setup_logging(options)
-      Direct.new(non_logging_options).run
+      direct = Direct.new(non_logging_options)
+      direct.check_password_options!
+      direct.run
     end
 
     desc "local SUBCOMMAND [OPTIONS]", "View local info"
