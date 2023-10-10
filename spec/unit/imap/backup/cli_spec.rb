@@ -36,7 +36,7 @@ module Imap::Backup
     end
 
     describe "#direct" do
-      let(:direct) { instance_double(CLI::Direct, run: nil, check_password_options!: nil) }
+      let(:direct) { instance_double(CLI::Direct, run: nil, handle_password_options!: nil) }
 
       before do
         allow(CLI::Direct).to receive(:new) { direct }
@@ -64,7 +64,7 @@ module Imap::Backup
       it "checks password options" do
         subject.direct
 
-        expect(direct).to have_received(:check_password_options!)
+        expect(direct).to have_received(:handle_password_options!)
       end
     end
 

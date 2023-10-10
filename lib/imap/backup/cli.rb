@@ -203,7 +203,6 @@ module Imap::Backup
     def direct
       non_logging_options = Imap::Backup::Logger.setup_logging(options)
       direct = Direct.new(non_logging_options)
-      direct.check_password_options!
       direct.run
     end
 
