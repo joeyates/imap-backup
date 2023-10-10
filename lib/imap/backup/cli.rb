@@ -10,6 +10,7 @@ module Imap::Backup
     require "imap/backup/cli/helpers"
 
     autoload :Backup, "imap/backup/cli/backup"
+    autoload :Direct, "imap/backup/cli/direct"
     autoload :Local, "imap/backup/cli/local"
     autoload :Remote, "imap/backup/cli/remote"
     autoload :Restore, "imap/backup/cli/restore"
@@ -200,7 +201,8 @@ module Imap::Backup
     quiet_option
     verbose_option
     def direct
-      puts "options: #{options.inspect}"
+      non_logging_options = Imap::Backup::Logger.setup_logging(options)
+      Direct.new(non_logging_options).run
     end
 
     desc "local SUBCOMMAND [OPTIONS]", "View local info"
