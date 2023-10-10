@@ -2,6 +2,7 @@
 [![Build Status](https://github.com/joeyates/imap-backup/actions/workflows/main.yml/badge.svg)][CI Status]
 ![Coverage](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/joeyates/b54fe758bfb405c04bef72dad293d707/raw/coverage.json)
 ![License](https://img.shields.io/github/license/joeyates/imap-backup?color=brightgreen&label=License)
+![Stars](https://img.shields.io/github/stars/joeyates/imap-backup?style=social)
 
 # imap-backup
 
@@ -34,6 +35,8 @@ See below for a [full list of commands](#Commands).
 # Installation
 
 ## Homebrew (macOS)
+
+![Homebrew installs](https://img.shields.io/homebrew/installs/dm/imap-backup?label=Homebrew%20installs)
 
 If you have [Homebrew](https://brew.sh/), do this:
 
@@ -167,6 +170,8 @@ If you have problems:
 2. run `imap-backup` with the `-v` or `--verbose` parameter.
 
 # Development
+
+![Activity](https://img.shields.io/github/last-commit/joeyates/imap-backup/main)
 
 See the [Development documentation](./docs/development.md) for notes
 on development and testing.
