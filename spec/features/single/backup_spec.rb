@@ -3,7 +3,7 @@ require "features/helper"
 RSpec.describe "imap-backup single backup", :docker, type: :aruba do
   include_context "message-fixtures"
 
-  let(:folder) { "my-stuff" }
+  let(:folder) { "single-backup" }
   let(:messages_as_mbox) do
     to_mbox_entry(**message_one) + to_mbox_entry(**message_two)
   end

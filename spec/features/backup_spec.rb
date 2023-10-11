@@ -6,7 +6,7 @@ RSpec.describe "imap-backup backup", :docker, type: :aruba do
   include_context "message-fixtures"
 
   let(:backup_folders) { [folder] }
-  let(:folder) { "my-stuff" }
+  let(:folder) { "stuff-to-backup" }
   let(:messages_as_mbox) do
     to_mbox_entry(**message_one) + to_mbox_entry(**message_two)
   end
@@ -242,7 +242,7 @@ RSpec.describe "imap-backup backup", :docker, type: :aruba do
       {path: custom_config_path, accounts: [other_server_connection_parameters]}
     end
     let(:account_config) { other_server_connection_parameters }
-    let(:folder) { "other_public.my-stuff" }
+    let(:folder) { "other_public.other-stuff" }
     let(:command) { "imap-backup backup --config #{custom_config_path}" }
 
     let(:setup) do
