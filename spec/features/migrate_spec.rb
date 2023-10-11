@@ -79,6 +79,10 @@ RSpec.describe "imap-backup migrate", :docker, type: :aruba do
   context "when migrating from a subfolder" do
     let(:source_folder) { "my_sub.migrate-folder" }
 
+    after do
+      destination_server.delete_folder "migrate-folder"
+    end
+
     it "copies email from subfolders on the source account" do
       command = [
         "imap-backup",
@@ -105,6 +109,11 @@ RSpec.describe "imap-backup migrate", :docker, type: :aruba do
 
   context "when migrating into a subfolder" do
     let(:destination_folder) { "my_sub.migrate-folder" }
+
+    after do
+      destination_server.delete_folder "my_sub"
+      destination_server.delete_folder "my_sub.migrate-folder"
+    end
 
     it "copies email to subfolders on the destination account" do
       command = [
@@ -136,6 +145,10 @@ RSpec.describe "imap-backup migrate", :docker, type: :aruba do
     let(:email) { source_account[:username] }
     let(:destination_account) { test_server_connection_parameters }
     let(:config_options) { {accounts: [source_account, destination_account]} }
+
+    after do
+      destination_server.delete_folder "migrate-folder"
+    end
 
     it "copies email to the destination account" do
       command = [
