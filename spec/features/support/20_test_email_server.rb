@@ -91,6 +91,7 @@ class TestEmailServer
   end
 
   def send_email(folder, **options)
+    reconnect if imap.disconnected?
     flags = options[:flags]
     message = message_as_server_message(**options)
     imap.append(folder, message, flags, nil)
