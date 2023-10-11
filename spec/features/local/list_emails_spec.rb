@@ -8,10 +8,6 @@ RSpec.describe "imap-backup local list", type: :aruba do
     create_config(**config_options)
     append_local email: email, folder: "my_folder", subject: "Ciao"
   end
-  let!(:cleanup) do
-    test_server.delete_folder "my_folder"
-    test_server.disconnect
-  end
 
   it "lists emails" do
     run_command_and_stop "imap-backup local list #{email} my_folder"
@@ -36,10 +32,6 @@ RSpec.describe "imap-backup local list", type: :aruba do
       append_local(
         configuration_path: custom_config_path, email: email, folder: "my_folder", subject: "Ciao"
       )
-    end
-    let(:cleanup) do
-      other_server.delete_folder "my_folder"
-      other_server.disconnect
     end
 
     it "lists emails" do
