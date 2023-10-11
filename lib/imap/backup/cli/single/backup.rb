@@ -20,8 +20,7 @@ module Imap::Backup
     end
 
     def run
-      handle_password_options! if !password
-
+      process_options!
       account = Account.new(
         username: email,
         password: password,
@@ -40,6 +39,18 @@ module Imap::Backup
     end
 
     private
+
+    def process_options!
+      if !email
+        raise Thor::RequiredArgumentMissingError,
+              "No value provided for required options '--email'"
+      end
+      if !server
+        raise Thor::RequiredArgumentMissingError,
+              "No value provided for required options '--server'"
+      end
+      handle_password_options!
+    end
 
     def handle_password_options!
       plain = options[:password]

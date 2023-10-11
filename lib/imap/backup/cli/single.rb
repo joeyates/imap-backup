@@ -63,14 +63,12 @@ module Imap::Backup
       "email",
       type: :string,
       desc: "the email address",
-      required: true,
       aliases: ["-e"]
     )
     method_option(
       "server",
       type: :string,
       desc: "the address of the IMAP server",
-      required: true,
       aliases: ["-s"]
     )
     method_option(

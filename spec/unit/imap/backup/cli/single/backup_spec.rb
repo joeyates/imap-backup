@@ -45,8 +45,18 @@ module Imap::Backup
       end
     end
 
+    context "when no --email option is set" do
+      let(:options) { {server: "host", password: "plain"} }
+
+      it "fails" do
+        expect do
+          subject.run
+        end.to raise_error(Thor::RequiredArgumentMissingError, /--email/)
+      end
+    end
+
     context "when --password is supplied" do
-      let(:options) { {email: "me", password: "plain"} }
+      let(:options) { {email: "me", password: "plain", server: "host"} }
 
       it "is used" do
         subject.run
@@ -57,7 +67,9 @@ module Imap::Backup
     end
 
     context "when --password-environment-variable is supplied" do
-      let(:options) { {email: "me", password_environment_variable: "env"} }
+      let(:options) do
+        {email: "me", server: "host", password_environment_variable: "env"}
+      end
 
       before do
         allow(ENV).to receive(:fetch).and_call_original
@@ -73,7 +85,7 @@ module Imap::Backup
     end
 
     context "when --password-file is supplied" do
-      let(:options) { {email: "me", password_file: "some/path"} }
+      let(:options) { {email: "me", password_file: "some/path", server: "host"} }
       let(:file_content) { "text" }
 
       before do
@@ -119,6 +131,7 @@ module Imap::Backup
         let(:options) do
           {
             email: "me",
+            server: "host",
             parameter1.tr("-", "_").to_sym => "v1",
             parameter2.tr("-", "_").to_sym => "v2"
           }
