@@ -66,7 +66,7 @@ RSpec.describe "imap-backup backup", :docker, type: :aruba do
       expect(uids).to eq(folder_uids)
     end
 
-    it "records message offsets in the mbox file" do
+    it "records message offsets in the imap file" do
       run_command_and_stop command
 
       offsets = imap_metadata[:messages].map { |m| m[:offset] }
@@ -75,7 +75,7 @@ RSpec.describe "imap-backup backup", :docker, type: :aruba do
       expect(offsets).to eq(expected)
     end
 
-    it "records message lengths in the mbox file" do
+    it "records message lengths in the imap file" do
       run_command_and_stop command
 
       lengths = imap_metadata[:messages].map { |m| m[:length] }
