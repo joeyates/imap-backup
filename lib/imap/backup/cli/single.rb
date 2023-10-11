@@ -14,11 +14,11 @@ module Imap::Backup
 
     desc "backup", "Backup a single email account based on command-line parameters"
     method_option(
-      "username",
+      "email",
       type: :string,
-      desc: "your email address",
+      desc: "the email address",
       required: true,
-      aliases: ["-u"]
+      aliases: ["-e"]
     )
     method_option(
       "server",

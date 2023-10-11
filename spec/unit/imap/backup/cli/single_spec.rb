@@ -18,13 +18,13 @@ module Imap::Backup
       it_behaves_like(
         "an action that handles Logger options",
         action: ->(subject, options) do
-          with_required = options.merge({"username" => "me", "server" => "host"})
+          with_required = options.merge({"email" => "me", "server" => "host"})
           subject.invoke(:backup, [], with_required)
         end
       ) do
         it "passes other options to the class" do
           expect(CLI::Single::Backup).to have_received(:new).
-            with(hash_including({username: "me", server: "host"}))
+            with(hash_including({email: "me", server: "host"}))
         end
 
         it "does not pass loggint options to the class" do
@@ -35,4 +35,3 @@ module Imap::Backup
     end
   end
 end
-

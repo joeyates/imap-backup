@@ -8,7 +8,7 @@ To do so, you pass all the relevant settings as command-line parameters.
 For example
 
 ```sh
-imap-backup single backup --username me@example.com --password mysecret --server imap.example.com
+imap-backup single backup --email me@example.com --password mysecret --server imap.example.com
 ```
 
 As putting your password in a command line is obviously problematic for security

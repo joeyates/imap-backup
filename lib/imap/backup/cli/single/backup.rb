@@ -23,7 +23,7 @@ module Imap::Backup
       handle_password_options! if !password
 
       account = Account.new(
-        username: username,
+        username: email,
         password: password,
         server: server,
         download_strategy: download_strategy,
@@ -78,6 +78,10 @@ module Imap::Backup
         end
     end
 
+    def email
+      options[:email]
+    end
+
     def folder_blacklist
       options[:folder_blacklist] ? true : false
     end
@@ -89,7 +93,7 @@ module Imap::Backup
     def local_path
       return options[:path] if options.key?(:path)
 
-      for_account = username.tr("@", "_")
+      for_account = email.tr("@", "_")
       File.join(Dir.pwd, for_account)
     end
 
@@ -111,10 +115,6 @@ module Imap::Backup
 
     def server
       options[:server]
-    end
-
-    def username
-      options[:username]
     end
   end
 end

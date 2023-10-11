@@ -14,7 +14,7 @@ module Imap::Backup
       )
     end
     let(:backup) { instance_double(Account::Backup, run: nil) }
-    let(:good_options) { {username: "me", password: "plain", server: "host"} }
+    let(:good_options) { {email: "me", password: "plain", server: "host"} }
 
     before do
       allow(Account).to receive(:new) { account }
@@ -30,7 +30,7 @@ module Imap::Backup
         expect(backup).to have_received(:run)
       end
 
-      it "uses the username value" do
+      it "uses the email value" do
         subject.run
 
         expect(Account).to have_received(:new).
@@ -46,7 +46,7 @@ module Imap::Backup
     end
 
     context "when --password is supplied" do
-      let(:options) { {username: "me", password: "plain"} }
+      let(:options) { {email: "me", password: "plain"} }
 
       it "is used" do
         subject.run
@@ -57,7 +57,7 @@ module Imap::Backup
     end
 
     context "when --password-environment-variable is supplied" do
-      let(:options) { {username: "me", password_environment_variable: "env"} }
+      let(:options) { {email: "me", password_environment_variable: "env"} }
 
       before do
         allow(ENV).to receive(:fetch).and_call_original
@@ -73,7 +73,7 @@ module Imap::Backup
     end
 
     context "when --password-file is supplied" do
-      let(:options) { {username: "me", password_file: "some/path"} }
+      let(:options) { {email: "me", password_file: "some/path"} }
       let(:file_content) { "text" }
 
       before do
@@ -101,7 +101,7 @@ module Imap::Backup
     end
 
     context "when no --password... option is set" do
-      let(:options) { {username: "me", server: "host"} }
+      let(:options) { {email: "me", server: "host"} }
 
       it "fails" do
         expect do
@@ -118,7 +118,7 @@ module Imap::Backup
       context "when both --#{parameter1} and --#{parameter2} are set" do
         let(:options) do
           {
-            username: "me",
+            email: "me",
             parameter1.tr("-", "_").to_sym => "v1",
             parameter2.tr("-", "_").to_sym => "v2"
           }

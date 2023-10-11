@@ -19,7 +19,7 @@ RSpec.describe "imap-backup single backup", :docker, type: :aruba do
   let(:connection_options) { account[:connection_options].to_json }
   let(:command) do
     "imap-backup single backup " \
-      "--username #{account[:username]} " \
+      "--email #{account[:username]} " \
       "--password #{account[:password]} " \
       "--server #{account[:server]} " \
       "--path #{account[:local_path]} " \
