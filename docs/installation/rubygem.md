@@ -11,5 +11,5 @@ You need at least Ruby 2.7 installed.
 # Install
 
 ```sh
-gem install imap-backup
+gem install imap-backup --no-document
 ```

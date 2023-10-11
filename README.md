@@ -12,7 +12,7 @@ Backup, restore and migrate email accounts.
 
 ```sh
 brew install imap-backup # for macOS
-gem install imap-backup # for Linux
+gem install imap-backup --no-document # for Linux
 imap-backup setup
 imap-backup
 ```
@@ -47,7 +47,7 @@ brew install imap-backup
 ## As a Ruby Gem
 
 ```sh
-gem install imap-backup
+gem install imap-backup --no-document
 ```
 
 If that doesn't work, see the [detailed installation instructions](docs/installation/rubygem.md).
