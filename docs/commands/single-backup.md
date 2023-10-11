@@ -13,4 +13,4 @@ imap-backup single backup --email me@example.com --password mysecret --server im
 
 As putting your password in a command line is obviously problematic for security
 reasons, there are alternatives to the `--password` parameter,
-see `imap-backup help direct` for a full list of parameters.
+see `imap-backup help single backup` for a full list of parameters.
