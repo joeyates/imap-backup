@@ -15,6 +15,7 @@ RSpec.describe "imap-backup restore", :docker, type: :aruba do
   let(:config_options) { {accounts: [account_config]} }
   let(:email) { account_config[:username] }
 
+  let!(:pre) { test_server.warn_about_non_default_folders }
   let!(:setup) do
     create_config(**config_options)
     create_local_folder email: email, folder: folder, uid_validity: uid_validity

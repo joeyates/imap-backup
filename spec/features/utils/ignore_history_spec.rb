@@ -18,6 +18,7 @@ RSpec.describe "imap-backup utils ignore-history", :docker, type: :aruba do
   end
 
   let!(:setup) do
+    test_server.warn_about_non_default_folders
     test_server.delete_folder folder
     test_server.create_folder folder
     test_server.send_email folder, **message_one

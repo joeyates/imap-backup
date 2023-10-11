@@ -19,6 +19,7 @@ RSpec.describe "imap-backup single backup", :docker, type: :aruba do
   end
 
   before do
+    test_server.warn_about_non_default_folders
     test_server.create_folder folder
     test_server.send_email folder, **message_one
     test_server.send_email folder, **message_two

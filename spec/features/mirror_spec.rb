@@ -27,6 +27,7 @@ RSpec.describe "imap-backup mirror", :docker, type: :aruba do
   end
 
   before do
+    test_server.warn_about_non_default_folders
     test_server.create_folder source_folder
     test_server.send_email source_folder, **message_one, flags: [:Seen]
     create_config(**config_options)

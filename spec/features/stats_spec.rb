@@ -8,6 +8,7 @@ RSpec.describe "imap-backup stats", :docker, type: :aruba do
   let(:command) { "imap-backup stats #{account[:username]}" }
   let(:config_options) { {accounts: [account]} }
   let!(:setup) do
+    test_server.warn_about_non_default_folders
     test_server.create_folder folder
     test_server.send_email folder, **message_one
     test_server.disconnect

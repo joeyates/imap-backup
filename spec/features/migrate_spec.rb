@@ -16,6 +16,7 @@ RSpec.describe "imap-backup migrate", :docker, type: :aruba do
   let(:config_options) { {accounts: [source_account, destination_account]} }
 
   let!(:setup) do
+    test_server.warn_about_non_default_folders
     create_config(**config_options)
     append_local(
       email: email, folder: source_folder.gsub(".", "/"), subject: "Ciao", flags: [:Draft, :$CUSTOM]
