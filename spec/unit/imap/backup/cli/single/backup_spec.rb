@@ -1,7 +1,7 @@
-require "imap/backup/cli/direct"
+require "imap/backup/cli/single/backup"
 
 module Imap::Backup
-  RSpec.describe CLI::Direct do
+  RSpec.describe CLI::Single::Backup do
     subject { described_class.new(options) }
 
     let(:account) do

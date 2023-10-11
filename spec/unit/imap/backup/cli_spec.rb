@@ -35,33 +35,6 @@ module Imap::Backup
       end
     end
 
-    describe "#direct" do
-      let(:direct) { instance_double(CLI::Direct, run: nil, handle_password_options!: nil) }
-
-      before do
-        allow(CLI::Direct).to receive(:new) { direct }
-      end
-
-      it "runs Direct" do
-        subject.direct
-
-        expect(direct).to have_received(:run)
-      end
-
-      it_behaves_like(
-        "an action that handles Logger options",
-        action: ->(subject, options) do
-          with_required = options.merge({"username" => "me", "server" => "host"})
-          subject.invoke(:direct, [], with_required)
-        end
-      ) do
-        it "does not pass the option to the class" do
-          expect(CLI::Direct).to have_received(:new).
-            with(hash_including({username: "me", server: "host"}))
-        end
-      end
-    end
-
     describe "#migrate" do
       let(:transfer) { instance_double(CLI::Transfer, run: nil) }
 

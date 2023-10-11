@@ -70,8 +70,8 @@ imap-backup setup
 ```
 
 As an alternative, if you only want to backup a single account,
-you can pass all the necessary parameters directly to the `direct` command
-(see the [direct](docs/commands/direct.md) docs).
+you can pass all the necessary parameters directly to the `single backup` command
+(see the [`single backup`](docs/commands/single-backup.md) docs).
 
 ## GMail
 
@@ -95,7 +95,6 @@ and exported via [`utils export-to-thunderbird`](docs/commands/utils-export-to-t
 # Commands
 
 * [`backup`](docs/commands/backup.md)
-* [`direct`](docs/commands/direct.md)
 * [`local accounts`](docs/commands/local-accounts.md)
 * [`local check`](docs/commands/local-check.md)
 * [`local folders`](docs/commands/local-folders.md)
@@ -106,6 +105,7 @@ and exported via [`utils export-to-thunderbird`](docs/commands/utils-export-to-t
 * [`remote folders`](docs/commands/remote-folders.md)
 * [`restore`](docs/commands/restore.md)
 * [`setup`](docs/commands/setup.md)
+* [`single backup`](docs/commands/single-backup.md)
 * [`utils export-to-thunderbird`](docs/commands/utils-export-to-thunderbird.md)
 * [`utils ignore-history`](docs/commands/utils-ignore-history.md)
 

@@ -3,6 +3,7 @@ require "thor"
 require "imap/backup/account/serialized_folders"
 require "imap/backup/cli/helpers"
 require "imap/backup/cli/local/check"
+require "imap/backup/logger"
 
 module Imap; end
 

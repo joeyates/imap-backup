@@ -1,6 +1,6 @@
 require "features/helper"
 
-RSpec.describe "imap-backup direct", :docker, type: :aruba do
+RSpec.describe "imap-backup single backup", :docker, type: :aruba do
   include_context "message-fixtures"
 
   let(:folder) { "my-stuff" }
@@ -18,7 +18,7 @@ RSpec.describe "imap-backup direct", :docker, type: :aruba do
   let(:account) { test_server_connection_parameters }
   let(:connection_options) { account[:connection_options].to_json }
   let(:command) do
-    "imap-backup direct " \
+    "imap-backup single backup " \
       "--username #{account[:username]} " \
       "--password #{account[:password]} " \
       "--server #{account[:server]} " \

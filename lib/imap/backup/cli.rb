@@ -10,11 +10,11 @@ module Imap::Backup
     require "imap/backup/cli/helpers"
 
     autoload :Backup, "imap/backup/cli/backup"
-    autoload :Direct, "imap/backup/cli/direct"
     autoload :Local, "imap/backup/cli/local"
     autoload :Remote, "imap/backup/cli/remote"
     autoload :Restore, "imap/backup/cli/restore"
     autoload :Setup, "imap/backup/cli/setup"
+    autoload :Single, "imap/backup/cli/single"
     autoload :Stats, "imap/backup/cli/stats"
     autoload :Transfer, "imap/backup/cli/transfer"
     autoload :Utils, "imap/backup/cli/utils"
@@ -84,126 +84,6 @@ module Imap::Backup
     def backup
       non_logging_options = Imap::Backup::Logger.setup_logging(options)
       Backup.new(non_logging_options).run
-    end
-
-    desc "direct", "Backup a single email account based on command-line parameters"
-    method_option(
-      "username",
-      type: :string,
-      desc: "your email address",
-      required: true,
-      aliases: ["-u"]
-    )
-    method_option(
-      "server",
-      type: :string,
-      desc: "the address of the IMAP server",
-      required: true,
-      aliases: ["-s"]
-    )
-    method_option(
-      "password",
-      type: :string,
-      desc: "your password. " \
-            "As an alternative, use the --password-environment-variable " \
-            "or --password-file parameter. " \
-            "You need to pass exactly one of these parameters. " \
-            "If you pass more than one of the --password... parameters together " \
-            "you will get an error.",
-      aliases: ["-p"]
-    )
-    method_option(
-      "password-environment-variable",
-      type: :string,
-      desc: "an environment variable that is set to your password",
-      aliases: ["-e"]
-    )
-    method_option(
-      "password-file",
-      type: :string,
-      desc: "a file containing your password. " \
-            "Note that to make it easier to create such files, " \
-            "trailing newlines will be removed. " \
-            "If you happen to have a password that ends in a newline (!), " \
-            "you can't use this parameter.",
-      aliases: ["-W"]
-    )
-    method_option(
-      "path",
-      type: "string",
-      desc: "the path of the directory where backups are to be saved. " \
-            "If the directory does not exists, it will be created. " \
-            "If not set, this is set to a diretory under the current path " \
-            "which is derived from the username, by replacing '@' with '_'.",
-      aliases: ["-P"]
-    )
-    method_option(
-      "folder",
-      type: :string,
-      desc: "a folder (this option can be given any number of times). " \
-            "By default, all of an account's folders are backed up. " \
-            "If you supply any --folder parameters, " \
-            "only **those** folders are backed up. " \
-            "See also --folder-blacklist.",
-      repeatable: true,
-      aliases: ["-F"]
-    )
-    method_option(
-      "folder-blacklist",
-      type: :boolean,
-      desc: "if this option is given, the list of --folders specified " \
-            "will treated as a blacklist - " \
-            "those folders will be skipped and " \
-            "all others will be backed up.",
-      default: false,
-      aliases: ["-b"]
-    )
-    method_option(
-      "mirror",
-      type: :boolean,
-      desc: "if this option is given, " \
-            "emails that are removed from the server " \
-            "will be removed from the local backup.",
-      aliases: ["-m"]
-    )
-    method_option(
-      "multi-fetch-size",
-      type: :numeric,
-      desc: "the number of emails to download at a time",
-      default: 1,
-      aliases: ["-n"]
-    )
-    method_option(
-      "connection-options",
-      type: :string,
-      desc: "an optional JSON string with options for the IMAP connection",
-      aliases: ["-o"]
-    )
-    method_option(
-      "download-strategy",
-      type: :string,
-      desc: "the download strategy to adopt. " \
-            "For details, see the documentation for this setting " \
-            "in the setup program.",
-      enum: %w(delay direct),
-      default: "delay",
-      aliases: ["-S"]
-    )
-    refresh_option
-    method_option(
-      "reset-seen-flags-after-fetch",
-      type: :boolean,
-      desc: "reset 'Seen' flags after backup. " \
-            "For details, see the documentation for this setting " \
-            "in the setup program.",
-      aliases: ["-R"]
-    )
-    quiet_option
-    verbose_option
-    def direct
-      non_logging_options = Imap::Backup::Logger.setup_logging(options)
-      direct = Direct.new(non_logging_options)
-      direct.run
     end
 
     desc "local SUBCOMMAND [OPTIONS]", "View local info"
@@ -354,6 +234,9 @@ module Imap::Backup
       non_logging_options = Imap::Backup::Logger.setup_logging(options)
       CLI::Setup.new(non_logging_options).run
     end
+
+    desc "single SUBCOMMAND [OPTIONS]", "Run actions on a single account"
+    subcommand "single", Single
 
     desc "stats EMAIL [OPTIONS]", "Print stats for each account folder"
     long_desc <<~DESC
