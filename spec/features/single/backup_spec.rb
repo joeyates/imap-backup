@@ -7,14 +7,6 @@ RSpec.describe "imap-backup single backup", :docker, type: :aruba do
   let(:messages_as_mbox) do
     to_mbox_entry(**message_one) + to_mbox_entry(**message_two)
   end
-  let!(:pre) do
-    test_server.delete_folder folder
-  end
-  let!(:setup) do
-    test_server.create_folder folder
-    test_server.send_email folder, **message_one
-    test_server.send_email folder, **message_two
-  end
   let(:account) { test_server_connection_parameters }
   let(:connection_options) { account[:connection_options].to_json }
   let(:command) do
@@ -24,6 +16,17 @@ RSpec.describe "imap-backup single backup", :docker, type: :aruba do
       "--server #{account[:server]} " \
       "--path #{account[:local_path]} " \
       "--connection-options '#{connection_options}'"
+  end
+
+  before do
+    test_server.create_folder folder
+    test_server.send_email folder, **message_one
+    test_server.send_email folder, **message_two
+  end
+
+  after do
+    test_server.delete_folder folder
+    test_server.disconnect
   end
 
   it "downloads messages" do
