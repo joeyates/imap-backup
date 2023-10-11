@@ -28,13 +28,12 @@ two local IMAP servers controlled by Docker Compose.
 Start them before running the test suite
 
 ```sh
-$ docker-compose -f dev/docker-compose.yml up -d
-```
-
-or, with Podman
-
-```sh
-$ podman-compose -f dev/docker-compose.yml up -d
+# docker-cli-compose
+$ docker compose -f dev/imap-compose.yml up -d
+# legacy docker-compose
+$ docker-compose -f dev/imap-compose.yml up -d
+# podman
+$ podman-compose -f dev/imap-compose.yml up -d
 ```
 
 ```sh

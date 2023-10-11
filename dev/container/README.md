@@ -1,5 +1,4 @@
-# container
-
+# Ruby version testing
 This directory contains the files that allow experimenting with
 any desired Ruby version locally.
 
@@ -7,46 +6,30 @@ This is especially useful for older, deprecated Ruby versions
 which are often difficult to install due to openssl
 compatibility problems.
 
-# Start Container
+## Start Container
 
 Do the following from the project's root directory:
 
 ```sh
 export RUBY_VERSION=[VERSION]
-export ID=$(id -u)
-docker-compose --file dev/container/compose.yml build
-docker-compose --file dev/container/compose.yml up -d
+docker compose --file dev/imap-compose.yml up -d
+docker compose --file dev/ruby-compose.yml up -d --build
 docker attach imap-backup
 ```
 
 ...and stop the server afterwards:
 
 ```sh
-docker-compose --file dev/container/compose.yml down
+docker compose --file dev/imap-compose.yml down
+docker compose --file dev/ruby-compose.yml down
 ```
 
-# Setup Project
-
-It's best to delete any `Gemfile.lock` you may have
-in order to get gem versions which
-are compatible with the Ruby version you are using.
-
-```sh
-rm Gemfile.lock
-bundle install
-```
-
-# Run tests
-
+## Run tests
 ```sh
 rake
 ```
 
-# Invoke `imap-backup`
-
-As the `BUNDLE_BINSTUBS` environment variable is set,
-you can invoke imap-backup directly
-
+## Invoke `imap-backup`
 ```sh
 imap-backup help
 ```
@@ -58,7 +41,7 @@ An example file `dev/container/config.json` is supplied.
 The following should produce a list of folders
 
 ```sh
-imap-backup remote folders address@example.com -c dev/container/config.json
+imap-backup remote folders address@example.com -c /app/config.json
 ```
 
 You can use the test helpers to interact with the test IMAP servers:

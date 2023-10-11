@@ -1,20 +1,17 @@
-ARG RUBY_VERSION
-FROM ruby:$RUBY_VERSION-buster
+ARG RUBY_VERSION=3.2
+FROM ruby:$RUBY_VERSION-alpine as builder
 
-# Install dependencies
-RUN \
-  apt-get update && \
-  apt-get install --yes libffi-dev
+# install dependencies
+RUN apk add libffi-dev alpine-sdk
+RUN gem install bundler --version=2.3.22
+COPY . .
+RUN bundle install
 
-# Show full path in prompt
-RUN echo 'PS1='\''imap-backup:$(pwd)>'\''' > /etc/bash.bashrc
-
-# Create binstubs (including one for imap-backup) so we can run it
-# without using `bundle exec`
-ENV PATH ./bin/stubs:$PATH
-
+FROM ruby:$RUBY_VERSION-alpine as final
+ENV HOME=/config \
+    PATH=/app/bin:$PATH
 WORKDIR /app
+COPY --from=builder /usr/local/bundle /usr/local/bundle
+COPY . .
 
-RUN gem install bundler --version=2.1.4
-
-ENTRYPOINT ["bash"]
+CMD ["imap-backup", "--config", "/config/config.json"]

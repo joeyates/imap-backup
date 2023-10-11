@@ -1,1 +1,18 @@
-/dev
+# ignore everything
+*
+
+# include rubyfiles
+!lib
+!spec
+# include gemfiles
+!Gemfile
+!imap-backup.gemspec
+!Rakefile
+
+# Include essentials
+!CHANGELOG.md
+!LICENSE
+!README.md
+
+# bin stubs
+!bin

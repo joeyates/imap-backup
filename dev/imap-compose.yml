@@ -1,4 +1,4 @@
-# This file adapted from github.com/antespi/docker-imap-devel
+# test IMAP servers for devlopment
 version: "3"
 
 services:

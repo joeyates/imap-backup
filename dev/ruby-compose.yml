@@ -1,4 +1,4 @@
-# production docker compose file
+# imap-backup built with different ruby versions for testing
 version: "3"
 
 services:
@@ -6,13 +6,14 @@ services:
     build:
       context: ../
       dockerfile: dev/container/Dockerfile
-    image: ghcr.io/joeyates/imap-backup:latest
+      args:
+      - RUBY_VERSION
+    image: imap-backup:${RUBY_VERSION}
     user: $(id -u)
     environment:
     - DOCKER_HOST_IMAP=imap
-    - DOCKER_PORT_IMAP=993
+    - DOCKER_PORT_IMAP=8993
     - DOCKER_HOST_OTHER_IMAP=other-imap
-    - DOCKER_PORT_OTHER_IMAP=993
+    - DOCKER_PORT_OTHER_IMAP=9993
     volumes:
-      - ./backups:/backup
-      - ./config:/config
+      - ./dev/container:/app
