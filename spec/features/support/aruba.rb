@@ -73,12 +73,16 @@ module LocalHelpers
     account.local_path
   end
 
-  def mbox_path(email, name, configuration_path: nil)
-    File.join(local_path(email, configuration_path: configuration_path), "#{name}.mbox")
+  def mbox_path(email, name, configuration_path: nil, local_path: nil)
+    local_path ||= local_path(email, configuration_path: configuration_path)
+    File.join(local_path, "#{name}.mbox")
   end
 
-  def mbox_content(email, name, configuration_path: nil)
-    File.read(mbox_path(email, name, configuration_path: configuration_path))
+  def mbox_content(email, name, configuration_path: nil, local_path: nil)
+    path = mbox_path(
+      email, name, configuration_path: configuration_path, local_path: local_path
+    )
+    File.read(path)
   end
 
   def imap_path(email, name, configuration_path: nil)

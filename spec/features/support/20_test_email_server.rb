@@ -91,6 +91,7 @@ class TestEmailServer
   end
 
   def send_email(folder, **options)
+    reconnect if imap.disconnected?
     flags = options[:flags]
     message = message_as_server_message(**options)
     imap.append(folder, message, flags, nil)
@@ -150,5 +151,15 @@ class TestEmailServer
   def set_flags(folder, uids, flags)
     imap.select(folder)
     imap.uid_store(uids, "FLAGS", flags)
+  end
+
+  def warn_about_non_default_folders
+    expected = %w(Drafts INBOX Sent Trash)
+    actual = folders.map(&:name).sort
+    extra = actual - expected
+    extra.each do |name|
+      puts "Unexpected folder '#{name}' found - deleting"
+      delete_folder name
+    end
   end
 end

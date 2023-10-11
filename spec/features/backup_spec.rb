@@ -6,7 +6,7 @@ RSpec.describe "imap-backup backup", :docker, type: :aruba do
   include_context "message-fixtures"
 
   let(:backup_folders) { [folder] }
-  let(:folder) { "my-stuff" }
+  let(:folder) { "stuff-to-backup" }
   let(:messages_as_mbox) do
     to_mbox_entry(**message_one) + to_mbox_entry(**message_two)
   end
@@ -22,16 +22,14 @@ RSpec.describe "imap-backup backup", :docker, type: :aruba do
   let(:config_options) { {accounts: [account_config]} }
   let(:write_config) { create_config(**config_options) }
 
-  let!(:pre) do
-    test_server.delete_folder folder
-  end
-  let(:command) { "imap-backup backup" }
+  let!(:pre) { test_server.warn_about_non_default_folders }
   let!(:setup) do
     test_server.create_folder folder
     test_server.send_email folder, **message_one
     test_server.send_email folder, **message_two
     write_config
   end
+  let(:command) { "imap-backup backup" }
 
   after do
     test_server.delete_folder folder
@@ -68,7 +66,7 @@ RSpec.describe "imap-backup backup", :docker, type: :aruba do
       expect(uids).to eq(folder_uids)
     end
 
-    it "records message offsets in the mbox file" do
+    it "records message offsets in the imap file" do
       run_command_and_stop command
 
       offsets = imap_metadata[:messages].map { |m| m[:offset] }
@@ -77,7 +75,7 @@ RSpec.describe "imap-backup backup", :docker, type: :aruba do
       expect(offsets).to eq(expected)
     end
 
-    it "records message lengths in the mbox file" do
+    it "records message lengths in the imap file" do
       run_command_and_stop command
 
       lengths = imap_metadata[:messages].map { |m| m[:length] }
@@ -96,13 +94,13 @@ RSpec.describe "imap-backup backup", :docker, type: :aruba do
       let(:command) { "imap-backup backup --refresh" }
 
       context "with messages that have already been backed up" do
-        let!(:pre) do
-          super()
-          write_config
+        let(:setup) do
           test_server.create_folder folder
           test_server.send_email folder, **message_three, flags: [:Draft]
+          write_config
           backup.run
           test_server.set_flags folder, [1], [:Seen]
+          super()
         end
 
         it "updates flags" do
@@ -119,14 +117,17 @@ RSpec.describe "imap-backup backup", :docker, type: :aruba do
     context "when uid_validity does not match" do
       let(:new_name) { "NEWNAME" }
       let(:original_folder_uid_validity) { test_server.folder_uid_validity(folder) }
-      let!(:pre) do
-        super()
+      let(:local_setup) do
         test_server.delete_folder new_name
         test_server.create_folder folder
         test_server.send_email folder, **message_three
         original_folder_uid_validity
         backup.run
         test_server.rename_folder folder, new_name
+      end
+      let(:setup) do
+        local_setup
+        super()
       end
       let(:renamed_folder) { "#{folder}-#{original_folder_uid_validity}" }
 
@@ -159,7 +160,7 @@ RSpec.describe "imap-backup backup", :docker, type: :aruba do
       end
 
       context "when a renamed local backup exists" do
-        let!(:pre) do
+        let(:local_setup) do
           super()
           create_directory account_config[:local_path]
           valid_imap_data = {version: 3, uid_validity: 1, messages: []}
@@ -184,7 +185,7 @@ RSpec.describe "imap-backup backup", :docker, type: :aruba do
     let(:imap_path) { File.join(account_config[:local_path], "Foo.imap") }
     let(:mbox_path) { File.join(account_config[:local_path], "Foo.mbox") }
 
-    let!(:pre) do
+    let!(:setup) do
       create_directory account_config[:local_path]
       message = "existing mbox"
       valid_imap_data = {
@@ -192,6 +193,7 @@ RSpec.describe "imap-backup backup", :docker, type: :aruba do
       }
       File.write(imap_path, valid_imap_data.to_json)
       File.write(mbox_path, message)
+      super()
     end
 
     context "with folders that are not being backed up" do
@@ -242,7 +244,7 @@ RSpec.describe "imap-backup backup", :docker, type: :aruba do
       {path: custom_config_path, accounts: [other_server_connection_parameters]}
     end
     let(:account_config) { other_server_connection_parameters }
-    let(:folder) { "other_public.my-stuff" }
+    let(:folder) { "other_public.other-stuff" }
     let(:command) { "imap-backup backup --config #{custom_config_path}" }
 
     let(:setup) do

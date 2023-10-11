@@ -47,6 +47,16 @@ module Imap::Backup
           )
         end
 
+        def self.refresh_option
+          method_option(
+            "refresh",
+            type: :boolean,
+            desc: "in the default 'keep all emails' mode, " \
+                  "updates flags for messages that are already downloaded",
+            aliases: ["-r"]
+          )
+        end
+
         def self.verbose_option
           method_option(
             "verbose",

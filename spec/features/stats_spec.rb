@@ -4,10 +4,11 @@ RSpec.describe "imap-backup stats", :docker, type: :aruba do
   include_context "message-fixtures"
 
   let(:account) { test_server_connection_parameters }
-  let(:folder) { "my-stuff" }
+  let(:folder) { "stats-stuff" }
   let(:command) { "imap-backup stats #{account[:username]}" }
   let(:config_options) { {accounts: [account]} }
   let!(:setup) do
+    test_server.warn_about_non_default_folders
     test_server.create_folder folder
     test_server.send_email folder, **message_one
     test_server.disconnect
@@ -22,7 +23,7 @@ RSpec.describe "imap-backup stats", :docker, type: :aruba do
   it "lists messages to be backed up" do
     run_command_and_stop command
 
-    expect(last_command_started).to have_output(/my-stuff\s+\|\s+1\|\s+0\|\s+0/)
+    expect(last_command_started).to have_output(/stats-stuff\s+\|\s+1\|\s+0\|\s+0/)
   end
 
   context "when JSON is requested" do
@@ -32,7 +33,7 @@ RSpec.describe "imap-backup stats", :docker, type: :aruba do
       run_command_and_stop command
 
       expect(last_command_started).
-        to have_output(/\{"folder":"my-stuff","remote":1,"both":0,"local":0\}/)
+        to have_output(/\{"folder":"stats-stuff","remote":1,"both":0,"local":0\}/)
     end
   end
 

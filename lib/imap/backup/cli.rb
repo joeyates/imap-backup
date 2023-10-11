@@ -14,6 +14,7 @@ module Imap::Backup
     autoload :Remote, "imap/backup/cli/remote"
     autoload :Restore, "imap/backup/cli/restore"
     autoload :Setup, "imap/backup/cli/setup"
+    autoload :Single, "imap/backup/cli/single"
     autoload :Stats, "imap/backup/cli/stats"
     autoload :Transfer, "imap/backup/cli/transfer"
     autoload :Utils, "imap/backup/cli/utils"
@@ -78,13 +79,8 @@ module Imap::Backup
     accounts_option
     config_option
     quiet_option
+    refresh_option
     verbose_option
-    method_option(
-      "refresh",
-      type: :boolean,
-      desc: "in 'keep all emails' mode, update flags for messages that are already downloaded",
-      aliases: ["-r"]
-    )
     def backup
       non_logging_options = Imap::Backup::Logger.setup_logging(options)
       Backup.new(non_logging_options).run
@@ -238,6 +234,9 @@ module Imap::Backup
       non_logging_options = Imap::Backup::Logger.setup_logging(options)
       CLI::Setup.new(non_logging_options).run
     end
+
+    desc "single SUBCOMMAND [OPTIONS]", "Run actions on a single account"
+    subcommand "single", Single
 
     desc "stats EMAIL [OPTIONS]", "Print stats for each account folder"
     long_desc <<~DESC

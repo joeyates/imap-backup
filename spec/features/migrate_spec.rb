@@ -2,7 +2,7 @@ require "features/helper"
 
 RSpec.describe "imap-backup migrate", :docker, type: :aruba do
   let(:email) { "me@example.com" }
-  let(:folder) { "my_folder" }
+  let(:folder) { "migrate-folder" }
   let(:source_folder) { folder }
   let(:source_account) do
     {
@@ -16,6 +16,7 @@ RSpec.describe "imap-backup migrate", :docker, type: :aruba do
   let(:config_options) { {accounts: [source_account, destination_account]} }
 
   let!(:setup) do
+    test_server.warn_about_non_default_folders
     create_config(**config_options)
     append_local(
       email: email, folder: source_folder.gsub(".", "/"), subject: "Ciao", flags: [:Draft, :$CUSTOM]
@@ -77,7 +78,11 @@ RSpec.describe "imap-backup migrate", :docker, type: :aruba do
   end
 
   context "when migrating from a subfolder" do
-    let(:source_folder) { "my_sub.my_folder" }
+    let(:source_folder) { "my_sub.migrate-folder" }
+
+    after do
+      destination_server.delete_folder "migrate-folder"
+    end
 
     it "copies email from subfolders on the source account" do
       command = [
@@ -104,7 +109,12 @@ RSpec.describe "imap-backup migrate", :docker, type: :aruba do
   end
 
   context "when migrating into a subfolder" do
-    let(:destination_folder) { "my_sub.my_folder" }
+    let(:destination_folder) { "my_sub.migrate-folder" }
+
+    after do
+      destination_server.delete_folder "my_sub"
+      destination_server.delete_folder "my_sub.migrate-folder"
+    end
 
     it "copies email to subfolders on the destination account" do
       command = [
@@ -132,10 +142,14 @@ RSpec.describe "imap-backup migrate", :docker, type: :aruba do
 
   context "when the source server has a namespace prefix" do
     let(:source_account) { other_server_connection_parameters }
-    let(:source_folder) { "other_public.my_folder" }
+    let(:source_folder) { "other_public.migrate-folder" }
     let(:email) { source_account[:username] }
     let(:destination_account) { test_server_connection_parameters }
     let(:config_options) { {accounts: [source_account, destination_account]} }
+
+    after do
+      destination_server.delete_folder "migrate-folder"
+    end
 
     it "copies email to the destination account" do
       command = [
@@ -187,7 +201,7 @@ RSpec.describe "imap-backup migrate", :docker, type: :aruba do
     let(:source_account) { test_server_connection_parameters }
     let(:email) { source_account[:username] }
     let(:destination_account) { other_server_connection_parameters }
-    let(:destination_folder) { "other_public.my_folder" }
+    let(:destination_folder) { "other_public.migrate-folder" }
     let(:destination_server) { other_server }
     let(:config_options) { {accounts: [source_account, destination_account]} }
 
