@@ -140,7 +140,7 @@ If you have problems:
 See the [Development documentation](./docs/development.md) for notes
 on development and testing.
 
-See [the CHANGELOG](./CHANGELOG.md) to a list of changes that have been
+See [the CHANGELOG](./CHANGELOG.md) for a list of changes that have been
 made in each release.
 
 * [Source Code]
