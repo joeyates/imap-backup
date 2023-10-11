@@ -12,6 +12,12 @@ By default, emails for all *configured* accounts are copied to disk.
 The backup is incremental and interruptable, so backups won't get messed up
 if your connection goes down during an operation.
 
+# Single Account Backups
+
+As an alternative, if you only want to backup a single account,
+you can pass all the necessary parameters directly to the `single backup` command
+(see the [`single backup`](./single-backup.md) docs).
+
 # Serialized Format
 
 Emails are stored on disk in [Mbox files](../files/mboxrd.md), one for each folder,
