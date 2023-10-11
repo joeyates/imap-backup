@@ -12,8 +12,8 @@ RSpec.describe "imap-backup restore", :docker, type: :aruba do
     [message_as_server_message(**message_one), message_as_server_message(**message_two)]
   end
   let(:uid_validity) { 1234 }
-  let(:email) { test_server_connection_parameters[:username] }
   let(:config_options) { {accounts: [account_config]} }
+  let(:email) { account_config[:username] }
 
   let!(:pre) {}
   let!(:setup) do
