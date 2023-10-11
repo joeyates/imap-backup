@@ -13,6 +13,52 @@ module Imap::Backup
     include CLI::Helpers
 
     desc "backup", "Backup a single email account based on command-line parameters"
+    long_desc <<~DESC
+      This is a "stand-alone" backup command that doesn't require
+      a configuration file.
+
+      At a minimum, you need to supply the email, the server and the
+      password. (There are three ways of specifying the password)
+
+      $ imap-backup single backup
+        --email me@example.com
+        --password MyS3kr1t
+        --server imap.example.com
+
+      Instead of supplying the password directly on the command line,
+      there are two alternatives.
+      You can set an environment variable (with any name) to your
+      password, then pass the name of the environment variable.
+
+      For example, if MY_IMAP_PASSWORD is set to your password,
+
+      $ imap-backup single backup
+        --email me@example.com
+        --password-environment-variable MY_IMAP_PASSWORD
+        --server imap.example.com
+
+      Alternatively, you can supply the name of a file that contains
+      the password.
+
+      For example, in `~/imap-password`:
+
+      `MyS3kr1t`
+
+      $ imap-backup single backup
+        --email me@example.com
+        --password-file ~/imap-password
+        --server imap.example.com
+
+      If you need to use an insecure connection (this normally happens
+      when running an OAuth2 proxy), you can specify server connection options
+      in JSON:
+
+      $ imap-backup single backup
+        --email me@example.com
+        --password MyS3kr1t
+        --server imap.example.com
+        --connection-options '{"ssl":{"verify_mode":0}}'
+    DESC
     method_option(
       "email",
       type: :string,
