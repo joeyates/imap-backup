@@ -15,7 +15,6 @@ RSpec.describe "imap-backup restore", :docker, type: :aruba do
   let(:config_options) { {accounts: [account_config]} }
   let(:email) { account_config[:username] }
 
-  let!(:pre) {}
   let!(:setup) do
     create_config(**config_options)
     create_local_folder email: email, folder: folder, uid_validity: uid_validity
@@ -63,10 +62,11 @@ RSpec.describe "imap-backup restore", :docker, type: :aruba do
     let(:email3) { test_server.send_email folder, **message_three }
 
     context "when the uid_validity matches" do
-      let(:pre) do
+      let(:setup) do
         test_server.create_folder folder
         email3
         uid_validity
+        super()
       end
       let(:messages_as_server_messages) do
         [
@@ -85,8 +85,9 @@ RSpec.describe "imap-backup restore", :docker, type: :aruba do
 
     context "when the uid_validity doesn't match" do
       context "when the folder is empty" do
-        let(:pre) do
+        let(:setup) do
           test_server.create_folder folder
+          super()
         end
 
         it "sets the backup uid_validity to match the folder" do
@@ -105,9 +106,10 @@ RSpec.describe "imap-backup restore", :docker, type: :aruba do
 
       context "when the folder has content" do
         let(:new_folder) { "#{folder}-#{uid_validity}" }
-        let(:pre) do
+        let(:setup) do
           test_server.create_folder folder
           email3
+          super()
         end
         let(:cleanup) do
           test_server.delete_folder new_folder
