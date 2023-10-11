@@ -9,7 +9,7 @@ git config --local blame.ignoreRevsFile .git-blame-ignore-revs
 
 # Design Goals
 
-* Secure - use a local file protected by permissions
+* Secure - use a local configuration file protected by permissions
 * Restartable - calculate start point based on already downloaded messages
 * Standalone - do not rely on an email client or MTA
 
