@@ -83,24 +83,24 @@ imap-backup
 
 Alternatively, add it to your crontab.
 
-Backups can also be inspected, for example via [local show](docs/commands/local-show.md)
-and exported via [utils export-to-thunderbird](docs/commands/utils-export-to-thunderbird.md).
+Backups can also be inspected, for example via [`local show`](docs/commands/local-show.md)
+and exported via [`utils export-to-thunderbird`](docs/commands/utils-export-to-thunderbird.md).
 
 # Commands
 
-* [backup](docs/commands/backup.md)
-* [local accounts](docs/commands/local-accounts.md)
-* [local check](docs/commands/local-check.md)
-* [local folders](docs/commands/local-folders.md)
-* [local list](docs/commands/local-list.md)
-* [local show](docs/commands/local-show.md)
-* [migrate](docs/commands/migrate.md)
-* [mirror](docs/commands/mirror.md)
-* [remote folders](docs/commands/remote-folders.md)
-* [restore](docs/commands/restore.md)
-* [setup](docs/commands/setup.md)
-* [utils export-to-thunderbird](docs/commands/utils-export-to-thunderbird.md)
-* [utils ignore-history](docs/commands/utils-ignore-history.md)
+* [`backup`](docs/commands/backup.md)
+* [`local accounts`](docs/commands/local-accounts.md)
+* [`local check`](docs/commands/local-check.md)
+* [`local folders`](docs/commands/local-folders.md)
+* [`local list`](docs/commands/local-list.md)
+* [`local show`](docs/commands/local-show.md)
+* [`migrate`](docs/commands/migrate.md)
+* [`mirror`](docs/commands/mirror.md)
+* [`remote folders`](docs/commands/remote-folders.md)
+* [`restore`](docs/commands/restore.md)
+* [`setup`](docs/commands/setup.md)
+* [`utils export-to-thunderbird`](docs/commands/utils-export-to-thunderbird.md)
+* [`utils ignore-history`](docs/commands/utils-ignore-history.md)
 
 For a full list of available commands, run
 
