@@ -215,13 +215,23 @@ RSpec.describe "imap-backup restore", :docker, type: :aruba do
         **message_one
       )
     end
-
-    it "does not raise any errors" do
+    let(:run_command) do
       run_command_and_stop(
         "imap-backup restore #{email} --config #{custom_config_path}"
       )
+    end
+
+    it "does not raise any errors" do
+      run_command
 
       expect(last_command_started).to have_exit_status(0)
+    end
+
+    it "restores messages" do
+      run_command
+
+      messages = test_server.folder_messages(folder).map { |m| server_message_to_body(m) }
+      expect(messages).to eq([message_as_server_message(**message_one)])
     end
   end
 end
