@@ -6,10 +6,8 @@ docs/**
 tmp/**
 
 # dotfiles
-.containerignores
-.git-blame-ignore-revs
-.rubocop_todo.yml
-.rubocop.yml
+.containerignore
+.dockerignore
 .simplecov
 .yardopts
 

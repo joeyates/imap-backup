@@ -21,3 +21,24 @@ services:
     - MAIL_ADDRESS=email@other.org
     - MAIL_PASS=pass
     - DOVECOT_PUBLIC_NAMESPACE_PREFIX=other_public
+  imap-backup:
+    container_name: imap-backup
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile
+      args:
+        - RUBY_VERSION
+    image: imap-backup:${RUBY_VERSION}
+    depends_on:
+      - imap
+      - other-imap
+    tty: true
+    stdin_open: true
+    command: [ash]
+    environment:
+    - DOCKER_HOST_IMAP=imap
+    - DOCKER_PORT_IMAP=993
+    - DOCKER_HOST_OTHER_IMAP=other-imap
+    - DOCKER_PORT_OTHER_IMAP=993
+    volumes:
+      - ./container:/config

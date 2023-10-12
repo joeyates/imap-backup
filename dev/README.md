@@ -13,8 +13,7 @@ Do the following from the project's root directory:
 ```sh
 export RUBY_VERSION=[VERSION]
 export ID=(id -u)
-docker-compose --file dev/imap-compose.yml up -d
-docker-compose --file dev/ruby-compose.yml up -d --build
+docker-compose --file dev/imap-compose.yml up -d --build
 docker attach imap-backup
 ```
 
@@ -22,7 +21,6 @@ docker attach imap-backup
 
 ```sh
 docker-compose --file dev/imap-compose.yml down
-docker-compose --file dev/ruby-compose.yml down
 ```
 
 ## Run tests
@@ -42,7 +40,7 @@ An example file `dev/container/config.json` is supplied.
 The following should produce a list of folders
 
 ```sh
-imap-backup remote folders address@example.com -c /app/config.json
+imap-backup remote folders address@example.com -c /config/config.json
 ```
 
 You can use the test helpers to interact with the test IMAP servers:

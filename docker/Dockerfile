@@ -6,7 +6,8 @@ RUN apk add libffi-dev alpine-sdk
 RUN gem install bundler --version=2.3.22
 WORKDIR /app
 COPY . .
-RUN bundle install --binstubs
+RUN bundle install
+RUN bundle binstubs --all --path /app/bin/stubs
 
 FROM ruby:$RUBY_VERSION-alpine as final
 ENV HOME=/app \
