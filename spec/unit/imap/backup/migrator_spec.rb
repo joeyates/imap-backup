@@ -1,5 +1,9 @@
 require "imap/backup/migrator"
 
+require "imap/backup/account/folder"
+require "imap/backup/serializer"
+require "imap/backup/serializer/message"
+
 module Imap::Backup
   RSpec.describe Migrator do
     subject { described_class.new(serializer, folder, reset: reset) }

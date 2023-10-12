@@ -1,4 +1,7 @@
 require "imap/backup/serializer/integrity_checker"
+require "imap/backup/serializer/imap"
+require "imap/backup/serializer/mbox"
+require "imap/backup/serializer/message"
 
 module Imap::Backup
   RSpec.describe Serializer::IntegrityChecker do

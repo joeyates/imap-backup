@@ -1,4 +1,6 @@
 require "imap/backup/account/folder"
+
+require "imap/backup/client/default"
 require "imap/backup/serializer/message"
 
 # rubocop:disable RSpec/PredicateMatcher

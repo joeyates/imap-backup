@@ -1,5 +1,4 @@
 require "imap/backup/serializer/unused_name_finder"
-require "imap/backup/serializer"
 
 module Imap::Backup
   RSpec.describe Serializer::UnusedNameFinder do

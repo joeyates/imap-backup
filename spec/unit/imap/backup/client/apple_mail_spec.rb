@@ -1,3 +1,7 @@
+require "imap/backup/client/apple_mail"
+
+require "imap/backup/account"
+
 module Imap::Backup
   RSpec.describe Client::AppleMail do
     subject { described_class.new("server", account, {}) }

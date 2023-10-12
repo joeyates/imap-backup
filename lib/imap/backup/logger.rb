@@ -1,3 +1,4 @@
+require "net/imap"
 require "logger"
 require "singleton"
 

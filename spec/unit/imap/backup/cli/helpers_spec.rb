@@ -1,5 +1,7 @@
 require "imap/backup/cli/helpers"
 
+require "imap/backup/account"
+
 module Imap::Backup
   class WithHelpers < Thor
     include CLI::Helpers

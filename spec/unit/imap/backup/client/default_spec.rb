@@ -1,5 +1,7 @@
 require "imap/backup/client/default"
 
+require "imap/backup/account"
+
 module Imap::Backup
   RSpec.describe Client::Default do
     subject { described_class.new("server", account, {}) }

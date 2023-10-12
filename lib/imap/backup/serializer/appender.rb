@@ -28,20 +28,41 @@ module Imap::Backup
         return
       end
 
-      rollback_on_error do
+      begin
         serialized = to_serialized(message)
+      rescue StandardError => e
+        raise wrap_error(
+          error: e,
+          note: "failed to serialize message",
+          folder: folder,
+          uid: uid,
+          message: message
+        )
+      end
+
+      rollback_on_error do
         mbox.append serialized
         imap.append uid, serialized.bytesize, flags: flags
       rescue StandardError => e
-        raise <<-ERROR.gsub(/^\s*/m, "")
-          [#{folder}] failed to append message #{uid}: #{message}.
-          #{e}:
-          #{e.backtrace.join("\n")}"
-        ERROR
+        raise wrap_error(
+          error: e,
+          note: "failed to append message",
+          folder: folder,
+          uid: uid,
+          message: message
+        )
       end
     end
 
     private
+
+    def wrap_error(error:, note:, folder:, uid:, message:)
+      <<-ERROR.gsub(/^\s*/m, "")
+        [#{folder}] #{note} #{uid}: #{message}.
+        #{error}:
+        #{error.backtrace.join("\n")}"
+      ERROR
+    end
 
     def to_serialized(message)
       mboxrd_message = Email::Mboxrd::Message.new(message)

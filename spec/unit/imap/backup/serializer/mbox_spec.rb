@@ -1,3 +1,5 @@
+require "imap/backup/serializer/mbox"
+
 module Imap::Backup
   RSpec.describe Serializer::Mbox do
     subject { described_class.new(folder_path) }

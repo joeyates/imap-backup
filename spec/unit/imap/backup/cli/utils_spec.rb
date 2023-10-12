@@ -1,4 +1,8 @@
 require "imap/backup/cli/utils"
+
+require "thunderbird/install"
+require "imap/backup/client/default"
+require "imap/backup/configuration"
 require "support/shared_examples/an_action_that_handles_logger_options"
 
 module Imap::Backup

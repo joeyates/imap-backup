@@ -1,5 +1,11 @@
 require "imap/backup/account/backup"
 
+require "imap/backup/client/default"
+require "imap/backup/downloader"
+require "imap/backup/flag_refresher"
+require "imap/backup/local_only_message_deleter"
+require "imap/backup/serializer"
+
 module Imap::Backup
   RSpec.describe Account::Backup do
     subject { described_class.new(account: account, refresh: refresh) }

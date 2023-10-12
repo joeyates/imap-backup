@@ -1,6 +1,5 @@
 require "imap/backup/uploader"
-require "imap/backup/account/folder"
-require "imap/backup/serializer"
+require "imap/backup/client/default"
 
 module Imap::Backup
   RSpec.describe Uploader do
