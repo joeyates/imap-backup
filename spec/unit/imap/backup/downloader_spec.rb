@@ -5,6 +5,12 @@ module Imap::Backup
     describe "#run" do
       subject { described_class.new(folder, serializer, **options) }
 
+      def allow_fetch_multi(uid:, body:, flags: [])
+        allow(folder).to receive(:fetch_multi).with([uid]) do
+          [{uid: uid, body: body, flags: flags}]
+        end
+      end
+
       let(:body) { "blah" }
       let(:folder) do
         instance_double(
@@ -28,9 +34,7 @@ module Imap::Backup
 
       context "with fetched messages" do
         specify "are saved" do
-          allow(folder).to receive(:fetch_multi).with(["111"]) do
-            [{uid: "111", body: body, flags: [:MyFlag]}]
-          end
+          allow_fetch_multi(uid: "111", body: body, flags: [:MyFlag])
 
           expect(serializer).to receive(:append).with("111", body, [:MyFlag])
 
@@ -40,9 +44,7 @@ module Imap::Backup
 
       context "with messages which are already present" do
         specify "are skipped" do
-          allow(folder).to receive(:fetch_multi).with(["111"]) do
-            [{uid: "111", body: body, flags: [:MyFlag]}]
-          end
+          allow_fetch_multi(uid: "111", body: body, flags: [:MyFlag])
 
           expect(serializer).to_not receive(:append).with("222", anything, anything)
 
@@ -67,10 +69,8 @@ module Imap::Backup
         context "when the first fetch fails" do
           before do
             allow(folder).to receive(:fetch_multi).with(remote_uids) { nil }
-            allow(folder).to receive(:fetch_multi).with(["111"]).
-              and_return([{uid: "111", body: body, flags: [:Flag1]}])
-            allow(folder).to receive(:fetch_multi).with(["999"]).
-              and_return([{uid: "999", body: body, flags: [:Flag2]}])
+            allow_fetch_multi(uid: "111", body: body, flags: [:Flag1])
+            allow_fetch_multi(uid: "999", body: body, flags: [:Flag2])
 
             subject.run
           end
@@ -86,7 +86,7 @@ module Imap::Backup
         let(:remote_uids) { %w(111) }
 
         before do
-          allow(folder).to receive(:fetch_multi).with(["111"]) { [{uid: "111", body: nil}] }
+          allow_fetch_multi(uid: "111", body: nil)
 
           subject.run
         end
@@ -114,7 +114,7 @@ module Imap::Backup
         let(:options) { {reset_seen_flags_after_fetch: true} }
 
         before do
-          allow(folder).to receive(:fetch_multi).with(["111"]) { [{uid: "111", body: body}] }
+          allow_fetch_multi(uid: "111", body: body)
           allow(folder).to receive(:unseen).and_return([33], [])
           allow(folder).to receive(:remove_flags)
 
