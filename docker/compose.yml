@@ -5,14 +5,9 @@ services:
   imap-backup:
     build:
       context: ../
-      dockerfile: dev/container/Dockerfile
+      dockerfile: docker/Dockerfile
     image: ghcr.io/joeyates/imap-backup:latest
-    user: $(id -u)
-    environment:
-    - DOCKER_HOST_IMAP=imap
-    - DOCKER_PORT_IMAP=993
-    - DOCKER_HOST_OTHER_IMAP=other-imap
-    - DOCKER_PORT_OTHER_IMAP=993
+    user: $ID
     volumes:
       - ./backups:/backup
       - ./config:/config

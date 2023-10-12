@@ -5,11 +5,11 @@ services:
   imap-backup:
     build:
       context: ../
-      dockerfile: dev/container/Dockerfile
+      dockerfile: docker/Dockerfile
       args:
       - RUBY_VERSION
     image: imap-backup:${RUBY_VERSION}
-    user: $(id -u)
+    user: $ID
     environment:
     - DOCKER_HOST_IMAP=imap
     - DOCKER_PORT_IMAP=8993

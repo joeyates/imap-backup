@@ -1,4 +1,4 @@
-# test IMAP servers for devlopment
+# test IMAP servers for development
 version: "3"
 
 services:

@@ -8,10 +8,9 @@ COPY . .
 RUN bundle install
 
 FROM ruby:$RUBY_VERSION-alpine as final
-ENV HOME=/config \
-    PATH=/app/bin:$PATH
+ENV HOME=/app \
+    PATH=/app/bin/stubs:$PATH
 WORKDIR /app
 COPY --from=builder /usr/local/bundle /usr/local/bundle
+COPY --from=builder .bins/stubs /app/bin/stubs
 COPY . .
-
-CMD ["imap-backup", "--config", "/config/config.json"]

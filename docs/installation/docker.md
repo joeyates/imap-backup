@@ -3,16 +3,11 @@
 These instructions do not include any guidance for building or testing the Docker image - for those, please see the [dev/container](dev/container) folder
 
 ## setup
-
-After setting up your config, your directory structure should look like this. Make sure that your backup destination is prefixed with `/backup` or change your local path accordingly.
-
-If you would only like to run with docker compose, then [dev/container/compose.yml](dev/container/compose.yml) can be copied out of the directory and used independently.
-
-```
-backup/
-config/
-  config.json
-compose.yml (optional)
+The docker containers by default mount the `/backup` folder to your local `./backup` folder. If you would like to change either, please adjust the compose or docker-run commands accordingly
+```yml
+volumes:
+  - ./local-backup-path:/container-backup-path
+  - ./local-settings-path:/container-settings-path
 ```
 
 ## docker/podman compose
@@ -20,19 +15,19 @@ compose.yml (optional)
 Out of the box, running
 ```sh
 # docker-cli-compose
-$ docker compose up -f compose.yml -d
+$ docker compose up -f docker/compose.yml -d
 # legacy docker-compose
-$ docker-compose up -f compose.yml -d
+$ docker-compose up -f docker/compose.yml -d
 # podman
-$ podman-compose up -f compose.yml -d
+$ podman-compose up -f docker/compose.yml -d
 ```
-will read the configuration from `./config/config.json` and back up to `./backup`. This job can be restarted as new backups are needed 
 
 ## docker compose-less
 
-If you would like to run the backup as a one-shot or as a service, the compose can be adapted to a oneline command
+If you would like to run the backup as a one-shot or as a service, the compose can be adapted to a Docker run command
 
 ```sh
-docker run -v ./config:/config -v ./backup:/backup --user $(id -u) ghcr.io/joeyates/imap-backup
+export ID=$(id -u)
+docker run -v ./config:/config -v ./backup:/backup --user $ID ghcr.io/joeyates/imap-backup imap-backup --config /config/config.json
 ```
 

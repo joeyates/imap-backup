@@ -1,1 +1,18 @@
-Gemfile.lock
+# ignore CI files
+.github/**
+dev/**
+
+docs/**
+tmp/**
+
+# dotfiles
+.containerignores
+.git-blame-ignore-revs
+.rubocop_todo.yml
+.rubocop.yml
+.simplecov
+.yardopts
+
+# Lock files
+GemFile.lock
+bin/stubs/**

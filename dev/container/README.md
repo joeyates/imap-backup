@@ -12,16 +12,17 @@ Do the following from the project's root directory:
 
 ```sh
 export RUBY_VERSION=[VERSION]
-docker compose --file dev/imap-compose.yml up -d
-docker compose --file dev/ruby-compose.yml up -d --build
+export ID=(id -u)
+docker-compose --file dev/imap-compose.yml up -d
+docker-compose --file dev/ruby-compose.yml up -d --build
 docker attach imap-backup
 ```
 
 ...and stop the server afterwards:
 
 ```sh
-docker compose --file dev/imap-compose.yml down
-docker compose --file dev/ruby-compose.yml down
+docker-compose --file dev/imap-compose.yml down
+docker-compose --file dev/ruby-compose.yml down
 ```
 
 ## Run tests
