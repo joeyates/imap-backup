@@ -4,13 +4,14 @@ FROM ruby:$RUBY_VERSION-alpine as builder
 # install dependencies
 RUN apk add libffi-dev alpine-sdk
 RUN gem install bundler --version=2.3.22
+WORKDIR /app
 COPY . .
-RUN bundle install
+RUN bundle install --binstubs
 
 FROM ruby:$RUBY_VERSION-alpine as final
 ENV HOME=/app \
     PATH=/app/bin/stubs:$PATH
 WORKDIR /app
 COPY --from=builder /usr/local/bundle /usr/local/bundle
-COPY --from=builder .bins/stubs /app/bin/stubs
+COPY --from=builder /app/bin/stubs /app/bin/stubs
 COPY . .
