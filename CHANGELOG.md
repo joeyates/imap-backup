@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 14.1.1 - 2023-10-12
+
+### Changed
+
+* Fixed: When handling serialization errors, when using the
+  `delayed_metadata` strategy, previously downloaded
+  messages are now saved.
+
 ## 14.1.0 - 2023-10-12
 
 ### Changed
