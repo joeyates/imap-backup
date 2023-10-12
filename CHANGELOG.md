@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 14.1.0 - 2023-10-12
+
+### Changed
+
+* Messages that cause errors during serialization are now skipped
+  end the account backup continues.
+
 ## 14.0.0 - 2023-10-11
 
 ### Added
