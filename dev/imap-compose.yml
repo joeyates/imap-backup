@@ -34,7 +34,7 @@ services:
       - other-imap
     tty: true
     stdin_open: true
-    command: [ash]
+    command: [bash]
     environment:
     - DOCKER_HOST_IMAP=imap
     - DOCKER_PORT_IMAP=993

@@ -10,6 +10,7 @@ RUN bundle install
 RUN bundle binstubs --all --path /app/bin/stubs
 
 FROM ruby:$RUBY_VERSION-alpine as final
+RUN apk add bash --no-cache
 ENV HOME=/app \
     PATH=/app/bin/stubs:$PATH
 WORKDIR /app
