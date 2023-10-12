@@ -1,3 +1,5 @@
+require "imap/backup/downloader"
+
 module Imap::Backup
   RSpec.describe Downloader do
     describe "#run" do

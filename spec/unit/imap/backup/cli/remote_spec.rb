@@ -1,6 +1,8 @@
-require "ostruct"
-
 require "imap/backup/cli/remote"
+
+require "ostruct"
+require "imap/backup/client/default"
+require "imap/backup/configuration"
 require "support/shared_examples/an_action_that_handles_logger_options"
 
 module Imap::Backup

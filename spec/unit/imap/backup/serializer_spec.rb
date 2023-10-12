@@ -1,6 +1,6 @@
-RSpec.shared_examples "a method that checks for invalid serialization" do
-  require "imap/backup/serializer/version2_migrator"
+require "imap/backup/serializer"
 
+RSpec.shared_examples "a method that checks for invalid serialization" do
   context "with version 2 metadata files" do
     let(:version2_migrator) do
       instance_double(Imap::Backup::Serializer::Version2Migrator, required?: true, run: false)

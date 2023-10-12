@@ -1,8 +1,8 @@
 require "imap/backup/cli"
 
-module Imap::Backup
-  require "support/shared_examples/an_action_that_handles_logger_options"
+require "support/shared_examples/an_action_that_handles_logger_options"
 
+module Imap::Backup
   RSpec.describe CLI do
     describe ".exit_on_failure?" do
       it "is true" do

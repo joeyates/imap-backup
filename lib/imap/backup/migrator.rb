@@ -1,3 +1,5 @@
+require "imap/backup/logger"
+
 module Imap; end
 
 module Imap::Backup

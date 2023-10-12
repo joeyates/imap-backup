@@ -1,6 +1,7 @@
 require "thor"
 
 require "imap/backup/cli/helpers"
+require "imap/backup/logger"
 
 module Imap; end
 

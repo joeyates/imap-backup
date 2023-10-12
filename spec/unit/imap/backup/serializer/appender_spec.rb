@@ -1,6 +1,7 @@
 require "imap/backup/serializer/appender"
 require "imap/backup/serializer/imap"
 require "imap/backup/serializer/mbox"
+require "imap/backup/serializer/message"
 
 module Imap::Backup
   RSpec.describe Serializer::Appender do

@@ -1,5 +1,9 @@
 require "imap/backup/cli/transfer"
 
+require "net/imap"
+require "imap/backup/account/folder"
+require "imap/backup/serializer"
+
 module Imap::Backup
   RSpec.describe CLI::Transfer do
     subject { described_class.new(action, source, destination, options) }

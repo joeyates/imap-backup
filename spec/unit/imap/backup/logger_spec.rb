@@ -1,4 +1,4 @@
-require "net/imap"
+require "imap/backup/logger"
 
 module Imap::Backup
   RSpec.describe Logger do

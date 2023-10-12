@@ -1,5 +1,8 @@
 require "imap/backup/cli/restore"
 
+require "imap/backup/account"
+require "imap/backup/configuration"
+
 module Imap::Backup
   RSpec.describe CLI::Restore do
     subject { described_class.new(email, options) }
