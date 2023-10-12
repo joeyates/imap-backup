@@ -1,5 +1,4 @@
-require "json"
-require "os"
+require "imap/backup/configuration"
 
 # rubocop:disable RSpec/PredicateMatcher
 

@@ -1,4 +1,6 @@
 require "imap/backup/setup/account/header"
+require "highline"
+require "imap/backup/account"
 
 module Imap::Backup
   RSpec.describe Setup::Account::Header do

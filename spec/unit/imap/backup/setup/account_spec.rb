@@ -1,7 +1,6 @@
 require "imap/backup/setup/account"
-require "imap/backup/setup/asker"
-require "imap/backup/setup/connection_tester"
-require "imap/backup/setup/folder_chooser"
+require "highline"
+require "imap/backup/configuration"
 
 module Imap::Backup
   RSpec.describe Setup::Account do

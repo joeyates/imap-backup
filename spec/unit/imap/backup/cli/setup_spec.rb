@@ -1,5 +1,7 @@
 require "imap/backup/cli/setup"
 
+require "imap/backup/configuration"
+
 module Imap::Backup
   RSpec.describe CLI::Setup do
     subject { described_class.new({}) }

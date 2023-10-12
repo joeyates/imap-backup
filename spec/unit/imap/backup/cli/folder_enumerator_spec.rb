@@ -1,5 +1,8 @@
 require "imap/backup/cli/folder_enumerator"
 
+require "imap/backup/account"
+require "imap/backup/client/default"
+
 module Imap::Backup
   RSpec.describe CLI::FolderEnumerator do
     subject { described_class.new(**options) }

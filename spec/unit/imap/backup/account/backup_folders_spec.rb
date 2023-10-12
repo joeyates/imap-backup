@@ -1,3 +1,8 @@
+require "imap/backup/account/backup_folders"
+
+require "imap/backup/account"
+require "imap/backup/client/default"
+
 module Imap::Backup
   RSpec.describe Account::BackupFolders do
     subject { described_class.new(client: client, account: account) }

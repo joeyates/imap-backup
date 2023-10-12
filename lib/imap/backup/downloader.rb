@@ -96,18 +96,24 @@ module Imap::Backup
         debug("uid: #{uid} (#{index}/#{uids.count}) - #{body.size} bytes")
         serializer.append uid, body, flags
       end
+    rescue StandardError => e
+      error(e)
     end
 
     def uids
       @uids ||= folder.uids - serializer.uids
     end
 
-    def info(message)
-      Logger.logger.info("[#{folder.name}] #{message}")
-    end
-
     def debug(message)
       Logger.logger.debug("[#{folder.name}] #{message}")
+    end
+
+    def error(message)
+      Logger.logger.error("[#{folder.name}] #{message}")
+    end
+
+    def info(message)
+      Logger.logger.info("[#{folder.name}] #{message}")
     end
   end
 end

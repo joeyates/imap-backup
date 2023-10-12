@@ -3,6 +3,7 @@ require "imap/backup/cli/local"
 require "mail"
 
 require "imap/backup/account/folder"
+require "imap/backup/configuration"
 require "imap/backup/serializer"
 require "imap/backup/serializer/message"
 

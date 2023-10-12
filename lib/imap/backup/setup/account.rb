@@ -1,4 +1,5 @@
 require "imap/backup/setup/account/header"
+require "imap/backup/setup/asker"
 require "imap/backup/setup/backup_path"
 require "imap/backup/setup/connection_tester"
 require "imap/backup/setup/email"

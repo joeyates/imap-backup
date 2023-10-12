@@ -1,5 +1,7 @@
 require "imap/backup/client/automatic_login_wrapper"
 
+require "imap/backup/client/default"
+
 module Imap::Backup
   RSpec.describe Client::AutomaticLoginWrapper do
     subject { described_class.new(client: client) }
