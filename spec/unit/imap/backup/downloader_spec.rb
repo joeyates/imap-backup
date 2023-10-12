@@ -96,6 +96,24 @@ module Imap::Backup
         end
       end
 
+      context "when appending messages raise errors" do
+        let(:remote_uids) { %w(111 999) }
+
+        before do
+          allow_fetch_multi(uid: "111", body: body)
+          allow_fetch_multi(uid: "999", body: body)
+          allow(serializer).to receive(:append).
+            with("111", anything, anything).
+            and_raise(RuntimeError)
+        end
+
+        specify "other messages are saved" do
+          subject.run
+
+          expect(serializer).to have_received(:append).with("999", anything, anything)
+        end
+      end
+
       context "when the UID is not returned by the fetch" do
         let(:remote_uids) { %w(111) }
 
