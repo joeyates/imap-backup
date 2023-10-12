@@ -102,12 +102,12 @@ module Imap::Backup
       @uids ||= folder.uids - serializer.uids
     end
 
-    def info(message)
-      Logger.logger.info("[#{folder.name}] #{message}")
-    end
-
     def debug(message)
       Logger.logger.debug("[#{folder.name}] #{message}")
+    end
+
+    def info(message)
+      Logger.logger.info("[#{folder.name}] #{message}")
     end
   end
 end
