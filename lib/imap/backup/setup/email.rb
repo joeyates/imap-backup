@@ -1,4 +1,4 @@
-require "email/provider"
+require "imap/backup/email/provider"
 require "imap/backup/setup/asker"
 
 module Imap; end

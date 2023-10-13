@@ -1,7 +1,7 @@
 require "highline"
 
-require "email/provider"
 require "imap/backup/account"
+require "imap/backup/email/provider"
 require "imap/backup/setup/account"
 require "imap/backup/setup/asker"
 require "imap/backup/setup/global_options"
@@ -88,7 +88,7 @@ module Imap::Backup
         password: "",
         folders: []
       ).tap do |a|
-        provider = ::Email::Provider.for_address(username)
+        provider = Imap::Backup::Email::Provider.for_address(username)
         a.server = provider.host if provider.host
         a.reset_seen_flags_after_fetch = true if provider.sets_seen_flags_on_fetch?
       end
