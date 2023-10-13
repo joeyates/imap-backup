@@ -1,10 +1,10 @@
 require "net/imap"
-require "retry_on_error"
+require "imap/backup/retry_on_error"
 require_relative "10_server_message_helpers"
 
 class TestEmailServer
   include ServerMessageHelpers
-  include RetryOnError
+  include Imap::Backup::RetryOnError
 
   REQUESTED_ATTRIBUTES = [BODY_ATTRIBUTE, "FLAGS"].freeze
 

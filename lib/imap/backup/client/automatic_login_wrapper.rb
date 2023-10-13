@@ -1,4 +1,4 @@
-require "retry_on_error"
+require "imap/backup/retry_on_error"
 
 module Imap; end
 
