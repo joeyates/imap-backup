@@ -1,2 +1,8 @@
 # Nest classes under module's namespace
 8c04221838f14fd1222f0e2f20176497a04e0a38
+# Put all code under the Imap::Backup namespace
+2c818d8b7c377927e0feb0e55d44567859869c9e
+c83f7c3d938f0880b011c2cbe68585be7aab6a64
+1e10c1d21cb9d6c9230dedecf393add3393de5c8
+fe01b42edb4b01a7d02baa67b4d31ece5352d831
+dd871eaeddfabc245ff443d4132f4bc1095bfe5c
