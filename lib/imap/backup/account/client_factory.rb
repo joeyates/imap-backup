@@ -1,9 +1,9 @@
 require "socket"
 
-require "email/provider"
 require "imap/backup/client/apple_mail"
 require "imap/backup/client/automatic_login_wrapper"
 require "imap/backup/client/default"
+require "imap/backup/email/provider"
 
 module Imap; end
 

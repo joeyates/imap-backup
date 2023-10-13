@@ -1,40 +1,44 @@
-RSpec.describe Text::Sanitizer do
-  require "stringio"
+require "imap/backup/text/sanitizer"
 
-  subject { described_class.new(output) }
+require "stringio"
 
-  let(:output) { StringIO.new }
+module Imap::Backup
+  RSpec.describe Text::Sanitizer do
+    subject { described_class.new(output) }
 
-  describe "#puts" do
-    it "delegates to output" do
-      subject.puts("x")
+    let(:output) { StringIO.new }
 
-      expect(output.string).to eq("x\n")
+    describe "#puts" do
+      it "delegates to output" do
+        subject.puts("x")
+
+        expect(output.string).to eq("x\n")
+      end
     end
-  end
 
-  describe "#write" do
-    it "delegates to output" do
-      subject.write("x")
+    describe "#write" do
+      it "delegates to output" do
+        subject.write("x")
 
-      expect(output.string).to eq("x")
+        expect(output.string).to eq("x")
+      end
     end
-  end
 
-  describe "#print" do
-    it "removes passwords from complete lines of text" do
-      subject.print("C: RUBY99 LOGIN xx) secret!!!!\netc")
+    describe "#print" do
+      it "removes passwords from complete lines of text" do
+        subject.print("C: RUBY99 LOGIN xx) secret!!!!\netc")
 
-      expect(output.string).to eq("C: RUBY99 LOGIN xx) [PASSWORD REDACTED]\n")
+        expect(output.string).to eq("C: RUBY99 LOGIN xx) [PASSWORD REDACTED]\n")
+      end
     end
-  end
 
-  describe "#flush" do
-    it "sanitizes remaining text" do
-      subject.print("before\nC: RUBY99 LOGIN xx) secret!!!!")
-      subject.flush
+    describe "#flush" do
+      it "sanitizes remaining text" do
+        subject.print("before\nC: RUBY99 LOGIN xx) secret!!!!")
+        subject.flush
 
-      expect(output.string).to eq("before\nC: RUBY99 LOGIN xx) [PASSWORD REDACTED]\n")
+        expect(output.string).to eq("before\nC: RUBY99 LOGIN xx) [PASSWORD REDACTED]\n")
+      end
     end
   end
 end

@@ -3,7 +3,7 @@ require "logger"
 require "net/imap"
 
 require "imap/backup/logger"
-require "retry_on_error"
+require "imap/backup/retry_on_error"
 
 module Imap; end
 

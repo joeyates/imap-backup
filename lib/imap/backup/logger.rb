@@ -2,7 +2,7 @@ require "net/imap"
 require "logger"
 require "singleton"
 
-require "text/sanitizer"
+require "imap/backup/text/sanitizer"
 
 module Imap; end
 

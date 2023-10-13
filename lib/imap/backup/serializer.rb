@@ -1,6 +1,6 @@
 require "forwardable"
 
-require "email/mboxrd/message"
+require "imap/backup/email/mboxrd/message"
 require "imap/backup/logger"
 require "imap/backup/naming"
 require "imap/backup/serializer/appender"

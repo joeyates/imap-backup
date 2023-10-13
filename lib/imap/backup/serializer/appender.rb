@@ -1,4 +1,4 @@
-require "email/mboxrd/message"
+require "imap/backup/email/mboxrd/message"
 
 module Imap; end
 
