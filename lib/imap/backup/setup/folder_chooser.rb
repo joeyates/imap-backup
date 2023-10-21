@@ -91,7 +91,7 @@ module Imap::Backup
         if selected?(folder_name)
           account_folders.reject { |f| f == folder_name }
         else
-          account.folders = account_folders + [folder_name]
+          account_folders + [folder_name]
         end
       account.folders = new_list
     end
