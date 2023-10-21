@@ -60,16 +60,13 @@ module Imap::Backup
     end
 
     def selected?(folder_name)
-      config_folders = account.folders
-      return false if config_folders.nil?
-
-      config_folders.find { |f| f == folder_name }
+      account_folders.find { |f| f == folder_name }
     end
 
     def remove_missing
       removed = []
       config_folders = []
-      account.folders.each do |f|
+      account_folders.each do |f|
         found = folder_names.find { |folder| folder == f }
         if found
           config_folders << f
@@ -90,13 +87,13 @@ module Imap::Backup
     end
 
     def toggle_selection(folder_name)
-      if selected?(folder_name)
-        new_list = account.folders.reject { |f| f == folder_name }
-        account.folders = new_list
-      else
-        existing = account.folders || []
-        account.folders = existing << folder_name
-      end
+      new_list =
+        if selected?(folder_name)
+          account_folders.reject { |f| f == folder_name }
+        else
+          account.folders = account_folders + [folder_name]
+        end
+      account.folders = new_list
     end
 
     def client
@@ -116,6 +113,10 @@ module Imap::Backup
 
     def helpers
       Setup::Helpers.new
+    end
+
+    def account_folders
+      account.folders || []
     end
   end
 end

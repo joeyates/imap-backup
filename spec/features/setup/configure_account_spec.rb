@@ -68,4 +68,45 @@ RSpec.describe "imap-backup setup - configuring accounts", :docker, type: :aruba
       expect(last_command_started).to have_exit_status(0)
     end
   end
+
+  context "when the account's folder list is changed" do
+    context "when the existing account has configued folders" do
+      let(:account) do
+        super().merge(folders: [])
+      end
+
+      it "indicates the account is modified" do
+        run_command "imap-backup setup"
+        last_command_started.write "#{email}\n"
+        last_command_started.write "9\n"
+        last_command_started.write "1\n"
+        last_command_started.write "q\n"
+        last_command_started.write "q\n"
+        last_command_started.write "4\n"
+        last_command_started.stop
+
+        puts "last_command_started.output: #{last_command_started.output}"
+        expect(last_command_started).to have_output(/Account\*/)
+      end
+    end
+
+    context "when the existing account does not have configued folders" do
+      let(:account) do
+        super().tap { |a| a.delete(:folders) }
+      end
+
+      it "does not throw errors" do
+        run_command "imap-backup setup"
+        last_command_started.write "#{email}\n"
+        last_command_started.write "9\n"
+        last_command_started.write "q\n"
+        last_command_started.write "q\n"
+        last_command_started.write "4\n"
+        last_command_started.stop
+
+        puts "last_command_started.output: #{last_command_started.output}"
+        expect(last_command_started).to have_exit_status(0)
+      end
+    end
+  end
 end
