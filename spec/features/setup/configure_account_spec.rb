@@ -85,7 +85,6 @@ RSpec.describe "imap-backup setup - configuring accounts", :docker, type: :aruba
         last_command_started.write "4\n"
         last_command_started.stop
 
-        puts "last_command_started.output: #{last_command_started.output}"
         expect(last_command_started).to have_output(/Account\*/)
       end
     end
@@ -104,7 +103,6 @@ RSpec.describe "imap-backup setup - configuring accounts", :docker, type: :aruba
         last_command_started.write "4\n"
         last_command_started.stop
 
-        puts "last_command_started.output: #{last_command_started.output}"
         expect(last_command_started).to have_exit_status(0)
       end
     end
