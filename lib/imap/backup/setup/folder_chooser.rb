@@ -69,7 +69,7 @@ module Imap::Backup
     def remove_missing
       removed = []
       config_folders = []
-      account.folders.each do |f|
+      (account.folders | []).each do |f|
         found = folder_names.find { |folder| folder == f }
         if found
           config_folders << f
