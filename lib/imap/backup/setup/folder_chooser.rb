@@ -91,7 +91,7 @@ module Imap::Backup
         new_list = account_folders.reject { |f| f == folder_name }
         account.folders = new_list
       else
-        account.folders = account_folders << folder_name
+        account.folders = account_folders + [folder_name]
       end
     end
 
