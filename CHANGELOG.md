@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 14.2.0 - 2023-10-21
+
+### Changed
+
+* Fixed bug in account setup where changing the list of
+  folders to back up did not set the account modified
+  flag.
+
 ## 14.1.1 - 2023-10-12
 
 ### Changed
