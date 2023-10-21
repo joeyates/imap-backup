@@ -87,12 +87,13 @@ module Imap::Backup
     end
 
     def toggle_selection(folder_name)
-      if selected?(folder_name)
-        new_list = account_folders.reject { |f| f == folder_name }
-        account.folders = new_list
-      else
-        account.folders = account_folders + [folder_name]
-      end
+      new_list =
+        if selected?(folder_name)
+          account_folders.reject { |f| f == folder_name }
+        else
+          account.folders = account_folders + [folder_name]
+        end
+      account.folders = new_list
     end
 
     def client
