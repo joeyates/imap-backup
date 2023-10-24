@@ -77,7 +77,7 @@ you can pass all the necessary parameters directly to the `single backup` comman
 
 To use imap-backup with GMail, Office 365 and other services that require
 OAuth2 authentication, you can use [email-oauth2-proxy](https://github.com/simonrob/email-oauth2-proxy)
-to handle authentication, and then connect to the proxy on a local port.
+see [the blog post about using imap-backup with email-oauth2-proxy](https://joeyates.info/posts/back-up-gmail-accounts-with-imap-backup-using-email-oauth2-proxy/).
 
 # Backup
 
