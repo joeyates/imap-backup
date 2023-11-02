@@ -1,0 +1,48 @@
+name: Build and publish the production container image to the GitHub Registry
+
+# Run this workflow every time on every push to the branch `release`.
+on:
+  push:
+    branches: ['feature/runnable-container']
+
+env:
+  IMAGE_NAME: imap-backup
+  REGISTRY_USER: ${{ github.actor }}
+  REGISTRY_PASSWORD: ${{ github.token }}
+  REGISTRY: ghcr.io/${{ github.repository_owner }}
+
+jobs:
+  build-and-push-image:
+    runs-on: ubuntu-latest
+    # Sets the permissions granted to the `GITHUB_TOKEN` for the actions in this job.
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build Image
+        # https://github.com/marketplace/actions/buildah-build
+        id: build-image
+        uses: redhat-actions/buildah-build@v2
+        with:
+          image: ${{ env.IMAGE_NAME }}
+          tags: latest ${{ github.sha }}
+          extra-args: |
+            --ignorefile ./container/.containerignore
+          containerfiles: |
+            ./container/Containerfile
+          labels: |
+            ${{ env.IMAGE_NAME }}:latest
+
+      - name: Publish Image
+        # https://github.com/marketplace/actions/push-to-registry
+        id: push-to-registry
+        uses: redhat-actions/push-to-registry@v2
+        with:
+          image: ${{ steps.build-image.outputs.image }}
+          tags: ${{ steps.build-image.outputs.tags }}
+          registry: ${{ env.REGISTRY }}
+          username: ${{ env.REGISTRY_USER }}
+          password: ${{ env.REGISTRY_PASSWORD }}
