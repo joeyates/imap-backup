@@ -1,0 +1,6 @@
+*
+!bin/imap-backup
+!Gemfile
+!imap-backup.gemspec
+!lib
+!LICENSE
