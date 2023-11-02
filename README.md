@@ -34,6 +34,45 @@ See below for a [full list of commands](#Commands).
 
 # Installation
 
+## Docker or Podman
+
+If you have Docker or Podman installed, the easist way to use imap-backup
+is via the container image.
+
+You'll need to choose a path on your computer where your backups will be saved,
+we'll use `./my-data` here.
+
+If you have just one account, you can do as follows
+
+```sh
+docker run -v ./my-data:/data -ti ghcr.io/joeyates/imap-backup:latest \
+  imap-backup single backup \
+  --email me@example.com --password mysecret --server imap.example.com \
+  --path /data/me_example.com
+```
+
+Podman will work exactly the same.
+
+If you have multiple accounts, you can create a configuration file.
+
+You'll need to choose a path on your computer where your configuration will be saved,
+we'll use `./my-config` here.
+
+First, run the menu-driven setup program to configure your accounts
+
+```sh
+docker run -ti -v ./my-config:/config -v ./my-data:/data -ti ghcr.io/joeyates/imap-backup:latest \
+  imap-backup setup -c /config/imap-backup.json
+```
+
+Then, run the backup
+
+```sh
+docker run -v ./my-config:/config -v ./my-data:/data -ti ghcr.io/joeyates/imap-backup:latest \
+  imap-backup backup -c /config/imap-backup.json
+```
+
+
 ## Homebrew (macOS)
 
 ![Homebrew installs](https://img.shields.io/homebrew/installs/dm/imap-backup?label=Homebrew%20installs)
