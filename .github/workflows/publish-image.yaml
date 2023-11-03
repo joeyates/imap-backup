@@ -22,13 +22,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Get the latest tag
+        run: |
+          echo "GIT_TAG=$(git describe --tags `git rev-list --tags --max-count=1`)" >> $GITHUB_ENV
+
       - name: Build Image
         # https://github.com/marketplace/actions/buildah-build
         id: build-image
         uses: redhat-actions/buildah-build@v2
         with:
           image: ${{ env.IMAGE_NAME }}
-          tags: latest ${{ github.sha }}
+          tags: latest ${{ github.sha }} ${{ env.GIT_TAG }}
           extra-args: |
             --ignorefile ./container/.containerignore
           containerfiles: |
