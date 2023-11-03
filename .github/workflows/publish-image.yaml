@@ -38,7 +38,7 @@ jobs:
 
       # Check that imap-backup runs
       - name: Test Image
-        run: podman run ${{ env.IMAGE_NAME }}:latest imap-backup help
+        run: podman run ${{ env.IMAGE_NAME }}:latest imap-backup help | grep 'Commands:'
 
       - name: Publish Image
         # https://github.com/marketplace/actions/push-to-registry
