@@ -1,9 +1,9 @@
 name: Build and publish the production container image to the GitHub Registry
 
-# Run this workflow every time on every push to the branch `release`.
+# Run this workflow when new releases are created
 on:
-  push:
-    branches: ['releases']
+  release:
+    types: [published]
 
 env:
   IMAGE_NAME: imap-backup
