@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 14.3.0 - 2023-11-03
+
+### Added
+
+* Each release is accompanied by the creation of a container
+  image (usable with Docker or Podman) the can be used to
+  run backups without any other installation necessary.
+
 ## 14.2.0 - 2023-10-21
 
 ### Changed
