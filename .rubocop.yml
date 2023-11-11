@@ -421,6 +421,8 @@ Style/SelectByRegexp:
   Enabled: true
 Style/SingleArgumentDig:
   Enabled: true
+Style/SingleLineDoEndBlock:
+  Enabled: true
 Style/SlicingWithRange:
   Enabled: true
 Style/StringConcatenation:
