@@ -13,35 +13,30 @@ git config --local blame.ignoreRevsFile .git-blame-ignore-revs
 * Restartable - calculate start point based on already downloaded messages
 * Standalone - do not rely on an email client or MTA
 
-# Development
-
-A Dockerfile is available to allow testing with all available Ruby versions,
-see the `dev/container` directory.
-
 # Testing
 
 ## Feature Specs
 
 Specs under `specs/features` are integration specs run against
-two local IMAP servers controlled by Docker Compose.
+two local IMAP servers controlled by Podman (or Docker) Compose.
 
 Start them before running the test suite
 
 ```sh
-$ docker-compose -f dev/docker-compose.yml up -d
+$ podman-compose -f dev/compose.yml up -d
 ```
 
 or, with Podman
 
 ```sh
-$ podman-compose -f dev/docker-compose.yml up -d
+$ podman-compose -f dev/compose.yml up -d
 ```
 
 ```sh
 $ rake
 ```
 
-To exclude Docker-based tests:
+To exclude container-based tests:
 
 ```sh
 rake no-docker
@@ -52,6 +47,11 @@ or
 ```sh
 $ rspec --tag ~docker
 ```
+
+# Older Rubies
+
+A Containerfile is available to allow testing with all available Ruby versions,
+see the README in the `dev` directory.
 
 # Performance Specs
 
