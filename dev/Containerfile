@@ -6,7 +6,7 @@ ARG BUNDLER_VERSION=2.4.22
 # Install dependencies
 RUN \
   apt-get update && \
-  apt-get install --yes libffi-dev
+  apt-get install --yes less libffi-dev vim-nox
 
 # Show full path in prompt
 RUN echo 'PS1='\''imap-backup:$(pwd)>'\''' > /etc/bash.bashrc
