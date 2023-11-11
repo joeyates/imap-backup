@@ -36,7 +36,7 @@ $ podman-compose -f dev/compose.yml up -d
 $ rake
 ```
 
-To exclude Docker-based tests:
+To exclude container-based tests:
 
 ```sh
 rake no-docker
@@ -48,10 +48,10 @@ or
 $ rspec --tag ~docker
 ```
 
-# Development
+# Older Rubies
 
-A Dockerfile is available to allow testing with all available Ruby versions,
-see the `dev/container` directory.
+A Containerfile is available to allow testing with all available Ruby versions,
+see the README in the `dev` directory.
 
 # Performance Specs
 

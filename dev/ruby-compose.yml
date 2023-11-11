@@ -26,7 +26,6 @@ services:
     container_name: imap-backup
     tty: true
     stdin_open: true
-    user: $ID
     environment:
     - RUBY_VERSION=$RUBY_VERSION
     - BUNDLE_PATH=/app/vendor
@@ -37,4 +36,4 @@ services:
     - DOCKER_PORT_OTHER_IMAP=993
     - HOME=/app
     volumes:
-      - ../..:/app
+    - ..:/app

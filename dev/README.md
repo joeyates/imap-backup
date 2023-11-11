@@ -1,28 +1,34 @@
-# container
+# Containerized Rubies
 
-This directory contains the files that allow experimenting with
+This directory contains some files that allow experimenting with
 any desired Ruby version locally.
 
 This is especially useful for older, deprecated Ruby versions
 which are often difficult to install due to openssl
 compatibility problems.
 
-# Start Container
+The supplied `dev/ruby-compose.yml` starts the same
+two IMAP servers that are run under development and CI
+alongside a container with your chosen Ruby version.
+
+This container has the project root available as the `/app`
+directory so that you can run tests and edit code.
+
+# Start Containers
 
 Do the following from the project's root directory:
 
 ```sh
 export RUBY_VERSION=[VERSION]
-export ID=$(id -u)
-docker-compose --file dev/container/compose.yml build
-docker-compose --file dev/container/compose.yml up -d
-docker attach imap-backup
+podman-compose --file dev/ruby-compose.yml build
+podman-compose --file dev/ruby-compose.yml up -d
+podman attach imap-backup
 ```
 
 ...and stop the server afterwards:
 
 ```sh
-docker-compose --file dev/container/compose.yml down
+podman-compose --file dev/ruby-compose.yml down
 ```
 
 # Setup Project
@@ -53,12 +59,12 @@ imap-backup help
 
 # Connect to the Test IMAP Server
 
-An example file `dev/container/config.json` is supplied.
+An example file `dev/config.json` is supplied.
 
 The following should produce a list of folders
 
 ```sh
-imap-backup remote folders address@example.com -c dev/container/config.json
+imap-backup remote folders address@example.com -c dev/config.json
 ```
 
 You can use the test helpers to interact with the test IMAP servers:
