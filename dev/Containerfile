@@ -1,5 +1,5 @@
 ARG RUBY_VERSION
-FROM ruby:$RUBY_VERSION-buster
+FROM docker.io/library/ruby:$RUBY_VERSION-buster
 
 # Install dependencies
 RUN \
