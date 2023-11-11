@@ -30,7 +30,7 @@ services:
     environment:
     - RUBY_VERSION=$RUBY_VERSION
     - BUNDLE_PATH=/app/vendor
-    - BUNDLE_BINSTUBS=./bin/stubs
+    - BUNDLE_BINSTUBS=/app/bin/stubs
     - DOCKER_HOST_IMAP=imap
     - DOCKER_PORT_IMAP=993
     - DOCKER_HOST_OTHER_IMAP=other-imap

@@ -42,19 +42,21 @@ rm Gemfile.lock
 bundle install
 ```
 
+As the BUNDLE_BINSTUBS environment variable is set,
+we get a version of imap-backup that can be invoked
+without prepending `bundle exec`.
+
+The `PATH` environment variable includes `/app/bin/stubs`,
+so you can invoke imap-backup directly
+
+```sh
+imap-backup help
+```
+
 # Run tests
 
 ```sh
 rake
-```
-
-# Invoke `imap-backup`
-
-As the `BUNDLE_BINSTUBS` environment variable is set,
-you can invoke imap-backup directly
-
-```sh
-imap-backup help
 ```
 
 # Connect to the Test IMAP Server
