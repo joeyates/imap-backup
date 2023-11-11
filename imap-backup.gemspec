@@ -1,5 +1,4 @@
-$LOAD_PATH.unshift(File.expand_path("lib", __dir__))
-require "imap/backup/version"
+require_relative "lib/imap/backup/version"
 
 Gem::Specification.new do |gem|
   gem.name          = "imap-backup"
