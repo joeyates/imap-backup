@@ -1,6 +1,8 @@
 ARG RUBY_VERSION
 FROM docker.io/library/ruby:$RUBY_VERSION-buster
 
+ARG BUNDLER_VERSION=2.4.22
+
 # Install dependencies
 RUN \
   apt-get update && \
@@ -15,6 +17,6 @@ ENV PATH ./bin/stubs:$PATH
 
 WORKDIR /app
 
-RUN gem install bundler --version=2.1.4
+RUN gem install bundler --version=$BUNDLER_VERSION
 
 ENTRYPOINT ["bash"]

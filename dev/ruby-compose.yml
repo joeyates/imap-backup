@@ -21,6 +21,7 @@ services:
     build:
       context: .
       args:
+      - BUNDLER_VERSION
       - RUBY_VERSION
     image: imap-backup:${RUBY_VERSION}
     container_name: imap-backup
