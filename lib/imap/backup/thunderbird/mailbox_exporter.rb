@@ -5,6 +5,8 @@ require "imap/backup/logger"
 module Imap; end
 
 module Imap::Backup
+  class Thunderbird; end
+
   class Thunderbird::MailboxExporter
     EXPORT_PREFIX = "imap-backup".freeze
 
