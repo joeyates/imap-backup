@@ -30,7 +30,7 @@ There are two types of backups:
 * Mirror - make a destination account match the local copy. This action can be repeated.
 * Restore - push the local copy back to the original account.
 
-See below for a [full list of commands](#Commands).
+See below for a [full list of commands](#commands).
 
 # Installation
 
