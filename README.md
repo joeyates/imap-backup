@@ -160,7 +160,7 @@ For more information about a command, run
 imap-backup help COMMAND
 ```
 
-# Performace
+# Performance
 
 There are a couple of performance tweaks that you can use
 to improve backup speed.
