@@ -106,7 +106,7 @@ module Imap::Backup
       end
 
       def thunderbird_profile(name = nil)
-        profiles = Thunderbird::Profiles.new
+        profiles = ::Thunderbird::Profiles.new
         if name
           profiles.profile(name)
         else

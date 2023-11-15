@@ -22,7 +22,7 @@ module Imap::Backup
     end
     let(:profile) do
       instance_double(
-        Thunderbird::Profile,
+        ::Thunderbird::Profile,
         local_folders_path: "local_folders_path",
         title: "profile_title"
       )
@@ -30,7 +30,7 @@ module Imap::Backup
     let(:profile_local_folders_exists) { true }
     let(:local_folder) do
       instance_double(
-        Thunderbird::LocalFolder,
+        ::Thunderbird::LocalFolder,
         exists?: local_folder_exists,
         full_path: "full_path",
         msf_exists?: msf_exists,
@@ -50,7 +50,7 @@ module Imap::Backup
       allow(File).to receive(:open).with("full_path", "w").and_yield(file)
       allow(FileUtils).to receive(:rm).and_call_original
       allow(FileUtils).to receive(:rm).with("msf_path")
-      allow(Thunderbird::LocalFolder).to receive(:new) { local_folder }
+      allow(::Thunderbird::LocalFolder).to receive(:new) { local_folder }
       allow(Kernel).to receive(:puts)
     end
 

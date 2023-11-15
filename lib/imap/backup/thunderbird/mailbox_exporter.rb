@@ -97,7 +97,7 @@ module Imap::Backup
       @local_folder ||= begin
         top_level_folders = [EXPORT_PREFIX, email]
         prefixed_folder_path = File.join(top_level_folders, serializer.folder)
-        Thunderbird::LocalFolder.new(profile, prefixed_folder_path)
+        ::Thunderbird::LocalFolder.new(profile, prefixed_folder_path)
       end
     end
 

@@ -1,6 +1,6 @@
 require "imap/backup/cli/utils"
 
-require "thunderbird/install"
+require "thunderbird"
 require "imap/backup/client/default"
 require "imap/backup/configuration"
 require "support/shared_examples/an_action_that_handles_logger_options"
@@ -39,10 +39,10 @@ module Imap::Backup
       let(:command) { subject.export_to_thunderbird(email) }
       let(:options) { {} }
       let(:profiles) do
-        instance_double(Thunderbird::Profiles, installs: installs, profile: named_profile)
+        instance_double(::Thunderbird::Profiles, installs: installs, profile: named_profile)
       end
       let(:installs) { [install1] }
-      let(:install1) { instance_double(Thunderbird::Install, default: default_install) }
+      let(:install1) { instance_double(::Thunderbird::Install, default: default_install) }
       let(:default_install) { "default" }
       let(:named_profile) { "named" }
       let(:serialized_folders) { instance_double(Account::SerializedFolders, none?: false) }
@@ -59,7 +59,7 @@ module Imap::Backup
 
       before do
         allow(Thunderbird::MailboxExporter).to receive(:new) { exporter }
-        allow(Thunderbird::Profiles).to receive(:new) { profiles }
+        allow(::Thunderbird::Profiles).to receive(:new) { profiles }
         allow(Account::SerializedFolders).to receive(:new) { serialized_folders }
         allow(subject).to receive(:options) { options }
         allow(serialized_folders).to receive(:each).and_yield("foo", "bar")
@@ -91,7 +91,7 @@ module Imap::Backup
 
         context "when there is more than one install" do
           let(:installs) { [install1, install2] }
-          let(:install2) { instance_double(Thunderbird::Install, default: default_install) }
+          let(:install2) { instance_double(::Thunderbird::Install, default: default_install) }
 
           it "fails" do
             expect do
