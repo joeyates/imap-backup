@@ -8,6 +8,6 @@ group :development do
   gem "rspec", ">= 3.0.0"
   gem "rubocop-rspec"
   gem "simplecov"
-  gem "yard"
   gem "webrick"
+  gem "yard"
 end
