@@ -188,10 +188,10 @@ module Imap::Backup
       end
     end
 
-    context "when a version 2.1 file is present" do
+    context "when a folders are stored as Hashes" do
       let(:file) { instance_double(File, write: nil) }
       let(:configuration) do
-        {version: "2.1", accounts: [{username: "account", folders: [{name: "foo"}]}]}.to_json
+        {accounts: [{username: "account", folders: [{name: "foo"}]}]}.to_json
       end
 
       before do

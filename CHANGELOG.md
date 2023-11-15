@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 14.4.0 - 2023-11-15
+
+### Changed
+
+* Always check whether the configuration file has folders
+  listed as an Array of Hashes, and convert to the newer,
+  simpler, structure. See #184
+
 ## 14.3.0 - 2023-11-03
 
 ### Added

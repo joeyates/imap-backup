@@ -122,26 +122,29 @@ module Imap::Backup
             else
               DEFAULT_STRATEGY
             end
-          if data[:version] == VERSION_2_1
-            dehashify_folders(data)
-          else
-            data
-          end
+          dehashify_folders(data)
         else
           {accounts: [], download_strategy: DEFAULT_STRATEGY}
         end
     end
 
     def dehashify_folders(data)
-      data[:version] = VERSION
-
       data[:accounts].each do |account|
         next if !account.key?(:folders)
 
         folders = account[:folders]
-        names = folders.map { |f| f[:name] }
+        names = folders.map do |f|
+          case f
+          when Hash
+            f[:name]
+          else
+            f
+          end
+        end
         account[:folders] = names
       end
+
+      data[:version] = VERSION
 
       data
     end
