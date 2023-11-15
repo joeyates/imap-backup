@@ -9,4 +9,5 @@ group :development do
   gem "rubocop-rspec"
   gem "simplecov"
   gem "yard"
+  gem "webrick"
 end
