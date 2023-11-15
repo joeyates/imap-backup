@@ -1,12 +1,24 @@
+FROM docker.io/library/ruby:3.2.2-alpine3.18 AS builder
+
+WORKDIR /app
+
+COPY Gemfile .
+COPY imap-backup.gemspec .
+COPY lib/imap/backup/version.rb lib/imap/backup/
+
+RUN \
+  apk add alpine-sdk && \
+  gem install bundler --version "2.4.21" && \
+  BUNDLE_WITHOUT=development bundle install
+
 FROM docker.io/library/ruby:3.2.2-alpine3.18
+
+COPY --from=builder /usr/local/bundle /usr/local/bundle
 
 WORKDIR /app
 
 COPY . .
-RUN \
-  gem install bundler --version "2.4.21" && \
-  BUNDLE_WITHOUT=development bundle install && \
-  rm -f /usr/local/bundle/bin/imap-backup
+
 ENV PATH=${PATH}:/app/bin
 
 CMD ["imap-backup", "backup", "-c", "/config/imap-backup.json"]
