@@ -10,6 +10,7 @@ module Imap; end
 module Imap::Backup
   class Account; end
 
+  # Handles access to a folder on an IMAP server
   class Account::Folder
     class FolderNotFound < StandardError; end
 

@@ -6,6 +6,7 @@ module Imap; end
 module Imap::Backup
   class Account; end
 
+  # Handles creation of directories for backup storage
   class Account::FolderEnsurer
     attr_reader :account
 

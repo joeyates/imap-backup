@@ -8,6 +8,7 @@ module Imap; end
 module Imap::Backup
   class Account; end
 
+  # Carries out the backup of the configured folders of the account
   class Account::Backup
     attr_reader :account
     attr_reader :refresh

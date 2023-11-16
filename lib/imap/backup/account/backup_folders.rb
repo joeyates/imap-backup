@@ -5,6 +5,7 @@ module Imap; end
 module Imap::Backup
   class Account; end
 
+  # Iterates over the account folders that are to be backed up
   class Account::BackupFolders
     include Enumerable
 

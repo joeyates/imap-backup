@@ -10,6 +10,7 @@ module Imap; end
 module Imap::Backup
   class Account; end
 
+  # Runs a backup for a single account folder
   class Account::FolderBackup
     attr_reader :account
     attr_reader :folder

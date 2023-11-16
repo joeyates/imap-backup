@@ -6,6 +6,7 @@ module Imap; end
 module Imap::Backup
   class Account; end
 
+  # Restores all backed up folders to the server
   class Account::Restore
     attr_reader :account
 

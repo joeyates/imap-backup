@@ -10,6 +10,7 @@ module Imap; end
 module Imap::Backup
   class Account; end
 
+  # Returns an IMAP client set up for the supplied account
   class Account::ClientFactory
     attr_reader :account
 

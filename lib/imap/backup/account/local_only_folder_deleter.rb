@@ -6,7 +6,9 @@ module Imap; end
 module Imap::Backup
   class Account; end
 
-  # Deletes serialized folders that are not configured to be backed up
+  # Deletes serialized folders that are not configured to be backed up.
+  # This is used in mirror mode, where local copies are only kept as long as they
+  # exist on the server.
   class Account::LocalOnlyFolderDeleter
     attr_reader :account
 

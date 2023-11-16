@@ -9,6 +9,7 @@ module Imap; end
 module Imap::Backup
   class Account; end
 
+  # Enumerates over the folders that are backed up to an account
   class Account::SerializedFolders
     include Enumerable
 

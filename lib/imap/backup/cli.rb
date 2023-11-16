@@ -6,6 +6,7 @@ require "imap/backup/version"
 module Imap; end
 
 module Imap::Backup
+  # Top-level cli call handler
   class CLI < Thor
     require "imap/backup/cli/helpers"
 
@@ -41,9 +42,12 @@ module Imap::Backup
       To check what values you should use, check the output of the
       `imap-backup remote namespaces EMAIL` command.
     DESC
+    private_constant :NAMESPACE_CONFIGURATION_DESCRIPTION
 
     default_task :backup
 
+    # Overrides {https://www.rubydoc.info/gems/thor/Thor%2FBase%2FClassMethods:start Thor's method}
+    # to handle '--version' and rearrange parameters if 'help' is passed
     def self.start(args)
       if args.include?("--version")
         new.version
@@ -64,6 +68,7 @@ module Imap::Backup
       super
     end
 
+    # see {https://www.rubydoc.info/gems/thor/Thor/Base/ClassMethods#exit_on_failure%3F-instance_method Thor documentation}
     def self.exit_on_failure?
       true
     end
@@ -81,6 +86,7 @@ module Imap::Backup
     quiet_option
     refresh_option
     verbose_option
+    # Runs account backups
     def backup
       non_logging_options = Imap::Backup::Logger.setup_logging(options)
       Backup.new(non_logging_options).run
@@ -141,6 +147,7 @@ module Imap::Backup
       desc: "the prefix (namespace) to strip from source folder names",
       aliases: ["-s"]
     )
+    # Migrates emails from one account to another
     def migrate(source_email, destination_email)
       non_logging_options = Imap::Backup::Logger.setup_logging(options)
       Transfer.new(:migrate, source_email, destination_email, non_logging_options).run
@@ -200,6 +207,7 @@ module Imap::Backup
       desc: "the prefix (namespace) to strip from source folder names",
       aliases: ["-s"]
     )
+    # Keeps one email account in line with another
     def mirror(source_email, destination_email)
       non_logging_options = Imap::Backup::Logger.setup_logging(options)
       Transfer.new(:mirror, source_email, destination_email, non_logging_options).run
@@ -217,6 +225,7 @@ module Imap::Backup
     config_option
     quiet_option
     verbose_option
+    # Restores backed up meails to an account
     def restore(email = nil)
       non_logging_options = Imap::Backup::Logger.setup_logging(options)
       Restore.new(email, non_logging_options).run
@@ -230,6 +239,7 @@ module Imap::Backup
     config_option
     quiet_option
     verbose_option
+    # Runs the menu-driven setup program
     def setup
       non_logging_options = Imap::Backup::Logger.setup_logging(options)
       CLI::Setup.new(non_logging_options).run
@@ -253,6 +263,7 @@ module Imap::Backup
     format_option
     quiet_option
     verbose_option
+    # Prints various statistics about a configured account
     def stats(email)
       non_logging_options = Imap::Backup::Logger.setup_logging(options)
       Stats.new(email, non_logging_options).run
@@ -262,6 +273,7 @@ module Imap::Backup
     subcommand "utils", Utils
 
     desc "version", "Print the imap-backup version"
+    # Prints the program version
     def version
       Kernel.puts "imap-backup #{Imap::Backup::VERSION}"
     end
