@@ -28,6 +28,14 @@ module ConfigurationHelpers
   end
 end
 
+module DebugHelpers
+  # Show Aruba output with 'clear screen' codes removed
+  # to allow all output to be viewed when printed to stdout
+  def command_output
+    last_command_started.output.gsub("\e[H\e[2J\e[3J", "\n-- CLEAR SCREEN --\n")
+  end
+end
+
 module LocalHelpers
   def create_local_folder(email:, folder:, uid_validity:, configuration_path: nil)
     account = config(configuration_path).accounts.find { |a| a.username == email }
@@ -112,6 +120,7 @@ end
 
 RSpec.configure do |config|
   config.include ConfigurationHelpers, type: :aruba
+  config.include DebugHelpers, type: :aruba
   config.include LocalHelpers, type: :aruba
 
   config.before(:example, type: :aruba) do
