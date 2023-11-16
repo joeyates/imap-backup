@@ -10,9 +10,9 @@ module Imap; end
 module Imap::Backup
   class Account; end
 
-  class FolderNotFound < StandardError; end
-
   class Account::Folder
+    class FolderNotFound < StandardError; end
+
     extend Forwardable
     include RetryOnError
 

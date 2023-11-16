@@ -251,7 +251,7 @@ module Imap::Backup
         it "raises an error" do
           expect do
             subject.uid_validity
-          end.to raise_error(FolderNotFound)
+          end.to raise_error(Account::Folder::FolderNotFound)
         end
       end
     end
@@ -408,7 +408,7 @@ module Imap::Backup
 
       context "when the folder doesn't exist" do
         before do
-          allow(client).to receive(:examine).and_raise(FolderNotFound)
+          allow(client).to receive(:examine).and_raise(Account::Folder::FolderNotFound)
         end
 
         it "returns an empty array" do

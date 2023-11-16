@@ -3,9 +3,9 @@ require "net/imap"
 module Imap; end
 
 module Imap::Backup
-  class MultiFetchFailedError < StandardError; end
-
   class Downloader
+    class MultiFetchFailedError < StandardError; end
+
     attr_reader :folder
     attr_reader :serializer
     attr_reader :multi_fetch_size
