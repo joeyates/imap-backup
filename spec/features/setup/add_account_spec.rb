@@ -20,11 +20,9 @@ RSpec.describe "imap-backup setup - adding an account", type: :aruba do
   end
 
   it "saves account info" do
-    configuration_file_path = File.join(config_path, "config.json")
-    content = File.read(configuration_file_path)
-    config = JSON.parse(content)
-    account = config["accounts"].last
+    config = parsed_config
+    account = config[:accounts].last
 
-    expect(account["username"]).to eq("new@example.com")
+    expect(account[:username]).to eq("new@example.com")
   end
 end

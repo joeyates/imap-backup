@@ -1,4 +1,5 @@
 require "aruba/rspec"
+require "json"
 
 require "imap/backup/serializer"
 require "imap/backup/serializer/mbox"
@@ -25,6 +26,12 @@ module ConfigurationHelpers
     FileUtils.chmod 0o700, config_path
     File.open(path, "w") { |f| f.write(JSON.pretty_generate(save_data)) }
     FileUtils.chmod(0o600, path)
+  end
+
+  def parsed_config(path: nil)
+    path ||= File.join(config_path, "config.json")
+    content = File.read(path)
+    JSON.parse(content, symbolize_names: true)
   end
 end
 
