@@ -17,8 +17,9 @@ git config --local blame.ignoreRevsFile .git-blame-ignore-revs
 
 ## Feature Specs
 
-Specs under `specs/features` are integration specs run against
-two local IMAP servers controlled by Podman (or Docker) Compose.
+Specs under `specs/features` are integration specs.
+Some of these specs run against two local IMAP servers
+controlled by Podman (or Docker) Compose.
 
 Start them before running the test suite
 
@@ -32,20 +33,24 @@ or, with Podman
 $ podman-compose -f dev/compose.yml up -d
 ```
 
+Then, run all specs
+
 ```sh
-$ rake
+$ rspec
 ```
 
 To exclude container-based tests:
 
 ```sh
-rake no-docker
+$ rspec --tag ~docker
 ```
 
-or
+## Full Test Run
+
+The full test run includes RSpec specs **and** Runbocop checks
 
 ```sh
-$ rspec --tag ~docker
+rake
 ```
 
 # Older Rubies
