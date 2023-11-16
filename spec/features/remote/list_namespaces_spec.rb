@@ -9,7 +9,7 @@ RSpec.describe "imap-backup remote namespaces", :docker, type: :aruba do
     create_config(**config_options)
   end
 
-  it "lists folders" do
+  it "lists namespaces" do
     run_command_and_stop command
 
     expect(last_command_started).to have_output(/personal\s+""\s+"\."/)
@@ -18,7 +18,7 @@ RSpec.describe "imap-backup remote namespaces", :docker, type: :aruba do
   context "when JSON is requested" do
     let(:command) { "imap-backup remote namespaces #{account[:username]} --format json" }
 
-    it "lists folders as JSON" do
+    it "lists namespaces as JSON" do
       run_command_and_stop command
 
       expect(last_command_started).to have_output(/{"personal":{"prefix":"","delim":"."}/)
