@@ -2,9 +2,9 @@
 
 $LOAD_PATH.unshift(File.expand_path("../lib/", __dir__))
 
-require "imap/backup/cli_coverage"
+require_relative "../spec/support/cli_coverage"
 
-Imap::Backup::CliCoverage.conditionally_activate
+CliCoverage.conditionally_activate
 
 require "imap/backup/cli"
 require "imap/backup/logger"
