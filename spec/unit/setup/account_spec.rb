@@ -127,10 +127,10 @@ module Imap::Backup
       end
 
       describe "choosing 'modify email'" do
-        let(:email) { instance_double(Setup::Email, run: nil) }
+        let(:email) { instance_double(Setup::EmailChanger, run: nil) }
 
         before do
-          allow(Setup::Email).
+          allow(Setup::EmailChanger).
             to receive(:new) { email }
           subject.run
           menu.choices["modify email"].call

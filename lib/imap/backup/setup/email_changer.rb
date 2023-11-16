@@ -6,7 +6,7 @@ module Imap; end
 module Imap::Backup
   class Setup; end
 
-  class Setup::Email
+  class Setup::EmailChanger
     attr_reader :account
     attr_reader :config
 

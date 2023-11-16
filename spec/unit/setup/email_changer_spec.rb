@@ -1,7 +1,7 @@
-require "imap/backup/setup/email"
+require "imap/backup/setup/email_changer"
 
 module Imap::Backup
-  RSpec.describe Setup::Email do
+  RSpec.describe Setup::EmailChanger do
     subject { described_class.new(account: account, config: config) }
 
     let(:account) do

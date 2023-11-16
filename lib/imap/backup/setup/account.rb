@@ -2,7 +2,7 @@ require "imap/backup/setup/account/header"
 require "imap/backup/setup/asker"
 require "imap/backup/setup/backup_path"
 require "imap/backup/setup/connection_tester"
-require "imap/backup/setup/email"
+require "imap/backup/setup/email_changer"
 require "imap/backup/setup/folder_chooser"
 
 module Imap; end
@@ -62,7 +62,7 @@ module Imap::Backup
 
     def modify_email(menu)
       menu.choice("modify email") do
-        Setup::Email.new(account: account, config: config).run
+        Setup::EmailChanger.new(account: account, config: config).run
       end
     end
 
