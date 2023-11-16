@@ -1,9 +1,9 @@
 class CliCoverage
   def self.conditionally_activate
-    return if !ENV.key?("COVERAGE")
+    return if !ENV.key?("FEATURE_SPEC_ID")
 
     # Collect coverage separately
-    ENV["SIMPLECOV_COMMAND_NAME"] = "#{ENV.fetch('COVERAGE')} #{ARGV.join(' ')} coverage"
+    ENV["SIMPLECOV_COMMAND_NAME"] = ENV.fetch("FEATURE_SPEC_ID")
     require "simplecov"
 
     # Silence output
