@@ -17,6 +17,30 @@ RSpec.describe "imap-backup setup - configuring accounts", :docker, type: :aruba
     expect(last_command_started).to have_output(/email\s+#{account[:username]}/)
   end
 
+  it "modifies the email" do
+    run_command "imap-backup setup"
+    last_command_started.write "#{email}\n"
+    last_command_started.write "modify email\n"
+    last_command_started.write "new@example.com\n"
+    last_command_started.write "(q) return to main menu\n"
+    last_command_started.write "save and exit\n"
+    last_command_started.stop
+
+    expect(parsed_config.dig(:accounts, 0, :username)).to eq("new@example.com")
+  end
+
+  it "modifies the backup path" do
+    run_command "imap-backup setup"
+    last_command_started.write "#{email}\n"
+    last_command_started.write "modify backup path\n"
+    last_command_started.write "new/path\n"
+    last_command_started.write "(q) return to main menu\n"
+    last_command_started.write "save and exit\n"
+    last_command_started.stop
+
+    expect(parsed_config.dig(:accounts, 0, :local_path)).to eq("new/path")
+  end
+
   it "tests the connection" do
     run_command "imap-backup setup"
     last_command_started.write "#{email}\n"

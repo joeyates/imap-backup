@@ -52,7 +52,19 @@ module Imap::Backup
       expect(imap).to have_received(:append).with(anything, anything, flags: [:MyFlag])
     end
 
-    context "when appending to the mailbox causes an error" do
+    context "when serializing the message causes an error" do
+      before do
+        allow(mboxrd_message).to receive(:to_serialized).and_throw(RuntimeError, "Boom")
+      end
+
+      it "re-raises the error" do
+        expect do
+          command
+        end.to raise_error(RuntimeError, /failed to serialize/)
+      end
+    end
+
+    context "when appending to the mailbox causes a standard error" do
       before do
         allow(mbox).to receive(:append).and_throw(RuntimeError, "Boom")
       end
@@ -63,6 +75,36 @@ module Imap::Backup
 
       it "leaves the metadata file unchanged" do
         command
+
+        expect(imap).to have_received(:rollback)
+      end
+    end
+
+    context "when appending to the mailbox is interrupted" do
+      before do
+        allow(mbox).to receive(:append) { Process.kill("HUP", Process.pid) }
+      end
+
+      it "exits" do
+        expect { command }.to raise_error(SignalException, /HUP/)
+      end
+
+      it "leaves the mailbox file unchanged" do
+        begin
+          command
+        rescue SignalException
+          # swallow exception
+        end
+
+        expect(mbox).to have_received(:rollback)
+      end
+
+      it "leaves the metadata file unchanged" do
+        begin
+          command
+        rescue SignalException
+          # swallow exception
+        end
 
         expect(imap).to have_received(:rollback)
       end
