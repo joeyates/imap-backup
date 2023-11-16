@@ -9,9 +9,5 @@ class CliCoverage
     # Silence output
     SimpleCov.formatter = SimpleCov::Formatter::SimpleFormatter
     SimpleCov.print_error_status = false
-
-    # Ensure SimpleCov doesn't filter out all out code
-    project_root = File.expand_path("../..", __dir__)
-    SimpleCov.root project_root
   end
 end
