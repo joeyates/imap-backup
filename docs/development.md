@@ -39,10 +39,16 @@ Then, run all specs
 $ rspec
 ```
 
-To exclude container-based tests:
+To exclude container-based tests
 
 ```sh
 $ rspec --tag ~docker
+```
+
+To run **just** the feature specs
+
+```sh
+rspec spec/features/**/*_spec.rb
 ```
 
 ## Full Test Run
