@@ -171,9 +171,9 @@ module Imap::Backup
       serializer.each_message(uids).each do |message|
         if uids.count > 1
           Kernel.puts <<~HEADER
-              #{'-' * 80}
-              #{format('| UID: %-71s |', message.uid)}
-              #{'-' * 80}
+            #{'-' * 80}
+            #{format('| UID: %-71s |', message.uid)}
+            #{'-' * 80}
           HEADER
         end
         Kernel.puts message.body
@@ -181,10 +181,11 @@ module Imap::Backup
     end
 
     def config
-      @config ||= begin
-                    non_logging_options = Logger.setup_logging(options)
-                    load_config(**non_logging_options)
-                  end
+      @config ||=
+        begin
+          non_logging_options = Logger.setup_logging(options)
+          load_config(**non_logging_options)
+        end
     end
   end
 end

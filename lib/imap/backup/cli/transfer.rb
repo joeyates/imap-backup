@@ -96,9 +96,7 @@ module Imap::Backup
       if destination_delimiter
         raise "--automatic-namespaces is incompatible with --destination-delimiter"
       end
-      if destination_prefix
-        raise "--automatic-namespaces is incompatible with --destination-prefix"
-      end
+      raise "--automatic-namespaces is incompatible with --destination-prefix" if destination_prefix
       raise "--automatic-namespaces is incompatible with --source-delimiter" if source_delimiter
       raise "--automatic-namespaces is incompatible with --source-prefix" if source_prefix
     end
