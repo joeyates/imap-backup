@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 14.4.3 - 2023-11-17
+
+### Changed
+
+* Documentation is now split into two areas:
+  * End-user facing: via the README on GitHub
+  * Developer: via a different main YARD page on rubydoc.info
+
 ## 14.4.0 - 2023-11-15
 
 ### Changed
