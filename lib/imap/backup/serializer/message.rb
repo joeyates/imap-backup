@@ -1,3 +1,5 @@
+require "forwardable"
+
 require "imap/backup/email/mboxrd/message"
 
 module Imap; end
@@ -9,7 +11,10 @@ module Imap::Backup
     attr_reader :offset
     attr_accessor :uid
 
-    # TODO: delegate to Mboxrd::Message
+    extend Forwardable
+
+    def_delegator :message, :supplied_body, :body
+    def_delegators :message, :imap_body, :date, :subject
 
     def initialize(uid:, offset:, length:, mbox:, flags: [])
       @uid = uid
@@ -34,22 +39,6 @@ module Imap::Backup
           raw = mbox.read(offset, length)
           Email::Mboxrd::Message.from_serialized(raw)
         end
-    end
-
-    def body
-      @body ||= message.supplied_body
-    end
-
-    def imap_body
-      @imap_body ||= message.imap_body
-    end
-
-    def date
-      @date ||= message.date
-    end
-
-    def subject
-      @subject ||= message.subject
     end
 
     private
