@@ -1,5 +1,6 @@
 require "imap/backup/serializer/message_enumerator"
 require "imap/backup/serializer/imap"
+require "imap/backup/serializer/message"
 
 module Imap::Backup
   RSpec.describe Serializer::MessageEnumerator do
