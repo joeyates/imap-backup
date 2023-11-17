@@ -14,8 +14,6 @@ module Imap::Backup
     include Thor::Actions
     include CLI::Helpers
 
-    MAX_SUBJECT = 60
-
     desc "accounts", "List locally backed-up accounts"
     config_option
     format_option
@@ -123,6 +121,8 @@ module Imap::Backup
     end
 
     private
+
+    MAX_SUBJECT = 60
 
     def list_emails_as_json(serializer)
       emails = serializer.each_message.map do |message|

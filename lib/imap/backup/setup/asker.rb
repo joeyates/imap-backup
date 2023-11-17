@@ -4,8 +4,6 @@ module Imap::Backup
   class Setup; end
 
   class Setup::Asker
-    EMAIL_MATCHER = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]+$/i.freeze
-
     def initialize(highline)
       @highline = highline
     end
@@ -40,6 +38,8 @@ module Imap::Backup
     end
 
     private
+
+    EMAIL_MATCHER = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]+$/i.freeze
 
     attr_reader :highline
   end

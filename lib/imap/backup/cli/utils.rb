@@ -17,8 +17,6 @@ module Imap::Backup
     include Thor::Actions
     include CLI::Helpers
 
-    FAKE_EMAIL = "fake@email.com".freeze
-
     desc "ignore-history EMAIL", "Skip downloading emails up to today for all configured folders"
     config_option
     quiet_option
@@ -88,6 +86,8 @@ module Imap::Backup
     end
 
     private
+
+    FAKE_EMAIL = "fake@email.com".freeze
 
     def do_ignore_folder_history(folder, serializer)
       uids = folder.uids - serializer.uids

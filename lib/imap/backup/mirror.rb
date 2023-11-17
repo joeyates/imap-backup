@@ -4,8 +4,6 @@ module Imap; end
 
 module Imap::Backup
   class Mirror
-    CHUNK_SIZE = 100
-
     def initialize(serializer, folder)
       @serializer = serializer
       @folder = folder
@@ -20,6 +18,8 @@ module Imap::Backup
     end
 
     private
+
+    CHUNK_SIZE = 100
 
     attr_reader :serializer
     attr_reader :folder

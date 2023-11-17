@@ -8,8 +8,6 @@ module Imap::Backup
   class Thunderbird; end
 
   class Thunderbird::MailboxExporter
-    EXPORT_PREFIX = "imap-backup".freeze
-
     def initialize(email, serializer, profile, force: false)
       @email = email
       @serializer = serializer
@@ -44,6 +42,8 @@ module Imap::Backup
     end
 
     private
+
+    EXPORT_PREFIX = "imap-backup".freeze
 
     attr_reader :email
     attr_reader :serializer

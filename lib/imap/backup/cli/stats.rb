@@ -8,14 +8,6 @@ module Imap::Backup
     include Thor::Actions
     include CLI::Helpers
 
-    TEXT_COLUMNS = [
-      {name: :folder, width: 20, alignment: :left},
-      {name: :remote, width: 8, alignment: :right},
-      {name: :both, width: 8, alignment: :right},
-      {name: :local, width: 8, alignment: :right}
-    ].freeze
-    ALIGNMENT_FORMAT_SYMBOL = {left: "-", right: " "}.freeze
-
     def initialize(email, options)
       super([])
       @email = email
@@ -34,6 +26,14 @@ module Imap::Backup
     end
 
     private
+
+    TEXT_COLUMNS = [
+      {name: :folder, width: 20, alignment: :left},
+      {name: :remote, width: 8, alignment: :right},
+      {name: :both, width: 8, alignment: :right},
+      {name: :local, width: 8, alignment: :right}
+    ].freeze
+    ALIGNMENT_FORMAT_SYMBOL = {left: "-", right: " "}.freeze
 
     attr_reader :email
     attr_reader :options

@@ -17,13 +17,6 @@ module Imap::Backup
     extend Forwardable
     include RetryOnError
 
-    BODY_ATTRIBUTE = "BODY[]".freeze
-    UID_FETCH_RETRY_CLASSES = [::EOFError, ::Errno::ECONNRESET, ::IOError].freeze
-    APPEND_RETRY_CLASSES = [::Net::IMAP::BadResponseError].freeze
-    CREATE_RETRY_CLASSES = [::Net::IMAP::BadResponseError].freeze
-    EXAMINE_RETRY_CLASSES = [::Net::IMAP::BadResponseError].freeze
-    PERMITTED_FLAGS = %i(Answered Draft Flagged Seen).freeze
-
     attr_reader :client
     attr_reader :name
 
@@ -156,6 +149,13 @@ module Imap::Backup
     end
 
     private
+
+    BODY_ATTRIBUTE = "BODY[]".freeze
+    UID_FETCH_RETRY_CLASSES = [::EOFError, ::Errno::ECONNRESET, ::IOError].freeze
+    APPEND_RETRY_CLASSES = [::Net::IMAP::BadResponseError].freeze
+    CREATE_RETRY_CLASSES = [::Net::IMAP::BadResponseError].freeze
+    EXAMINE_RETRY_CLASSES = [::Net::IMAP::BadResponseError].freeze
+    PERMITTED_FLAGS = %i(Answered Draft Flagged Seen).freeze
 
     def examine
       client.examine(utf7_encoded_name)

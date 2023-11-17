@@ -11,13 +11,12 @@ module Imap; end
 module Imap::Backup
   class Configuration
     CONFIGURATION_DIRECTORY = File.expand_path("~/.imap-backup")
-    VERSION_2_1 = "2.1".freeze
-    VERSION = "2.2".freeze
     DEFAULT_STRATEGY = "delay_metadata".freeze
     DOWNLOAD_STRATEGIES = [
       {key: "direct", description: "write straight to disk"},
       {key: DEFAULT_STRATEGY, description: "delay writing metadata"}
     ].freeze
+    VERSION = "2.2".freeze
 
     def self.default_pathname
       File.join(CONFIGURATION_DIRECTORY, "config.json")
@@ -95,6 +94,8 @@ module Imap::Backup
     end
 
     private
+
+    VERSION_2_1 = "2.1".freeze
 
     attr_reader :pathname
 
