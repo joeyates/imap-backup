@@ -5,12 +5,19 @@ module Imap::Backup
 
   class Serializer::FolderIntegrityError < StandardError; end
 
+  # Checks that both the mailbox and its associated metadata file match
   class Serializer::IntegrityChecker
+    # @param imap [Imap]
+    # @param mbox [Mbox]
     def initialize(imap:, mbox:)
       @imap = imap
       @mbox = mbox
     end
 
+    # Runs the integrity check
+    #
+    # @raise [FolderIntegrityError] if the files do not match
+    # @return [void]
     def run
       Logger.logger.debug(
         "[IntegrityChecker] checking '#{imap.pathname}' against '#{mbox.pathname}'"

@@ -5,6 +5,7 @@ module Imap; end
 module Imap::Backup
   class Serializer; end
 
+  # Appends messages to the local store
   class Serializer::Appender
     def initialize(folder:, imap:, mbox:)
       @folder = folder
@@ -12,6 +13,8 @@ module Imap::Backup
       @mbox = mbox
     end
 
+    # Adds a message to the metadata file and the mailbox.
+    # Wraps any errors with information about the message that caused them.
     def append(uid:, message:, flags:)
       raise "Can't add messages without uid_validity" if !imap.uid_validity
 

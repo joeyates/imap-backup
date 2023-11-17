@@ -16,6 +16,10 @@ module Imap::Backup
       @tsx = nil
     end
 
+    # Initializes the metadata and mailbox transactions, then calls the supplied block.
+    # Once the block has finished, commits changes to metadata
+    #
+    # @return [void]
     def transaction(&block)
       tsx.fail_in_transaction!(:transaction, message: "nested transactions are not supported")
 
@@ -30,6 +34,13 @@ module Imap::Backup
       end
     end
 
+    # Appends a message to the mbox file and adds the metadata
+    # to the transaction
+    #
+    # @param uid [Integer] the UID of the message
+    # @param message [String] the message
+    # @param flags [Array<Symbol>] the flags for the message
+    # @return [void]
     def append(uid, message, flags)
       tsx.fail_outside_transaction!(:append)
       mboxrd_message = Email::Mboxrd::Message.new(message)

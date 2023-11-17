@@ -35,6 +35,11 @@ module Imap::Backup
       @validated = nil
     end
 
+    # Calls the supplied block.
+    # This method is present so that this class implements the same
+    # interface as {DelayedMetadataSerializer}
+    #
+    # @return [void]
     def transaction(&block)
       block.call
     end

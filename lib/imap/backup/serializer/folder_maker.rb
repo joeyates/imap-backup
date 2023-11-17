@@ -5,13 +5,19 @@ module Imap; end
 module Imap::Backup
   class Serializer; end
 
+  # Creates directories
   class Serializer::FolderMaker
+    # @param base [String] The base directory of the account
+    # @param path [String] The path to the folder, relative to the base
+    # @param permissions [Integer] The permissions to set on the folder
     def initialize(base:, path:, permissions:)
       @base = base
       @path = path
       @permissions = permissions
     end
 
+    # Creates the directory and any missing parent directories,
+    # ensuring the desired permissions.
     def run
       parts = path.split("/")
       return if parts.empty?

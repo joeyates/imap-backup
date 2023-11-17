@@ -7,11 +7,14 @@ require "imap/backup/serializer/transaction"
 module Imap; end
 
 module Imap::Backup
+  # Stores message metadata
   class Serializer::Imap
+    # The version number to store in the metadata file
     CURRENT_VERSION = 3
 
     attr_reader :folder_path
 
+    # @param folder_path [String] The path of the imap metadata file, without the '.imap' extension
     def initialize(folder_path)
       @folder_path = folder_path
       @loaded = false
