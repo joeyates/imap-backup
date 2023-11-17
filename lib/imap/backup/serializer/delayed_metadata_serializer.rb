@@ -1,3 +1,5 @@
+require "forwardable"
+
 require "imap/backup/email/mboxrd/message"
 require "imap/backup/serializer/imap"
 require "imap/backup/serializer/mbox"

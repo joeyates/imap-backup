@@ -1,4 +1,3 @@
-require "forwardable"
 require "mail"
 
 module Imap; end
