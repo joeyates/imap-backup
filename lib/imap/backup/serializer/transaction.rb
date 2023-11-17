@@ -2,7 +2,6 @@ module Imap; end
 
 module Imap::Backup
   class Serializer::Transaction
-    attr_reader :owner
     attr_reader :data
 
     def initialize(owner:)
@@ -33,5 +32,9 @@ module Imap::Backup
     def fail_outside_transaction!(method)
       raise "#{owner.class}##{method} can only be called inside a transaction" if !in_transaction?
     end
+
+    private
+
+    attr_reader :owner
   end
 end

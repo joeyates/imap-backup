@@ -8,8 +8,6 @@ module Imap::Backup
 
   module Email::Mboxrd
     class Message
-      attr_reader :supplied_body
-
       def self.clean_serialized(serialized)
         cleaned = serialized.gsub(/^>(>*From)/, "\\1")
         # Serialized messages in this format *should* start with a line
@@ -25,6 +23,8 @@ module Imap::Backup
       def self.from_serialized(serialized)
         new(clean_serialized(serialized))
       end
+
+      attr_reader :supplied_body
 
       def initialize(supplied_body)
         @supplied_body = supplied_body.clone

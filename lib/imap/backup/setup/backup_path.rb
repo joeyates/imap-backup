@@ -4,9 +4,6 @@ module Imap::Backup
   class Setup; end
 
   class Setup::BackupPath
-    attr_reader :account
-    attr_reader :config
-
     def initialize(account:, config:)
       @account = account
       @config = config
@@ -21,6 +18,9 @@ module Imap::Backup
     end
 
     private
+
+    attr_reader :account
+    attr_reader :config
 
     def highline
       Setup.highline

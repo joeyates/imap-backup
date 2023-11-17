@@ -9,9 +9,6 @@ module Imap::Backup
   class Setup::Account; end
 
   class Setup::Account::Header
-    attr_reader :account
-    attr_reader :menu
-
     def initialize(menu:, account:)
       @menu = menu
       @account = account
@@ -40,6 +37,9 @@ module Imap::Backup
     end
 
     private
+
+    attr_reader :account
+    attr_reader :menu
 
     def modified_flag
       account.modified? ? "*" : ""

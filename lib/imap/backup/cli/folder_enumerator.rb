@@ -10,11 +10,6 @@ module Imap::Backup
   class CLI < Thor; end
 
   class CLI::FolderEnumerator
-    attr_reader :destination
-    attr_reader :destination_delimiter
-    attr_reader :source
-    attr_reader :source_delimiter
-
     def initialize(
       destination:,
       source:,
@@ -44,6 +39,11 @@ module Imap::Backup
     end
 
     private
+
+    attr_reader :destination
+    attr_reader :destination_delimiter
+    attr_reader :source
+    attr_reader :source_delimiter
 
     def destination_prefix_clipped
       @destination_prefix_clipped ||=

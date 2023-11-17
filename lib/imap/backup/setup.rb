@@ -16,8 +16,6 @@ module Imap::Backup
     end
     self.highline = HighLine.new
 
-    attr_accessor :config
-
     def initialize(config:)
       @config = config
     end
@@ -32,6 +30,8 @@ module Imap::Backup
     end
 
     private
+
+    attr_accessor :config
 
     def show_menu
       self.class.highline.choose do |menu|

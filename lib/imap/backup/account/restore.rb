@@ -8,8 +8,6 @@ module Imap::Backup
 
   # Restores all backed up folders to the server
   class Account::Restore
-    attr_reader :account
-
     def initialize(account:)
       @account = account
     end
@@ -20,5 +18,9 @@ module Imap::Backup
         Uploader.new(folder, serializer).run
       end
     end
+
+    private
+
+    attr_reader :account
   end
 end

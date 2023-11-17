@@ -4,8 +4,6 @@ module Imap; end
 
 module Imap::Backup
   class Serializer::UnusedNameFinder
-    attr_reader :serializer
-
     def initialize(serializer:)
       @serializer = serializer
     end
@@ -25,5 +23,9 @@ module Imap::Backup
 
       folder
     end
+
+    private
+
+    attr_reader :serializer
   end
 end

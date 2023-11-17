@@ -13,8 +13,6 @@ module Imap::Backup
   class CLI::Local::Check
     include CLI::Helpers
 
-    attr_reader :options
-
     def initialize(options)
       @options = options
     end
@@ -47,6 +45,10 @@ module Imap::Backup
         print_check_results_as_text(results)
       end
     end
+
+    private
+
+    attr_reader :options
 
     def print_check_results_as_json(results)
       Kernel.puts results.to_json

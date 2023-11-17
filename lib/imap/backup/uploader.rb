@@ -6,9 +6,6 @@ module Imap; end
 
 module Imap::Backup
   class Uploader
-    attr_reader :folder
-    attr_reader :serializer
-
     def initialize(folder, serializer)
       @folder = folder
       @serializer = serializer
@@ -31,6 +28,9 @@ module Imap::Backup
     end
 
     private
+
+    attr_reader :folder
+    attr_reader :serializer
 
     def upload_message(message, index)
       return if message.nil?

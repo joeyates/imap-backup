@@ -10,11 +10,6 @@ module Imap::Backup
   class Thunderbird::MailboxExporter
     EXPORT_PREFIX = "imap-backup".freeze
 
-    attr_reader :email
-    attr_reader :serializer
-    attr_reader :profile
-    attr_reader :force
-
     def initialize(email, serializer, profile, force: false)
       @email = email
       @serializer = serializer
@@ -49,6 +44,11 @@ module Imap::Backup
     end
 
     private
+
+    attr_reader :email
+    attr_reader :serializer
+    attr_reader :profile
+    attr_reader :force
 
     def profile_set_up
       File.exist?(profile.local_folders_path)

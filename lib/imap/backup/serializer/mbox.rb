@@ -5,7 +5,6 @@ module Imap; end
 module Imap::Backup
   class Serializer::Mbox
     attr_reader :folder_path
-    attr_reader :savepoint
 
     def initialize(folder_path)
       @folder_path = folder_path
@@ -85,6 +84,8 @@ module Imap::Backup
     end
 
     private
+
+    attr_reader :savepoint
 
     def rewind(length)
       File.open(pathname, File::RDWR | File::CREAT, 0o644) do |f|

@@ -11,10 +11,6 @@ module Imap::Backup
   class Setup; end
 
   class Setup::Account
-    attr_reader :account
-    attr_reader :config
-    attr_reader :highline
-
     def initialize(config, account, highline)
       @account = account
       @config = config
@@ -35,6 +31,10 @@ module Imap::Backup
     end
 
     private
+
+    attr_reader :account
+    attr_reader :config
+    attr_reader :highline
 
     def create_menu
       highline.choose do |menu|

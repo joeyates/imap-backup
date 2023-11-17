@@ -4,10 +4,6 @@ module Imap; end
 
 module Imap::Backup
   class Migrator
-    attr_reader :folder
-    attr_reader :reset
-    attr_reader :serializer
-
     def initialize(serializer, folder, reset: false)
       @folder = folder
       @reset = reset
@@ -35,5 +31,11 @@ module Imap::Backup
         end
       end
     end
+
+    private
+
+    attr_reader :folder
+    attr_reader :reset
+    attr_reader :serializer
   end
 end

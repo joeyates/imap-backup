@@ -11,7 +11,6 @@ module Imap::Backup
     CURRENT_VERSION = 3
 
     attr_reader :folder_path
-    attr_reader :loaded
 
     def initialize(folder_path)
       @folder_path = folder_path
@@ -148,6 +147,8 @@ module Imap::Backup
     end
 
     private
+
+    attr_reader :loaded
 
     def save_internal(version:, uid_validity:, messages:)
       raise "Cannot save metadata without a uid_validity" if !uid_validity

@@ -2,9 +2,6 @@ module Imap; end
 
 module Imap::Backup
   class FlagRefresher
-    attr_reader :folder
-    attr_reader :serializer
-
     CHUNK_SIZE = 100
 
     def initialize(folder, serializer)
@@ -21,6 +18,9 @@ module Imap::Backup
     end
 
     private
+
+    attr_reader :folder
+    attr_reader :serializer
 
     def refresh_block(uids)
       uids_and_flags = folder.fetch_multi(uids, ["FLAGS"])

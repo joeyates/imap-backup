@@ -9,9 +9,6 @@ module Imap::Backup
   class Account::BackupFolders
     include Enumerable
 
-    attr_reader :account
-    attr_reader :client
-
     def initialize(client:, account:)
       @client = client
       @account = account
@@ -47,5 +44,10 @@ module Imap::Backup
         block.call(folder)
       end
     end
+
+    private
+
+    attr_reader :account
+    attr_reader :client
   end
 end

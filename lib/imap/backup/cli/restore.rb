@@ -12,9 +12,6 @@ module Imap::Backup
     include Thor::Actions
     include CLI::Helpers
 
-    attr_reader :email
-    attr_reader :options
-
     def initialize(email = nil, options)
       super([])
       @email = email
@@ -42,5 +39,10 @@ module Imap::Backup
         end
       end
     end
+
+    private
+
+    attr_reader :email
+    attr_reader :options
   end
 end

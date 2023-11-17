@@ -4,9 +4,6 @@ module Imap; end
 
 module Imap::Backup
   class LocalOnlyMessageDeleter
-    attr_reader :folder
-    attr_reader :serializer
-
     def initialize(folder, serializer)
       @folder = folder
       @serializer = serializer
@@ -29,5 +26,10 @@ module Imap::Backup
         !local_only_uids.include?(message.uid)
       end
     end
+
+    private
+
+    attr_reader :folder
+    attr_reader :serializer
   end
 end

@@ -9,8 +9,6 @@ module Imap::Backup
   class Serializer::DelayedMetadataSerializer
     extend Forwardable
 
-    attr_reader :serializer
-
     def_delegator :serializer, :uids
 
     def initialize(serializer:)
@@ -41,6 +39,8 @@ module Imap::Backup
     end
 
     private
+
+    attr_reader :serializer
 
     def commit
       # rubocop:disable Lint/RescueException

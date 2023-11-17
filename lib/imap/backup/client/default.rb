@@ -15,11 +15,6 @@ module Imap::Backup
       responses uid_fetch uid_search uid_store
     )
 
-    attr_reader :account
-    attr_reader :options
-    attr_reader :server
-    attr_accessor :state
-
     def initialize(server, account, options)
       @account = account
       @options = options
@@ -74,6 +69,11 @@ module Imap::Backup
     end
 
     private
+
+    attr_reader :account
+    attr_reader :options
+    attr_reader :server
+    attr_accessor :state
 
     def imap
       @imap ||= Net::IMAP.new(server, options)

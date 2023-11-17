@@ -4,11 +4,10 @@ module Imap; end
 
 module Imap::Backup
   class Serializer::Message
-    attr_accessor :uid
     attr_accessor :flags
-    attr_reader :offset
     attr_reader :length
-    attr_reader :mbox
+    attr_reader :offset
+    attr_accessor :uid
 
     # TODO: delegate to Mboxrd::Message
 
@@ -52,5 +51,9 @@ module Imap::Backup
     def subject
       @subject ||= message.subject
     end
+
+    private
+
+    attr_reader :mbox
   end
 end

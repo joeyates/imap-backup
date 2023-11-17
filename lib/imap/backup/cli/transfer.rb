@@ -14,18 +14,6 @@ module Imap::Backup
 
     ACTIONS = %i(migrate mirror).freeze
 
-    attr_reader :action
-    attr_accessor :automatic_namespaces
-    attr_accessor :config_path
-    attr_accessor :destination_delimiter
-    attr_reader :destination_email
-    attr_accessor :destination_prefix
-    attr_reader :options
-    attr_accessor :reset
-    attr_accessor :source_delimiter
-    attr_reader :source_email
-    attr_accessor :source_prefix
-
     def initialize(action, source_email, destination_email, options)
       super([])
       @action = action
@@ -160,5 +148,19 @@ module Imap::Backup
         config.accounts.find { |a| a.username == source_email }
       end
     end
+
+    private
+
+    attr_reader :action
+    attr_accessor :automatic_namespaces
+    attr_accessor :config_path
+    attr_accessor :destination_delimiter
+    attr_reader :destination_email
+    attr_accessor :destination_prefix
+    attr_reader :options
+    attr_accessor :reset
+    attr_accessor :source_delimiter
+    attr_reader :source_email
+    attr_accessor :source_prefix
   end
 end

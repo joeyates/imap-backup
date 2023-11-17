@@ -19,8 +19,6 @@ module Imap::Backup
       {key: DEFAULT_STRATEGY, description: "delay writing metadata"}
     ].freeze
 
-    attr_reader :pathname
-
     def self.default_pathname
       File.join(CONFIGURATION_DIRECTORY, "config.json")
     end
@@ -97,6 +95,8 @@ module Imap::Backup
     end
 
     private
+
+    attr_reader :pathname
 
     def ensure_loaded!
       return true if @data

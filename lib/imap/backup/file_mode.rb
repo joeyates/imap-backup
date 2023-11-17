@@ -2,8 +2,6 @@ module Imap; end
 
 module Imap::Backup
   class FileMode
-    attr_reader :filename
-
     def initialize(filename:)
       @filename = filename
     end
@@ -14,5 +12,9 @@ module Imap::Backup
       stat = File.stat(filename)
       stat.mode & 0o777
     end
+
+    private
+
+    attr_reader :filename
   end
 end

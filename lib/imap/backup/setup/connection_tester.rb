@@ -6,8 +6,6 @@ module Imap::Backup
   class Setup; end
 
   class Setup::ConnectionTester
-    attr_reader :account
-
     def initialize(account)
       @account = account
     end
@@ -20,5 +18,9 @@ module Imap::Backup
     rescue StandardError => e
       "Unexpected error: #{e}"
     end
+
+    private
+
+    attr_reader :account
   end
 end

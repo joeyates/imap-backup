@@ -7,8 +7,6 @@ module Imap::Backup
   class Setup; end
 
   class Setup::GlobalOptions
-    attr_reader :config
-
     def initialize(config:)
       @config = config
     end
@@ -23,6 +21,8 @@ module Imap::Backup
     end
 
     private
+
+    attr_reader :config
 
     def show_menu
       highline.choose do |menu|

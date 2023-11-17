@@ -16,9 +16,6 @@ module Imap::Backup
     ].freeze
     ALIGNMENT_FORMAT_SYMBOL = {left: "-", right: " "}.freeze
 
-    attr_reader :email
-    attr_reader :options
-
     def initialize(email, options)
       super([])
       @email = email
@@ -85,5 +82,10 @@ module Imap::Backup
         "#{titles}\n#{underline}"
       end
     end
+
+    private
+
+    attr_reader :email
+    attr_reader :options
   end
 end

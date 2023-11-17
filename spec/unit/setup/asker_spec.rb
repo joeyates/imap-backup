@@ -48,10 +48,6 @@ module Imap::Backup
           described_class.new
         end.to raise_error(ArgumentError, /wrong number/)
       end
-
-      it "expects a higline" do
-        expect(subject.highline).to eq(highline)
-      end
     end
 
     describe "#email" do

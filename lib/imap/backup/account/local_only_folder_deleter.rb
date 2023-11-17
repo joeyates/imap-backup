@@ -10,8 +10,6 @@ module Imap::Backup
   # This is used in mirror mode, where local copies are only kept as long as they
   # exist on the server.
   class Account::LocalOnlyFolderDeleter
-    attr_reader :account
-
     def initialize(account:)
       @account = account
     end
@@ -26,5 +24,9 @@ module Imap::Backup
         serializer.delete if !wanted.include?(serializer.folder)
       end
     end
+
+    private
+
+    attr_reader :account
   end
 end

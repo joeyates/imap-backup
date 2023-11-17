@@ -6,10 +6,6 @@ module Imap::Backup
   class Serializer; end
 
   class Serializer::FolderMaker
-    attr_reader :base
-    attr_reader :path
-    attr_reader :permissions
-
     def initialize(base:, path:, permissions:)
       @base = base
       @path = path
@@ -27,6 +23,12 @@ module Imap::Backup
         FileUtils.chmod permissions, full
       end
     end
+
+    private
+
+    attr_reader :base
+    attr_reader :path
+    attr_reader :permissions
 
     def full_path
       File.join(base, path)

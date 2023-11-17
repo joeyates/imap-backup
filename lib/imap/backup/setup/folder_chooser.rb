@@ -6,8 +6,6 @@ module Imap::Backup
   class Setup; end
 
   class Setup::FolderChooser
-    attr_reader :account
-
     def initialize(account)
       @account = account
     end
@@ -35,6 +33,8 @@ module Imap::Backup
     end
 
     private
+
+    attr_reader :account
 
     def show_menu
       highline.choose do |menu|

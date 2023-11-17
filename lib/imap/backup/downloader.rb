@@ -6,12 +6,6 @@ module Imap::Backup
   class Downloader
     class MultiFetchFailedError < StandardError; end
 
-    attr_reader :folder
-    attr_reader :serializer
-    attr_reader :multi_fetch_size
-    # (see Imap::Backup::Account#reset_seen_flags_after_fetch)
-    attr_reader :reset_seen_flags_after_fetch
-
     def initialize(folder, serializer, multi_fetch_size: 1, reset_seen_flags_after_fetch: false)
       @folder = folder
       @serializer = serializer
@@ -38,6 +32,11 @@ module Imap::Backup
     end
 
     private
+
+    attr_reader :folder
+    attr_reader :serializer
+    attr_reader :multi_fetch_size
+    attr_reader :reset_seen_flags_after_fetch
 
     def download_block(block, index)
       uids_and_bodies =

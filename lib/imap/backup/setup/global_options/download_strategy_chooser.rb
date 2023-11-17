@@ -6,8 +6,6 @@ class Imap::Backup::Setup; end
 
 class Imap::Backup::Setup::GlobalOptions
   class DownloadStrategyChooser
-    attr_reader :config
-
     def initialize(config:)
       @config = config
     end
@@ -22,6 +20,8 @@ class Imap::Backup::Setup::GlobalOptions
     end
 
     private
+
+    attr_reader :config
 
     def create_menu
       strategies = Imap::Backup::Configuration::DOWNLOAD_STRATEGIES

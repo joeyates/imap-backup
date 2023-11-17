@@ -6,9 +6,6 @@ module Imap::Backup
   class Mirror; end
 
   class Mirror::Map
-    attr_reader :pathname
-    attr_reader :destination
-
     def initialize(pathname:, destination:)
       @pathname = pathname
       @destination = destination
@@ -63,6 +60,9 @@ module Imap::Backup
     end
 
     private
+
+    attr_reader :pathname
+    attr_reader :destination
 
     def store
       @store ||=

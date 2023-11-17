@@ -6,10 +6,6 @@ module Imap::Backup
   class Serializer; end
 
   class Serializer::Appender
-    attr_reader :imap
-    attr_reader :folder
-    attr_reader :mbox
-
     def initialize(folder:, imap:, mbox:)
       @folder = folder
       @imap = imap
@@ -55,6 +51,10 @@ module Imap::Backup
     end
 
     private
+
+    attr_reader :imap
+    attr_reader :folder
+    attr_reader :mbox
 
     def wrap_error(error:, note:, folder:, uid:, message:)
       <<-ERROR.gsub(/^\s*/m, "")

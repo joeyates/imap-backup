@@ -8,8 +8,6 @@ module Imap::Backup
 
   # Handles creation of directories for backup storage
   class Account::FolderEnsurer
-    attr_reader :account
-
     def initialize(account:)
       @account = account
     end
@@ -23,5 +21,9 @@ module Imap::Backup
         permissions: Serializer::Directory::DIRECTORY_PERMISSIONS
       ).run
     end
+
+    private
+
+    attr_reader :account
   end
 end

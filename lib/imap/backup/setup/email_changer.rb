@@ -7,9 +7,6 @@ module Imap::Backup
   class Setup; end
 
   class Setup::EmailChanger
-    attr_reader :account
-    attr_reader :config
-
     def initialize(account:, config:)
       @account = account
       @config = config
@@ -33,6 +30,9 @@ module Imap::Backup
     end
 
     private
+
+    attr_reader :account
+    attr_reader :config
 
     def default_server(username)
       provider = Email::Provider.for_address(username)

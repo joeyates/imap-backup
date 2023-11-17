@@ -11,9 +11,6 @@ module Imap::Backup
   class Serializer::Directory
     DIRECTORY_PERMISSIONS = 0o700
 
-    attr_reader :relative
-    attr_reader :path
-
     def initialize(path, relative)
       @path = path
       @relative = relative
@@ -33,6 +30,9 @@ module Imap::Backup
     end
 
     private
+
+    attr_reader :relative
+    attr_reader :path
 
     def full_path
       containing_directory = File.join(path, relative)

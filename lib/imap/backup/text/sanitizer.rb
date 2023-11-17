@@ -8,8 +8,6 @@ module Imap::Backup
   class Text::Sanitizer
     extend Forwardable
 
-    attr_reader :output
-
     delegate puts: :output
     delegate write: :output
 
@@ -38,6 +36,8 @@ module Imap::Backup
     end
 
     private
+
+    attr_reader :output
 
     def sanitize(text)
       # Hide password in Net::IMAP debug output

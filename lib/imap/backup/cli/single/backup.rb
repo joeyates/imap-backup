@@ -11,9 +11,6 @@ module Imap::Backup
   class CLI::Single < Thor; end
 
   class CLI::Single::Backup
-    attr_reader :options
-    attr_reader :password
-
     def initialize(options)
       @options = options
       @password = nil
@@ -39,6 +36,9 @@ module Imap::Backup
     end
 
     private
+
+    attr_reader :options
+    attr_reader :password
 
     def process_options!
       if !email

@@ -6,8 +6,6 @@ module Imap; end
 
 module Imap::Backup
   class Serializer::Version2Migrator
-    attr_reader :folder_path
-
     def initialize(folder_path)
       @folder_path = folder_path
     end
@@ -38,6 +36,8 @@ module Imap::Backup
     end
 
     private
+
+    attr_reader :folder_path
 
     def imap_pathname
       "#{folder_path}.imap"

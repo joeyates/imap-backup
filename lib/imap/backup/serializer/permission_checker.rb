@@ -4,9 +4,6 @@ module Imap; end
 
 module Imap::Backup
   class Serializer::PermissionChecker
-    attr_reader :filename
-    attr_reader :limit
-
     def initialize(filename:, limit:)
       @filename = filename
       @limit = limit
@@ -26,5 +23,10 @@ module Imap::Backup
       )
       raise message
     end
+
+    private
+
+    attr_reader :filename
+    attr_reader :limit
   end
 end

@@ -12,10 +12,6 @@ module Imap::Backup
 
   # Runs a backup for a single account folder
   class Account::FolderBackup
-    attr_reader :account
-    attr_reader :folder
-    attr_reader :refresh
-
     def initialize(account:, folder:, refresh: false)
       @account = account
       @folder = folder
@@ -38,6 +34,10 @@ module Imap::Backup
     end
 
     private
+
+    attr_reader :account
+    attr_reader :folder
+    attr_reader :refresh
 
     def folder_ok?
       begin

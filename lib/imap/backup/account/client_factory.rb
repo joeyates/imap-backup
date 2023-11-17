@@ -12,8 +12,6 @@ module Imap::Backup
 
   # Returns an IMAP client set up for the supplied account
   class Account::ClientFactory
-    attr_reader :account
-
     def initialize(account:)
       @account = account
       @provider = nil
@@ -35,6 +33,8 @@ module Imap::Backup
     end
 
     private
+
+    attr_reader :account
 
     def provider
       @provider ||= Email::Provider.for_address(account.username)

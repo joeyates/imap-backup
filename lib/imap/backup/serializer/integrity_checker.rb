@@ -6,9 +6,6 @@ module Imap::Backup
   class Serializer::FolderIntegrityError < StandardError; end
 
   class Serializer::IntegrityChecker
-    attr_reader :imap
-    attr_reader :mbox
-
     def initialize(imap:, mbox:)
       @imap = imap
       @mbox = mbox
@@ -46,6 +43,9 @@ module Imap::Backup
     end
 
     private
+
+    attr_reader :imap
+    attr_reader :mbox
 
     def check_offset_ordering!
       offsets = imap.messages.map(&:offset)
