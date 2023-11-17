@@ -122,69 +122,69 @@ module Imap::Backup
       end
     end
 
-    no_commands do
-      def list_emails_as_json(serializer)
-        emails = serializer.each_message.map do |message|
-          {
-            uid: message.uid,
-            date: message.date.to_s,
-            subject: message.subject || ""
-          }
-        end
-        Kernel.puts emails.to_json
-      end
+    private
 
-      def list_emails_as_text(serializer)
-        Kernel.puts format(
-          "%-10<uid>s  %-#{MAX_SUBJECT}<subject>s - %<date>s",
-          {uid: "UID", subject: "Subject", date: "Date"}
-        )
-        Kernel.puts "-" * (12 + MAX_SUBJECT + 28)
-
-        serializer.each_message.map do |message|
-          list_message_as_text message
-        end
-      end
-
-      def list_message_as_text(message)
-        m = {
+    def list_emails_as_json(serializer)
+      emails = serializer.each_message.map do |message|
+        {
           uid: message.uid,
           date: message.date.to_s,
           subject: message.subject || ""
         }
-        if m[:subject].length > MAX_SUBJECT
-          Kernel.puts format("% 10<uid>u: %.#{MAX_SUBJECT - 3}<subject>s... - %<date>s", m)
-        else
-          Kernel.puts format("% 10<uid>u: %-#{MAX_SUBJECT}<subject>s - %<date>s", m)
-        end
       end
+      Kernel.puts emails.to_json
+    end
 
-      def show_emails_as_json(serializer, uids)
-        emails = serializer.each_message(uids).map do |m|
-          m.to_h.tap { |h| h[:body] = m.body }
-        end
-        Kernel.puts emails.to_json
+    def list_emails_as_text(serializer)
+      Kernel.puts format(
+        "%-10<uid>s  %-#{MAX_SUBJECT}<subject>s - %<date>s",
+        {uid: "UID", subject: "Subject", date: "Date"}
+      )
+      Kernel.puts "-" * (12 + MAX_SUBJECT + 28)
+
+      serializer.each_message.map do |message|
+        list_message_as_text message
       end
+    end
 
-      def show_emails_as_text(serializer, uids)
-        serializer.each_message(uids).each do |message|
-          if uids.count > 1
-            Kernel.puts <<~HEADER
+    def list_message_as_text(message)
+      m = {
+        uid: message.uid,
+        date: message.date.to_s,
+        subject: message.subject || ""
+      }
+      if m[:subject].length > MAX_SUBJECT
+        Kernel.puts format("% 10<uid>u: %.#{MAX_SUBJECT - 3}<subject>s... - %<date>s", m)
+      else
+        Kernel.puts format("% 10<uid>u: %-#{MAX_SUBJECT}<subject>s - %<date>s", m)
+      end
+    end
+
+    def show_emails_as_json(serializer, uids)
+      emails = serializer.each_message(uids).map do |m|
+        m.to_h.tap { |h| h[:body] = m.body }
+      end
+      Kernel.puts emails.to_json
+    end
+
+    def show_emails_as_text(serializer, uids)
+      serializer.each_message(uids).each do |message|
+        if uids.count > 1
+          Kernel.puts <<~HEADER
               #{'-' * 80}
               #{format('| UID: %-71s |', message.uid)}
               #{'-' * 80}
-            HEADER
-          end
-          Kernel.puts message.body
+          HEADER
         end
+        Kernel.puts message.body
       end
+    end
 
-      def config
-        @config ||= begin
-          non_logging_options = Logger.setup_logging(options)
-          load_config(**non_logging_options)
-        end
-      end
+    def config
+      @config ||= begin
+                    non_logging_options = Logger.setup_logging(options)
+                    load_config(**non_logging_options)
+                  end
     end
   end
 end

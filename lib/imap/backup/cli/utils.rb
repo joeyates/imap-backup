@@ -87,38 +87,38 @@ module Imap::Backup
       end
     end
 
-    no_commands do
-      def do_ignore_folder_history(folder, serializer)
-        uids = folder.uids - serializer.uids
-        Logger.logger.info "Folder '#{folder.name}' - #{uids.length} messages"
+    private
 
-        serializer.apply_uid_validity(folder.uid_validity)
+    def do_ignore_folder_history(folder, serializer)
+      uids = folder.uids - serializer.uids
+      Logger.logger.info "Folder '#{folder.name}' - #{uids.length} messages"
 
-        uids.each do |uid|
-          message = <<~MESSAGE
-            From: #{FAKE_EMAIL}
-            Subject: Message #{uid} not backed up
-            Skipped #{uid}
-          MESSAGE
+      serializer.apply_uid_validity(folder.uid_validity)
 
-          serializer.append uid, message, []
-        end
+      uids.each do |uid|
+        message = <<~MESSAGE
+          From: #{FAKE_EMAIL}
+          Subject: Message #{uid} not backed up
+          Skipped #{uid}
+        MESSAGE
+
+        serializer.append uid, message, []
       end
+    end
 
-      def thunderbird_profile(name = nil)
-        profiles = ::Thunderbird::Profiles.new
-        if name
-          profiles.profile(name)
-        else
-          if profiles.installs.count > 1
-            raise <<~MESSAGE
-              Thunderbird has multiple installs, so no default profile exists.
-              Please supply a profile name
-            MESSAGE
-          end
-
-          profiles.installs[0].default
+    def thunderbird_profile(name = nil)
+      profiles = ::Thunderbird::Profiles.new
+      if name
+        profiles.profile(name)
+      else
+        if profiles.installs.count > 1
+          raise <<~MESSAGE
+            Thunderbird has multiple installs, so no default profile exists.
+            Please supply a profile name
+          MESSAGE
         end
+
+        profiles.installs[0].default
       end
     end
   end

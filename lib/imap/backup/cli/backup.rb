@@ -42,23 +42,23 @@ module Imap::Backup
         end
         exit(exit_code) if exit_code
       end
-
-      def refresh
-        options.key?(:refresh) ? !!options[:refresh] : false
-      end
-
-      def choose_exit_code(exception)
-        case exception
-        when Net::IMAP::NoResponseError, Errno::ECONNREFUSED
-          111
-        else
-          1
-        end
-      end
     end
 
     private
 
     attr_reader :options
+
+    def refresh
+      options.key?(:refresh) ? !!options[:refresh] : false
+    end
+
+    def choose_exit_code(exception)
+      case exception
+      when Net::IMAP::NoResponseError, Errno::ECONNREFUSED
+        111
+      else
+        1
+      end
+    end
   end
 end
