@@ -8,6 +8,7 @@ module Imap; end
 module Imap::Backup
   module Client; end
 
+  # Wraps a Net::IMAP instance
   class Client::Default
     extend Forwardable
     def_delegators :imap, *%i(

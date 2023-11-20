@@ -8,6 +8,7 @@ module Imap; end
 module Imap::Backup
   class CLI < Thor; end
 
+  # Runs the menu-driven setup program
   class CLI::Setup < Thor
     include Thor::Actions
     include CLI::Helpers

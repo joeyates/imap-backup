@@ -10,6 +10,7 @@ module Imap; end
 module Imap::Backup
   class CLI < Thor; end
 
+  # Implements the CLI functions relating to local storage
   class CLI::Local < Thor
     include Thor::Actions
     include CLI::Helpers

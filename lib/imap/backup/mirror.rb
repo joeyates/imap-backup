@@ -3,6 +3,7 @@ require "imap/backup/mirror/map"
 module Imap; end
 
 module Imap::Backup
+  # Synchronises a folder between a source and destination
   class Mirror
     def initialize(serializer, folder)
       @serializer = serializer

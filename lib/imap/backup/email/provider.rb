@@ -9,6 +9,7 @@ module Imap; end
 module Imap::Backup
   module Email; end
 
+  # Acts as a factory of Email::Provider classes
   class Email::Provider
     def self.for_address(address)
       # rubocop:disable Lint/DuplicateBranch

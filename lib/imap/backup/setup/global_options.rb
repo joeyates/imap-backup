@@ -6,6 +6,7 @@ module Imap; end
 module Imap::Backup
   class Setup; end
 
+  # Shows the menu of global options
   class Setup::GlobalOptions
     def initialize(config:)
       @config = config

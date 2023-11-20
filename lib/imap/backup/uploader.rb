@@ -5,6 +5,7 @@ require "imap/backup/serializer"
 module Imap; end
 
 module Imap::Backup
+  # Uploads a backed-up folder
   class Uploader
     def initialize(folder, serializer)
       @folder = folder

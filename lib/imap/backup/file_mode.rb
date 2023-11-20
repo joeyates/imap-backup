@@ -1,6 +1,7 @@
 module Imap; end
 
 module Imap::Backup
+  # Accesses a file's access premissions
   class FileMode
     def initialize(filename:)
       @filename = filename

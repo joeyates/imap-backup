@@ -5,6 +5,7 @@ require "imap/backup/email/mboxrd/message"
 module Imap; end
 
 module Imap::Backup
+  # Represents a stored message
   class Serializer::Message
     attr_accessor :flags
     attr_reader :length

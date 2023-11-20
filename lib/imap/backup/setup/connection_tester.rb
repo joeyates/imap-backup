@@ -5,6 +5,7 @@ module Imap; end
 module Imap::Backup
   class Setup; end
 
+  # Attempts to login to an account and reports the result
   class Setup::ConnectionTester
     def initialize(account)
       @account = account

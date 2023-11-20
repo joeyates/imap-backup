@@ -3,6 +3,7 @@ require "imap/backup/serializer/transaction"
 module Imap; end
 
 module Imap::Backup
+  # Stores messages
   class Serializer::Mbox
     attr_reader :folder_path
 

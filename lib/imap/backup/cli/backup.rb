@@ -10,6 +10,7 @@ module Imap; end
 module Imap::Backup
   class CLI < Thor; end
 
+  # Runs backups of configured accounts
   class CLI::Backup < Thor
     include Thor::Actions
     include CLI::Helpers

@@ -7,6 +7,7 @@ module Imap; end
 module Imap::Backup
   class Thunderbird; end
 
+  # Exports an accounts emails to Thunderbird
   class Thunderbird::MailboxExporter
     def initialize(email, serializer, profile, force: false)
       @email = email

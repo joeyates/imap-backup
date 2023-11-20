@@ -5,6 +5,7 @@ module Imap; end
 module Imap::Backup
   module Text; end
 
+  # Wraps standard output and hides passwords from debug output
   class Text::Sanitizer
     extend Forwardable
 

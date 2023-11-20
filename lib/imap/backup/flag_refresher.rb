@@ -1,6 +1,7 @@
 module Imap; end
 
 module Imap::Backup
+  # Updates the flags on backed-up emails
   class FlagRefresher
     CHUNK_SIZE = 100
 

@@ -3,6 +3,7 @@ module Imap; end
 module Imap::Backup
   class Setup; end
 
+  # Requests an updated backup path from the user
   class Setup::BackupPath
     def initialize(account:, config:)
       @account = account

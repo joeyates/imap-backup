@@ -8,6 +8,7 @@ module Imap; end
 module Imap::Backup
   class CLI < Thor; end
 
+  # Provides helper methods for CLI classes
   module CLI::Helpers
     def self.included(base)
       base.class_eval do

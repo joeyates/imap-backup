@@ -1,6 +1,7 @@
 module Imap; end
 
 module Imap::Backup
+  # Enumerates over a list of stores messages
   class Serializer::MessageEnumerator
     attr_reader :imap
 

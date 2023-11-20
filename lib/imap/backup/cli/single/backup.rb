@@ -10,6 +10,7 @@ module Imap::Backup
   class CLI < Thor; end
   class CLI::Single < Thor; end
 
+  # Runs a backup without relying on existing configuration
   class CLI::Single::Backup
     def initialize(options)
       @options = options

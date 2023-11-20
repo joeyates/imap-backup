@@ -10,6 +10,7 @@ module Imap::Backup
   class CLI; end
   class CLI::Local < Thor; end
 
+  # Runs integrity check on local backups
   class CLI::Local::Check
     include CLI::Helpers
 

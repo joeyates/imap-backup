@@ -8,6 +8,7 @@ require "imap/backup/mirror"
 module Imap; end
 
 module Imap::Backup
+  # Implements migration and mirroring
   class CLI::Transfer < Thor
     include Thor::Actions
     include CLI::Helpers

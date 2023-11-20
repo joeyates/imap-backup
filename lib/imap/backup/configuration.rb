@@ -9,6 +9,7 @@ require "imap/backup/serializer/permission_checker"
 module Imap; end
 
 module Imap::Backup
+  # Handles the application's configuration file
   class Configuration
     CONFIGURATION_DIRECTORY = File.expand_path("~/.imap-backup")
     DEFAULT_STRATEGY = "delay_metadata".freeze

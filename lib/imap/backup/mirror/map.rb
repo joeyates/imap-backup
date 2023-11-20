@@ -5,6 +5,7 @@ module Imap; end
 module Imap::Backup
   class Mirror; end
 
+  # Keeps track of the mapping between source and destination UIDs
   class Mirror::Map
     def initialize(pathname:, destination:)
       @pathname = pathname

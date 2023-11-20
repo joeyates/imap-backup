@@ -3,6 +3,7 @@ require "imap/backup/serializer"
 module Imap; end
 
 module Imap::Backup
+  # Finds a name that can be used to rename a serialized folder
   class Serializer::UnusedNameFinder
     def initialize(serializer:)
       @serializer = serializer

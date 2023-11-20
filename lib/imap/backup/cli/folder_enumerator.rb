@@ -9,6 +9,7 @@ module Imap; end
 module Imap::Backup
   class CLI < Thor; end
 
+  # Enumerates backed-up folders
   class CLI::FolderEnumerator
     def initialize(
       destination:,

@@ -3,6 +3,7 @@ require "imap/backup/logger"
 module Imap; end
 
 module Imap::Backup
+  # Calls a block, handling certain types of errors and retries up to a given number of times
   module RetryOnError
     def retry_on_error(errors:, limit: 10, on_error: nil)
       tries ||= 1

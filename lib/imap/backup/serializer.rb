@@ -15,6 +15,7 @@ require "imap/backup/serializer/unused_name_finder"
 module Imap; end
 
 module Imap::Backup
+  # Handles serialization for a folder
   class Serializer
     def self.folder_path_for(path:, folder:)
       relative = File.join(path, folder)

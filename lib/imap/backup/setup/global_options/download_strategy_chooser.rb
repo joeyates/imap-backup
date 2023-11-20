@@ -5,6 +5,7 @@ module Imap::Backup; end
 class Imap::Backup::Setup; end
 
 class Imap::Backup::Setup::GlobalOptions
+  # Allows changing the globally configured download strategy
   class DownloadStrategyChooser
     def initialize(config:)
       @config = config

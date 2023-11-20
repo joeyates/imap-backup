@@ -4,6 +4,7 @@ module Imap::Backup
   module Email; end
   class Email::Provider; end
 
+  # Supplies defaults for email provider behaviour
   class Email::Provider::Base
     def options
       # rubocop:disable Naming/VariableNumber

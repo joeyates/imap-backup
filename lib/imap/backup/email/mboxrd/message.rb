@@ -6,6 +6,7 @@ module Imap::Backup
   module Email; end
 
   module Email::Mboxrd
+    # Handles serialization and deserialization of messages
     class Message
       def self.clean_serialized(serialized)
         cleaned = serialized.gsub(/^>(>*From)/, "\\1")

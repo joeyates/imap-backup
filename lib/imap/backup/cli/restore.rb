@@ -8,6 +8,7 @@ module Imap; end
 module Imap::Backup
   class CLI < Thor; end
 
+  # Restore a local backup to the server
   class CLI::Restore < Thor
     include Thor::Actions
     include CLI::Helpers

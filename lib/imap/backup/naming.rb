@@ -1,6 +1,7 @@
 module Imap; end
 
 module Imap::Backup
+  # Maps between server and file system folder names
   class Naming
     INVALID_FILENAME_CHARACTERS = ":%;".freeze
     INVALID_FILENAME_CHARACTER_MATCH = /([#{INVALID_FILENAME_CHARACTERS}])/.freeze

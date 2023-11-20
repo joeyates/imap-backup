@@ -3,6 +3,7 @@ require "net/imap"
 module Imap; end
 
 module Imap::Backup
+  # Downloads as yet undownloaded emails from an account's server
   class Downloader
     class MultiFetchFailedError < StandardError; end
 

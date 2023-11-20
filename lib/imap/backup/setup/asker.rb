@@ -3,6 +3,7 @@ module Imap; end
 module Imap::Backup
   class Setup; end
 
+  # Implements interactively requesting information from the user
   class Setup::Asker
     def initialize(highline)
       @highline = highline

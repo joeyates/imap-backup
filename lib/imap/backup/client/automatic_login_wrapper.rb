@@ -5,6 +5,7 @@ module Imap; end
 module Imap::Backup
   module Client; end
 
+  # Transparently wraps a client instance, while delaying login until it becomes necessary
   class Client::AutomaticLoginWrapper
     include RetryOnError
 

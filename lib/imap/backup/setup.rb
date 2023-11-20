@@ -10,6 +10,7 @@ require "imap/backup/setup/helpers"
 module Imap; end
 
 module Imap::Backup
+  # Interactively updates the application's configuration file
   class Setup
     class << self
       attr_accessor :highline

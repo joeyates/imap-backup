@@ -8,6 +8,7 @@ module Imap; end
 module Imap::Backup
   class CLI < Thor; end
 
+  # Implements the CLI functions relating to configured online accounts
   class CLI::Remote < Thor
     include Thor::Actions
     include CLI::Helpers

@@ -6,6 +6,7 @@ module Imap; end
 module Imap::Backup
   class Setup; end
 
+  # Asks the user for a new email address
   class Setup::EmailChanger
     def initialize(account:, config:)
       @account = account

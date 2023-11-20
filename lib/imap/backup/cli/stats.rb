@@ -4,6 +4,7 @@ require "imap/backup/serializer"
 module Imap; end
 
 module Imap::Backup
+  # Prints various statistics about an account and its backup
   class CLI::Stats < Thor
     include Thor::Actions
     include CLI::Helpers

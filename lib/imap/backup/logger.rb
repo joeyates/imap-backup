@@ -7,6 +7,7 @@ require "imap/backup/text/sanitizer"
 module Imap; end
 
 module Imap::Backup
+  # Wraps the standard logger, providing configuration and sanitization
   class Logger
     include Singleton
 

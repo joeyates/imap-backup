@@ -13,6 +13,7 @@ module Imap; end
 module Imap::Backup
   class CLI < Thor; end
 
+  # Implements the CLI utility functions
   class CLI::Utils < Thor
     include Thor::Actions
     include CLI::Helpers

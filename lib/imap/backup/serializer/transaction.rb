@@ -1,6 +1,7 @@
 module Imap; end
 
 module Imap::Backup
+  # Stores data during a transaction
   class Serializer::Transaction
     attr_reader :data
 

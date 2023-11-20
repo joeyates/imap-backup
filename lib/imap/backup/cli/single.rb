@@ -9,6 +9,8 @@ module Imap; end
 module Imap::Backup
   class CLI < Thor; end
 
+  # Processes parameters to run a backup via command-line parameters
+  # (without using a configuration file)
   class CLI::Single < Thor
     include CLI::Helpers
 

@@ -8,6 +8,7 @@ module Imap::Backup
   class Setup; end
   class Setup::Account; end
 
+  # Displays the header to the account modification menu
   class Setup::Account::Header
     def initialize(menu:, account:)
       @menu = menu

@@ -3,6 +3,7 @@ require "imap/backup/file_mode"
 module Imap; end
 
 module Imap::Backup
+  # Ensures a file has the desired permissions
   class Serializer::PermissionChecker
     def initialize(filename:, limit:)
       @filename = filename

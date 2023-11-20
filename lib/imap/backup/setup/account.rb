@@ -10,6 +10,7 @@ module Imap; end
 module Imap::Backup
   class Setup; end
 
+  # Handles interactive account setup
   class Setup::Account
     def initialize(config, account, highline)
       @account = account

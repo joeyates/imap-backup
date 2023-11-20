@@ -3,6 +3,7 @@ require "imap/backup/logger"
 module Imap; end
 
 module Imap::Backup
+  # Deletes locally backed-up emails that are no longer on the server
   class LocalOnlyMessageDeleter
     def initialize(folder, serializer)
       @folder = folder
