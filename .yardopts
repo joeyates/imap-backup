@@ -1,6 +1,5 @@
 --protected
 --no-private
---main docs/api.md
 -
 ARCHITECTURE.md
 CHANGELOG.md
