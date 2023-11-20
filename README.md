@@ -1,4 +1,3 @@
-# @title Index
 # imap-backup API Documentation
 
 ![Version](https://img.shields.io/gem/v/imap-backup?label=Version&logo=rubygems)
