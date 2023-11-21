@@ -10,6 +10,7 @@ module Imap::Backup
       @limit = limit
     end
 
+    # Runs the check
     def run
       actual = FileMode.new(filename: filename).mode
       return nil if actual.nil?

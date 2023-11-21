@@ -74,6 +74,7 @@ module Imap::Backup
       end
     end
 
+    # Processes command-line parameters
     def options
       @symbolized_options ||= # rubocop:disable Naming/MemoizedInstanceVariableName
         begin
@@ -90,6 +91,7 @@ module Imap::Backup
         end
     end
 
+    # Loads the application configuration
     def load_config(**options)
       path = options[:config]
       require_exists = options.key?(:require_exists) ? options[:require_exists] : true
@@ -103,6 +105,7 @@ module Imap::Backup
       Configuration.new(path: path)
     end
 
+    # @return [Account] the Account information for the email address
     def account(config, email)
       account = config.accounts.find { |a| a.username == email }
       raise "#{email} is not a configured account" if !account
@@ -110,6 +113,9 @@ module Imap::Backup
       account
     end
 
+    # @return [Array<Account>] If email addresses have been specified
+    #   returns the Account configurations for them.
+    #   If non have been specified, returns all account configurations
     def requested_accounts(config)
       emails = (options[:accounts] || "").split(",")
       if emails.any?

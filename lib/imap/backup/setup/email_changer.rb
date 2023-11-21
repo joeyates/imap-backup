@@ -13,6 +13,8 @@ module Imap::Backup
       @config = config
     end
 
+    # Asks the user for an email address,
+    # ensuring that the supplied address is not an existing account
     def run
       username = Setup::Asker.email(account.username)
       other_accounts = config.accounts.reject { |a| a == account }

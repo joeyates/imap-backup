@@ -13,6 +13,7 @@ module Imap::Backup
     include Thor::Actions
     include CLI::Helpers
 
+    # The possible vaues for the action parameter
     ACTIONS = %i(migrate mirror).freeze
 
     def initialize(action, source_email, destination_email, options)

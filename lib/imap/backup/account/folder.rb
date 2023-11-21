@@ -12,6 +12,7 @@ module Imap::Backup
 
   # Handles access to a folder on an IMAP server
   class Account::Folder
+    # An error that is thrown if a requestd folder does not exist
     class FolderNotFound < StandardError; end
 
     extend Forwardable
@@ -42,6 +43,7 @@ module Imap::Backup
       Net::IMAP.debug = previous_debug
     end
 
+    # Creates the folder on the server
     def create
       return if exist?
 
@@ -50,6 +52,7 @@ module Imap::Backup
       end
     end
 
+    # Fetches the folder's UID validity
     def uid_validity
       @uid_validity ||=
         begin
@@ -58,6 +61,7 @@ module Imap::Backup
         end
     end
 
+    # @return [Array<Integer>] the folders message UIDs
     def uids
       examine
       client.uid_search(["ALL"]).sort
@@ -75,6 +79,7 @@ module Imap::Backup
       []
     end
 
+    # @return [Array<Hash>, nil] the requested messages
     def fetch_multi(uids, attr = [BODY_ATTRIBUTE, "FLAGS"])
       examine
       fetch_data_items =
@@ -96,6 +101,7 @@ module Imap::Backup
       nil
     end
 
+    # Uploads a message
     def append(message)
       body = message.imap_body
       date = message.date&.to_time
@@ -106,17 +112,20 @@ module Imap::Backup
       end
     end
 
+    # Deletes multiple messages
     def delete_multi(uids)
       add_flags(uids, [:Deleted])
       client.expunge
     end
 
+    # Sets one or more flags on a group of messages
     def set_flags(uids, flags)
       client.select(utf7_encoded_name)
       flags.reject! { |f| f == :Recent }
       client.uid_store(uids, "FLAGS", flags)
     end
 
+    # Adds one or more flags to a group of messages
     def add_flags(uids, flags)
       # Use read-write access, via `select`
       client.select(utf7_encoded_name)
@@ -124,11 +133,13 @@ module Imap::Backup
       client.uid_store(uids, "+FLAGS", flags)
     end
 
+    # Removes one or more flags from a group of messages
     def remove_flags(uids, flags)
       client.select(utf7_encoded_name)
       client.uid_store(uids, "-FLAGS", flags)
     end
 
+    # Deletes all messages from the folder
     def clear
       existing = uids
       return if existing.empty?
@@ -137,6 +148,7 @@ module Imap::Backup
       client.expunge
     end
 
+    # @return [Array<Integer>] the UIDs of messages with the 'UNSEEN' flag
     def unseen(uids)
       messages = uids.map(&:to_s).join(",")
       examine

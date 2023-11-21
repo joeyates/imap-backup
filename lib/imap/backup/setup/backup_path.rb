@@ -10,6 +10,9 @@ module Imap::Backup
       @config = config
     end
 
+    # Asks the user for a backup path
+    #
+    # @return [void]
     def run
       account.local_path = highline.ask("backup directory: ") do |q|
         q.default  = account.local_path

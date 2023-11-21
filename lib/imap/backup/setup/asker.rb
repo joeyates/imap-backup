@@ -9,6 +9,10 @@ module Imap::Backup
       @highline = highline
     end
 
+    # Asks for a email address
+    #
+    # @param default [String] the existing email address
+    # @return [String] the email address
     def email(default = "")
       highline.ask("email address: ") do |q|
         q.default               = default
@@ -17,6 +21,9 @@ module Imap::Backup
       end
     end
 
+    # Asks for a password
+    #
+    # @return [String] the password
     def password
       password     = highline.ask("password: ")        { |q| q.echo = false }
       confirmation = highline.ask("repeat password: ") { |q| q.echo = false }
@@ -30,10 +37,17 @@ module Imap::Backup
       password
     end
 
+    # Asks for a email address using the configured menu handler
+    #
+    # @param default [String] the existing email address
+    # @return [String] the email address
     def self.email(default = "")
       new(Setup.highline).email(default)
     end
 
+    # Asks for a password using the configured menu handler
+    #
+    # @return [String] the password
     def self.password
       new(Setup.highline).password
     end

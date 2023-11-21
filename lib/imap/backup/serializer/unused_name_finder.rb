@@ -9,6 +9,7 @@ module Imap::Backup
       @serializer = serializer
     end
 
+    # Finds the name
     def run
       digit = 0
       folder = nil

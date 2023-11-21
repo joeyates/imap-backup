@@ -12,6 +12,7 @@ module Imap::Backup
       @config = config
     end
 
+    # Shows the menu
     def run
       catch :done do
         loop do

@@ -24,6 +24,7 @@ module Imap::Backup
       @tsx = nil
     end
 
+    # Opens a transaction
     def transaction(&block)
       tsx.fail_in_transaction!(:transaction, message: "nested transactions are not supported")
 
@@ -41,6 +42,7 @@ module Imap::Backup
       # rubocop:enable Lint/RescueException
     end
 
+    # Discards stored changes to the data
     def rollback
       tsx.fail_outside_transaction!(:rollback)
 
@@ -50,6 +52,7 @@ module Imap::Backup
       tsx.clear
     end
 
+    # @return [String] The full path name of the metadata file
     def pathname
       "#{folder_path}.imap"
     end
@@ -66,6 +69,7 @@ module Imap::Backup
       true
     end
 
+    # Append message metadata
     def append(uid, length, flags: [])
       offset =
         if messages.empty?
@@ -82,10 +86,13 @@ module Imap::Backup
       save
     end
 
+    # Get message metadata
     def get(uid)
       messages.find { |m| m.uid == uid }
     end
 
+    # Deletes the metadata file
+    # and discards stored attributes
     def delete
       return if !exist?
 
@@ -96,6 +103,8 @@ module Imap::Backup
       @version = nil
     end
 
+    # Renames the metadata file, if it exists,
+    # otherwise, simply stores the new name
     def rename(new_path)
       if exist?
         old_pathname = pathname
@@ -106,28 +115,31 @@ module Imap::Backup
       end
     end
 
+    # Returns the UID validity for the folder
     def uid_validity
       ensure_loaded
       @uid_validity
     end
 
+    # Sets the folder's UID validity and saves the metadata file
     def uid_validity=(value)
       ensure_loaded
       @uid_validity = value
       save
     end
 
-    # Make private
+    # TODO: Make private
     def messages
       ensure_loaded
       @messages
     end
 
-    # Deprecated
+    # @return [Array<Integer>] The uids of all messages
     def uids
       messages.map(&:uid)
     end
 
+    # Update a message's metadata, replacing its UID
     def update_uid(old, new)
       index = messages.find_index { |m| m.uid == old }
       return if index.nil?
@@ -136,11 +148,14 @@ module Imap::Backup
       save
     end
 
+    # @return [String] The format version for the metadata file
     def version
       ensure_loaded
       @version
     end
 
+    # Saves the file,
+    # except in a transaction when it does nothing
     def save
       return if tsx.in_transaction?
 

@@ -22,6 +22,7 @@ module Imap::Backup
       true
     end
 
+    # Runs the migration
     def run
       return false if !required?
 

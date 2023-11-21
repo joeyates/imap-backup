@@ -15,6 +15,9 @@ module Imap::Backup
       @account = account
     end
 
+    # Displays the header
+    #
+    # @return [void]
     def run
       rows = [
         email,

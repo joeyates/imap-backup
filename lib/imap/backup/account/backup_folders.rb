@@ -5,7 +5,7 @@ module Imap; end
 module Imap::Backup
   class Account; end
 
-  # Iterates over the account folders that are to be backed up
+  # Enumerates over the account folders that are to be backed up
   class Account::BackupFolders
     include Enumerable
 
@@ -14,6 +14,7 @@ module Imap::Backup
       @account = account
     end
 
+    # Runs the enumeration
     def each(&block)
       return enum_for(:each) if !block
 
@@ -39,6 +40,7 @@ module Imap::Backup
       names.each { |name| block.call(Account::Folder.new(client, name)) }
     end
 
+    # Runs a map operation over the folders
     def map(&block)
       each.map do |folder|
         block.call(folder)

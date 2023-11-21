@@ -11,6 +11,8 @@ module Imap::Backup
       @account = account
     end
 
+    # Carries out the attempted login and indicates
+    # whether it was successful
     def test
       account.client.login
       "Connection successful"

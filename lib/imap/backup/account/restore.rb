@@ -12,6 +12,7 @@ module Imap::Backup
       @account = account
     end
 
+    # Runs the restore operation
     def run
       serialized_folders = Account::SerializedFolders.new(account: account)
       serialized_folders.each do |serializer, folder|

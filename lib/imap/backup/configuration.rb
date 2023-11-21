@@ -11,14 +11,19 @@ module Imap; end
 module Imap::Backup
   # Handles the application's configuration file
   class Configuration
+    # The default directory of the configuration file
     CONFIGURATION_DIRECTORY = File.expand_path("~/.imap-backup")
+    # The default download strategy key
     DEFAULT_STRATEGY = "delay_metadata".freeze
+    # The available download strategies
     DOWNLOAD_STRATEGIES = [
       {key: "direct", description: "write straight to disk"},
       {key: DEFAULT_STRATEGY, description: "delay writing metadata"}
     ].freeze
+    # The current file version
     VERSION = "2.2".freeze
 
+    # @return [String] the default configuration file path
     def self.default_pathname
       File.join(CONFIGURATION_DIRECTORY, "config.json")
     end
@@ -34,10 +39,12 @@ module Imap::Backup
       @download_strategy_modified = false
     end
 
+    # @return [String] the directory containing the configuration file
     def path
       File.dirname(pathname)
     end
 
+    # Saves the configuration file in JSON format
     def save
       ensure_loaded!
       FileUtils.mkdir_p(path) if !File.directory?(path)
@@ -54,6 +61,7 @@ module Imap::Backup
       @data = nil
     end
 
+    # @return [Array<Account>] the configured accounts
     def accounts
       @accounts ||= begin
         ensure_loaded!
@@ -64,12 +72,14 @@ module Imap::Backup
       end
     end
 
+    # @return [String] the cofigured download strategy
     def download_strategy
       ensure_loaded!
 
       @download_strategy
     end
 
+    # @param value [String] the new strategy
     def download_strategy=(value)
       raise "Unknown strategy '#{value}'" if !DOWNLOAD_STRATEGIES.find { |s| s[:key] == value }
 

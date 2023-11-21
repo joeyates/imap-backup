@@ -18,6 +18,7 @@ module Imap::Backup
       @highline = highline
     end
 
+    # Shows the menu
     def run
       if !account.local_path
         account.local_path = File.join(config.path, account.username.tr("@", "_"))

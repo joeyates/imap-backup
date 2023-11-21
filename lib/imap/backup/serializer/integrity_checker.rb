@@ -3,6 +3,7 @@ module Imap; end
 module Imap::Backup
   class Serializer; end
 
+  # An error indicating the folder is not serialized correctly
   class Serializer::FolderIntegrityError < StandardError; end
 
   # Checks that both the mailbox and its associated metadata file match

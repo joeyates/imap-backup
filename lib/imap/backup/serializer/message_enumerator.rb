@@ -9,6 +9,7 @@ module Imap::Backup
       @imap = imap
     end
 
+    # Enumerates over the messages
     def run(uids:)
       uids.each do |uid_maybe_string|
         uid = uid_maybe_string.to_i

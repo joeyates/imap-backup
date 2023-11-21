@@ -20,6 +20,7 @@ module Imap::Backup
     format_option
     quiet_option
     verbose_option
+    # Lists configured accounts
     def accounts
       names = config.accounts.map(&:username)
       case options[:format]
@@ -45,6 +46,7 @@ module Imap::Backup
     format_option
     quiet_option
     verbose_option
+    # Runs integrity checks on backups
     def check
       non_logging_options = Imap::Backup::Logger.setup_logging(options)
       Check.new(non_logging_options).run
@@ -55,6 +57,7 @@ module Imap::Backup
     format_option
     quiet_option
     verbose_option
+    # Lists backed-up folders for an account
     def folders(email)
       account = account(config, email)
 
@@ -75,6 +78,7 @@ module Imap::Backup
     format_option
     quiet_option
     verbose_option
+    # Lists backed-up emails for an account folder
     def list(email, folder_name)
       account = account(config, email)
 
@@ -102,6 +106,7 @@ module Imap::Backup
     format_option
     quiet_option
     verbose_option
+    # Shows the content of one or more backed-up email messages
     def show(email, folder_name, uids)
       account = account(config, email)
 

@@ -11,6 +11,7 @@ class Imap::Backup::Setup::GlobalOptions
       @config = config
     end
 
+    # Shows the menu
     def run
       catch :done do
         loop do

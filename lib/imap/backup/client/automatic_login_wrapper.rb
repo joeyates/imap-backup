@@ -9,6 +9,7 @@ module Imap::Backup
   class Client::AutomaticLoginWrapper
     include RetryOnError
 
+    # @private
     LOGIN_RETRY_CLASSES = [::EOFError, ::Errno::ECONNRESET, ::SocketError].freeze
 
     attr_reader :client
@@ -19,6 +20,8 @@ module Imap::Backup
       @login_called = false
     end
 
+    # Proxies calls to the client.
+    # Before the first call does login
     def method_missing(method_name, *arguments, &block)
       if login_called
         client.send(method_name, *arguments, &block)

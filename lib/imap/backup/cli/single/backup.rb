@@ -17,6 +17,7 @@ module Imap::Backup
       @password = nil
     end
 
+    # Runs the backup
     def run
       process_options!
       account = Account.new(

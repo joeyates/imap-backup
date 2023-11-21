@@ -12,6 +12,7 @@ module Imap::Backup
       @serializer = serializer
     end
 
+    # Uploads messages that are present in the backup, but not in the online folder
     def run
       if folder.uids.any?
         rename_serialized_folder

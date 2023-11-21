@@ -9,7 +9,7 @@ module Imap; end
 module Imap::Backup
   class CLI < Thor; end
 
-  # Enumerates backed-up folders
+  # Implements a folder enumerator for backed-up accounts
   class CLI::FolderEnumerator
     def initialize(
       destination:,
@@ -27,6 +27,7 @@ module Imap::Backup
       @source_prefix = source_prefix
     end
 
+    # Enumerates backed-up folders
     def each
       return enum_for(:each) if !block_given?
 

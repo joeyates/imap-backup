@@ -9,7 +9,7 @@ module Imap; end
 module Imap::Backup
   class Account; end
 
-  # Enumerates over the folders that are backed up to an account
+  # Enumerates over an account's backed-up folders
   class Account::SerializedFolders
     include Enumerable
 
@@ -17,6 +17,7 @@ module Imap::Backup
       @account = account
     end
 
+    # Runs the enumeration
     def each(&block)
       return enum_for(:each) if !block
 

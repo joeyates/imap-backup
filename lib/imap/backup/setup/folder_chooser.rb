@@ -11,6 +11,7 @@ module Imap::Backup
       @account = account
     end
 
+    # Lists account folders and allows the user to toggle whther they are selected
     def run
       if client.nil?
         highline.ask "Press a key "

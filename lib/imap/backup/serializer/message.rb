@@ -25,6 +25,7 @@ module Imap::Backup
       @flags = flags.map(&:to_sym)
     end
 
+    # Returns the message metadata
     def to_h
       {
         uid: uid,
@@ -34,6 +35,7 @@ module Imap::Backup
       }
     end
 
+    # Reads the message text and returns the original form
     def message
       @message =
         begin

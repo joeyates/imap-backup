@@ -12,6 +12,7 @@ module Imap::Backup
       @tsx = nil
     end
 
+    # Starts a transaction
     def transaction(&block)
       tsx.fail_in_transaction!(:transaction, message: "nested transactions are not supported")
 
@@ -27,6 +28,7 @@ module Imap::Backup
       end
     end
 
+    # Returns to the pre-transaction state
     def rollback
       tsx.fail_outside_transaction!(:rollback)
 
@@ -37,12 +39,14 @@ module Imap::Backup
       exist?
     end
 
+    # Serializes a message
     def append(message)
       File.open(pathname, "ab") do |file|
         file.write message
       end
     end
 
+    # Reads a message from disk
     def read(offset, length)
       File.open(pathname, "rb") do |f|
         f.seek offset
@@ -50,6 +54,7 @@ module Imap::Backup
       end
     end
 
+    # Deletes the mailbox
     def delete
       return if !exist?
 
@@ -60,16 +65,20 @@ module Imap::Backup
       File.exist?(pathname)
     end
 
+    # @return [Integer] The lsize of the disk file
     def length
       return nil if !exist?
 
       File.stat(pathname).size
     end
 
+    # @return [String] The full path name of the mailbox
     def pathname
       "#{folder_path}.mbox"
     end
 
+    # Renames the mailbox, if it exists,
+    # otherwise, simply stores the new name
     def rename(new_path)
       if exist?
         old_pathname = pathname
@@ -80,6 +89,7 @@ module Imap::Backup
       end
     end
 
+    # Sets the mailbox file's updated time to the current time
     def touch
       File.open(pathname, "a") {}
     end
