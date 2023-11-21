@@ -180,24 +180,29 @@ module Imap::Backup
       update(:local_path, value)
     end
 
+    # @return [void]
     def folders=(value)
       raise "folders must be an Array" if !value.is_a?(Array)
 
       update(:folders, value)
     end
 
+    # @return [void]
     def folder_blacklist=(value)
       update(:folder_blacklist, value)
     end
 
+    # @return [void]
     def mirror_mode=(value)
       update(:mirror_mode, value)
     end
 
+    # @return [void]
     def server=(value)
       update(:server, value)
     end
 
+    # @return [void]
     def connection_options=(value)
       parsed =
         if value == ""
@@ -232,6 +237,7 @@ module Imap::Backup
       update(:multi_fetch_size, parsed)
     end
 
+    # @return [void]
     def reset_seen_flags_after_fetch=(value)
       update(:reset_seen_flags_after_fetch, value)
     end

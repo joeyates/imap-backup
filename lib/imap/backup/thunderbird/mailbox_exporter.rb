@@ -9,6 +9,9 @@ module Imap::Backup
 
   # Exports an account's emails to Thunderbird
   class Thunderbird::MailboxExporter
+    # @param email [String] an email address
+    # @param serializer [Serializer] a local folder backup
+    # @param profile [Thunderbird::Profile] an existing Thunderbird profile
     def initialize(email, serializer, profile, force: false)
       @email = email
       @serializer = serializer

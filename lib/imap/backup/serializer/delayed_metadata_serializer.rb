@@ -14,6 +14,7 @@ module Imap::Backup
 
     def_delegator :serializer, :uids
 
+    # @param serializer [Serializer] the serializer for a folder
     def initialize(serializer:)
       @serializer = serializer
       @tsx = nil
@@ -21,6 +22,7 @@ module Imap::Backup
 
     # Initializes the metadata and mailbox transactions, then calls the supplied block.
     # Once the block has finished, commits changes to metadata
+    # @param block [block] the block that is wrapped by the transaction
     #
     # @return [void]
     def transaction(&block)

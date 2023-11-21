@@ -5,6 +5,7 @@ module Imap::Backup
 
   # Implements interactively requesting information from the user
   class Setup::Asker
+    # @param highline [Higline] the configured Highline instance
     def initialize(highline)
       @highline = highline
     end

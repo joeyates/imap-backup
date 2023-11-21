@@ -12,6 +12,9 @@ module Imap::Backup
 
   # Handles interactive account setup
   class Setup::Account
+    # @param config [Configuration] the application configuration
+    # @param account [Account] an Account
+    # @param highline [Higline] the configured Highline instance
     def initialize(config, account, highline)
       @account = account
       @config = config

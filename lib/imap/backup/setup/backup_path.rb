@@ -5,6 +5,8 @@ module Imap::Backup
 
   # Requests an updated backup path from the user
   class Setup::BackupPath
+    # @param account [Account] an Account
+    # @param config [Configuration] the application configuration
     def initialize(account:, config:)
       @account = account
       @config = config

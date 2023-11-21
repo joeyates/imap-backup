@@ -5,6 +5,8 @@ module Imap::Backup
   class Serializer::Transaction
     attr_reader :data
 
+    # @param owner [any] the class using the transaction -
+    #   this is used when raising errors
     def initialize(owner:)
       @data = nil
       @owner = owner
@@ -12,6 +14,8 @@ module Imap::Backup
     end
 
     # Runs the transaction
+    # @param data [any] the data to maintain during the transaction
+    # @param block [block] the block to wrap with the transaction
     def begin(data, &block)
       @data = data
       @in_transaction = true
@@ -29,11 +33,13 @@ module Imap::Backup
     end
 
     # Throws an exception if there is a current transaction
+    # @param method [Symbol] the method where the check is run
     def fail_in_transaction!(method, message: "not supported inside trasactions")
       raise "#{owner.class}##{method} #{message}" if in_transaction?
     end
 
     # Throws an exception if there is not a current transaction
+    # @param method [Symbol] the method where the check is run
     def fail_outside_transaction!(method)
       raise "#{owner.class}##{method} can only be called inside a transaction" if !in_transaction?
     end

@@ -10,6 +10,7 @@ module Imap::Backup
     INVALID_FILENAME_CHARACTER_MATCH = /([#{INVALID_FILENAME_CHARACTERS}])/.freeze
 
     # Replaces disallowed characters with their hexadecimal representation
+    # @param name [String] a folder name
     def self.to_local_path(name)
       name.gsub(INVALID_FILENAME_CHARACTER_MATCH) do |character|
         hex =
@@ -21,6 +22,7 @@ module Imap::Backup
     end
 
     # Reinstates disallowed characters based on their hexadecimal representation
+    # @param name [String] a serialized folder name
     def self.from_local_path(name)
       name.gsub(/%(.*?);/) do
         ::Regexp.last_match(1).

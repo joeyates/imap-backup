@@ -8,6 +8,7 @@ module Imap::Backup
 
   # Shows the menu of global options
   class Setup::GlobalOptions
+    # @param config [Configuration] the application configuration
     def initialize(config:)
       @config = config
     end

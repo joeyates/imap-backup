@@ -17,6 +17,8 @@ module Imap; end
 module Imap::Backup
   # Handles serialization for a folder
   class Serializer
+    # @param path [String] an account's backup path
+    # @param folder [String] a folder name
     # @return [String] the full path to a serialized folder (without file extensions)
     def self.folder_path_for(path:, folder:)
       relative = File.join(path, folder)
@@ -31,6 +33,8 @@ module Imap::Backup
     attr_reader :folder
     attr_reader :path
 
+    # @param path [String] an account's backup path
+    # @param folder [String] a folder name
     def initialize(path, folder)
       @path = path
       @folder = folder
@@ -40,6 +44,7 @@ module Imap::Backup
     # Calls the supplied block.
     # This method is present so that this class implements the same
     # interface as {DelayedMetadataSerializer}
+    # @param block [block] the block that is wrapped by the transaction
     #
     # @return [void]
     def transaction(&block)
@@ -106,6 +111,7 @@ module Imap::Backup
     # Overwrites the UID validity of the folder
     # and ensures that both the metadata file and the mailbox
     # are saved.
+    # @param value [Integer] the new UID validity
     def force_uid_validity(value)
       validate!
 
@@ -113,6 +119,9 @@ module Imap::Backup
     end
 
     # Appends a message to the serialized data
+    # @param uid [Integer] the message's UID
+    # @param length [Integer] the length of the message (as stored on disk)
+    # @param flags [Array[Symbol]] the message's flags
     def append(uid, message, flags)
       validate!
 
@@ -121,6 +130,8 @@ module Imap::Backup
     end
 
     # Updates a messages flags
+    # @param uid [Integer] the message's UID
+    # @param flags [Array<Symbol>] the flags to set on the message
     def update(uid, flags: nil)
       message = imap.get(uid)
       return if !message
@@ -130,6 +141,7 @@ module Imap::Backup
     end
 
     # Enumerates over a series of messages
+    # @param required_uids [Array<Integer>] the UIDs of the message to enumerate over
     def each_message(required_uids = nil, &block)
       return enum_for(:each_message, required_uids) if !block
 
@@ -143,6 +155,7 @@ module Imap::Backup
 
     # Calls the supplied block on each message in the folder
     # and discards those for which the block returns a false result
+    # @param block [block] the block to call
     def filter(&block)
       temp_name = Serializer::UnusedNameFinder.new(serializer: self).run
       temp_folder_path = self.class.folder_path_for(path: path, folder: temp_name)

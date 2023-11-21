@@ -7,6 +7,7 @@ module Imap::Backup
 
   # Allows the user to select and deselect folders to be backed up
   class Setup::FolderChooser
+    # @param account [Account] an Account
     def initialize(account)
       @account = account
     end

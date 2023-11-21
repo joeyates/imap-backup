@@ -17,6 +17,7 @@ module Imap::Backup
     end
     self.highline = HighLine.new
 
+    # @param config [Configuration] the application configuration
     def initialize(config:)
       @config = config
     end

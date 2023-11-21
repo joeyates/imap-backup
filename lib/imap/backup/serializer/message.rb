@@ -17,6 +17,11 @@ module Imap::Backup
     def_delegator :message, :supplied_body, :body
     def_delegators :message, :imap_body, :date, :subject
 
+    # @param uid [Integer] the message's UID
+    # @param offset [Integer] the start of the message inside the mailbox file
+    # @param length [Integer] the length of the message (as stored on disk)
+    # @param mbox [Serializer::Mbox] the mailbox containing the message
+    # @param flags [Array[Symbol]] the message's flags
     def initialize(uid:, offset:, length:, mbox:, flags: [])
       @uid = uid
       @offset = offset

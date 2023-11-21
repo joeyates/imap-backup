@@ -8,6 +8,9 @@ module Imap::Backup
     # Calls the supplied block,
     # traps the given types of errors
     # retrying up to a given number of times
+    # @param errors [Array<Exception>] the exceptions to trap
+    # @param limit [Integer] the maximum number of retries
+    # @param on_error [Proc] a block to call when an error occurs
     def retry_on_error(errors:, limit: 10, on_error: nil)
       tries ||= 1
       yield

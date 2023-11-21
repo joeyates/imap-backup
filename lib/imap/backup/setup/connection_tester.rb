@@ -7,6 +7,7 @@ module Imap::Backup
 
   # Attempts to login to an account and reports the result
   class Setup::ConnectionTester
+    # @param account [Account] an Account
     def initialize(account)
       @account = account
     end

@@ -13,14 +13,15 @@ module Imap::Backup
     delegate puts: :output
     delegate write: :output
 
+    # @param output [IO] the stream to write output to
     def initialize(output)
       @output = output
       @current = ""
     end
 
-    # Accepts lines of text and outputs
-    # everything up to the last newline character,
+    # Outputs everything up to the last newline character,
     # storing whatever follows the newline.
+    # @param args [Array<String>] lines of text
     def print(*args)
       @current << args.join
       loop do

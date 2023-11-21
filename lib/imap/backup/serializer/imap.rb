@@ -25,6 +25,7 @@ module Imap::Backup
     end
 
     # Opens a transaction
+    # @param block [block] the block that is wrapped by the transaction
     def transaction(&block)
       tsx.fail_in_transaction!(:transaction, message: "nested transactions are not supported")
 
@@ -70,6 +71,9 @@ module Imap::Backup
     end
 
     # Append message metadata
+    # @param uid [Integer] the message's UID
+    # @param length [Integer] the length of the message (as stored on disk)
+    # @param flags [Array[Symbol]] the message's flags
     def append(uid, length, flags: [])
       offset =
         if messages.empty?
@@ -87,6 +91,7 @@ module Imap::Backup
     end
 
     # Get message metadata
+    # @param uid [Integer] a message UID
     def get(uid)
       messages.find { |m| m.uid == uid }
     end
@@ -105,6 +110,7 @@ module Imap::Backup
 
     # Renames the metadata file, if it exists,
     # otherwise, simply stores the new name
+    # @param new_path [String] the new path (without extension)
     def rename(new_path)
       if exist?
         old_pathname = pathname
@@ -122,6 +128,7 @@ module Imap::Backup
     end
 
     # Sets the folder's UID validity and saves the metadata file
+    # @param value [Integer] the new UID validity
     def uid_validity=(value)
       ensure_loaded
       @uid_validity = value
@@ -140,6 +147,8 @@ module Imap::Backup
     end
 
     # Update a message's metadata, replacing its UID
+    # @param old [Integer] the existing message UID
+    # @param new [Integer] the new UID to apply to the message
     def update_uid(old, new)
       index = messages.find_index { |m| m.uid == old }
       return if index.nil?

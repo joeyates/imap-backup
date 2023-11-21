@@ -5,6 +5,8 @@ module Imap; end
 module Imap::Backup
   # Ensures a file has the desired permissions
   class Serializer::PermissionChecker
+    # @param filename [String] the file name
+    # @param limit [Integer] the maximum permission that should be set
     def initialize(filename:, limit:)
       @filename = filename
       @limit = limit

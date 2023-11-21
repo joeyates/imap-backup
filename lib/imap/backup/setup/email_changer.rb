@@ -8,6 +8,8 @@ module Imap::Backup
 
   # Asks the user for a new email address
   class Setup::EmailChanger
+    # @param account [Account] an Account
+    # @param config [Configuration] the application configuration
     def initialize(account:, config:)
       @account = account
       @config = config
