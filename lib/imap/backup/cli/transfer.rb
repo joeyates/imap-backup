@@ -32,6 +32,10 @@ module Imap::Backup
     end
 
     no_commands do
+      # @raise [RuntimeError] if the indicated action is unknown,
+      #   or the source and destination accounts are the same,
+      #   or either of the accounts is not configured,
+      #   or incompatible namespace/delimter parameters have been supplied
       def run
         raise "Unknown action '#{action}'" if !ACTIONS.include?(action)
 

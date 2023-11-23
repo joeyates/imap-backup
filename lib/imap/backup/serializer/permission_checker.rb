@@ -13,6 +13,7 @@ module Imap::Backup
     end
 
     # Runs the check
+    # @raise [RuntimeError] if the permissions are incorrect
     # @return [void]
     def run
       actual = FileMode.new(filename: filename).mode

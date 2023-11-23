@@ -95,6 +95,7 @@ module Imap::Backup
     end
 
     # Loads the application configuration
+    # @raise [ConfigurationNotFound] if the configuration file does not exist
     # @return [Configuration]
     def load_config(**options)
       path = options[:config]
@@ -109,6 +110,7 @@ module Imap::Backup
       Configuration.new(path: path)
     end
 
+    # @raise [RuntimeError] if the account does not exist
     # @return [Account] the Account information for the email address
     def account(config, email)
       account = config.accounts.find { |a| a.username == email }

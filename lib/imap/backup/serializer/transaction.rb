@@ -37,6 +37,7 @@ module Imap::Backup
 
     # Throws an exception if there is a current transaction
     # @param method [Symbol] the method where the check is run
+    # @raise [RuntimeError] if called from inside a transaction
     # @return [void]
     def fail_in_transaction!(method, message: "not supported inside trasactions")
       raise "#{owner.class}##{method} #{message}" if in_transaction?
@@ -44,6 +45,7 @@ module Imap::Backup
 
     # Throws an exception if there is not a current transaction
     # @param method [Symbol] the method where the check is run
+    # @raise [RuntimeError] if called from outside a transaction
     # @return [void]
     def fail_outside_transaction!(method)
       raise "#{owner.class}##{method} can only be called inside a transaction" if !in_transaction?

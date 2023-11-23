@@ -40,6 +40,7 @@ module Imap::Backup
 
     # @param destination_uid [Integer] a message UID from the destination server
     #
+    # @raise [RuntimeError] if the UID validity is not set
     # @return [Integer, nil] the source UID that is equivalent to the given destination UID
     #   or nil if it is not found
     def source_uid(destination_uid)
@@ -52,6 +53,7 @@ module Imap::Backup
 
     # @param source_uid [Integer] a message UID from the source server
     #
+    # @raise [RuntimeError] if the UID validity is not set
     # @return [Integer, nil] the destination UID that is equivalent to the given source UID
     #   or nil if it is not found
     def destination_uid(source_uid)
@@ -64,6 +66,7 @@ module Imap::Backup
 
     # Creates a mapping between message UIDs on the source
     # and destination servers
+    # @raise [RuntimeError] if the UID validity is not set
     # @return [void]
     def map_uids(source:, destination:)
       raise "Assign UID validities with #reset before calling #map_uids" if destination_store == {}

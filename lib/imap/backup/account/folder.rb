@@ -29,6 +29,7 @@ module Imap::Backup
       @uid_validity = nil
     end
 
+    # @raise any error that occurs more than 10 times
     def exist?
       previous_level = Imap::Backup::Logger.logger.level
       previous_debug = Net::IMAP.debug
@@ -55,6 +56,7 @@ module Imap::Backup
       end
     end
 
+    # @raise any error that occurs more than 10 times
     # @return [Integer] the folder's UID validity
     def uid_validity
       @uid_validity ||=
@@ -64,6 +66,7 @@ module Imap::Backup
         end
     end
 
+    # @raise any error that occurs more than 10 times
     # @return [Array<Integer>] the folders message UIDs
     def uids
       examine
@@ -82,6 +85,7 @@ module Imap::Backup
       []
     end
 
+    # @raise any error that occurs more than 10 times
     # @return [Array<Hash>, nil] the requested messages
     def fetch_multi(uids, attr = [BODY_ATTRIBUTE, "FLAGS"])
       examine
@@ -157,6 +161,7 @@ module Imap::Backup
       client.expunge
     end
 
+    # @raise any error that occurs more than 10 times
     # @return [Array<Integer>] the UIDs of messages with the 'UNSEEN' flag
     def unseen(uids)
       messages = uids.map(&:to_s).join(",")

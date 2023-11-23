@@ -24,6 +24,7 @@ module Imap::Backup
     # Once the block has finished, commits changes to metadata
     # @param block [block] the block that is wrapped by the transaction
     #
+    # @raise any error ocurring during the commit phase
     # @return [void]
     def transaction(&block)
       tsx.fail_in_transaction!(:transaction, message: "nested transactions are not supported")

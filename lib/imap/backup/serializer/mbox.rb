@@ -16,6 +16,7 @@ module Imap::Backup
 
     # Starts a transaction
     # @param block [block] the block that is wrapped by the transaction
+    # @raise re-raises errors which occur in the block
     # @return [void]
     def transaction(&block)
       tsx.fail_in_transaction!(:transaction, message: "nested transactions are not supported")

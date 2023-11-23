@@ -175,6 +175,7 @@ module Imap::Backup
       update(:local_path, value)
     end
 
+    # @raise [RuntimeError] if the supplied value is not an Array
     # @return [void]
     def folders=(value)
       raise "folders must be an Array" if !value.is_a?(Array)

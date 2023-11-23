@@ -27,6 +27,7 @@ module Imap::Backup
 
     # Opens a transaction
     # @param block [block] the block that is wrapped by the transaction
+    # @raise any exception ocurring in the block
     # @return [void]
     def transaction(&block)
       tsx.fail_in_transaction!(:transaction, message: "nested transactions are not supported")
@@ -174,6 +175,7 @@ module Imap::Backup
 
     # Saves the file,
     # except in a transaction when it does nothing
+    # @raise [RuntimeError] if UID validity has not been set
     # @return [void]
     def save
       return if tsx.in_transaction?

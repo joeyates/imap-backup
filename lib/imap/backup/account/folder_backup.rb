@@ -19,6 +19,7 @@ module Imap::Backup
     end
 
     # Runs the backup
+    # @raise [RuntimeError] if the configured download strategy is incorrect
     # @return [void]
     def run
       folder_ok = folder_ok?

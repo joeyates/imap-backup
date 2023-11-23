@@ -20,6 +20,7 @@ module Imap::Backup
     end
 
     no_commands do
+      # @raise [RuntimeError] if no email is specified
       def run
         config = load_config(**options)
         case

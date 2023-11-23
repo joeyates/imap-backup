@@ -13,6 +13,7 @@ module Imap::Backup
     end
 
     # Creates the account's base directory and sets its permissions
+    # @raise [RuntimeError] is the account's backup path is not set
     # @return [void]
     def run
       raise "The backup path for #{account.username} is not set" if !account.local_path

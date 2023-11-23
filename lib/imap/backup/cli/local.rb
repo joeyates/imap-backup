@@ -82,6 +82,7 @@ module Imap::Backup
     quiet_option
     verbose_option
     # Lists backed-up emails for an account folder
+    # @raise [RuntimeError] if the folder does not exist
     # @return [void]
     def list(email, folder_name)
       account = account(config, email)
@@ -111,6 +112,7 @@ module Imap::Backup
     quiet_option
     verbose_option
     # Shows the content of one or more backed-up email messages
+    # @raise [RuntimeError] if the folder does not exist
     # @return [void]
     def show(email, folder_name, uids)
       account = account(config, email)
