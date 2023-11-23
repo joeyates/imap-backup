@@ -127,7 +127,7 @@ module Imap::Backup
 
     # Appends a message to the serialized data
     # @param uid [Integer] the message's UID
-    # @param length [Integer] the length of the message (as stored on disk)
+    # @param message [Integer] the message text
     # @param flags [Array[Symbol]] the message's flags
     # @return [void]
     def append(uid, message, flags)
