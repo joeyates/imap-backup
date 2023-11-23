@@ -8,6 +8,7 @@ module Imap; end
 module Imap::Backup
   class CLI < Thor; end
 
+  # Provides helper methods for CLI classes
   module CLI::Helpers
     def self.included(base)
       base.class_eval do
@@ -73,6 +74,10 @@ module Imap::Backup
       end
     end
 
+    # Processes command-line parameters
+    # @return [Hash] the supplied command-line parameters with
+    #   with hyphens in keys replaced by underscores
+    #   and the keys converted to Symbols
     def options
       @symbolized_options ||= # rubocop:disable Naming/MemoizedInstanceVariableName
         begin
@@ -89,6 +94,9 @@ module Imap::Backup
         end
     end
 
+    # Loads the application configuration
+    # @raise [ConfigurationNotFound] if the configuration file does not exist
+    # @return [Configuration]
     def load_config(**options)
       path = options[:config]
       require_exists = options.key?(:require_exists) ? options[:require_exists] : true
@@ -102,6 +110,8 @@ module Imap::Backup
       Configuration.new(path: path)
     end
 
+    # @raise [RuntimeError] if the account does not exist
+    # @return [Account] the Account information for the email address
     def account(config, email)
       account = config.accounts.find { |a| a.username == email }
       raise "#{email} is not a configured account" if !account
@@ -109,6 +119,9 @@ module Imap::Backup
       account
     end
 
+    # @return [Array<Account>] If email addresses have been specified
+    #   returns the Account configurations for them.
+    #   If non have been specified, returns all account configurations
     def requested_accounts(config)
       emails = (options[:accounts] || "").split(",")
       if emails.any?

@@ -3,12 +3,20 @@ require "imap/backup/mirror/map"
 module Imap; end
 
 module Imap::Backup
+  # Synchronises a folder between a source and destination
   class Mirror
     def initialize(serializer, folder)
       @serializer = serializer
       @folder = folder
     end
 
+    # If necessary, reates the destination folder,
+    # then deletes any messages in the destination folder
+    # that are not in the local store,
+    # sets existing messages' flas
+    # then appends any missing messages
+    # and saves the mapping file
+    # @return [void]
     def run
       ensure_destination_folder
       delete_destination_only_emails

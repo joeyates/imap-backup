@@ -8,10 +8,12 @@ require "imap/backup/mirror"
 module Imap; end
 
 module Imap::Backup
+  # Implements migration and mirroring
   class CLI::Transfer < Thor
     include Thor::Actions
     include CLI::Helpers
 
+    # The possible vaues for the action parameter
     ACTIONS = %i(migrate mirror).freeze
 
     def initialize(action, source_email, destination_email, options)
@@ -29,6 +31,12 @@ module Imap::Backup
       @source_prefix = nil
     end
 
+    # @!method run
+    #   @raise [RuntimeError] if the indicated action is unknown,
+    #     or the source and destination accounts are the same,
+    #     or either of the accounts is not configured,
+    #     or incompatible namespace/delimter parameters have been supplied
+    #   @return [void]
     no_commands do
       def run
         raise "Unknown action '#{action}'" if !ACTIONS.include?(action)

@@ -10,6 +10,7 @@ module Imap::Backup
   class CLI; end
   class CLI::Local < Thor; end
 
+  # Runs integrity check on local backups
   class CLI::Local::Check
     include CLI::Helpers
 
@@ -17,6 +18,8 @@ module Imap::Backup
       @options = options
     end
 
+    # Runs the check
+    # @return [void]
     def run
       results = requested_accounts(config).map do |account|
         serialized_folders = Account::SerializedFolders.new(account: account)

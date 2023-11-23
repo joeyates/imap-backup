@@ -13,6 +13,7 @@ module Imap; end
 module Imap::Backup
   class CLI < Thor; end
 
+  # Implements the CLI utility functions
   class CLI::Utils < Thor
     include Thor::Actions
     include CLI::Helpers
@@ -21,6 +22,9 @@ module Imap::Backup
     config_option
     quiet_option
     verbose_option
+    # Creates fake downloaded emails so that only the account's future emails
+    # will really get backed up
+    # @return [void]
     def ignore_history(email)
       Logger.setup_logging options
       config = load_config(**options)
@@ -59,6 +63,8 @@ module Imap::Backup
       banner: "the name of the Thunderbird profile to copy emails to",
       aliases: ["-p"]
     )
+    # Exports the account's emails to Thunderbird
+    # @return [void]
     def export_to_thunderbird(email)
       Imap::Backup::Logger.setup_logging options
       force = options.key?(:force) ? options[:force] : false

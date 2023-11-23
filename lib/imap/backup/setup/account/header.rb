@@ -8,12 +8,18 @@ module Imap::Backup
   class Setup; end
   class Setup::Account; end
 
+  # Displays the header to the account modification menu
   class Setup::Account::Header
+    # @param menu [Highline::Menu] the menu
+    # @param account [Account] an Account
     def initialize(menu:, account:)
       @menu = menu
       @account = account
     end
 
+    # Displays the header
+    #
+    # @return [void]
     def run
       rows = [
         email,

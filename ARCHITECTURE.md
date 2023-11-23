@@ -62,3 +62,11 @@ aruba gem.
 These tests make connections to two containers
 running dovecot and postfix. This allows simulation
 of mirroring and migrations.
+
+# Documentation
+
+This project has two READMEs:
+
+* The {file:.github/README.md GitHub README} the end-user documentation which appears
+  on GitHub,
+* {file:README.md} - the developer documentation.

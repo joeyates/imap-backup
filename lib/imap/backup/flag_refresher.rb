@@ -1,7 +1,9 @@
 module Imap; end
 
 module Imap::Backup
+  # Updates the flags on backed-up emails
   class FlagRefresher
+    # The number of messages to process at a time
     CHUNK_SIZE = 100
 
     def initialize(folder, serializer)
@@ -9,6 +11,8 @@ module Imap::Backup
       @serializer = serializer
     end
 
+    # Runs the update
+    # @return [void]
     def run
       uids = serializer.uids.clone
 

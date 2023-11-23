@@ -18,6 +18,7 @@ module Imap::Backup
       @server = nil
     end
 
+    # @return [Client::AutomaticLoginWrapper] a client for the account
     def run
       options = provider_options
       Logger.logger.debug(

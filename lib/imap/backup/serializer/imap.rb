@@ -12,6 +12,7 @@ module Imap::Backup
     # The version number to store in the metadata file
     CURRENT_VERSION = 3
 
+    # @return [String] The path of the imap metadata file, without the '.imap' extension
     attr_reader :folder_path
 
     # @param folder_path [String] The path of the imap metadata file, without the '.imap' extension
@@ -24,6 +25,10 @@ module Imap::Backup
       @tsx = nil
     end
 
+    # Opens a transaction
+    # @param block [block] the block that is wrapped by the transaction
+    # @raise any exception ocurring in the block
+    # @return [void]
     def transaction(&block)
       tsx.fail_in_transaction!(:transaction, message: "nested transactions are not supported")
 
@@ -41,6 +46,8 @@ module Imap::Backup
       # rubocop:enable Lint/RescueException
     end
 
+    # Discards stored changes to the data
+    # @return [void]
     def rollback
       tsx.fail_outside_transaction!(:rollback)
 
@@ -50,6 +57,7 @@ module Imap::Backup
       tsx.clear
     end
 
+    # @return [String] The full path name of the metadata file
     def pathname
       "#{folder_path}.imap"
     end
@@ -66,6 +74,11 @@ module Imap::Backup
       true
     end
 
+    # Append message metadata
+    # @param uid [Integer] the message's UID
+    # @param length [Integer] the length of the message (as stored on disk)
+    # @param flags [Array[Symbol]] the message's flags
+    # @return [void]
     def append(uid, length, flags: [])
       offset =
         if messages.empty?
@@ -82,10 +95,16 @@ module Imap::Backup
       save
     end
 
+    # Get message metadata
+    # @param uid [Integer] a message UID
+    # @return [Serializer::Message]
     def get(uid)
       messages.find { |m| m.uid == uid }
     end
 
+    # Deletes the metadata file
+    # and discards stored attributes
+    # @return [void]
     def delete
       return if !exist?
 
@@ -96,6 +115,10 @@ module Imap::Backup
       @version = nil
     end
 
+    # Renames the metadata file, if it exists,
+    # otherwise, simply stores the new name
+    # @param new_path [String] the new path (without extension)
+    # @return [void]
     def rename(new_path)
       if exist?
         old_pathname = pathname
@@ -106,28 +129,36 @@ module Imap::Backup
       end
     end
 
+    # @return [Integer] the UID validity for the folder
     def uid_validity
       ensure_loaded
       @uid_validity
     end
 
+    # Sets the folder's UID validity and saves the metadata file
+    # @param value [Integer] the new UID validity
+    # @return [void]
     def uid_validity=(value)
       ensure_loaded
       @uid_validity = value
       save
     end
 
-    # Make private
+    # @return [Array<Hash>]
     def messages
       ensure_loaded
       @messages
     end
 
-    # Deprecated
+    # @return [Array<Integer>] The uids of all messages
     def uids
       messages.map(&:uid)
     end
 
+    # Update a message's metadata, replacing its UID
+    # @param old [Integer] the existing message UID
+    # @param new [Integer] the new UID to apply to the message
+    # @return [void]
     def update_uid(old, new)
       index = messages.find_index { |m| m.uid == old }
       return if index.nil?
@@ -136,11 +167,16 @@ module Imap::Backup
       save
     end
 
+    # @return [String] The format version for the metadata file
     def version
       ensure_loaded
       @version
     end
 
+    # Saves the file,
+    # except in a transaction when it does nothing
+    # @raise [RuntimeError] if UID validity has not been set
+    # @return [void]
     def save
       return if tsx.in_transaction?
 

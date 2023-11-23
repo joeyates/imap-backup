@@ -5,11 +5,15 @@ module Imap::Backup; end
 class Imap::Backup::Setup; end
 
 class Imap::Backup::Setup::GlobalOptions
+  # Allows changing the globally configured download strategy
   class DownloadStrategyChooser
+    # @param config [Configuration] the application configuration
     def initialize(config:)
       @config = config
     end
 
+    # Shows the menu
+    # @return [void]
     def run
       catch :done do
         loop do

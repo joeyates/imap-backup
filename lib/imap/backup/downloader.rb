@@ -3,7 +3,9 @@ require "net/imap"
 module Imap; end
 
 module Imap::Backup
+  # Downloads as yet undownloaded emails from an account's server
   class Downloader
+    # @private
     class MultiFetchFailedError < StandardError; end
 
     def initialize(folder, serializer, multi_fetch_size: 1, reset_seen_flags_after_fetch: false)
@@ -14,6 +16,8 @@ module Imap::Backup
       @uids = nil
     end
 
+    # Runs the downloader
+    # @return [void]
     def run
       info("#{uids.count} new messages") if uids.any?
 

@@ -5,12 +5,17 @@ require "imap/backup/serializer"
 module Imap; end
 
 module Imap::Backup
+  # Uploads a backed-up folder
   class Uploader
+    # @param folder [Account::Folder] an online folder
+    # @param serializer [Serializer] a local folder backup
     def initialize(folder, serializer)
       @folder = folder
       @serializer = serializer
     end
 
+    # Uploads messages that are present in the backup, but not in the online folder
+    # @return [void]
     def run
       if folder.uids.any?
         rename_serialized_folder

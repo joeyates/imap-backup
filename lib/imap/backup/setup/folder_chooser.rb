@@ -5,11 +5,15 @@ module Imap; end
 module Imap::Backup
   class Setup; end
 
+  # Allows the user to select and deselect folders to be backed up
   class Setup::FolderChooser
+    # @param account [Account] an Account
     def initialize(account)
       @account = account
     end
 
+    # Lists account folders and allows the user to toggle whther they are selected
+    # @return [void]
     def run
       if client.nil?
         highline.ask "Press a key "

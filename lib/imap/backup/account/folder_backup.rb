@@ -10,7 +10,7 @@ module Imap; end
 module Imap::Backup
   class Account; end
 
-  # Runs a backup for a single account folder
+  # Implements backup for a single folder
   class Account::FolderBackup
     def initialize(account:, folder:, refresh: false)
       @account = account
@@ -18,6 +18,9 @@ module Imap::Backup
       @refresh = refresh
     end
 
+    # Runs the backup
+    # @raise [RuntimeError] if the configured download strategy is incorrect
+    # @return [void]
     def run
       folder_ok = folder_ok?
       return if !folder_ok

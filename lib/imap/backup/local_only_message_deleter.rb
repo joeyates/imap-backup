@@ -3,6 +3,7 @@ require "imap/backup/logger"
 module Imap; end
 
 module Imap::Backup
+  # Deletes locally backed-up emails that are no longer on the server
   class LocalOnlyMessageDeleter
     def initialize(folder, serializer)
       @folder = folder
@@ -12,6 +13,7 @@ module Imap::Backup
     # TODO: this method is very slow as it copies all messages.
     # A quicker method would only remove UIDs from the .imap file,
     # but that would require a garbage collection later.
+    # @return [void]
     def run
       local_only_uids = serializer.uids - folder.uids
       if local_only_uids.empty?

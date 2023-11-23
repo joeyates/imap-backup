@@ -9,6 +9,8 @@ module Imap; end
 module Imap::Backup
   class CLI < Thor; end
 
+  # Processes parameters to run a backup via command-line parameters
+  # (without using a configuration file)
   class CLI::Single < Thor
     include CLI::Helpers
 
@@ -170,6 +172,8 @@ module Imap::Backup
     )
     quiet_option
     verbose_option
+    # Launches the backup procedure
+    # @return [void]
     def backup
       non_logging_options = Imap::Backup::Logger.setup_logging(options)
       direct = Backup.new(non_logging_options)

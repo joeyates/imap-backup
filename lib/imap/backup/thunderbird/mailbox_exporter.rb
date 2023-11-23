@@ -7,7 +7,11 @@ module Imap; end
 module Imap::Backup
   class Thunderbird; end
 
+  # Exports an account's emails to Thunderbird
   class Thunderbird::MailboxExporter
+    # @param email [String] an email address
+    # @param serializer [Serializer] a local folder backup
+    # @param profile [Thunderbird::Profile] an existing Thunderbird profile
     def initialize(email, serializer, profile, force: false)
       @email = email
       @serializer = serializer
@@ -15,6 +19,9 @@ module Imap::Backup
       @force = force
     end
 
+    # Copies the account's messages to the Thunderbird directory
+    # in the format expected by Thunderbird
+    # @return [void]
     def run
       if !profile_set_up
         error "The Thunderbird profile '#{profile.title}' " \

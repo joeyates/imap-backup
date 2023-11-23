@@ -10,16 +10,21 @@ require "imap/backup/setup/helpers"
 module Imap; end
 
 module Imap::Backup
+  # Interactively updates the application's configuration file
   class Setup
     class << self
+      # @return [Highline]
       attr_accessor :highline
     end
     self.highline = HighLine.new
 
+    # @param config [Configuration] the application configuration
     def initialize(config:)
       @config = config
     end
 
+    # Shows the menu
+    # @return [void]
     def run
       catch :done do
         loop do

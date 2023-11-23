@@ -3,6 +3,7 @@ require "imap/backup/logger"
 module Imap; end
 
 module Imap::Backup
+  # Copies a folder of backed-up emails to an online folder
   class Migrator
     def initialize(serializer, folder, reset: false)
       @folder = folder
@@ -10,6 +11,8 @@ module Imap::Backup
       @serializer = serializer
     end
 
+    # Runs the migration
+    # @return [void]
     def run
       count = serializer.uids.count
       folder.create

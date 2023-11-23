@@ -5,17 +5,24 @@ module Imap; end
 module Imap::Backup
   module Text; end
 
+  # Wraps standard output and hides passwords from debug output
+  # Any text matching Net::IMAP debug output of passwords is sanitized
   class Text::Sanitizer
     extend Forwardable
 
     delegate puts: :output
     delegate write: :output
 
+    # @param output [IO] the stream to write output to
     def initialize(output)
       @output = output
       @current = ""
     end
 
+    # Outputs everything up to the last newline character,
+    # storing whatever follows the newline.
+    # @param args [Array<String>] lines of text
+    # @return [void]
     def print(*args)
       @current << args.join
       loop do
@@ -28,6 +35,8 @@ module Imap::Backup
       end
     end
 
+    # Outputs any text still not printed
+    # @return [void]
     def flush
       return if @current == ""
 

@@ -9,7 +9,12 @@ module Imap; end
 module Imap::Backup
   module Email; end
 
+  # Provides a class factory for email account providers
   class Email::Provider
+    # @param address [String] an email address
+    # @return [Email::Provider::Fastmail, Email::Provider::GMail, Email::Provider::AppleMail,
+    #   Email::Provider::Purelymail, Email::Provider::Unknown]
+    #   an instance supplying default values for the email's account set up
     def self.for_address(address)
       # rubocop:disable Lint/DuplicateBranch
       case

@@ -6,11 +6,15 @@ module Imap; end
 module Imap::Backup
   class Setup; end
 
+  # Shows the menu of global options
   class Setup::GlobalOptions
+    # @param config [Configuration] the application configuration
     def initialize(config:)
       @config = config
     end
 
+    # Shows the menu
+    # @return [void]
     def run
       catch :done do
         loop do

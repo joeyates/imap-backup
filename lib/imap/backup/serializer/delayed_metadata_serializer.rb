@@ -8,11 +8,13 @@ require "imap/backup/serializer/transaction"
 module Imap; end
 
 module Imap::Backup
+  # Wraps the Serializer, delaying metadata appends
   class Serializer::DelayedMetadataSerializer
     extend Forwardable
 
     def_delegator :serializer, :uids
 
+    # @param serializer [Serializer] the serializer for a folder
     def initialize(serializer:)
       @serializer = serializer
       @tsx = nil
@@ -20,7 +22,9 @@ module Imap::Backup
 
     # Initializes the metadata and mailbox transactions, then calls the supplied block.
     # Once the block has finished, commits changes to metadata
+    # @param block [block] the block that is wrapped by the transaction
     #
+    # @raise any error ocurring during the commit phase
     # @return [void]
     def transaction(&block)
       tsx.fail_in_transaction!(:transaction, message: "nested transactions are not supported")

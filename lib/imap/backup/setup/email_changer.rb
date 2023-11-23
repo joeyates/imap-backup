@@ -6,12 +6,18 @@ module Imap; end
 module Imap::Backup
   class Setup; end
 
+  # Asks the user for a new email address
   class Setup::EmailChanger
+    # @param account [Account] an Account
+    # @param config [Configuration] the application configuration
     def initialize(account:, config:)
       @account = account
       @config = config
     end
 
+    # Asks the user for an email address,
+    # ensuring that the supplied address is not an existing account
+    # @return [void]
     def run
       username = Setup::Asker.email(account.username)
       other_accounts = config.accounts.reject { |a| a == account }

@@ -1,7 +1,8 @@
 --protected
 --no-private
+--hide-void-return
 -
 ARCHITECTURE.md
 CHANGELOG.md
-docs/*.md
+docs/**/*.md
 LICENSE

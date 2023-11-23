@@ -8,6 +8,7 @@ module Imap; end
 module Imap::Backup
   class CLI < Thor; end
 
+  # Restores backups for one or more accounts
   class CLI::Restore < Thor
     include Thor::Actions
     include CLI::Helpers
@@ -18,6 +19,9 @@ module Imap::Backup
       @options = options
     end
 
+    # @!method run
+    #   @raise [RuntimeError] if no email is specified
+    #   @return [void]
     no_commands do
       def run
         config = load_config(**options)

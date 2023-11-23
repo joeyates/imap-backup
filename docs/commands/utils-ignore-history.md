@@ -1,3 +1,6 @@
+<!--
+# @title command: 'utils ignore-history'
+-->
 # Utils Ignore History
 
 ```sh

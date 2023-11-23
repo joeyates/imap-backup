@@ -1,3 +1,6 @@
+<!--
+# @title command: 'local show'
+-->
 # Local Show
 
 ```sh

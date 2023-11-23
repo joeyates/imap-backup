@@ -6,7 +6,13 @@ module Imap::Backup
   module Email; end
 
   module Email::Mboxrd
+    # Handles serialization and deserialization of messages
     class Message
+      # @param serialized [String] an email message
+      #
+      # @return [String] The message without the initial 'From ' line
+      #   and with one level of '>' quoting removed from other lines
+      #   that start with 'From'
       def self.clean_serialized(serialized)
         cleaned = serialized.gsub(/^>(>*From)/, "\\1")
         # Serialized messages in this format *should* start with a line
@@ -19,32 +25,40 @@ module Imap::Backup
         cleaned
       end
 
+      # @param serialized [String] the on-disk version of the message
+      #
+      # @return [Message] the original message
       def self.from_serialized(serialized)
         new(clean_serialized(serialized))
       end
 
+      # @return [String] the original message body
       attr_reader :supplied_body
 
       def initialize(supplied_body)
         @supplied_body = supplied_body.clone
       end
 
+      # @return [String] the message with an initial 'From ADDRESS' line
       def to_serialized
         from_line = "From #{from}\n"
         body = mboxrd_body.dup.force_encoding(Encoding::UTF_8)
         from_line + body
       end
 
+      # @return [Date, nil] the date of the message
       def date
         parsed.date
       rescue StandardError
         nil
       end
 
+      # @return [String] the message's subject line
       def subject
         parsed.subject
       end
 
+      # @return [String] the original message ready for transmission to an IMAP server
       def imap_body
         supplied_body.gsub(/(?<!\r)\n/, "\r\n")
       end

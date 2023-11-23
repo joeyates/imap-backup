@@ -3,12 +3,18 @@ module Imap; end
 module Imap::Backup
   class Setup; end
 
+  # Requests an updated backup path from the user
   class Setup::BackupPath
+    # @param account [Account] an Account
+    # @param config [Configuration] the application configuration
     def initialize(account:, config:)
       @account = account
       @config = config
     end
 
+    # Asks the user for a backup path
+    #
+    # @return [void]
     def run
       account.local_path = highline.ask("backup directory: ") do |q|
         q.default  = account.local_path
