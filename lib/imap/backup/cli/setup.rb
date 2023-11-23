@@ -18,6 +18,8 @@ module Imap::Backup
       @options = options
     end
 
+    # @!method run
+    #   @return [void]
     no_commands do
       def run
         config = load_config(**options, require_exists: false)

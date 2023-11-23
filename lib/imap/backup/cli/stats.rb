@@ -15,6 +15,8 @@ module Imap::Backup
       @options = options
     end
 
+    # @!method run
+    #   @return [void]
     no_commands do
       def run
         case options[:format]
