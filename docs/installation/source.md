@@ -1,3 +1,6 @@
+<!--
+# @title installation: from source
+-->
 # Installation From Source
 
 In order to run imap-backup from source, you'll need Ruby and [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git).

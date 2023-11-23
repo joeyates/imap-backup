@@ -1,3 +1,6 @@
+<!--
+# @title command: 'single backup'
+-->
 # Direct Config-less Backup
 
 This command is an alternative to the `imap-backup backup` command.

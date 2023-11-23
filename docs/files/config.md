@@ -1,3 +1,6 @@
+<!--
+# @title files: 'config.json'
+-->
 By default, imap-backup's configuration is stored as `~/.imap-backup/config.json`.
 It is a JSON file.
 You can use a configuration file in another location by passing the

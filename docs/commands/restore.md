@@ -1,3 +1,6 @@
+<!--
+# @title command: 'restore'
+-->
 # Restore
 
 ```sh

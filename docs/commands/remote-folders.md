@@ -1,3 +1,6 @@
+<!--
+# @title command: 'remote folders'
+-->
 # Remote Folders
 
 ```sh

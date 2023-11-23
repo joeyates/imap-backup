@@ -1,3 +1,6 @@
+<!--
+# @title command: 'local accounts'
+-->
 # Local Accounts
 
 ```sh

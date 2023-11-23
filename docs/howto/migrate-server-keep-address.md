@@ -1,3 +1,6 @@
+<!--
+# @title howto: Migrate to a new e-mail server while keeping your existing address
+-->
 # Migrate to a new e-mail server while keeping your existing address
 
 While switching e-mail provider (from provider `A` to `B`),

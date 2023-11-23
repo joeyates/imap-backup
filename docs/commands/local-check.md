@@ -1,3 +1,6 @@
+<!--
+# @title command: 'local check'
+-->
 # Local Integrity Check
 
 ```sh
