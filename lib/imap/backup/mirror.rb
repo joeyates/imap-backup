@@ -16,6 +16,7 @@ module Imap::Backup
     # sets existing messages' flas
     # then appends any missing messages
     # and saves the mapping file
+    # @return [void]
     def run
       ensure_destination_folder
       delete_destination_only_emails

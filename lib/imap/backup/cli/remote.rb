@@ -18,7 +18,8 @@ module Imap::Backup
     format_option
     quiet_option
     verbose_option
-    # Lists an account's folders
+    # Prints an account's folders
+    # @return [void]
     def folders(email)
       Imap::Backup::Logger.setup_logging options
       folder_names = folder_names(email)
@@ -38,7 +39,8 @@ module Imap::Backup
     format_option
     quiet_option
     verbose_option
-    # Lists an account's IMAP capabilities
+    # Prints an account's IMAP capabilities
+    # @return [void]
     def capabilities(email)
       Imap::Backup::Logger.setup_logging options
       config = load_config(**options)
@@ -58,7 +60,8 @@ module Imap::Backup
     format_option
     quiet_option
     verbose_option
-    # Lists an account's IMAP namespaces
+    # Prints an account's IMAP namespaces
+    # @return [void]
     def namespaces(email)
       Imap::Backup::Logger.setup_logging options
       config = load_config(**options)

@@ -35,6 +35,7 @@ module Imap::Backup
     end
 
     # Logs in to the account on the IMAP server
+    # @return [void]
     def login
       Logger.logger.debug "Logging in: #{account.username}/#{masked_password}"
       imap.login(account.username, account.password)
@@ -42,6 +43,7 @@ module Imap::Backup
     end
 
     # Logs out and back in to the server
+    # @return [void]
     def reconnect
       disconnect
       login
@@ -53,21 +55,23 @@ module Imap::Backup
     end
 
     # Disconects from the server
+    # @return [void]
     def disconnect
       imap.disconnect
       self.state = nil
     end
 
     # Prepares read-only access to a folder
+    # @return [void]
     def examine(mailbox)
       return if state == [:examine, mailbox]
 
-      result = imap.examine(mailbox)
+      imap.examine(mailbox)
       self.state = [:examine, mailbox]
-      result
     end
 
     # Prepares read-write access to a folder
+    # @return [void]
     def select(mailbox)
       return if state == [:select, mailbox]
 

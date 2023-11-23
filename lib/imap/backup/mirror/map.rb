@@ -17,7 +17,8 @@ module Imap::Backup
       @map = nil
     end
 
-    # Checks that the supplied values match the existing UID validity values
+    # @return [Boolean] whether the supplied values match the existing
+    #  UID validity values
     def check_uid_validities(source:, destination:)
       store
       return false if source != source_uid_validity
@@ -27,6 +28,7 @@ module Imap::Backup
     end
 
     # Sets, or resets to an empty state
+    # @return [void]
     def reset(source_uid_validity:, destination_uid_validity:)
       destination_store["source_uid_validity"] = source_uid_validity
       @source_uid_validity = nil
@@ -62,6 +64,7 @@ module Imap::Backup
 
     # Creates a mapping between message UIDs on the source
     # and destination servers
+    # @return [void]
     def map_uids(source:, destination:)
       raise "Assign UID validities with #reset before calling #map_uids" if destination_store == {}
 
@@ -69,6 +72,7 @@ module Imap::Backup
     end
 
     # Saves the map to disk as JSON
+    # @return [void]
     def save
       File.write(pathname, store.to_json)
     end

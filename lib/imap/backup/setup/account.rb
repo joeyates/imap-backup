@@ -22,6 +22,7 @@ module Imap::Backup
     end
 
     # Shows the menu
+    # @return [void]
     def run
       if !account.local_path
         account.local_path = File.join(config.path, account.username.tr("@", "_"))

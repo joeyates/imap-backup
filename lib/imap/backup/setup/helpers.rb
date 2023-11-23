@@ -7,12 +7,12 @@ module Imap::Backup
 
   # Helpers for the setup system
   class Setup::Helpers
-    # The prefix for setup menus
+    # @return [String] the prefix for setup menus
     def title_prefix
       "imap-backup -"
     end
 
-    # The current application version
+    # @return [String] the current application version
     def version
       VERSION
     end

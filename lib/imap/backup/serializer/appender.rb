@@ -21,6 +21,7 @@ module Imap::Backup
     # @param uid [Integer] the message's UID
     # @param message [String] the on-disk version of the message
     # @param flags [Array[Symbol]] the message's flags
+    # @return [void]
     def append(uid:, message:, flags:)
       raise "Can't add messages without uid_validity" if !imap.uid_validity
 

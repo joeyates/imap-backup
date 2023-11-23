@@ -13,6 +13,7 @@ module Imap::Backup
     # TODO: this method is very slow as it copies all messages.
     # A quicker method would only remove UIDs from the .imap file,
     # but that would require a garbage collection later.
+    # @return [void]
     def run
       local_only_uids = serializer.uids - folder.uids
       if local_only_uids.empty?

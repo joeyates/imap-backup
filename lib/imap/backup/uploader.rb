@@ -15,6 +15,7 @@ module Imap::Backup
     end
 
     # Uploads messages that are present in the backup, but not in the online folder
+    # @return [void]
     def run
       if folder.uids.any?
         rename_serialized_folder

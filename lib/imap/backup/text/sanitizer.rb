@@ -22,6 +22,7 @@ module Imap::Backup
     # Outputs everything up to the last newline character,
     # storing whatever follows the newline.
     # @param args [Array<String>] lines of text
+    # @return [void]
     def print(*args)
       @current << args.join
       loop do
@@ -35,6 +36,7 @@ module Imap::Backup
     end
 
     # Outputs any text still not printed
+    # @return [void]
     def flush
       return if @current == ""
 

@@ -19,6 +19,7 @@ module Imap::Backup
     end
 
     # Runs the check
+    # @return [void]
     def run
       results = requested_accounts(config).map do |account|
         serialized_folders = Account::SerializedFolders.new(account: account)

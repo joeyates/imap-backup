@@ -5,6 +5,7 @@ module Imap; end
 module Imap::Backup
   # Stores messages
   class Serializer::Mbox
+    # @return [String] The path of the mailbox file, without the '.mbox' extension
     attr_reader :folder_path
 
     # @param folder_path [String] The path of the mailbox file, without the '.mbox' extension
@@ -15,6 +16,7 @@ module Imap::Backup
 
     # Starts a transaction
     # @param block [block] the block that is wrapped by the transaction
+    # @return [void]
     def transaction(&block)
       tsx.fail_in_transaction!(:transaction, message: "nested transactions are not supported")
 
@@ -31,6 +33,7 @@ module Imap::Backup
     end
 
     # Returns to the pre-transaction state
+    # @return [void]
     def rollback
       tsx.fail_outside_transaction!(:rollback)
 
@@ -43,6 +46,7 @@ module Imap::Backup
 
     # Serializes a message
     # @param message [String] the message text
+    # @return [void]
     def append(message)
       File.open(pathname, "ab") do |file|
         file.write message
@@ -52,6 +56,7 @@ module Imap::Backup
     # Reads a message from disk
     # @param offset [Integer] the start of the message inside the mailbox file
     # @param length [Integer] the length of the message (as stored on disk)
+    # @return [String] the message
     def read(offset, length)
       File.open(pathname, "rb") do |f|
         f.seek offset
@@ -60,6 +65,7 @@ module Imap::Backup
     end
 
     # Deletes the mailbox
+    # @return [void]
     def delete
       return if !exist?
 
@@ -85,6 +91,7 @@ module Imap::Backup
     # Renames the mailbox, if it exists,
     # otherwise, simply stores the new name
     # @param new_path [String] the new path (without extension)
+    # @return [void]
     def rename(new_path)
       if exist?
         old_pathname = pathname
@@ -96,6 +103,7 @@ module Imap::Backup
     end
 
     # Sets the mailbox file's updated time to the current time
+    # @return [void]
     def touch
       File.open(pathname, "a") {}
     end

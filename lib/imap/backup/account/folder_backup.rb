@@ -19,6 +19,7 @@ module Imap::Backup
     end
 
     # Runs the backup
+    # @return [void]
     def run
       folder_ok = folder_ok?
       return if !folder_ok

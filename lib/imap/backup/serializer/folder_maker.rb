@@ -18,6 +18,7 @@ module Imap::Backup
 
     # Creates the directory and any missing parent directories,
     # ensuring the desired permissions.
+    # @return [void]
     def run
       parts = path.split("/")
       return if parts.empty?

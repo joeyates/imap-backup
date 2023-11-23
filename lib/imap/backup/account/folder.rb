@@ -18,7 +18,9 @@ module Imap::Backup
     extend Forwardable
     include RetryOnError
 
+    # @return [Client::Default]
     attr_reader :client
+    # @return [String] the name of the folder
     attr_reader :name
 
     def initialize(client, name)
@@ -44,6 +46,7 @@ module Imap::Backup
     end
 
     # Creates the folder on the server
+    # @return [void]
     def create
       return if exist?
 
@@ -52,7 +55,7 @@ module Imap::Backup
       end
     end
 
-    # Fetches the folder's UID validity
+    # @return [Integer] the folder's UID validity
     def uid_validity
       @uid_validity ||=
         begin
@@ -102,6 +105,7 @@ module Imap::Backup
     end
 
     # Uploads a message
+    # @return [void]
     def append(message)
       body = message.imap_body
       date = message.date&.to_time
@@ -113,12 +117,14 @@ module Imap::Backup
     end
 
     # Deletes multiple messages
+    # @return [void]
     def delete_multi(uids)
       add_flags(uids, [:Deleted])
       client.expunge
     end
 
     # Sets one or more flags on a group of messages
+    # @return [void]
     def set_flags(uids, flags)
       client.select(utf7_encoded_name)
       flags.reject! { |f| f == :Recent }
@@ -126,6 +132,7 @@ module Imap::Backup
     end
 
     # Adds one or more flags to a group of messages
+    # @return [void]
     def add_flags(uids, flags)
       # Use read-write access, via `select`
       client.select(utf7_encoded_name)
@@ -134,12 +141,14 @@ module Imap::Backup
     end
 
     # Removes one or more flags from a group of messages
+    # @return [void]
     def remove_flags(uids, flags)
       client.select(utf7_encoded_name)
       client.uid_store(uids, "-FLAGS", flags)
     end
 
     # Deletes all messages from the folder
+    # @return [void]
     def clear
       existing = uids
       return if existing.empty?

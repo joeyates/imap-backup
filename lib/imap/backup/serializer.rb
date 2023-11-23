@@ -30,7 +30,9 @@ module Imap::Backup
     def_delegator :mbox, :pathname, :mbox_pathname
     def_delegators :imap, :get, :messages, :uid_validity, :uids, :update_uid
 
+    # @return [String] a folder name
     attr_reader :folder
+    # @return [String] an account's backup path
     attr_reader :path
 
     # @param path [String] an account's backup path
@@ -51,8 +53,10 @@ module Imap::Backup
       block.call
     end
 
-    # Returns true if there are existing, valid files
-    # false otherwise (in which case any existing files are deleted)
+    # Checks that the metadata files are valid, migrates the metadata file
+    # from older versions, if necessary,
+    # or deletes any existing files if the pair are not valid.
+    # @return [Boolean] indicates whether there are existing, valid files
     def validate!
       return true if @validated
 
@@ -68,12 +72,14 @@ module Imap::Backup
       false
     end
 
-    # Checks that the folders data is stored correctly
+    # Checks that the folder's data is stored correctly
+    # @return [void]
     def check_integrity!
       IntegrityChecker.new(imap: imap, mbox: mbox).run
     end
 
     # Deletes the serialized data
+    # @return [void]
     def delete
       imap.delete
       mbox.delete
@@ -92,7 +98,7 @@ module Imap::Backup
     #
     # @param value [Integer] The new UID validity value
     #
-    # @return [String] The name of the new folder
+    # @return [String, nil] The name of the new folder
     def apply_uid_validity(value)
       validate!
 
@@ -112,6 +118,7 @@ module Imap::Backup
     # and ensures that both the metadata file and the mailbox
     # are saved.
     # @param value [Integer] the new UID validity
+    # @return [void]
     def force_uid_validity(value)
       validate!
 
@@ -122,6 +129,7 @@ module Imap::Backup
     # @param uid [Integer] the message's UID
     # @param length [Integer] the length of the message (as stored on disk)
     # @param flags [Array[Symbol]] the message's flags
+    # @return [void]
     def append(uid, message, flags)
       validate!
 
@@ -132,6 +140,7 @@ module Imap::Backup
     # Updates a messages flags
     # @param uid [Integer] the message's UID
     # @param flags [Array<Symbol>] the flags to set on the message
+    # @return [void]
     def update(uid, flags: nil)
       message = imap.get(uid)
       return if !message
@@ -140,8 +149,10 @@ module Imap::Backup
       imap.save
     end
 
-    # Enumerates over a series of messages
+    # Enumerates over a series of messages.
+    # When called without a block, returns an Enumerator
     # @param required_uids [Array<Integer>] the UIDs of the message to enumerate over
+    # @return [Enumerator, void]
     def each_message(required_uids = nil, &block)
       return enum_for(:each_message, required_uids) if !block
 
@@ -156,6 +167,7 @@ module Imap::Backup
     # Calls the supplied block on each message in the folder
     # and discards those for which the block returns a false result
     # @param block [block] the block to call
+    # @return [void]
     def filter(&block)
       temp_name = Serializer::UnusedNameFinder.new(serializer: self).run
       temp_folder_path = self.class.folder_path_for(path: path, folder: temp_name)
@@ -186,6 +198,7 @@ module Imap::Backup
     end
 
     # Forces a reload of the serialized files
+    # @return [void]
     def reload
       @imap = nil
       @mbox = nil

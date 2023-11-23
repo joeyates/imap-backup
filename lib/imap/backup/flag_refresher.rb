@@ -12,6 +12,7 @@ module Imap::Backup
     end
 
     # Runs the update
+    # @return [void]
     def run
       uids = serializer.uids.clone
 

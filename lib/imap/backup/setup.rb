@@ -13,6 +13,7 @@ module Imap::Backup
   # Interactively updates the application's configuration file
   class Setup
     class << self
+      # @return [Highline]
       attr_accessor :highline
     end
     self.highline = HighLine.new
@@ -23,6 +24,7 @@ module Imap::Backup
     end
 
     # Shows the menu
+    # @return [void]
     def run
       catch :done do
         loop do

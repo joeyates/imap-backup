@@ -15,6 +15,7 @@ module Imap::Backup
     end
 
     # Runs the deletion operation
+    # @return [void]
     def run
       backup_folders = Account::BackupFolders.new(
         client: account.client, account: account

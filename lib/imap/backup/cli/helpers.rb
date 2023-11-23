@@ -75,6 +75,9 @@ module Imap::Backup
     end
 
     # Processes command-line parameters
+    # @return [Hash] the supplied command-line parameters with
+    #   with hyphens in keys replaced by underscores
+    #   and the keys converted to Symbols
     def options
       @symbolized_options ||= # rubocop:disable Naming/MemoizedInstanceVariableName
         begin
@@ -92,6 +95,7 @@ module Imap::Backup
     end
 
     # Loads the application configuration
+    # @return [Configuration]
     def load_config(**options)
       path = options[:config]
       require_exists = options.key?(:require_exists) ? options[:require_exists] : true

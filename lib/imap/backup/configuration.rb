@@ -45,6 +45,7 @@ module Imap::Backup
     end
 
     # Saves the configuration file in JSON format
+    # @return [void]
     def save
       ensure_loaded!
       FileUtils.mkdir_p(path) if !File.directory?(path)
@@ -80,6 +81,7 @@ module Imap::Backup
     end
 
     # @param value [String] the new strategy
+    # @return [void]
     def download_strategy=(value)
       raise "Unknown strategy '#{value}'" if !DOWNLOAD_STRATEGIES.find { |s| s[:key] == value }
 

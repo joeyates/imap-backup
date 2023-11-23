@@ -11,7 +11,7 @@ module Imap::Backup
   class Logger
     include Singleton
 
-    # @return [Logger] the singleton instance of the Logger
+    # @return [Imap::Backup::Logger] the singleton instance of this class
     def self.logger
       Logger.instance.logger
     end
@@ -51,6 +51,7 @@ module Imap::Backup
     # Traps optput to standard error,
     # hides passwords
     # and outputs the results to standard out
+    # @return [void]
     def self.sanitize_stderr
       sanitizer = Text::Sanitizer.new($stdout)
       previous_stderr = $stderr
@@ -66,6 +67,7 @@ module Imap::Backup
       verbose.reduce(1) { |acc, v| acc + (v ? 1 : -1) }
     end
 
+    # @return [Logger] the configured Logger
     attr_reader :logger
 
     def initialize

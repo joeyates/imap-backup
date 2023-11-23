@@ -14,10 +14,9 @@ module Imap::Backup
     # The username of the account (usually the same as the email address)
     # @return [String]
     attr_reader :username
-    # The password of the Account
+    # @return [String] password of the Account
     attr_reader :password
-    # The path where backups will be saved
-    # @return [String]
+    # @return [String] the path where backups will be saved
     attr_reader :local_path
     # @overload folders
     #   The list of folders that have been configured for the Account
@@ -38,6 +37,7 @@ module Imap::Backup
     attr_reader :folder_blacklist
     # Should all emails be backed up progressively, or should emails
     # which are deleted from the server be deleted locally?
+    # @return [Boolean]
     attr_reader :mirror_mode
     # The address of the IMAP server
     # @return [String]
@@ -121,6 +121,7 @@ module Imap::Backup
     end
 
     # Resets the store of changes, indicating that the current state is the saved state
+    # @return [void]
     def clear_changes
       @changes = {}
     end
@@ -132,16 +133,12 @@ module Imap::Backup
       @marked_for_deletion = true
     end
 
-    # Indicates whether the account has been flagged for deletion during setup
-    #
-    # @return [Boolean]
+    # @return [Boolean] whether the account has been flagged for deletion during setup
     def marked_for_deletion?
       @marked_for_deletion
     end
 
-    # Returns all Account data for serialization
-    #
-    # @return [Hash]
+    # @return [Hash] all Account data for serialization
     def to_h
       h = {username: @username, password: @password}
       h[:local_path] = @local_path if @local_path

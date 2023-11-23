@@ -7,9 +7,13 @@ module Imap; end
 module Imap::Backup
   # Represents a stored message
   class Serializer::Message
+    # @return [Array[Symbol]] the message's flags
     attr_accessor :flags
+    # @return [Integer] the length of the message (as stored on disk)
     attr_reader :length
+    # @return [Integer] the start of the message inside the mailbox file
     attr_reader :offset
+    # @return [Integer] the message's UID
     attr_accessor :uid
 
     extend Forwardable
@@ -30,7 +34,7 @@ module Imap::Backup
       @flags = flags.map(&:to_sym)
     end
 
-    # Returns the message metadata
+    # @return [Hash] the message metadata
     def to_h
       {
         uid: uid,
@@ -41,6 +45,7 @@ module Imap::Backup
     end
 
     # Reads the message text and returns the original form
+    # @return [String] the message
     def message
       @message =
         begin

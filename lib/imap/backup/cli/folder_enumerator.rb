@@ -28,6 +28,8 @@ module Imap::Backup
     end
 
     # Enumerates backed-up folders
+    # When called without a block, returns an Enumerator
+    # @return [Enumerator, void]
     def each
       return enum_for(:each) if !block_given?
 

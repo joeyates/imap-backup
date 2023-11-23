@@ -173,6 +173,7 @@ module Imap::Backup
     quiet_option
     verbose_option
     # Launches the backup procedure
+    # @return [void]
     def backup
       non_logging_options = Imap::Backup::Logger.setup_logging(options)
       direct = Backup.new(non_logging_options)

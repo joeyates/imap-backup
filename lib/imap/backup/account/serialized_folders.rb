@@ -18,6 +18,7 @@ module Imap::Backup
     end
 
     # Runs the enumeration
+    # @return [void]
     def each(&block)
       return enum_for(:each) if !block
 

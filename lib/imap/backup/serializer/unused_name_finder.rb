@@ -11,6 +11,7 @@ module Imap::Backup
     end
 
     # Finds the name
+    # @return [String] the name
     def run
       digit = 0
       folder = nil

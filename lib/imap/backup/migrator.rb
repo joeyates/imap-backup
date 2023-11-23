@@ -12,6 +12,7 @@ module Imap::Backup
     end
 
     # Runs the migration
+    # @return [void]
     def run
       count = serializer.uids.count
       folder.create

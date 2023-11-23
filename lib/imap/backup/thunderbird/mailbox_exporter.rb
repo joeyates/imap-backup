@@ -21,6 +21,7 @@ module Imap::Backup
 
     # Copies the account's messages to the Thunderbird directory
     # in the format expected by Thunderbird
+    # @return [void]
     def run
       if !profile_set_up
         error "The Thunderbird profile '#{profile.title}' " \

@@ -16,6 +16,7 @@ module Imap::Backup
     end
 
     # Runs the backup
+    # @return [void]
     def run
       Logger.logger.info "Running backup of account: #{account.username}"
       # start the connection so we get logging messages in the right order

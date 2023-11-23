@@ -32,6 +32,7 @@ module Imap::Backup
         new(clean_serialized(serialized))
       end
 
+      # @return [String] the original message body
       attr_reader :supplied_body
 
       def initialize(supplied_body)

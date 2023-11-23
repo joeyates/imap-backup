@@ -13,6 +13,7 @@ module Imap::Backup
     end
 
     # Runs the check
+    # @return [void]
     def run
       actual = FileMode.new(filename: filename).mode
       return nil if actual.nil?

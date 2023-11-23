@@ -13,6 +13,7 @@ class Imap::Backup::Setup::GlobalOptions
     end
 
     # Shows the menu
+    # @return [void]
     def run
       catch :done do
         loop do

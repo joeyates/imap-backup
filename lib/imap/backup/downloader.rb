@@ -17,6 +17,7 @@ module Imap::Backup
     end
 
     # Runs the downloader
+    # @return [void]
     def run
       info("#{uids.count} new messages") if uids.any?
 

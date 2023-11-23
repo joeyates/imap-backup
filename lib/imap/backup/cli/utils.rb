@@ -24,6 +24,7 @@ module Imap::Backup
     verbose_option
     # Creates fake downloaded emails so that only the account's future emails
     # will really get backed up
+    # @return [void]
     def ignore_history(email)
       Logger.setup_logging options
       config = load_config(**options)
@@ -63,6 +64,7 @@ module Imap::Backup
       aliases: ["-p"]
     )
     # Exports the account's emails to Thunderbird
+    # @return [void]
     def export_to_thunderbird(email)
       Imap::Backup::Logger.setup_logging options
       force = options.key?(:force) ? options[:force] : false

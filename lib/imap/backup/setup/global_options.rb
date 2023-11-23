@@ -14,6 +14,7 @@ module Imap::Backup
     end
 
     # Shows the menu
+    # @return [void]
     def run
       catch :done do
         loop do

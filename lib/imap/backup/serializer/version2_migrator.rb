@@ -24,6 +24,7 @@ module Imap::Backup
     end
 
     # Runs the migration
+    # @return [Boolean] whether the migration was run
     def run
       return false if !required?
 

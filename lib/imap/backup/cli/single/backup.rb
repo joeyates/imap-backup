@@ -18,6 +18,7 @@ module Imap::Backup
     end
 
     # Runs the backup
+    # @return [void]
     def run
       process_options!
       account = Account.new(
