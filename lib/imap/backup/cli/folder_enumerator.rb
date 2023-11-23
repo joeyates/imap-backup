@@ -29,6 +29,8 @@ module Imap::Backup
 
     # Enumerates backed-up folders
     # When called without a block, returns an Enumerator
+    # @yieldparam serializer [Serializer] the folder's serializer
+    # @yieldparam folder [Account::Folder] the online folder
     # @return [Enumerator, void]
     def each
       return enum_for(:each) if !block_given?

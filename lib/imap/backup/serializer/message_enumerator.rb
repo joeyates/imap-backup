@@ -10,6 +10,7 @@ module Imap::Backup
 
     # Enumerates over the messages
     # @param uids [Array<Integer>] the message UIDs of the messages to iterate over
+    # @yieldparam message [Serializer::Message]
     # @return [void]
     def run(uids:)
       uids.each do |uid_maybe_string|

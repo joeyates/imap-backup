@@ -96,7 +96,7 @@ module Imap::Backup
 
     # Get message metadata
     # @param uid [Integer] a message UID
-    # @return [Hash]
+    # @return [Serializer::Message]
     def get(uid)
       messages.find { |m| m.uid == uid }
     end

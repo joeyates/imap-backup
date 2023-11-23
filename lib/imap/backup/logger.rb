@@ -48,9 +48,8 @@ module Imap::Backup
       copy
     end
 
-    # Traps optput to standard error,
-    # hides passwords
-    # and outputs the results to standard out
+    # Wraps a block, filtering output to standard error,
+    # hidng passwords and outputs the results to standard out
     # @return [void]
     def self.sanitize_stderr
       sanitizer = Text::Sanitizer.new($stdout)

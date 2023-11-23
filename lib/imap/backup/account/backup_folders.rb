@@ -15,6 +15,7 @@ module Imap::Backup
     end
 
     # Runs the enumeration
+    # @yieldparam folder [Account::Folder] the online folder
     # @return [void]
     def each(&block)
       return enum_for(:each) if !block
@@ -42,6 +43,7 @@ module Imap::Backup
     end
 
     # Runs a map operation over the folders
+    # @yieldparam folder [Account::Folder] the online folder
     # @return The results of the map operation
     def map(&block)
       each.map do |folder|

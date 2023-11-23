@@ -18,6 +18,8 @@ module Imap::Backup
     end
 
     # Runs the enumeration
+    # @yieldparam serializer [Serializer] the folder's serializer
+    # @yieldparam folder [Account::Folder] the online folder
     # @return [void]
     def each(&block)
       return enum_for(:each) if !block
