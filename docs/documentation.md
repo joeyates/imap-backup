@@ -1,6 +1,14 @@
 # Documentation
 
-This project uses [yard]() to generate its documentation.
+This project uses [yard](https://yardoc.org/) to generate its documentation.
+
+# Development
+
+Run an autoreloading document viewer
+
+```
+yard server --reload
+```
 
 # Coverage
 
