@@ -61,8 +61,6 @@ module Imap::Backup
     # mark messages as '\Seen' when accessed).
     # @return [Boolean]
     attr_reader :reset_seen_flags_after_fetch
-    # Tracks changes to the Account's attributes
-    attr_reader :changes
 
     def initialize(options)
       @username = options[:username]
@@ -243,6 +241,8 @@ module Imap::Backup
     end
 
     private
+
+    attr_reader :changes
 
     def update(field, value)
       key = :"@#{field}"

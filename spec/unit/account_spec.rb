@@ -8,40 +8,6 @@ module Imap::Backup
 
     let(:options) { {username: "user", password: "pwd"} }
 
-    describe "#changes" do
-      it "lists changes" do
-        subject.username = "new"
-
-        expect(subject.changes).to eq(username: {from: "user", to: "new"})
-      end
-
-      context "when more than one change is made" do
-        it "retains the last one" do
-          subject.username = "first"
-          subject.username = "second"
-
-          expect(subject.changes).to eq(username: {from: "user", to: "second"})
-        end
-      end
-
-      context "when a value is reset to its original value" do
-        it "removes the change" do
-          subject.username = "changed"
-          subject.username = "user"
-
-          expect(subject.changes).to eq({})
-        end
-      end
-
-      context "when a value is set to it's initial value" do
-        it "ignores the change" do
-          subject.username = "user"
-
-          expect(subject.changes).to eq({})
-        end
-      end
-    end
-
     describe "#client" do
       let(:client_factory) { instance_double(Account::ClientFactory, run: client) }
       let(:client) do
@@ -116,7 +82,7 @@ module Imap::Backup
         subject.username = "new"
         subject.clear_changes
 
-        expect(subject.changes).to eq({})
+        expect(subject.modified?).to be false
       end
     end
 
@@ -247,8 +213,8 @@ module Imap::Backup
           expect(subject.send(attribute)).to eq(expected)
         end
 
-        it "adds a change" do
-          expect(subject.changes).to eq(attribute => {from: nil, to: expected})
+        it "modifies the Account" do
+          expect(subject.modified?).to be true
         end
       end
     end
