@@ -3,6 +3,7 @@
 ![Coverage](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/joeyates/b54fe758bfb405c04bef72dad293d707/raw/coverage.json)
 ![License](https://img.shields.io/github/license/joeyates/imap-backup?color=brightgreen&label=License)
 [![Stars](https://img.shields.io/github/stars/joeyates/imap-backup?style=social)][GitHub Stars]
+![Activity](https://img.shields.io/github/last-commit/joeyates/imap-backup/main)
 
 # imap-backup
 
@@ -72,7 +73,6 @@ docker run -v ./my-config:/config -v ./my-data:/data -ti ghcr.io/joeyates/imap-b
   imap-backup backup -c /config/imap-backup.json
 ```
 
-
 ## Homebrew (macOS)
 
 ![Homebrew installs](https://img.shields.io/homebrew/installs/dm/imap-backup?label=Homebrew%20installs)
@@ -85,11 +85,15 @@ brew install imap-backup
 
 ## As a Ruby Gem
 
+* [Rubygem]
+
 ```sh
 gem install imap-backup --no-document
 ```
 
 If that doesn't work, see the [detailed installation instructions](docs/installation/rubygem.md).
+
+[Rubygem]: https://rubygems.org/gems/imap-backup "Ruby gem at rubygems.org"
 
 ## From Source Code
 
@@ -181,21 +185,8 @@ If you have problems:
 
 # Development
 
-![Activity](https://img.shields.io/github/last-commit/joeyates/imap-backup/main)
+See the [Developer Documentation].
 
-See the [Development documentation](./docs/development.md) for notes
-on development and testing.
-
-See [the CHANGELOG](./CHANGELOG.md) for a list of changes that have been
-made in each release.
-
-* [Source Code]
-* [Code Documentation]
-* [Rubygem]
-* [CI Status]
-
-[Source Code]: https://github.com/joeyates/imap-backup "Source code at GitHub"
+[Developer Documentation]: https://rubydoc.info/gems/imap-backup "Developer Documentation at Rubydoc.info"
 [GitHub Stars]: https://github.com/joeyates/imap-backup/stargazers "GitHub Stars"
-[Code Documentation]: https://rubydoc.info/gems/imap-backup/frames "Code Documentation at Rubydoc.info"
-[Rubygem]: https://rubygems.org/gems/imap-backup "Ruby gem at rubygems.org"
 [CI Status]: https://github.com/joeyates/imap-backup/actions/workflows/main.yml

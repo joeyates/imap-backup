@@ -5,6 +5,7 @@
 ![Coverage](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/joeyates/b54fe758bfb405c04bef72dad293d707/raw/coverage.json)
 ![License](https://img.shields.io/github/license/joeyates/imap-backup?color=brightgreen&label=License)
 [![Stars](https://img.shields.io/github/stars/joeyates/imap-backup?style=social)][GitHub Stars]
+![Activity](https://img.shields.io/github/last-commit/joeyates/imap-backup/main)
 
 [CI Status]: https://github.com/joeyates/imap-backup/actions/workflows/main.yml
 [GitHub Stars]: https://github.com/joeyates/imap-backup/stargazers "GitHub Stars"
