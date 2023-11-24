@@ -33,4 +33,4 @@ see [the note about delimiters and prefixes](/docs/delimiters-and-prefixes.md).
 
 ## How do I migrate to a new server while keeping the same e-mail address?
 
-See [this note on the topic](/docs/migrate-server-keep-address.md).
+See [this note on the topic](/docs/howto/migrate-server-keep-address.md).

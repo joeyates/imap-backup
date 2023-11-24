@@ -40,4 +40,4 @@ is already on the server is skipped.
 
 ## How do I restore e-mails to a new service while keeping the same e-mail address?
 
-See [this guide on the topic](/docs/migrate-server-keep-address.md).
+See [this guide on the topic](/docs/howto/migrate-server-keep-address.md).
