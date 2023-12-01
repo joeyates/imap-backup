@@ -8,6 +8,30 @@ module Imap::Backup
 
     let(:options) { {username: "user", password: "pwd"} }
 
+    describe "#connection_options" do
+      begin
+        let(:options) { {username: "user", password: "pwd", connection_options: '{"foo": "bar"}' } }
+      end
+
+      context "when the supplied connection_options is a String" do
+        it "returns the parsed connection_options" do
+          expect(subject.connection_options).to eq({foo: "bar"})
+        end
+      end
+
+      context "when the supplied connection_options is a Hash" do
+        let(:options) { {username: "user", password: "pwd", connection_options: {foo: "bar"} } }
+
+        it "returns the connection_options" do
+          expect(subject.connection_options).to eq({foo: "bar"})
+        end
+      end
+
+      it "defaults to nil" do
+        expect(described_class.new({}).connection_options).to be nil
+      end
+    end
+
     describe "#client" do
       let(:client_factory) { instance_double(Account::ClientFactory, run: client) }
       let(:client) do
@@ -146,10 +170,10 @@ module Imap::Backup
       end
 
       context "when connection_options is set" do
-        let(:options) { {username: "user", password: "pwd", connection_options: "foo"} }
+        let(:options) { {username: "user", password: "pwd", connection_options: '{"foo": "bar"}'} }
 
         it "includes connection_options" do
-          expect(subject.to_h).to include({connection_options: "foo"})
+          expect(subject.to_h).to include({connection_options: {foo: "bar"}})
         end
       end
 

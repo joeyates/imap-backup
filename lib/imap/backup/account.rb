@@ -42,9 +42,6 @@ module Imap::Backup
     # The address of the IMAP server
     # @return [String]
     attr_reader :server
-    # Extra options to be passed to the IMAP server when connecting
-    # @return [Hash, void]
-    attr_reader :connection_options
     # The name of the download strategy to adopt during backups
     # @return [String]
     attr_accessor :download_strategy
@@ -70,7 +67,8 @@ module Imap::Backup
       @folder_blacklist = options[:folder_blacklist]
       @mirror_mode = options[:mirror_mode]
       @server = options[:server]
-      @connection_options = options[:connection_options]
+      @connection_options = nil
+      @supplied_connection_options = options[:connection_options]
       @download_strategy = options[:download_strategy]
       @multi_fetch_size_orignal = options[:multi_fetch_size]
       @reset_seen_flags_after_fetch = options[:reset_seen_flags_after_fetch]
@@ -146,7 +144,7 @@ module Imap::Backup
       h[:folder_blacklist] = true if @folder_blacklist
       h[:mirror_mode] = true if @mirror_mode
       h[:server] = @server if @server
-      h[:connection_options] = @connection_options if @connection_options
+      h[:connection_options] = @connection_options if connection_options
       h[:multi_fetch_size] = multi_fetch_size
       if @reset_seen_flags_after_fetch
         h[:reset_seen_flags_after_fetch] = @reset_seen_flags_after_fetch
@@ -198,8 +196,22 @@ module Imap::Backup
       update(:server, value)
     end
 
+    # Extra options to be passed to the IMAP server when connecting
+    # @return [Hash, void]
+    def connection_options
+      @connection_options ||=
+        case @supplied_connection_options
+        when String
+          JSON.parse(@supplied_connection_options, symbolize_names: true)
+        else
+          @supplied_connection_options
+        end
+    end
+
     # @return [void]
     def connection_options=(value)
+      # Ensure we've loaded the connection_options
+      connection_options
       parsed =
         if value == ""
           nil
