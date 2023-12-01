@@ -4,7 +4,7 @@ require "imap/backup/configuration"
 
 # rubocop:disable RSpec/BeforeAfterAll
 
-RSpec.describe "imap-backup backup performance", :docker, :performance, type: :aruba do
+RSpec.describe "imap-backup backup performance", :container, :performance, type: :aruba do
   # Use exponentially-spaced values so we get an even plot on a logarithmic scale
   counts = 0.upto(12).map { |p| (Math::E ** p).round }
   runs = 4

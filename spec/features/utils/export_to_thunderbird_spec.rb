@@ -1,6 +1,6 @@
 require "features/helper"
 
-RSpec.describe "imap-backup utils export-to-thunderbird", :docker, type: :aruba do
+RSpec.describe "imap-backup utils export-to-thunderbird", :container, type: :aruba do
   include_context "message-fixtures"
 
   let(:account_config) { test_server_connection_parameters.merge(folders: [folder]) }

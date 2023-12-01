@@ -1,6 +1,6 @@
 require "features/helper"
 
-RSpec.describe "imap-backup setup - configuring accounts", :docker, type: :aruba do
+RSpec.describe "imap-backup setup - configuring accounts", :container, type: :aruba do
   let(:account) { test_server_connection_parameters }
   let(:email) { account[:username] }
   let(:config_options) { {accounts: [account]} }

@@ -1,6 +1,6 @@
 require "features/helper"
 
-RSpec.describe "imap-backup remote namespaces", :docker, type: :aruba do
+RSpec.describe "imap-backup remote namespaces", :container, type: :aruba do
   let(:account) { test_server_connection_parameters }
   let(:config_options) { {accounts: [account]} }
   let(:command) { "imap-backup remote namespaces #{account[:username]}" }

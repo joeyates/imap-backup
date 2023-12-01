@@ -1,6 +1,6 @@
 require "features/helper"
 
-RSpec.describe "imap-backup mirror", :docker, type: :aruba do
+RSpec.describe "imap-backup mirror", :container, type: :aruba do
   include_context "message-fixtures"
 
   let(:source_folder) { "my_folder" }

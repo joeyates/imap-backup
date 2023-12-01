@@ -63,7 +63,7 @@ $ rspec
 To exclude container-based tests
 
 ```sh
-$ rspec --tag ~docker
+$ rspec --tag ~container
 ```
 
 To run **just** the feature specs

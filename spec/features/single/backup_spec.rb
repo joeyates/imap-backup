@@ -1,6 +1,6 @@
 require "features/helper"
 
-RSpec.describe "imap-backup single backup", :docker, type: :aruba do
+RSpec.describe "imap-backup single backup", :container, type: :aruba do
   include_context "message-fixtures"
 
   let(:folder) { "single-backup" }
