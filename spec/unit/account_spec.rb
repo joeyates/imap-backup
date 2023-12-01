@@ -8,6 +8,26 @@ module Imap::Backup
 
     let(:options) { {username: "user", password: "pwd"} }
 
+    describe "#local_path" do
+      begin
+        let(:options) { {username: "user", password: "pwd", local_path: "local_path"} }
+      end
+
+      it "returns the supplied local_path" do
+        expect(subject.local_path).to eq("local_path")
+      end
+    end
+
+    describe "#folders" do
+      begin
+        let(:options) { {username: "user", password: "pwd", folders: ["folder"]} }
+      end
+
+      it "returns the supplied folders" do
+        expect(subject.folders).to eq(["folder"])
+      end
+    end
+
     describe "#folder_blacklist" do
       begin
         let(:options) { {username: "user", password: "pwd", folder_blacklist: true} }
@@ -33,6 +53,20 @@ module Imap::Backup
 
       it "defaults to false" do
         expect(described_class.new({}).mirror_mode).to be false
+      end
+    end
+
+    describe "#server" do
+      begin
+        let(:options) { {username: "user", password: "pwd", server: "server"} }
+      end
+
+      it "returns the supplied server" do
+        expect(subject.server).to eq("server")
+      end
+
+      it "defaults to nil" do
+        expect(described_class.new({}).server).to be nil
       end
     end
 
