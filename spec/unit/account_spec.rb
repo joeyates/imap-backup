@@ -8,6 +8,20 @@ module Imap::Backup
 
     let(:options) { {username: "user", password: "pwd"} }
 
+    describe "#folder_blacklist" do
+      begin
+        let(:options) { {username: "user", password: "pwd", folder_blacklist: true} }
+      end
+
+      it "returns the supplied folder_blacklist" do
+        expect(subject.folder_blacklist).to be true
+      end
+
+      it "defaults to false" do
+        expect(described_class.new({}).folder_blacklist).to be false
+      end
+    end
+
     describe "#connection_options" do
       begin
         let(:options) { {username: "user", password: "pwd", connection_options: '{"foo": "bar"}' } }

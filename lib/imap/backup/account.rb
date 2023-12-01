@@ -64,7 +64,7 @@ module Imap::Backup
       @password = options[:password]
       @local_path = options[:local_path]
       @folders = options[:folders]
-      @folder_blacklist = options[:folder_blacklist]
+      @folder_blacklist = options[:folder_blacklist] || false
       @mirror_mode = options[:mirror_mode]
       @server = options[:server]
       @connection_options = nil
