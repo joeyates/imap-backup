@@ -9,9 +9,7 @@ module Imap::Backup
     let(:options) { {username: "user", password: "pwd"} }
 
     describe "#local_path" do
-      begin
-        let(:options) { {username: "user", password: "pwd", local_path: "local_path"} }
-      end
+      let(:options) { {username: "user", password: "pwd", local_path: "local_path"} }
 
       it "returns the supplied local_path" do
         expect(subject.local_path).to eq("local_path")
@@ -19,9 +17,7 @@ module Imap::Backup
     end
 
     describe "#folders" do
-      begin
-        let(:options) { {username: "user", password: "pwd", folders: ["folder"]} }
-      end
+      let(:options) { {username: "user", password: "pwd", folders: ["folder"]} }
 
       it "returns the supplied folders" do
         expect(subject.folders).to eq(["folder"])
@@ -29,9 +25,7 @@ module Imap::Backup
     end
 
     describe "#folder_blacklist" do
-      begin
-        let(:options) { {username: "user", password: "pwd", folder_blacklist: true} }
-      end
+      let(:options) { {username: "user", password: "pwd", folder_blacklist: true} }
 
       it "returns the supplied folder_blacklist" do
         expect(subject.folder_blacklist).to be true
@@ -43,9 +37,7 @@ module Imap::Backup
     end
 
     describe "#mirror_mode" do
-      begin
-        let(:options) { {username: "user", password: "pwd", mirror_mode: true} }
-      end
+      let(:options) { {username: "user", password: "pwd", mirror_mode: true} }
 
       it "returns the supplied mirror_mode" do
         expect(subject.mirror_mode).to be true
@@ -57,23 +49,19 @@ module Imap::Backup
     end
 
     describe "#server" do
-      begin
-        let(:options) { {username: "user", password: "pwd", server: "server"} }
-      end
+      let(:options) { {username: "user", password: "pwd", server: "server"} }
 
       it "returns the supplied server" do
         expect(subject.server).to eq("server")
       end
 
       it "defaults to nil" do
-        expect(described_class.new({}).server).to be nil
+        expect(described_class.new({}).server).to be_nil
       end
     end
 
     describe "#connection_options" do
-      begin
-        let(:options) { {username: "user", password: "pwd", connection_options: '{"foo": "bar"}' } }
-      end
+      let(:options) { {username: "user", password: "pwd", connection_options: '{"foo": "bar"}'} }
 
       context "when the supplied connection_options is a String" do
         it "returns the parsed connection_options" do
@@ -82,7 +70,7 @@ module Imap::Backup
       end
 
       context "when the supplied connection_options is a Hash" do
-        let(:options) { {username: "user", password: "pwd", connection_options: {foo: "bar"} } }
+        let(:options) { {username: "user", password: "pwd", connection_options: {foo: "bar"}} }
 
         it "returns the connection_options" do
           expect(subject.connection_options).to eq({foo: "bar"})
@@ -90,7 +78,7 @@ module Imap::Backup
       end
 
       it "defaults to nil" do
-        expect(described_class.new({}).connection_options).to be nil
+        expect(described_class.new({}).connection_options).to be_nil
       end
     end
 
