@@ -22,6 +22,20 @@ module Imap::Backup
       end
     end
 
+    describe "#mirror_mode" do
+      begin
+        let(:options) { {username: "user", password: "pwd", mirror_mode: true} }
+      end
+
+      it "returns the supplied mirror_mode" do
+        expect(subject.mirror_mode).to be true
+      end
+
+      it "defaults to false" do
+        expect(described_class.new({}).mirror_mode).to be false
+      end
+    end
+
     describe "#connection_options" do
       begin
         let(:options) { {username: "user", password: "pwd", connection_options: '{"foo": "bar"}' } }
