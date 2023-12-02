@@ -64,7 +64,7 @@ module Imap::Backup
 
     describe "folders" do
       before do
-        allow(serialized_folders).to receive(:each).and_yield(serializer, folder)
+        allow(serialized_folders).to receive(:each_value).and_yield(folder)
       end
 
       it_behaves_like(

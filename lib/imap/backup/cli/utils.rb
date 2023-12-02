@@ -84,7 +84,7 @@ module Imap::Backup
 
       raise "No serialized folders were found for account '#{email}'" if serialized_folders.none?
 
-      serialized_folders.each do |serializer, _folder|
+      serialized_folders.each_key do |serializer|
         Thunderbird::MailboxExporter.new(
           email, serializer, profile, force: force
         ).run

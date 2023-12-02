@@ -17,9 +17,9 @@ module Imap::Backup
     before do
       allow(Account::BackupFolders).to receive(:new) { backup_folders }
       allow(Account::SerializedFolders).to receive(:new) { serialized_folders }
-      allow(serialized_folders).to receive(:each).
-        and_yield(disk_only, "folder").
-        and_yield(both, "folder")
+      allow(serialized_folders).to receive(:each_key).
+        and_yield(disk_only).
+        and_yield(both)
     end
 
     context "with serialized folders" do

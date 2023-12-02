@@ -70,7 +70,7 @@ module Imap::Backup
         list = serialized_folders.map { |_s, f| {name: f.name} }
         Kernel.puts list.to_json
       else
-        serialized_folders.each do |_s, f|
+        serialized_folders.each_value do |f|
           Kernel.puts %("#{f.name}")
         end
       end

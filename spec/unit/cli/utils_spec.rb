@@ -62,7 +62,7 @@ module Imap::Backup
         allow(::Thunderbird::Profiles).to receive(:new) { profiles }
         allow(Account::SerializedFolders).to receive(:new) { serialized_folders }
         allow(subject).to receive(:options) { options }
-        allow(serialized_folders).to receive(:each).and_yield("foo", "bar")
+        allow(serialized_folders).to receive(:each_key).and_yield("foo")
       end
 
       it_behaves_like(

@@ -22,7 +22,7 @@ module Imap::Backup
       )
       wanted = backup_folders.map(&:name)
       serialized_folders = Account::SerializedFolders.new(account: account)
-      serialized_folders.each do |serializer, _folder|
+      serialized_folders.each_key do |serializer|
         serializer.delete if !wanted.include?(serializer.folder)
       end
     end
