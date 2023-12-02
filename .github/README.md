@@ -48,6 +48,7 @@ If you have just one account, you can do as follows
 ```sh
 docker run -v ./my-data:/data -ti ghcr.io/joeyates/imap-backup:latest \
   imap-backup single backup \
+  --dns 8.8.8.8 \
   --email me@example.com --password mysecret --server imap.example.com \
   --path /data/me_example.com
 ```
@@ -63,6 +64,7 @@ First, run the menu-driven setup program to configure your accounts
 
 ```sh
 docker run -ti -v ./my-config:/config -v ./my-data:/data -ti ghcr.io/joeyates/imap-backup:latest \
+  --dns 8.8.8.8 \
   imap-backup setup -c /config/imap-backup.json
 ```
 
@@ -70,6 +72,7 @@ Then, run the backup
 
 ```sh
 docker run -v ./my-config:/config -v ./my-data:/data -ti ghcr.io/joeyates/imap-backup:latest \
+  --dns 8.8.8.8 \
   imap-backup backup -c /config/imap-backup.json
 ```
 
