@@ -9,7 +9,7 @@ module Imap::Backup
     # @return [Hash] defaults for the Net::IMAP connection
     def options
       # rubocop:disable Naming/VariableNumber
-      {port: 993, ssl: {ssl_version: :TLSv1_2}}
+      {port: 993, ssl: {min_version: OpenSSL::SSL::TLS1_2_VERSION}}
       # rubocop:enable Naming/VariableNumber
     end
 

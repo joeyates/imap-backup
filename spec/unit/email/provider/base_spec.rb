@@ -9,7 +9,7 @@ module Imap::Backup
 
       it "forces TLSv1_2" do
         # rubocop:disable Naming/VariableNumber
-        expect(subject.options[:ssl][:ssl_version]).to eq(:TLSv1_2)
+        expect(subject.options[:ssl][:min_version]).to eq(OpenSSL::SSL::TLS1_2_VERSION)
         # rubocop:enable Naming/VariableNumber
       end
     end
