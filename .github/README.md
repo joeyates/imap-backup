@@ -94,13 +94,13 @@ brew install imap-backup
 gem install imap-backup --no-document
 ```
 
-If that doesn't work, see the [detailed installation instructions](docs/installation/rubygem.md).
+If that doesn't work, see the [detailed installation instructions](/docs/installation/rubygem.md).
 
 [Rubygem]: https://rubygems.org/gems/imap-backup "Ruby gem at rubygems.org"
 
 ## From Source Code
 
-If you want to use imap-backup directly from the source code, see [here](docs/installation/source.md).
+If you want to use imap-backup directly from the source code, see [here](/docs/installation/source.md).
 
 # Setup
 
@@ -117,7 +117,7 @@ imap-backup setup
 
 As an alternative, if you only want to backup a single account,
 you can pass all the necessary parameters directly to the `single backup` command
-(see the [`single backup`](docs/commands/single-backup.md) docs).
+(see the [`single backup`](/docs/commands/single-backup.md) docs).
 
 ## GMail
 
@@ -135,25 +135,25 @@ imap-backup
 
 Alternatively, add it to your crontab.
 
-Backups can also be inspected, for example via [`local show`](docs/commands/local-show.md)
-and exported via [`utils export-to-thunderbird`](docs/commands/utils-export-to-thunderbird.md).
+Backups can also be inspected, for example via [`local show`](/docs/commands/local-show.md)
+and exported via [`utils export-to-thunderbird`](/docs/commands/utils-export-to-thunderbird.md).
 
 # Commands
 
-* [`backup`](docs/commands/backup.md)
-* [`local accounts`](docs/commands/local-accounts.md)
-* [`local check`](docs/commands/local-check.md)
-* [`local folders`](docs/commands/local-folders.md)
-* [`local list`](docs/commands/local-list.md)
-* [`local show`](docs/commands/local-show.md)
-* [`migrate`](docs/commands/migrate.md)
-* [`mirror`](docs/commands/mirror.md)
-* [`remote folders`](docs/commands/remote-folders.md)
-* [`restore`](docs/commands/restore.md)
-* [`setup`](docs/commands/setup.md)
-* [`single backup`](docs/commands/single-backup.md)
-* [`utils export-to-thunderbird`](docs/commands/utils-export-to-thunderbird.md)
-* [`utils ignore-history`](docs/commands/utils-ignore-history.md)
+* [`backup`](/docs/commands/backup.md)
+* [`local accounts`](/docs/commands/local-accounts.md)
+* [`local check`](/docs/commands/local-check.md)
+* [`local folders`](/docs/commands/local-folders.md)
+* [`local list`](/docs/commands/local-list.md)
+* [`local show`](/docs/commands/local-show.md)
+* [`migrate`](/docs/commands/migrate.md)
+* [`mirror`](/docs/commands/mirror.md)
+* [`remote folders`](/docs/commands/remote-folders.md)
+* [`restore`](/docs/commands/restore.md)
+* [`setup`](/docs/commands/setup.md)
+* [`single backup`](/docs/commands/single-backup.md)
+* [`utils export-to-thunderbird`](/docs/commands/utils-export-to-thunderbird.md)
+* [`utils ignore-history`](/docs/commands/utils-ignore-history.md)
 
 For a full list of available commands, run
 
@@ -177,7 +177,7 @@ These are activated via two settings:
 * Global setting "Delay download writes",
 * Account setting "Multi-fetch size".
 
-See [the performance document](docs/performance.md) for more information.
+See [the performance document](/docs/performance.md) for more information.
 
 # Troubleshooting
 
