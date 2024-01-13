@@ -92,7 +92,11 @@ Lint/FloatComparison:
   Enabled: true
 Lint/IncompatibleIoSelectWithFiberScheduler:
   Enabled: true
+Lint/ItWithoutArgumentsInBlock:
+  Enabled: true
 Lint/LambdaWithoutLiteralBlock:
+  Enabled: true
+Lint/LiteralAssignmentInCondition:
   Enabled: true
 Lint/MissingSuper:
   Enabled: true
@@ -240,6 +244,10 @@ RSpec/Rails/TravelAround:
 RSpec/ReceiveMessages:
   Enabled: true
 RSpec/RedundantAround:
+  Enabled: true
+RSpec/RedundantPredicateMatcher:
+  Enabled: true
+RSpec/RemoveConst:
   Enabled: true
 RSpec/SkipBlockInsideExample:
   Enabled: true
@@ -431,6 +439,8 @@ Style/StringChars:
   Enabled: true
 Style/StringLiterals:
   EnforcedStyle: double_quotes
+Style/SuperWithArgsParentheses:
+  Enabled: true
 Style/SymbolArray:
   Enabled: false
 Style/SwapValues:
