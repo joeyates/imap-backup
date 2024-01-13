@@ -51,7 +51,8 @@ module Imap::Backup
       allow(File).to receive(:open).with("full_path", "w").and_yield(file)
       allow(FileUtils).to receive(:rm).and_call_original
       allow(FileUtils).to receive(:rm).with("msf_path")
-      allow(::Thunderbird::LocalFolder).to receive(:new) { local_folder }
+      allow(::Thunderbird::LocalFolder).to receive(:new).
+        with(path: anything, profile: anything) { local_folder }
       allow(Kernel).to receive(:puts)
     end
 
