@@ -1,3 +1,4 @@
+require "thunderbird/profile"
 require "imap/backup/thunderbird/mailbox_exporter"
 require "imap/backup/serializer"
 require "imap/backup/serializer/message"
