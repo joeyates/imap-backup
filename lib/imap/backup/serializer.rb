@@ -251,6 +251,8 @@ module Imap::Backup
       MESSAGE
 
       migrator.run
+      # Ensure new metadata gets loaded
+      @imap = nil
     end
 
     def ensure_containing_directory
