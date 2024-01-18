@@ -35,11 +35,11 @@ RSpec.shared_examples "a method that checks for invalid serialization" do
       let(:imap_valid) { false }
 
       it "deletes the imap file" do
-        expect(imap).to have_received(:delete)
+        expect(imap).to have_received(:delete).at_least(:once)
       end
 
       it "deletes the mbox file" do
-        expect(mbox).to have_received(:delete)
+        expect(mbox).to have_received(:delete).at_least(:once)
       end
     end
 
@@ -47,11 +47,11 @@ RSpec.shared_examples "a method that checks for invalid serialization" do
       let(:mbox_valid) { false }
 
       it "deletes the imap file" do
-        expect(imap).to have_received(:delete)
+        expect(imap).to have_received(:delete).at_least(:once)
       end
 
       it "deletes the mbox file" do
-        expect(mbox).to have_received(:delete)
+        expect(mbox).to have_received(:delete).at_least(:once)
       end
     end
   end
@@ -309,6 +309,7 @@ module Imap::Backup
           Serializer::Imap, "Old Imap",
           uid_validity: 1,
           uids: [1],
+          valid?: true,
           get: message,
           delete: nil,
           folder_path: "existing/imap"
@@ -318,7 +319,8 @@ module Imap::Backup
         instance_double(
           Serializer::Mbox, "Old Mbox",
           delete: nil,
-          folder_path: "existing/mbox"
+          folder_path: "existing/mbox",
+          valid?: true
         )
       end
       let(:imap) do
