@@ -28,7 +28,41 @@ module Imap::Backup
     extend Forwardable
 
     def_delegator :mbox, :pathname, :mbox_pathname
-    def_delegators :imap, :get, :messages, :uid_validity, :uids, :update_uid
+
+    # Get message metadata
+    # @param uid [Integer] a message UID
+    # @return [Serializer::Message]
+    def get(uid)
+      validate!
+      imap.get(uid)
+    end
+
+    # @return [Array<Hash>]
+    def messages
+      validate!
+      imap.messages
+    end
+
+    # @return [Integer] the UID validity for the folder
+    def uid_validity
+      validate!
+      imap.uid_validity
+    end
+
+    # @return [Array<Integer>] The uids of all messages
+    def uids
+      validate!
+      imap.uids
+    end
+
+    # Update a message's metadata, replacing its UID
+    # @param old [Integer] the existing message UID
+    # @param new [Integer] the new UID to apply to the message
+    # @return [void]
+    def update_uid(old, new)
+      validate!
+      imap.update_uid(old, new)
+    end
 
     # @return [String] a folder name
     attr_reader :folder
@@ -62,10 +96,14 @@ module Imap::Backup
 
       optionally_migrate2to3
 
-      if imap.valid? && mbox.valid?
+      imap_valid = imap.valid?
+      mbox_valid = mbox.valid?
+      if imap_valid && mbox_valid
         @validated = true
         return true
       end
+      Logger.logger.info("Metadata file '#{imap.pathname}' is invalid") if !imap_valid
+      Logger.logger.info("Mailbox '#{mbox.pathname}' is invalid") if !mbox_valid
 
       delete
 
@@ -247,6 +285,8 @@ module Imap::Backup
       MESSAGE
 
       migrator.run
+      # Ensure new metadata gets loaded
+      @imap = nil
     end
 
     def ensure_containing_directory
