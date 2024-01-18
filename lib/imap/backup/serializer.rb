@@ -62,10 +62,14 @@ module Imap::Backup
 
       optionally_migrate2to3
 
-      if imap.valid? && mbox.valid?
+      imap_valid = imap.valid?
+      mbox_valid = mbox.valid?
+      if imap_valid && mbox_valid
         @validated = true
         return true
       end
+      Logger.logger.info("Metadata file '#{imap.pathname}' is invalid") if !imap_valid
+      Logger.logger.info("Mailbox '#{mbox.pathname}' is invalid") if !mbox_valid
 
       delete
 

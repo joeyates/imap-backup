@@ -108,6 +108,7 @@ module Imap::Backup
     def delete
       return if !exist?
 
+      Logger.logger.info("Deleting metadata file '#{pathname}'")
       FileUtils.rm(pathname)
       @loaded = false
       @messages = nil

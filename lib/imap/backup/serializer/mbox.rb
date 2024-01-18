@@ -70,6 +70,7 @@ module Imap::Backup
     def delete
       return if !exist?
 
+      Logger.logger.info("Deleting mailbox '#{pathname}'")
       FileUtils.rm(pathname)
     end
 
