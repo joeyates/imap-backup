@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 14.5.1 - 2024-01-18
+
+### Changed
+
+* Bugfix: corrected the behaviour of the legacy metadata convertor.
+  Previous, mailboxes and metadata files would get deleted after migration.
+
 ## 14.4.5 - 2023-11-24
 
 ### Added
