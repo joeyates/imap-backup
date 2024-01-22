@@ -102,8 +102,10 @@ module Imap::Backup
         @validated = true
         return true
       end
-      Logger.logger.info("Metadata file '#{imap.pathname}' is invalid") if !imap_valid
-      Logger.logger.info("Mailbox '#{mbox.pathname}' is invalid") if !mbox_valid
+      warn_imap = !imap_valid && imap.exist?
+      Logger.logger.info("Metadata file '#{imap.pathname}' is invalid") if warn_imap
+      warn_mbox = !mbox_valid && mbox.exist?
+      Logger.logger.info("Mailbox '#{mbox.pathname}' is invalid") if warn_mbox
 
       delete
 

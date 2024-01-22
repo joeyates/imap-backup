@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 14.5.2 - 2024-01-22
+
+### Changed
+
+* Suppressed mailbox and metadata '...is invalid' messages when these
+  files are missing. Now, the messages are printed when a file is
+  actually malformed.
+
 ## 14.5.1 - 2024-01-18
 
 ### Changed

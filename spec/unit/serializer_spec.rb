@@ -23,9 +23,11 @@ RSpec.shared_examples "a method that checks for invalid serialization" do
     before do
       allow(imap).to receive(:pathname) { "imap pathname" }
       allow(imap).to receive(:valid?) { imap_valid }
+      allow(imap).to receive(:exist?) { true }
       allow(imap).to receive(:delete)
       allow(mbox).to receive(:pathname) { "mbox pathname" }
       allow(mbox).to receive(:valid?) { mbox_valid }
+      allow(mbox).to receive(:exist?) { true }
       allow(mbox).to receive(:delete)
 
       action.call
