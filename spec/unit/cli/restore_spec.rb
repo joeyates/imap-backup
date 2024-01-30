@@ -22,12 +22,10 @@ module Imap::Backup
       action: ->(subject) { subject.run }
     )
 
-    context "when an email is provided" do
-      it "runs restore on the account" do
-        subject.run
+    it "runs restore on the account" do
+      subject.run
 
-        expect(account).to have_received(:restore)
-      end
+      expect(account).to have_received(:restore)
     end
 
     context "when neither an email nor a list of account names is provided" do
