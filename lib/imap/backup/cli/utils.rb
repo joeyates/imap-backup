@@ -18,7 +18,10 @@ module Imap::Backup
     include Thor::Actions
     include CLI::Helpers
 
-    desc "ignore-history EMAIL", "Skip downloading emails up to today for all configured folders"
+    desc(
+      "ignore-history EMAIL [OPTIONS]",
+      "Skip downloading emails up to today for all configured folders"
+    )
     config_option
     quiet_option
     verbose_option

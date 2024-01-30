@@ -220,7 +220,7 @@ module Imap::Backup
     desc "remote SUBCOMMAND [OPTIONS]", "View info about online accounts"
     subcommand "remote", Remote
 
-    desc "restore EMAIL", "Restores a single account"
+    desc "restore EMAIL [OPTIONS]", "Restores a single account"
     long_desc <<~DESC
       Restores all backed-up emails for the supplied account to
       their original server.
@@ -236,7 +236,7 @@ module Imap::Backup
       Restore.new(email, non_logging_options).run
     end
 
-    desc "setup", "Configure imap-backup"
+    desc "setup [OPTIONS]", "Configure imap-backup"
     long_desc <<~DESC
       A menu-driven command-line application used to configure imap-backup.
       Configure email accounts to back up.

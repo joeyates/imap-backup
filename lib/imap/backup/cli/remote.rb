@@ -13,7 +13,7 @@ module Imap::Backup
     include Thor::Actions
     include CLI::Helpers
 
-    desc "folders EMAIL", "List account folders"
+    desc "folders EMAIL [OPTIONS]", "List account folders"
     config_option
     format_option
     quiet_option
@@ -31,7 +31,7 @@ module Imap::Backup
       end
     end
 
-    desc "capabilities EMAIL", "List server capabilities"
+    desc "capabilities EMAIL [OPTIONS]", "List server capabilities"
     long_desc <<~DESC
       Lists the IMAP capabilities supported by the IMAP server.
     DESC
@@ -49,7 +49,7 @@ module Imap::Backup
       Kernel.puts capabilities.join(", ")
     end
 
-    desc "namespaces EMAIL", "List account namespaces"
+    desc "namespaces EMAIL [OPTIONS]", "List account namespaces"
     long_desc <<~DESC
       Lists namespaces defined for an email account.
 

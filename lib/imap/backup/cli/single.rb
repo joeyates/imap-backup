@@ -14,7 +14,7 @@ module Imap::Backup
   class CLI::Single < Thor
     include CLI::Helpers
 
-    desc "backup", "Backup a single email account based on command-line parameters"
+    desc "backup [OPTIONS]", "Backup a single email account based on command-line parameters"
     long_desc <<~DESC
       This is a "stand-alone" backup command that doesn't require
       a configuration file.

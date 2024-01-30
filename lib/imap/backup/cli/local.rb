@@ -15,7 +15,7 @@ module Imap::Backup
     include Thor::Actions
     include CLI::Helpers
 
-    desc "accounts", "List locally backed-up accounts"
+    desc "accounts [OPTIONS]", "List locally backed-up accounts"
     config_option
     format_option
     quiet_option
@@ -34,7 +34,7 @@ module Imap::Backup
     end
 
     desc(
-      "check",
+      "check [OPTIONS]",
       "Check the integrity of backups for all accounts (or the selected account(s))"
     )
     method_option(
@@ -54,7 +54,7 @@ module Imap::Backup
       Check.new(non_logging_options).run
     end
 
-    desc "folders EMAIL", "List backed up folders"
+    desc "folders EMAIL [OPTIONS]", "List backed up folders"
     config_option
     format_option
     quiet_option
@@ -76,7 +76,7 @@ module Imap::Backup
       end
     end
 
-    desc "list EMAIL FOLDER", "List emails in a folder"
+    desc "list EMAIL FOLDER [OPTIONS]", "List emails in a folder"
     config_option
     format_option
     quiet_option
@@ -101,7 +101,7 @@ module Imap::Backup
       end
     end
 
-    desc "show EMAIL FOLDER UID[,UID]", "Show one or more emails"
+    desc "show EMAIL FOLDER UID[,UID] [OPTIONS]", "Show one or more emails"
     long_desc <<~DESC
       Prints out the requested emails.
       If more than one UID is given, they are separated by a header indicating
