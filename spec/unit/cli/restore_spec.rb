@@ -22,54 +22,52 @@ module Imap::Backup
       action: ->(subject) { subject.run }
     )
 
-    describe "#run" do
-      context "when an email is provided" do
-        it "runs restore on the account" do
-          subject.run
+    context "when an email is provided" do
+      it "runs restore on the account" do
+        subject.run
 
-          expect(account).to have_received(:restore)
-        end
+        expect(account).to have_received(:restore)
+      end
+    end
+
+    context "when neither an email nor a list of account names is provided" do
+      let(:email) { nil }
+      let(:options) { {} }
+
+      before do
+        allow(subject).to receive(:requested_accounts) { [account] }
       end
 
-      context "when neither an email nor a list of account names is provided" do
-        let(:email) { nil }
-        let(:options) { {} }
+      it "runs restore on each account" do
+        subject.run
 
-        before do
-          allow(subject).to receive(:requested_accounts) { [account] }
-        end
+        expect(account).to have_received(:restore)
+      end
+    end
 
-        it "runs restore on each account" do
+    context "when an email and a list of account names is provided" do
+      let(:email) { "email" }
+      let(:options) { {accounts: "email2"} }
+
+      it "fails" do
+        expect do
           subject.run
+        end.to raise_error(RuntimeError, /Missing EMAIL parameter/)
+      end
+    end
 
-          expect(account).to have_received(:restore)
-        end
+    context "when just a list of account names is provided" do
+      let(:email) { nil }
+      let(:options) { {accounts: "email2"} }
+
+      before do
+        allow(subject).to receive(:requested_accounts) { [account] }
       end
 
-      context "when an email and a list of account names is provided" do
-        let(:email) { "email" }
-        let(:options) { {accounts: "email2"} }
+      it "runs restore on each account" do
+        subject.run
 
-        it "fails" do
-          expect do
-            subject.run
-          end.to raise_error(RuntimeError, /Missing EMAIL parameter/)
-        end
-      end
-
-      context "when just a list of account names is provided" do
-        let(:email) { nil }
-        let(:options) { {accounts: "email2"} }
-
-        before do
-          allow(subject).to receive(:requested_accounts) { [account] }
-        end
-
-        it "runs restore on each account" do
-          subject.run
-
-          expect(account).to have_received(:restore)
-        end
+        expect(account).to have_received(:restore)
       end
     end
   end
