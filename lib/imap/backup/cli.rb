@@ -30,7 +30,7 @@ module Imap::Backup
       In these cases there are two choices.
 
       You can use the `--automatic-namespaces` option.
-      This wil query the source and detination servers for their
+      This will query the source and detination servers for their
       namespace configuration and will adapt paths accordingly.
       This option requires that both the source and destination
       servers are available and work with the provided parameters
@@ -229,7 +229,7 @@ module Imap::Backup
     config_option
     quiet_option
     verbose_option
-    # Restores backed up meails to an account
+    # Restores backed up emails to an account
     # @return [void]
     def restore(email = nil)
       non_logging_options = Imap::Backup::Logger.setup_logging(options)
