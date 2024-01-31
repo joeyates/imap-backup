@@ -24,7 +24,8 @@ RSpec.describe "imap-backup restore", :container, type: :aruba do
       email: email, folder: folder, flags: [:Draft, :$NON_SYSTEM_FLAG], **message_two
     )
   end
-  let(:run_command) { run_command_and_stop("imap-backup restore #{email}") }
+  let(:command) { "imap-backup restore #{email}" }
+  let(:run_command) { run_command_and_stop(command) }
   let(:cleanup) do
     test_server.delete_folder folder
     test_server.disconnect
@@ -215,11 +216,7 @@ RSpec.describe "imap-backup restore", :container, type: :aruba do
         **message_one
       )
     end
-    let(:run_command) do
-      run_command_and_stop(
-        "imap-backup restore #{email} --config #{custom_config_path}"
-      )
-    end
+    let(:command) { "imap-backup restore #{email} --config #{custom_config_path}" }
 
     it "does not raise any errors" do
       run_command
