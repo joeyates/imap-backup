@@ -2,9 +2,10 @@ require "imap/backup/account/restore"
 
 module Imap::Backup
   RSpec.describe Account::Restore do
-    subject { described_class.new(account: account) }
+    subject { described_class.new(account: account, **options) }
 
     let(:account) { "account" }
+    let(:options) { {} }
     let(:folder_mapper) { instance_double(Account::FolderMapper) }
     let(:uploader) { instance_double(Uploader, run: nil) }
 
@@ -18,6 +19,19 @@ module Imap::Backup
       subject.run
 
       expect(uploader).to have_received(:run)
+    end
+
+    context "when a delimiter is provided" do
+      let(:options) { {delimiter: "."} }
+      let(:delimited_folder) { instance_double(Account::Folder) }
+      let(:serializer) { instance_double(Serializer) }
+
+      it "maps destination folders with the delimiter" do
+        subject.run
+
+        expect(Account::FolderMapper).to have_received(:new).
+          with(hash_including(destination_delimiter: "."))
+      end
     end
   end
 end
