@@ -1,7 +1,6 @@
 require "json"
 
 require "imap/backup/account/client_factory"
-require "imap/backup/account/restore"
 
 module Imap; end
 
@@ -96,14 +95,6 @@ module Imap::Backup
     # @return [Array<String>] the capabilities
     def capabilities
       client.capability
-    end
-
-    # Restore the local backup to the server
-    #
-    # @return [void]
-    def restore
-      restore = Account::Restore.new(account: self)
-      restore.run
     end
 
     # Indicates whether the account has been configured, and is ready

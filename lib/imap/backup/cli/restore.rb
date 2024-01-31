@@ -1,5 +1,6 @@
 require "thor"
 
+require "imap/backup/account/restore"
 require "imap/backup/cli/helpers"
 require "imap/backup/logger"
 
@@ -28,10 +29,10 @@ module Imap::Backup
         case
         when email && !options.key?(:accounts)
           account = account(config, email)
-          account.restore
+          restore(account)
         when !email && !options.key?(:accounts)
           Logger.logger.info "Calling restore without an EMAIL parameter is deprecated"
-          config.accounts.map(&:restore)
+          config.accounts.each { |a| restore(a) }
         when email && options.key?(:accounts)
           raise "Missing EMAIL parameter"
         when !email && options.key?(:accounts)
@@ -39,7 +40,7 @@ module Imap::Backup
             "Calling restore with the --account option is deprected, " \
             "please pass a single EMAIL parameter"
           )
-          requested_accounts(config).each(&:restore)
+          requested_accounts(config).each { |a| restore(a) }
         end
       end
     end
@@ -48,5 +49,10 @@ module Imap::Backup
 
     attr_reader :email
     attr_reader :options
+
+    def restore(account)
+      restore = Account::Restore.new(account: account)
+      restore.run
+    end
   end
 end
