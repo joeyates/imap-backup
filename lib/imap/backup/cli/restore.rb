@@ -37,7 +37,7 @@ module Imap::Backup
           raise "Missing EMAIL parameter"
         when !email && options.key?(:accounts)
           Logger.logger.info(
-            "Calling restore with the --account option is deprected, " \
+            "Calling restore with the --account option is deprecated, " \
             "please pass a single EMAIL parameter"
           )
           requested_accounts(config).each { |a| restore(a) }
