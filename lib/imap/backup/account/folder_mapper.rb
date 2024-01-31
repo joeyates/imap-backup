@@ -7,22 +7,22 @@ require "imap/backup/serializer"
 module Imap; end
 
 module Imap::Backup
-  class CLI < Thor; end
+  class Account; end
 
   # Implements a folder enumerator for backed-up accounts
-  class CLI::FolderEnumerator
+  class Account::FolderMapper
     def initialize(
+      account:,
       destination:,
-      source:,
       destination_delimiter: "/",
       destination_prefix: "",
       source_delimiter: "/",
       source_prefix: ""
     )
+      @account = account
       @destination = destination
       @destination_delimiter = destination_delimiter
       @destination_prefix = destination_prefix
-      @source = source
       @source_delimiter = source_delimiter
       @source_prefix = source_prefix
     end
@@ -48,7 +48,7 @@ module Imap::Backup
 
     attr_reader :destination
     attr_reader :destination_delimiter
-    attr_reader :source
+    attr_reader :account
     attr_reader :source_delimiter
 
     def destination_prefix_clipped
@@ -94,7 +94,7 @@ module Imap::Backup
     end
 
     def source_local_path
-      source.local_path
+      account.local_path
     end
 
     def source_folder_name(imap_pathname)

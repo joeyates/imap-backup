@@ -1,6 +1,6 @@
+require "imap/backup/account/folder_mapper"
 require "imap/backup/cli/backup"
 require "imap/backup/cli/helpers"
-require "imap/backup/cli/folder_enumerator"
 require "imap/backup/logger"
 require "imap/backup/migrator"
 require "imap/backup/mirror"
@@ -148,17 +148,17 @@ module Imap::Backup
 
     def enumerator_options
       {
+        account: source_account,
         destination: destination_account,
         destination_delimiter: destination_delimiter,
         destination_prefix: destination_prefix,
-        source: source_account,
         source_delimiter: source_delimiter,
         source_prefix: source_prefix
       }
     end
 
     def folders
-      CLI::FolderEnumerator.new(**enumerator_options)
+      Account::FolderMapper.new(**enumerator_options)
     end
 
     def destination_account
