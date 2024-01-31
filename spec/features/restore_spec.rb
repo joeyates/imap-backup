@@ -196,6 +196,21 @@ RSpec.describe "imap-backup restore", :container, type: :aruba do
     end
   end
 
+  context "when a prefix and delimiter are supplied" do
+    after do
+      test_server.delete_folder "CIAO.#{folder}"
+      test_server.delete_folder "CIAO"
+    end
+
+    let(:command) { "imap-backup restore #{email} --prefix CIAO --delimiter ." }
+
+    it "prepends the prefix to the folder name" do
+      run_command
+
+      expect(test_server.folders.map(&:name)).to include("CIAO.#{folder}")
+    end
+  end
+
   context "when a config path is supplied" do
     let(:custom_config_path) { File.join(File.expand_path("~/.imap-backup"), "foo.json") }
     let(:config_options) { super().merge(path: custom_config_path) }
