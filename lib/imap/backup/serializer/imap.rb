@@ -7,6 +7,8 @@ require "imap/backup/serializer/transaction"
 module Imap; end
 
 module Imap::Backup
+  class Serializer; end
+
   # Stores message metadata
   class Serializer::Imap
     # The version number to store in the metadata file

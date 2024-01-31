@@ -3,6 +3,8 @@ require "imap/backup/file_mode"
 module Imap; end
 
 module Imap::Backup
+  class Serializer; end
+
   # Ensures a file has the desired permissions
   class Serializer::PermissionChecker
     # @param filename [String] the file name

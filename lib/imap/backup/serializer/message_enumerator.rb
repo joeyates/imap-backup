@@ -1,6 +1,8 @@
 module Imap; end
 
 module Imap::Backup
+  class Serializer; end
+
   # Enumerates over a list of stores messages
   class Serializer::MessageEnumerator
     # @param imap [Serializer::Imap] the metadata serializer for the folder

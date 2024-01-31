@@ -5,6 +5,8 @@ require "imap/backup/email/mboxrd/message"
 module Imap; end
 
 module Imap::Backup
+  class Serializer; end
+
   # Represents a stored message
   class Serializer::Message
     # @return [Array[Symbol]] the message's flags
