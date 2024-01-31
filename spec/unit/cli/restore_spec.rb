@@ -30,6 +30,17 @@ module Imap::Backup
       expect(restore).to have_received(:run)
     end
 
+    context "when options are provided" do
+      let(:options) { {delimiter: "/", prefix: "CIAO"} }
+
+      it "passes them to the restore" do
+        subject.run
+
+        expect(Account::Restore).to have_received(:new).
+          with(hash_including(delimiter: "/", prefix: "CIAO"))
+      end
+    end
+
     context "when neither an email nor a list of account names is provided" do
       let(:email) { nil }
       let(:options) { {} }

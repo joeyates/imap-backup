@@ -29,7 +29,7 @@ module Imap::Backup
         case
         when email && !options.key?(:accounts)
           account = account(config, email)
-          restore(account)
+          restore(account, **restore_options)
         when !email && !options.key?(:accounts)
           Logger.logger.info "Calling restore without an EMAIL parameter is deprecated"
           config.accounts.each { |a| restore(a) }
@@ -50,9 +50,13 @@ module Imap::Backup
     attr_reader :email
     attr_reader :options
 
-    def restore(account)
-      restore = Account::Restore.new(account: account)
+    def restore(account, **options)
+      restore = Account::Restore.new(account: account, **options)
       restore.run
+    end
+
+    def restore_options
+      options.slice(:delimiter, :prefix)
     end
   end
 end

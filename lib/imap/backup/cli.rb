@@ -229,6 +229,17 @@ module Imap::Backup
     config_option
     quiet_option
     verbose_option
+    method_option(
+      "delimiter",
+      type: :string,
+      desc: "the delimiter for folder names"
+    )
+    method_option(
+      "prefix",
+      type: :string,
+      desc: "a prefix (namespace) to add to folder names",
+      aliases: ["-d"]
+    )
     # Restores backed up emails to an account
     # @return [void]
     def restore(email = nil)
