@@ -5,12 +5,12 @@ module Imap::Backup
     subject { described_class.new(account: account) }
 
     let(:account) { "account" }
-    let(:serialized_folders) { instance_double(Account::SerializedFolders) }
+    let(:folder_mapper) { instance_double(Account::FolderMapper) }
     let(:uploader) { instance_double(Uploader, run: nil) }
 
     before do
-      allow(Account::SerializedFolders).to receive(:new) { serialized_folders }
-      allow(serialized_folders).to receive(:each).and_yield("folder", "serializer")
+      allow(Account::FolderMapper).to receive(:new) { folder_mapper }
+      allow(folder_mapper).to receive(:each).and_yield("serializer", "folder")
       allow(Uploader).to receive(:new) { uploader }
     end
 

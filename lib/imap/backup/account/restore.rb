@@ -1,4 +1,4 @@
-require "imap/backup/account/serialized_folders"
+require "imap/backup/account/folder_mapper"
 require "imap/backup/uploader"
 
 module Imap; end
@@ -15,8 +15,7 @@ module Imap::Backup
     # Runs the restore operation
     # @return [void]
     def run
-      serialized_folders = Account::SerializedFolders.new(account: account)
-      serialized_folders.each do |serializer, folder|
+      folders.each do |serializer, folder|
         Uploader.new(folder, serializer).run
       end
     end
@@ -24,5 +23,16 @@ module Imap::Backup
     private
 
     attr_reader :account
+
+    def enumerator_options
+      {
+        account: account,
+        destination: account
+      }
+    end
+
+    def folders
+      Account::FolderMapper.new(**enumerator_options)
+    end
   end
 end
