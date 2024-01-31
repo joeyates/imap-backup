@@ -9,15 +9,13 @@ module Imap; end
 
 module Imap::Backup
   # Implements migration and mirroring
-  class CLI::Transfer < Thor
-    include Thor::Actions
+  class CLI::Transfer
     include CLI::Helpers
 
     # The possible values for the action parameter
     ACTIONS = %i(migrate mirror).freeze
 
     def initialize(action, source_email, destination_email, options)
-      super([])
       @action = action
       @source_email = source_email
       @destination_email = destination_email
@@ -37,20 +35,18 @@ module Imap::Backup
     #     or either of the accounts is not configured,
     #     or incompatible namespace/delimiter parameters have been supplied
     #   @return [void]
-    no_commands do
-      def run
-        raise "Unknown action '#{action}'" if !ACTIONS.include?(action)
+    def run
+      raise "Unknown action '#{action}'" if !ACTIONS.include?(action)
 
-        process_options!
-        prepare_mirror if action == :mirror
+      process_options!
+      prepare_mirror if action == :mirror
 
-        folders.each do |serializer, folder|
-          case action
-          when :migrate
-            Migrator.new(serializer, folder, reset: reset).run
-          when :mirror
-            Mirror.new(serializer, folder).run
-          end
+      folders.each do |serializer, folder|
+        case action
+        when :migrate
+          Migrator.new(serializer, folder, reset: reset).run
+        when :mirror
+          Mirror.new(serializer, folder).run
         end
       end
     end
