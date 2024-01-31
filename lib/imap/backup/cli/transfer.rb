@@ -13,7 +13,7 @@ module Imap::Backup
     include Thor::Actions
     include CLI::Helpers
 
-    # The possible vaues for the action parameter
+    # The possible values for the action parameter
     ACTIONS = %i(migrate mirror).freeze
 
     def initialize(action, source_email, destination_email, options)
@@ -35,7 +35,7 @@ module Imap::Backup
     #   @raise [RuntimeError] if the indicated action is unknown,
     #     or the source and destination accounts are the same,
     #     or either of the accounts is not configured,
-    #     or incompatible namespace/delimter parameters have been supplied
+    #     or incompatible namespace/delimiter parameters have been supplied
     #   @return [void]
     no_commands do
       def run
