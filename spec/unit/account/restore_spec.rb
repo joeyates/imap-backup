@@ -33,5 +33,18 @@ module Imap::Backup
           with(hash_including(destination_delimiter: "."))
       end
     end
+
+    context "when a prefix is provided" do
+      let(:options) { {prefix: "."} }
+      let(:delimited_folder) { instance_double(Account::Folder) }
+      let(:serializer) { instance_double(Serializer) }
+
+      it "maps destination folders with the prefix" do
+        subject.run
+
+        expect(Account::FolderMapper).to have_received(:new).
+          with(hash_including(destination_prefix: "."))
+      end
+    end
   end
 end

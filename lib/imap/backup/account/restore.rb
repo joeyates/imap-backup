@@ -8,9 +8,10 @@ module Imap::Backup
 
   # Restores all backed up folders to the server
   class Account::Restore
-    def initialize(account:, delimiter: "/")
+    def initialize(account:, delimiter: "/", prefix: "")
       @account = account
       @destination_delimiter = delimiter
+      @destination_prefix = prefix
     end
 
     # Runs the restore operation
@@ -25,12 +26,14 @@ module Imap::Backup
 
     attr_reader :account
     attr_reader :destination_delimiter
+    attr_reader :destination_prefix
 
     def enumerator_options
       {
         account: account,
         destination: account,
-        destination_delimiter: destination_delimiter
+        destination_delimiter: destination_delimiter,
+        destination_prefix: destination_prefix
       }
     end
 
