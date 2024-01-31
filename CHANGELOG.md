@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 14.6.0 - 2024-01-31
+
+### Added
+
+* Handling of `--delimiter` and `--prefix` options for `imap-backup restore`.
+
 ## 14.5.2 - 2024-01-22
 
 ### Changed
