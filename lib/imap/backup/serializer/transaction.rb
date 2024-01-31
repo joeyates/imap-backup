@@ -1,6 +1,8 @@
 module Imap; end
 
 module Imap::Backup
+  class Serializer; end
+
   # Stores data during a transaction
   class Serializer::Transaction
     # @return the transaction's stored data

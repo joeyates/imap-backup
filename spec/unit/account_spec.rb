@@ -97,20 +97,6 @@ module Imap::Backup
       end
     end
 
-    describe "#restore" do
-      let(:restore) { instance_double(Account::Restore, run: nil) }
-
-      before do
-        allow(Account::Restore).to receive(:new) { restore }
-      end
-
-      it "runs restore" do
-        subject.restore
-
-        expect(restore).to have_received(:run)
-      end
-    end
-
     describe "#valid?" do
       context "with username and password" do
         it "is true" do

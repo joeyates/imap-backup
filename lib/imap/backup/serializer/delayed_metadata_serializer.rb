@@ -8,6 +8,8 @@ require "imap/backup/serializer/transaction"
 module Imap; end
 
 module Imap::Backup
+  class Serializer; end
+
   # Wraps the Serializer, delaying metadata appends
   class Serializer::DelayedMetadataSerializer
     extend Forwardable

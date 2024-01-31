@@ -24,7 +24,8 @@ RSpec.describe "imap-backup restore", :container, type: :aruba do
       email: email, folder: folder, flags: [:Draft, :$NON_SYSTEM_FLAG], **message_two
     )
   end
-  let(:run_command) { run_command_and_stop("imap-backup restore #{email}") }
+  let(:command) { "imap-backup restore #{email}" }
+  let(:run_command) { run_command_and_stop(command) }
   let(:cleanup) do
     test_server.delete_folder folder
     test_server.disconnect
@@ -195,6 +196,21 @@ RSpec.describe "imap-backup restore", :container, type: :aruba do
     end
   end
 
+  context "when a prefix and delimiter are supplied" do
+    after do
+      test_server.delete_folder "CIAO.#{folder}"
+      test_server.delete_folder "CIAO"
+    end
+
+    let(:command) { "imap-backup restore #{email} --prefix CIAO --delimiter ." }
+
+    it "prepends the prefix to the folder name" do
+      run_command
+
+      expect(test_server.folders.map(&:name)).to include("CIAO.#{folder}")
+    end
+  end
+
   context "when a config path is supplied" do
     let(:custom_config_path) { File.join(File.expand_path("~/.imap-backup"), "foo.json") }
     let(:config_options) { super().merge(path: custom_config_path) }
@@ -215,11 +231,7 @@ RSpec.describe "imap-backup restore", :container, type: :aruba do
         **message_one
       )
     end
-    let(:run_command) do
-      run_command_and_stop(
-        "imap-backup restore #{email} --config #{custom_config_path}"
-      )
-    end
+    let(:command) { "imap-backup restore #{email} --config #{custom_config_path}" }
 
     it "does not raise any errors" do
       run_command

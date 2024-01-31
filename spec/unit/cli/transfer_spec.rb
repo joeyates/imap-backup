@@ -35,7 +35,7 @@ module Imap::Backup
     let(:migrator) { instance_double(Migrator, run: nil) }
     let(:mirror) { instance_double(Mirror, run: nil) }
     let(:backup) { instance_double(CLI::Backup, "backup_1", run: nil) }
-    let(:folder_enumerator) { instance_double(CLI::FolderEnumerator) }
+    let(:folder_mapper) { instance_double(Account::FolderMapper) }
 
     before do
       allow(Configuration).to receive(:exist?) { true }
@@ -43,8 +43,8 @@ module Imap::Backup
       allow(CLI::Backup).to receive(:new) { backup }
       allow(Migrator).to receive(:new) { migrator }
       allow(Mirror).to receive(:new) { mirror }
-      allow(CLI::FolderEnumerator).to receive(:new) { folder_enumerator }
-      allow(folder_enumerator).to receive(:each).and_yield(serializer, folder)
+      allow(Account::FolderMapper).to receive(:new) { folder_mapper }
+      allow(folder_mapper).to receive(:each).and_yield(serializer, folder)
     end
 
     it_behaves_like(
@@ -173,7 +173,7 @@ module Imap::Backup
       it "uses the values from the servers" do
         subject.run
 
-        expect(CLI::FolderEnumerator).to have_received(:new).
+        expect(Account::FolderMapper).to have_received(:new).
           with(
             hash_including(
               {
@@ -211,7 +211,7 @@ module Imap::Backup
           it "defaults to '#{default}'" do
             subject.run
 
-            expect(CLI::FolderEnumerator).to have_received(:new).
+            expect(Account::FolderMapper).to have_received(:new).
               with(hash_including({parameter => default}))
           end
         end
@@ -225,7 +225,7 @@ module Imap::Backup
           it "uses the supplied value" do
             subject.run
 
-            expect(CLI::FolderEnumerator).to have_received(:new).
+            expect(Account::FolderMapper).to have_received(:new).
               with(hash_including({parameter => "x"}))
           end
         end

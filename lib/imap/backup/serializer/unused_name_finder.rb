@@ -3,6 +3,8 @@ require "imap/backup/serializer"
 module Imap; end
 
 module Imap::Backup
+  class Serializer; end
+
   # Finds a name that can be used to rename a serialized folder
   class Serializer::UnusedNameFinder
     # @param serializer [Serializer] a folder serializer

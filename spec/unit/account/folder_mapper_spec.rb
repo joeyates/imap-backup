@@ -1,15 +1,15 @@
-require "imap/backup/cli/folder_enumerator"
+require "imap/backup/account/folder_mapper"
 
 require "imap/backup/account"
 require "imap/backup/client/default"
 
 module Imap::Backup
-  RSpec.describe CLI::FolderEnumerator do
+  RSpec.describe Account::FolderMapper do
     subject { described_class.new(**options) }
 
     let(:path) { "folder_enumerator_path/foo.imap" }
     let(:imap_pathname) { Pathname.new(path) }
-    let(:options) { {source: source, destination: destination} }
+    let(:options) { {account: source, destination: destination} }
     let(:source) do
       instance_double(Account, username: "source", local_path: "folder_enumerator_path")
     end

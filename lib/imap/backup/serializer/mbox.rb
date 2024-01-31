@@ -3,6 +3,8 @@ require "imap/backup/serializer/transaction"
 module Imap; end
 
 module Imap::Backup
+  class Serializer; end
+
   # Stores messages
   class Serializer::Mbox
     # @return [String] The path of the mailbox file, without the '.mbox' extension

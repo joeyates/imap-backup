@@ -5,6 +5,8 @@ require "imap/backup/serializer/imap"
 module Imap; end
 
 module Imap::Backup
+  class Serializer; end
+
   # Migrates serialized folder metadata from the version 2 format to the version 3 format
   class Serializer::Version2Migrator
     # @param folder_path [String] the base pathv(without extension) of the folder backup

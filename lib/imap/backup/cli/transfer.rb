@@ -1,6 +1,6 @@
+require "imap/backup/account/folder_mapper"
 require "imap/backup/cli/backup"
 require "imap/backup/cli/helpers"
-require "imap/backup/cli/folder_enumerator"
 require "imap/backup/logger"
 require "imap/backup/migrator"
 require "imap/backup/mirror"
@@ -9,15 +9,13 @@ module Imap; end
 
 module Imap::Backup
   # Implements migration and mirroring
-  class CLI::Transfer < Thor
-    include Thor::Actions
+  class CLI::Transfer
     include CLI::Helpers
 
-    # The possible vaues for the action parameter
+    # The possible values for the action parameter
     ACTIONS = %i(migrate mirror).freeze
 
     def initialize(action, source_email, destination_email, options)
-      super([])
       @action = action
       @source_email = source_email
       @destination_email = destination_email
@@ -35,22 +33,20 @@ module Imap::Backup
     #   @raise [RuntimeError] if the indicated action is unknown,
     #     or the source and destination accounts are the same,
     #     or either of the accounts is not configured,
-    #     or incompatible namespace/delimter parameters have been supplied
+    #     or incompatible namespace/delimiter parameters have been supplied
     #   @return [void]
-    no_commands do
-      def run
-        raise "Unknown action '#{action}'" if !ACTIONS.include?(action)
+    def run
+      raise "Unknown action '#{action}'" if !ACTIONS.include?(action)
 
-        process_options!
-        prepare_mirror if action == :mirror
+      process_options!
+      prepare_mirror if action == :mirror
 
-        folders.each do |serializer, folder|
-          case action
-          when :migrate
-            Migrator.new(serializer, folder, reset: reset).run
-          when :mirror
-            Mirror.new(serializer, folder).run
-          end
+      folders.each do |serializer, folder|
+        case action
+        when :migrate
+          Migrator.new(serializer, folder, reset: reset).run
+        when :mirror
+          Mirror.new(serializer, folder).run
         end
       end
     end
@@ -148,17 +144,17 @@ module Imap::Backup
 
     def enumerator_options
       {
+        account: source_account,
         destination: destination_account,
         destination_delimiter: destination_delimiter,
         destination_prefix: destination_prefix,
-        source: source_account,
         source_delimiter: source_delimiter,
         source_prefix: source_prefix
       }
     end
 
     def folders
-      CLI::FolderEnumerator.new(**enumerator_options)
+      Account::FolderMapper.new(**enumerator_options)
     end
 
     def destination_account
