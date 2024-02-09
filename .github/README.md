@@ -35,8 +35,8 @@ See below for a [full list of commands](#commands).
 
 # Installation
 
-## Docker or Podman
-
+<details>
+<summary>Docker or Podman</summary>
 If you have Docker or Podman installed, the easist way to use imap-backup
 is via the container image.
 
@@ -75,9 +75,10 @@ docker run -v ./my-config:/config -v ./my-data:/data -ti ghcr.io/joeyates/imap-b
   --dns 8.8.8.8 \
   imap-backup backup -c /config/imap-backup.json
 ```
+</details>
 
-## Homebrew (macOS)
-
+<details>
+<summary>Homebrew (macOS)</summary>
 ![Homebrew installs](https://img.shields.io/homebrew/installs/dm/imap-backup?label=Homebrew%20installs)
 
 If you have [Homebrew](https://brew.sh/), do this:
@@ -85,9 +86,10 @@ If you have [Homebrew](https://brew.sh/), do this:
 ```sh
 brew install imap-backup
 ```
+</details>
 
-## As a Ruby Gem
-
+<details>
+<summary>As a Ruby Gem</summary>
 * [Rubygem]
 
 ```sh
@@ -97,10 +99,12 @@ gem install imap-backup --no-document
 If that doesn't work, see the [detailed installation instructions](/docs/installation/rubygem.md).
 
 [Rubygem]: https://rubygems.org/gems/imap-backup "Ruby gem at rubygems.org"
+</details>
 
-## From Source Code
-
+<details>
+<summary>From Source Code</summary>
 If you want to use imap-backup directly from the source code, see [here](/docs/installation/source.md).
+</details>
 
 # Setup
 
