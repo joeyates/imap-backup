@@ -1,0 +1,112 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# This script is an example of how to extract email text from a backup.
+# In order to just get the email text, pass the `--quiet` option.
+# Please adapt it to your specific needs.
+
+require "bundler/inline"
+
+gemfile do
+  source "https://rubygems.org"
+
+  gem "imap-backup", ">= 14.0.0"
+  gem "optparse"
+  gem "pry-byebug"
+end
+
+class Options
+  attr_reader :config_path
+  attr_reader :account
+  attr_reader :folder
+  attr_reader :uid
+  attr_reader :verbose
+  attr_reader :quiet
+
+  def initialize
+    parser.parse!
+
+    fail("Please supply a --config PATH option") if !config_path
+    fail("Please supply a --account EMAIL option") if !account
+    fail("Please supply a --folder FOLDER option") if !folder
+    fail("Please supply a --uid UID option") if !uid
+
+    raise "The configuration file '#{config_path}' does not exist" if !File.exist?(config_path)
+  end
+
+  def for_logging
+    {verbose: [verbose], quiet: quiet}
+  end
+
+  private
+
+  USAGE = "Usage: #{$PROGRAM_NAME} --config my-config.json --account me@example.com --folder INBOX --uid 12345 --quiet"
+
+  def parser
+    @parser ||= OptionParser.new do |opts|
+      opts.banner = <<~BANNER
+        Extract email text from an imap-backup backup file.#{' '}
+
+        #{USAGE}
+
+        Configuration:
+      BANNER
+
+      opts.on("--config=CONFIG", "The path to an existing (or new) imap-backup config file") do |v|
+        @config_path = v
+      end
+      opts.on("--account=EMAIL", "The email address of the account") do |v|
+        @account = v
+      end
+      opts.on("--folder=FOLDER", "The folder to extract from") do |v|
+        @folder = v
+      end
+      opts.on("--uid=UID", "The UID of the email to extract") do |v|
+        @uid = v
+      end
+      opts.on("-q", "--quiet", "Do not print any output") do
+        @quiet = true
+      end
+      opts.on("-v", "--[no-]verbose", "Run verbosely") do |v|
+        @verbose = v
+      end
+    end
+  end
+
+  def fail(message)
+    $stderr.puts message
+    $stderr.puts
+    $stderr.puts USAGE
+    exit 1
+  end
+end
+
+options = Options.new
+
+require "imap/backup/logger"
+require "imap/backup/configuration"
+require "imap/backup/account/serialized_folders"
+
+Imap::Backup::Logger.setup_logging(options.for_logging)
+
+Imap::Backup::Logger.logger.info(
+  "Extract #{options.account}, folder '#{options.folder}' message '#{options.uid}'"
+)
+
+Imap::Backup::Logger.logger.info("Loading imap-backup configuration '#{options.config_path}'")
+
+config = Imap::Backup::Configuration.new(path: options.config_path)
+account = config.accounts.find { |a| a.username == options.account }
+
+raise "Account '#{options.account}' not found in the configuration" if !account
+
+serialized_folders = Imap::Backup::Account::SerializedFolders.new(account: account)
+serializer, _folder = serialized_folders.find do |_s, f|
+  f.name == options.folder
+end
+raise "Folder '#{folder_name}' not found" if !serializer
+
+message = serializer.each_message([options.uid]).first
+raise "Message '#{options.uid}' not found in folder '#{options.folder}'" if !message
+
+puts message.body
