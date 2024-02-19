@@ -40,7 +40,13 @@ class Options
 
   private
 
-  USAGE = "Usage: #{$PROGRAM_NAME} --config my-config.json --account me@example.com --folder INBOX --uid 12345 --quiet"
+  USAGE =
+    "Usage: #{$PROGRAM_NAME} " \
+    "--config my-config.json " \
+    "--account me@example.com " \
+    "--folder INBOX " \
+    "--uid 12345 " \
+    "--quiet"
 
   def parser
     @parser ||= OptionParser.new do |opts|
@@ -74,9 +80,9 @@ class Options
   end
 
   def fail(message)
-    $stderr.puts message
-    $stderr.puts
-    $stderr.puts USAGE
+    warn message
+    warn ""
+    warn USAGE
     exit 1
   end
 end
