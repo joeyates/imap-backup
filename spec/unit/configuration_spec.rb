@@ -102,34 +102,30 @@ module Imap::Backup
         subject.save
       end
 
-      it "uses the Account#to_h method" do
-        allow(subject.accounts[0]).to receive(:to_h) { "Account1" }
-        allow(subject.accounts[1]).to receive(:to_h) { "Account2" }
-
-        expect(file).to receive(:write).with(/"accounts": \[\s+"Account1",\s+"Account2"\s+\]/)
+      it "serializes all Account data" do
+        serialized = nil
+        allow(file).to receive(:write) { |data| serialized = data }
 
         subject.save
+
+        parsed = JSON.parse(serialized, symbolize_names: true)
+
+        expect(parsed[:accounts].first).to eq(
+          {
+            username: "username1", password: "password1",
+            multi_fetch_size: 1
+          }
+        )
       end
 
       context "when accounts are to be deleted" do
-        let(:accounts) do
-          [
-            {username: "keep_me", password: "password1"},
-            {username: "delete_me", password: "password2"}
-          ]
-        end
-
-        before do
-          allow(subject.accounts[0]).to receive(:to_h) { "Account1" }
-          allow(subject.accounts[1]).to receive(:to_h) { "Account2" }
-          subject.accounts[0].mark_for_deletion
-        end
-
         it "does not save them" do
-          expect(JSON).to receive(:pretty_generate).
-            with(hash_including({accounts: ["Account2"]}))
+          subject.accounts[0].mark_for_deletion
 
           subject.save
+
+          expect(file).to have_received(:write).with(/"username2"/)
+          expect(file).to_not have_received(:write).with(/"username1"/)
         end
       end
 
