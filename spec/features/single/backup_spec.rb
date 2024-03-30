@@ -36,4 +36,30 @@ RSpec.describe "imap-backup single backup", :container, type: :aruba do
     actual = mbox_content(account[:username], folder, local_path: account[:local_path])
     expect(actual).to eq(messages_as_mbox)
   end
+
+  context "in mirror mode" do
+    let(:imap_path) { File.join(account[:local_path], "Foo.imap") }
+    let(:mbox_path) { File.join(account[:local_path], "Foo.mbox") }
+    let(:command) { "#{super()} --mirror" }
+
+    before do
+      create_directory account[:local_path]
+      File.write(imap_path, "existing imap")
+      File.write(mbox_path, "existing mbox")
+    end
+
+    context "with folders that are not being backed up" do
+      it "deletes .imap files" do
+        run_command_and_stop command
+
+        expect(File.exist?(imap_path)).to be false
+      end
+
+      it "deletes .mbox files" do
+        run_command_and_stop command
+
+        expect(File.exist?(mbox_path)).to be false
+      end
+    end
+  end
 end

@@ -28,7 +28,7 @@ module Imap::Backup
         download_strategy: download_strategy,
         folder_blacklist: folder_blacklist,
         local_path: local_path,
-        mirror: mirror,
+        mirror_mode: mirror,
         reset_seen_flags_after_fetch: reset_seen_flags_after_fetch
       )
       account.connection_options = connection_options if connection_options
