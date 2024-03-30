@@ -11,8 +11,8 @@ module Imap::Backup
     let(:configuration) { {accounts: accounts.map(&:to_h)}.to_json }
     let(:accounts) do
       [
-        Account.new({username: "username1"}),
-        Account.new({username: "username2"})
+        Account.new({username: "username1", password: "password1"}),
+        Account.new({username: "username2", password: "password2"})
       ]
     end
     let(:permission_checker) { instance_double(Serializer::PermissionChecker, run: nil) }
@@ -102,34 +102,30 @@ module Imap::Backup
         subject.save
       end
 
-      it "uses the Account#to_h method" do
-        allow(subject.accounts[0]).to receive(:to_h) { "Account1" }
-        allow(subject.accounts[1]).to receive(:to_h) { "Account2" }
-
-        expect(file).to receive(:write).with(/"accounts": \[\s+"Account1",\s+"Account2"\s+\]/)
+      it "serializes all Account data" do
+        serialized = nil
+        allow(file).to receive(:write) { |data| serialized = data }
 
         subject.save
+
+        parsed = JSON.parse(serialized, symbolize_names: true)
+
+        expect(parsed[:accounts].first).to eq(
+          {
+            username: "username1", password: "password1",
+            multi_fetch_size: 1
+          }
+        )
       end
 
       context "when accounts are to be deleted" do
-        let(:accounts) do
-          [
-            {name: "keep_me"},
-            {name: "delete_me", delete: true}
-          ]
-        end
-
-        before do
-          allow(subject.accounts[0]).to receive(:to_h) { "Account1" }
-          allow(subject.accounts[1]).to receive(:to_h) { "Account2" }
-          subject.accounts[0].mark_for_deletion
-        end
-
         it "does not save them" do
-          expect(JSON).to receive(:pretty_generate).
-            with(hash_including({accounts: ["Account2"]}))
+          subject.accounts[0].mark_for_deletion
 
           subject.save
+
+          expect(file).to have_received(:write).with(/"username2"/)
+          expect(file).to_not have_received(:write).with(/"username1"/)
         end
       end
 
@@ -191,7 +187,7 @@ module Imap::Backup
     context "when a folders are stored as Hashes" do
       let(:file) { instance_double(File, write: nil) }
       let(:configuration) do
-        {accounts: [{username: "account", folders: [{name: "foo"}]}]}.to_json
+        {accounts: [{username: "account", password: "ciao", folders: [{name: "foo"}]}]}.to_json
       end
 
       before do

@@ -16,6 +16,7 @@ RSpec.describe "imap-backup migrate: avoid regression in migrating legacy backup
   let(:source_account) do
     {
       username: email,
+      password: "password1",
       local_path: File.join(config_path, email.gsub("@", "_"))
     }
   end

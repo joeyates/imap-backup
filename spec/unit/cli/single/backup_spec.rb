@@ -216,7 +216,7 @@ module Imap::Backup
         subject.run
 
         expect(Account).to have_received(:new).
-          with(hash_including(mirror: true))
+          with(hash_including(mirror_mode: true))
       end
     end
 
@@ -227,7 +227,7 @@ module Imap::Backup
         subject.run
 
         expect(Account).to have_received(:new).
-          with(hash_including(mirror: false))
+          with(hash_including(mirror_mode: false))
       end
     end
 
