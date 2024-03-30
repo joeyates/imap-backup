@@ -8,62 +8,83 @@ module Imap::Backup
 
     let(:options) { {username: "user", password: "pwd"} }
 
-    describe "#local_path" do
-      let(:options) { {username: "user", password: "pwd", local_path: "local_path"} }
+    describe "#initialize" do
+      context "with valid options" do
+        let(:options) do
+          {
+            username: "user", password: "pwd", folder_blacklist: true, mirror_mode: true,
+            local_path: "local_path", folders: ["folder"]
+          }
+        end
 
-      it "returns the supplied local_path" do
-        expect(subject.local_path).to eq("local_path")
-      end
-    end
+        it "sets the username" do
+          expect(subject.username).to eq("user")
+        end
 
-    describe "#folders" do
-      let(:options) { {username: "user", password: "pwd", folders: ["folder"]} }
+        it "sets the password" do
+          expect(subject.password).to eq("pwd")
+        end
 
-      it "returns the supplied folders" do
-        expect(subject.folders).to eq(["folder"])
-      end
-    end
+        it "sets the folders" do
+          expect(subject.folders).to eq(["folder"])
+        end
 
-    describe "#folder_blacklist" do
-      let(:options) { {username: "user", password: "pwd", folder_blacklist: true} }
+        it "sets the folder_blacklist" do
+          expect(subject.folder_blacklist).to be true
+        end
 
-      it "returns the supplied folder_blacklist" do
-        expect(subject.folder_blacklist).to be true
-      end
+        it "sets the local_path" do
+          expect(subject.local_path).to eq("local_path")
+        end
 
-      it "defaults to false" do
-        expect(described_class.new({}).folder_blacklist).to be false
-      end
-    end
+        it "sets the mirror_mode" do
+          expect(subject.mirror_mode).to be true
+        end
 
-    describe "#mirror_mode" do
-      let(:options) { {username: "user", password: "pwd", mirror_mode: true} }
-
-      it "returns the supplied mirror_mode" do
-        expect(subject.mirror_mode).to be true
-      end
-
-      it "defaults to false" do
-        expect(described_class.new({}).mirror_mode).to be false
-      end
-    end
-
-    describe "#server" do
-      let(:options) { {username: "user", password: "pwd", server: "server"} }
-
-      it "returns the supplied server" do
-        expect(subject.server).to eq("server")
+        it "sets marked_for_deletion to false" do
+          expect(subject.marked_for_deletion?).to be false
+        end
       end
 
-      it "defaults to nil" do
-        expect(described_class.new({}).server).to be_nil
+      context "without optional options" do
+        it "sets folder_blacklist to false" do
+          expect(subject.folder_blacklist).to be false
+        end
+
+        it "sets mirror_mode to false" do
+          expect(subject.mirror_mode).to be false
+        end
+
+        it "sets server to nil" do
+          expect(subject.server).to be_nil
+        end
+      end
+
+      context "with missing required options" do
+        let(:options) { {} }
+
+        it "raises an error" do
+          expect do
+            described_class.new(options)
+          end.to raise_error(ArgumentError, /Missing required options: password, username/)
+        end
+      end
+
+      context "with invalid options" do
+        let(:options) { {username: "a", password: "b", not_a_valid_option: "value"} }
+
+        it "raises an error" do
+          expect do
+            described_class.new(options)
+          end.to raise_error(ArgumentError, /Unknown options: not_a_valid_option/)
+        end
       end
     end
 
     describe "#connection_options" do
-      let(:options) { {username: "user", password: "pwd", connection_options: '{"foo": "bar"}'} }
-
       context "when the supplied connection_options is a String" do
+        let(:options) { {username: "user", password: "pwd", connection_options: '{"foo": "bar"}'} }
+
         it "returns the parsed connection_options" do
           expect(subject.connection_options).to eq({foo: "bar"})
         end
@@ -77,8 +98,10 @@ module Imap::Backup
         end
       end
 
-      it "defaults to nil" do
-        expect(described_class.new({}).connection_options).to be_nil
+      context "when not set" do
+        it "defaults to nil" do
+          expect(subject.connection_options).to be_nil
+        end
       end
     end
 
@@ -94,30 +117,6 @@ module Imap::Backup
 
       it "calls ClientFactory" do
         expect(subject.client).to eq(client)
-      end
-    end
-
-    describe "#valid?" do
-      context "with username and password" do
-        it "is true" do
-          expect(subject.valid?).to be true
-        end
-      end
-
-      context "without a username" do
-        let(:options) { {password: "pwd"} }
-
-        it "is false" do
-          expect(subject.valid?).to be false
-        end
-      end
-
-      context "without a password" do
-        let(:options) { {username: "user"} }
-
-        it "is false" do
-          expect(subject.valid?).to be false
-        end
       end
     end
 
@@ -265,7 +264,7 @@ module Imap::Backup
       [:connection_options, '{"some": "option"}', {some: "option"}]
     ].each do |attribute, value, expected|
       describe "setting ##{attribute}=" do
-        let(:options) { {} }
+        let(:options) { {username: "original", password: "original"} }
 
         before { subject.send(:"#{attribute}=", value) }
 

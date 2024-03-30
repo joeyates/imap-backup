@@ -7,6 +7,7 @@ RSpec.describe "imap-backup migrate", :container, type: :aruba do
   let(:source_account) do
     {
       username: email,
+      password: "password1",
       local_path: File.join(config_path, email.gsub("@", "_"))
     }
   end

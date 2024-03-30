@@ -59,6 +59,7 @@ module Imap::Backup
     attr_reader :reset_seen_flags_after_fetch
 
     def initialize(options)
+      check_options!(options)
       @username = options[:username]
       @password = options[:password]
       @local_path = options[:local_path]
@@ -95,14 +96,6 @@ module Imap::Backup
     # @return [Array<String>] the capabilities
     def capabilities
       client.capability
-    end
-
-    # Indicates whether the account has been configured, and is ready
-    # to be used
-    #
-    # @return [Boolean]
-    def valid?
-      username && password ? true : false
     end
 
     def modified?
@@ -244,6 +237,23 @@ module Imap::Backup
     private
 
     attr_reader :changes
+
+    REQUIRED_ATTRIBUTES = %i[password username].freeze
+    OPTIONAL_ATTRIBUTES = %i[
+      connection_options download_strategy folders folder_blacklist local_path mirror_mode
+      multi_fetch_size reset_seen_flags_after_fetch server
+    ].freeze
+    KNOWN_ATTRIBUTES = REQUIRED_ATTRIBUTES + OPTIONAL_ATTRIBUTES
+
+    def check_options!(options)
+      missing_required = REQUIRED_ATTRIBUTES - options.keys
+      if missing_required.any?
+        raise ArgumentError, "Missing required options: #{missing_required.join(', ')}"
+      end
+
+      unknown = options.keys - KNOWN_ATTRIBUTES
+      raise ArgumentError, "Unknown options: #{unknown.join(', ')}" if unknown.any?
+    end
 
     def update(field, value)
       key = :"@#{field}"

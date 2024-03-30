@@ -11,8 +11,8 @@ module Imap::Backup
     let(:configuration) { {accounts: accounts.map(&:to_h)}.to_json }
     let(:accounts) do
       [
-        Account.new({username: "username1"}),
-        Account.new({username: "username2"})
+        Account.new({username: "username1", password: "password1"}),
+        Account.new({username: "username2", password: "password2"})
       ]
     end
     let(:permission_checker) { instance_double(Serializer::PermissionChecker, run: nil) }
@@ -114,8 +114,8 @@ module Imap::Backup
       context "when accounts are to be deleted" do
         let(:accounts) do
           [
-            {name: "keep_me"},
-            {name: "delete_me", delete: true}
+            {username: "keep_me", password: "password1"},
+            {username: "delete_me", password: "password2"}
           ]
         end
 
@@ -191,7 +191,7 @@ module Imap::Backup
     context "when a folders are stored as Hashes" do
       let(:file) { instance_double(File, write: nil) }
       let(:configuration) do
-        {accounts: [{username: "account", folders: [{name: "foo"}]}]}.to_json
+        {accounts: [{username: "account", password: "ciao", folders: [{name: "foo"}]}]}.to_json
       end
 
       before do
