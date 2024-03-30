@@ -1,0 +1,92 @@
+#!/usr/bin/env ruby
+
+# This script is an example of how to import messages from a Thunderbird
+# folder into imap-backup. It is not meant to be a general-purpose
+# Thunderbird importer, but rather a starting point for writing your own.
+# Please adapt it to your specific needs.
+
+require "bundler/inline"
+
+gemfile do
+  source "https://rubygems.org"
+
+  gem "imap-backup"
+  gem "optparse"
+  gem "thunderbird", "~> 0.5.0"
+end
+
+require "imap/backup/logger"
+require "imap/backup/configuration"
+require "imap/backup/serializer"
+require "thunderbird/mbox"
+
+class Options
+  attr_accessor :email
+  attr_accessor :config_path
+  attr_accessor :folder
+  attr_accessor :mbox_path
+  attr_accessor :verbose
+  attr_accessor :quiet
+
+  def parse!
+    OptionParser.new do |opts|
+      opts.banner = <<~BANNER
+        Usage: #{$PROGRAM_NAME} [options]"
+
+        Import email messages from a Thunderbird folder into imap-backup.
+
+      BANNER
+
+      opts.on("--config=CONFIG", "The path to an existing (or new) imap-backup config file") do |v|
+        self.config_path = v
+      end
+      opts.on("--email=EMAIL", "The email address configured in imap-backup") do |v|
+        self.email = v
+      end
+      opts.on("--folder=FOLDER", "The folder name to import into") do |v|
+        self.folder = v
+      end
+      opts.on("--mbox=MBOX_PATH", "The path to a Thunderbird folder") do |v|
+        self.mbox_path = v
+      end
+      opts.on("-q", "--quiet", "Do not print any output") do
+        self.quiet = true
+      end
+      opts.on("-v", "--[no-]verbose", "Run verbosely") do |v|
+        self.verbose = v
+      end
+    end.parse!
+
+    raise "Please supply a --config PATH option" if !config_path
+    raise "Please supply a --email EMAIL option" if !email
+    raise "Please supply a --folder FOLDER option" if !folder
+    raise "Please supply a --mbox PATH option" if !mbox_path
+  end
+
+  def for_logging
+    {verbose: [verbose], quiet: quiet}
+  end
+end
+
+options = Options.new.tap(&:parse!)
+
+Imap::Backup::Logger.setup_logging(options.for_logging)
+
+config = Imap::Backup::Configuration.new(path: options.config_path)
+
+account = config.accounts.find { |a| a.username == options.email }
+raise "No account found for email address '#{options.email}'" if account.nil?
+
+mbox = Thunderbird::Mbox.new(path: options.mbox_path)
+
+serializer = Imap::Backup::Serializer.new(account.local_path, options.folder)
+serializer.force_uid_validity(mbox.uid_validity)
+
+mbox.each do |id, message|
+  uid = id.to_i
+  next if serializer.uids.include?(uid)
+
+  # Remove Thunderbird mbox "From" line
+  message.sub!(/^From[\s\r\n]*/m, "")
+  serializer.append(id, message, [])
+end

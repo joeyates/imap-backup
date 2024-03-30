@@ -21,3 +21,14 @@ You can try out the script as follows:
 ```sh
 contrib/import-accounts-from-csv --csv contrib/example_users.csv --config example-config.json --verbose
 ```
+
+# import-messages-from-thunderbird
+
+This script imports all messages from a Thunderbird folder.
+
+Obviously, Thunderbird must be installed and the folder in question must
+have the Thunderbird setting "Select this folder for offline use".
+
+```sh
+contrib/import-thunderbird-folder --config example-config.json --verbose
+```
