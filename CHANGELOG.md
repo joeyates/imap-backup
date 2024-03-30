@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 14.6.1 - 2024-03-30
+
+### Changed
+
+* Fixed a bug in single backup where the `--mirror` parameter was ignored.
+
 ## 14.6.0 - 2024-01-31
 
 ### Added
