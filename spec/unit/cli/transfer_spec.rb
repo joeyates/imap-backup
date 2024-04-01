@@ -60,6 +60,29 @@ module Imap::Backup
       end
     end
 
+    context "when in copy mode" do
+      let(:action) { :copy }
+      let(:backup) { instance_double(CLI::Backup, "backup_1", run: nil) }
+
+      it "runs backup on the source" do
+        subject.run
+
+        expect(backup).to have_received(:run)
+      end
+
+      it "mirrors each folder" do
+        subject.run
+
+        expect(mirror).to have_received(:run)
+      end
+
+      it "instructs the mirror class to not reset the destination folder" do
+        subject.run
+
+        expect(Mirror).to have_received(:new).with(anything, anything, reset: false) { mirror }
+      end
+    end
+
     context "when in mirror mode" do
       let(:action) { :mirror }
       let(:backup) { instance_double(CLI::Backup, "backup_1", run: nil) }
@@ -86,6 +109,12 @@ module Imap::Backup
         subject.run
 
         expect(mirror).to have_received(:run)
+      end
+
+      it "instructs the mirror class to reset the destination folder" do
+        subject.run
+
+        expect(Mirror).to have_received(:new).with(anything, anything, reset: true) { mirror }
       end
     end
 

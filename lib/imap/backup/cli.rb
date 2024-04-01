@@ -94,6 +94,69 @@ module Imap::Backup
       Backup.new(non_logging_options).run
     end
 
+    desc(
+      "copy SOURCE_EMAIL DESTINATION_EMAIL [OPTIONS]",
+      "Copies emails from the SOURCE account to the DESTINATION account, avoiding duplicates"
+    )
+    long_desc <<~DESC
+      This command copies messages from the SOURCE_EMAIL account
+      to the DESTINATION_EMAIL account. It keeps track of copied
+      messages and avoids duplicate copies.
+
+      Any other messages that are present on the DESTINATION_EMAIL account
+      are not affected.
+
+      If a folder list is configured for the SOURCE_EMAIL account,
+      only the folders indicated by the setting are copied.
+
+      First, it runs the download of the SOURCE_EMAIL account.
+
+      When the copy command is used, for each folder that is processed,
+      a new file is created alongside the normal backup files (.imap and .mbox)
+      This file has a '.mirror' extension. This file contains a mapping of
+      the known UIDs on the source account to those on the destination account.
+
+      Some configuration may be necessary, as follows:
+
+      #{NAMESPACE_CONFIGURATION_DESCRIPTION}
+    DESC
+    config_option
+    quiet_option
+    verbose_option
+    method_option(
+      "automatic-namespaces",
+      type: :boolean,
+      desc: "automatically choose delimiters and prefixes"
+    )
+    method_option(
+      "destination-delimiter",
+      type: :string,
+      desc: "the delimiter for destination folder names"
+    )
+    method_option(
+      "destination-prefix",
+      type: :string,
+      desc: "the prefix (namespace) to add to destination folder names",
+      aliases: ["-d"]
+    )
+    method_option(
+      "source-delimiter",
+      type: :string,
+      desc: "the delimiter for source folder names"
+    )
+    method_option(
+      "source-prefix",
+      type: :string,
+      desc: "the prefix (namespace) to strip from source folder names",
+      aliases: ["-s"]
+    )
+    # Copies messages from one email account to another
+    # @return [void]
+    def copy(source_email, destination_email)
+      non_logging_options = Imap::Backup::Logger.setup_logging(options)
+      Transfer.new(:copy, source_email, destination_email, non_logging_options).run
+    end
+
     desc "local SUBCOMMAND [OPTIONS]", "View local info"
     subcommand "local", Local
 
