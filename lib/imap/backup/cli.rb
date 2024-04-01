@@ -162,9 +162,12 @@ module Imap::Backup
 
     desc(
       "migrate SOURCE_EMAIL DESTINATION_EMAIL [OPTIONS]",
-      "Uploads backed-up emails from account SOURCE_EMAIL to account DESTINATION_EMAIL"
+      "(Deprecated) Uploads backed-up emails from account SOURCE_EMAIL to account DESTINATION_EMAIL"
     )
     long_desc <<~DESC
+      This command is deprecated and will be removed in a future version.
+      Use 'copy' instead.
+
       All emails which have been backed up for the "source account" (SOURCE_EMAIL) are
       uploaded to the "destination account" (DESTINATION_EMAIL).
 
@@ -221,9 +224,12 @@ module Imap::Backup
 
     desc(
       "mirror SOURCE_EMAIL DESTINATION_EMAIL [OPTIONS]",
-      "Keeps the DESTINATION_EMAIL account aligned with the SOURCE_EMAIL account"
+      "(Deprecated) Keeps the DESTINATION_EMAIL account aligned with the SOURCE_EMAIL account"
     )
     long_desc <<~DESC
+      This command is deprecated and will be removed in a future version.
+      Use 'copy' instead.
+
       This command updates the DESTINATION_EMAIL account's folders to have the same contents
       as those on the SOURCE_EMAIL account.
 
