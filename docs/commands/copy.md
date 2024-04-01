@@ -1,23 +1,22 @@
 <!--
-# @title command: 'mirror'
+# @title command: 'copy'
 -->
-# Mirror
+# Copy
 
 ```sh
-imap-backup mirror SOURCE_EMAIL DESTINATION_EMAIL
+imap-backup copy SOURCE_EMAIL DESTINATION_EMAIL
 ```
-
-This command is deprecated and will be removed in a future version. Use [copy](./copy.md).
 
 This command makes a local copy of the emails in the source account
 and then copies them to the destination account.
 
-Exactly which folders are backed up (and mirrored) depends on how the account is set up.
+Exactly which folders are backed up (and copied) depends on how the account is set up.
 
 Specifically, the `folder inclusion mode (whitelist/blacklist)` and
 `folders to include/exclude` list.
 
-Note that, anything on the destination account that is not on the source account gets deleted.
+Note that, any messages on the destination account that is not on the source account
+are left unchanged.
 
 # Options
 
@@ -31,13 +30,6 @@ Note that, anything on the destination account that is not on the source account
   on the destination server,
 * `--automatic-namespaces` - works out the 4 parameters above by querying
   the source and destination IMAP servers.
-
-## Modes
-
-If the local copy is in 'keep all' mode, the destination account will gradually have more and more emails.
-
-On the other hand, if the local copy is in 'mirror' mode, the destination account will have the same emails
-as the source account.
 
 # Delimiters and Prefixes
 

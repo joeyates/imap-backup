@@ -7,6 +7,8 @@
 imap-backup migrate SOURCE_EMAIL DESTINATION_EMAIL [OPTIONS]
 ```
 
+This command is deprecated and will be removed in a future version. Use [copy](./copy.md).
+
 This command copies backed up emails for one account (the "source")
 to another account (the "destination").
 
