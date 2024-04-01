@@ -5,9 +5,10 @@ module Imap; end
 module Imap::Backup
   # Synchronises a folder between a source and destination
   class Mirror
-    def initialize(serializer, folder)
+    def initialize(serializer, folder, reset: false)
       @serializer = serializer
       @folder = folder
+      @reset = reset
     end
 
     # If necessary, reates the destination folder,
@@ -19,7 +20,7 @@ module Imap::Backup
     # @return [void]
     def run
       ensure_destination_folder
-      delete_destination_only_emails
+      delete_destination_only_emails if reset
       update_flags
       append_emails
       map.save
@@ -31,6 +32,7 @@ module Imap::Backup
 
     attr_reader :serializer
     attr_reader :folder
+    attr_reader :reset
 
     def ensure_destination_folder
       return if folder.exist?
@@ -90,7 +92,7 @@ module Imap::Backup
             destination: folder.uid_validity
           )
           if !map_ok
-            folder.clear
+            folder.clear if reset
             map.reset(
               source_uid_validity: serializer.uid_validity,
               destination_uid_validity: folder.uid_validity
