@@ -84,7 +84,11 @@ module Imap::Backup
     #
     # @return [void]
     def transaction(&block)
-      block.call
+      mbox.transaction do
+        imap.transaction do
+          block.call
+        end
+      end
     end
 
     # Checks that the metadata files are valid, migrates the metadata file

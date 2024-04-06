@@ -16,8 +16,10 @@ module Imap::Backup
     def run
       uids = serializer.uids.clone
 
-      uids.each_slice(CHUNK_SIZE) do |block|
-        refresh_block block
+      serializer.transaction do
+        uids.each_slice(CHUNK_SIZE) do |block|
+          refresh_block block
+        end
       end
     end
 
