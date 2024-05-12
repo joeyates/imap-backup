@@ -34,14 +34,12 @@ class TestEmailServer
   def disconnect
     return if !@imap
 
-    if !imap.disconnected?
-      begin
-        imap.logout
-      rescue EOFError
-        # ignore occasional error when closing connection
-      end
-      imap.disconnect
+    begin
+      imap.logout
+    rescue IOError
+      # ignore occasional error when closing connection
     end
+    imap.disconnect
 
     @imap = nil
   end

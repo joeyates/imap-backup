@@ -10,7 +10,7 @@ module Imap; end
 module Imap::Backup
   class Serializer; end
 
-  # Wraps the Serializer, delaying metadata appends
+  # Wraps the Serializer, delaying metadata changes
   class Serializer::DelayedMetadataSerializer
     extend Forwardable
 
@@ -31,7 +31,7 @@ module Imap::Backup
     def transaction(&block)
       tsx.fail_in_transaction!(:transaction, message: "nested transactions are not supported")
 
-      tsx.begin({metadata: []}) do
+      tsx.begin({appends: [], updates: []}) do
         mbox.transaction do
           block.call
 
@@ -42,7 +42,21 @@ module Imap::Backup
       end
     end
 
-    # Appends a message to the mbox file and adds the metadata
+    # Sets the folder's UID validity via the serializer
+    #
+    # @param uid_validity [Integer] the UID validity to apply
+    # @raise [RuntimeError] if called inside a transaction
+    # @return [void]
+    def apply_uid_validity(uid_validity)
+      tsx.fail_in_transaction!(
+        :transaction,
+        message: "UID validity cannot be changed in a transaction"
+      )
+
+      serializer.apply_uid_validity(uid_validity)
+    end
+
+    # Appends a message to the mbox file and adds the appended message's metadata
     # to the transaction
     #
     # @param uid [Integer] the UID of the message
@@ -53,8 +67,19 @@ module Imap::Backup
       tsx.fail_outside_transaction!(:append)
       mboxrd_message = Email::Mboxrd::Message.new(message)
       serialized = mboxrd_message.to_serialized
-      tsx.data[:metadata] << {uid: uid, length: serialized.bytesize, flags: flags}
+      tsx.data[:appends] << {uid: uid, length: serialized.bytesize, flags: flags}
       mbox.append(serialized)
+    end
+
+    # Stores changes to a message's metadata for later update
+    #
+    # @param uid [Integer] the UID of the message
+    # @param length [Integer] the length of the message
+    # @param flags [Array<Symbol>] the flags for the message
+    # @return [void]
+    def update(uid, length: nil, flags: nil)
+      tsx.fail_outside_transaction!(:update)
+      tsx.data[:updates] << {uid: uid, length: length, flags: flags}
     end
 
     private
@@ -64,8 +89,11 @@ module Imap::Backup
     def commit
       # rubocop:disable Lint/RescueException
       imap.transaction do
-        tsx.data[:metadata].each do |m|
+        tsx.data[:appends].each do |m|
           imap.append m[:uid], m[:length], flags: m[:flags]
+        end
+        tsx.data[:updates].each do |m|
+          imap.update m[:uid], length: m[:length], flags: m[:flags]
         end
       rescue Exception => e
         Logger.logger.error "#{self.class} handling #{e.class}"

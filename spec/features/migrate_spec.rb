@@ -27,6 +27,7 @@ RSpec.describe "imap-backup migrate", :container, type: :aruba do
   after do
     destination_server.delete_folder source_folder
     destination_server.disconnect
+    test_server.disconnect
   end
 
   context "when a config path is supplied" do

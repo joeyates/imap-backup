@@ -28,6 +28,7 @@ module Imap::Backup
     extend Forwardable
 
     def_delegator :mbox, :pathname, :mbox_pathname
+    def_delegator :imap, :update
 
     # Get message metadata
     # @param uid [Integer] a message UID
@@ -77,7 +78,7 @@ module Imap::Backup
       @validated = nil
     end
 
-    # Calls the supplied block.
+    # Calls the supplied block without implementing transactional behaviour.
     # This method is present so that this class implements the same
     # interface as {DelayedMetadataSerializer}
     # @param block [block] the block that is wrapped by the transaction
@@ -175,18 +176,6 @@ module Imap::Backup
 
       appender = Serializer::Appender.new(folder: sanitized, imap: imap, mbox: mbox)
       appender.append(uid: uid, message: message, flags: flags)
-    end
-
-    # Updates a messages flags
-    # @param uid [Integer] the message's UID
-    # @param flags [Array<Symbol>] the flags to set on the message
-    # @return [void]
-    def update(uid, flags: nil)
-      message = imap.get(uid)
-      return if !message
-
-      message.flags = flags if flags
-      imap.save
     end
 
     # Enumerates over a series of messages.
