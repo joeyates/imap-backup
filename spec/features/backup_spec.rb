@@ -100,7 +100,6 @@ RSpec.describe "imap-backup backup", :container, type: :aruba do
           write_config
           backup.run
           test_server.set_flags folder, [1], [:Seen]
-          super()
         end
 
         it "updates flags" do
@@ -182,13 +181,13 @@ RSpec.describe "imap-backup backup", :container, type: :aruba do
 
   context "in mirror mode" do
     let(:account_config) { super().merge(mirror_mode: true) }
-    let(:imap_path) { File.join(account_config[:local_path], "Foo.imap") }
-    let(:mbox_path) { File.join(account_config[:local_path], "Foo.mbox") }
+    let(:foo_imap_path) { File.join(account_config[:local_path], "Foo.imap") }
+    let(:foo_mbox_path) { File.join(account_config[:local_path], "Foo.mbox") }
 
     let!(:setup) do
       create_directory account_config[:local_path]
-      File.write(imap_path, "existing imap")
-      File.write(mbox_path, "existing mbox")
+      File.write(foo_imap_path, "existing imap")
+      File.write(foo_mbox_path, "existing mbox")
       super()
     end
 
@@ -196,13 +195,32 @@ RSpec.describe "imap-backup backup", :container, type: :aruba do
       it "deletes .imap files" do
         run_command_and_stop command
 
-        expect(File.exist?(imap_path)).to be false
+        expect(File.exist?(foo_imap_path)).to be false
       end
 
       it "deletes .mbox files" do
         run_command_and_stop command
 
-        expect(File.exist?(mbox_path)).to be false
+        expect(File.exist?(foo_mbox_path)).to be false
+      end
+    end
+
+    context "with messages that have been deleted from the server" do
+      let(:setup) do
+        super()
+        backup.run
+      end
+      let(:mbox_two) { to_mbox_entry(**message_two) }
+      let(:mbox_three) { to_mbox_entry(**message_three) }
+
+      it "deletes messages from the local backup" do
+        expect(mbox_content(email, folder)).to eq(messages_as_mbox)
+        test_server.delete_email folder, 1
+        test_server.send_email folder, **message_three
+
+        run_command_and_stop command
+
+        expect(mbox_content(email, folder)).to eq(mbox_two + mbox_three)
       end
     end
   end

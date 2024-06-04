@@ -29,11 +29,13 @@ module Imap::Backup
 
       serializer.apply_uid_validity(folder.uid_validity)
 
-      download_serializer.transaction do
+      serializer.transaction do
         downloader.run
+        FlagRefresher.new(folder, serializer).run if account.mirror_mode || refresh
       end
-
-      clean_up
+      # After the transaction the serializer will have any appended messages
+      # so we can check differences between the server and the local backup
+      LocalOnlyMessageDeleter.new(folder, raw_serializer).run if account.mirror_mode
     end
 
     private
@@ -55,34 +57,29 @@ module Imap::Backup
       true
     end
 
-    def clean_up
-      LocalOnlyMessageDeleter.new(folder, serializer).run if account.mirror_mode
-      FlagRefresher.new(folder, serializer).run if account.mirror_mode || refresh
-    end
-
     def downloader
       @downloader ||= Downloader.new(
         folder,
-        download_serializer,
+        serializer,
         multi_fetch_size: account.multi_fetch_size,
         reset_seen_flags_after_fetch: account.reset_seen_flags_after_fetch
       )
     end
 
-    def download_serializer
-      @download_serializer ||=
+    def serializer
+      @serializer ||=
         case account.download_strategy
         when "direct"
-          serializer
+          raw_serializer
         when "delay_metadata"
-          Serializer::DelayedMetadataSerializer.new(serializer: serializer)
+          Serializer::DelayedMetadataSerializer.new(serializer: raw_serializer)
         else
           raise "Unknown download strategy '#{account.download_strategy}'"
         end
     end
 
-    def serializer
-      @serializer ||= Serializer.new(account.local_path, folder.name)
+    def raw_serializer
+      @raw_serializer ||= Serializer.new(account.local_path, folder.name)
     end
   end
 end

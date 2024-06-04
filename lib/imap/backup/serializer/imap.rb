@@ -97,11 +97,27 @@ module Imap::Backup
       save
     end
 
-    # Get message metadata
+    # Updates a message's length and/or flags
+    # @param uid [Integer] the existing message's UID
+    # @param length [Integer] the length of the message (as stored on disk)
+    # @param flags [Array[Symbol]] the message's flags
+    # @raise [RuntimeError] if the UID does not exist
+    # @return [void]
+    def update(uid, length: nil, flags: nil)
+      index = messages.find_index { |m| m.uid == uid }
+      raise "UID #{uid} not found" if !index
+
+      messages[index].length = length if length
+      messages[index].flags = flags if flags
+      save
+    end
+
+    # Get a copy of message metadata
     # @param uid [Integer] a message UID
     # @return [Serializer::Message]
     def get(uid)
-      messages.find { |m| m.uid == uid }
+      message = messages.find { |m| m.uid == uid }
+      message&.dup
     end
 
     # Deletes the metadata file
@@ -158,11 +174,15 @@ module Imap::Backup
       messages.map(&:uid)
     end
 
-    # Update a message's metadata, replacing its UID
+    # Update a message's UID
     # @param old [Integer] the existing message UID
     # @param new [Integer] the new UID to apply to the message
+    # @raise [RuntimeError] if the new UID already exists
     # @return [void]
     def update_uid(old, new)
+      existing = messages.find_index { |m| m.uid == new }
+      raise "UID #{new} already exists" if existing
+
       index = messages.find_index { |m| m.uid == old }
       return if index.nil?
 

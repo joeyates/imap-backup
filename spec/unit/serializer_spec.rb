@@ -107,7 +107,8 @@ module Imap::Backup
         rename: nil,
         save: nil,
         uid_validity: existing_uid_validity,
-        "uid_validity=": nil
+        "uid_validity=": nil,
+        update: nil
       )
     end
     let(:mbox) do
@@ -247,36 +248,13 @@ module Imap::Backup
 
     describe "#update" do
       let(:flags) { [:Foo] }
-      let(:message) { instance_double(Serializer::Message, "flags=": nil) }
 
       before do
-        allow(imap).to receive(:get) { message }
-
         subject.update(33, flags: flags)
       end
 
-      it "updates the message flags" do
-        expect(message).to have_received(:flags=).with(flags)
-      end
-
-      it "saves the .imap file" do
-        expect(imap).to have_received(:save)
-      end
-
-      context "when no flags are supplied" do
-        let(:flags) { nil }
-
-        it "does not update the message flags" do
-          expect(message).to_not have_received(:flags=)
-        end
-      end
-
-      context "when the UID is not known" do
-        let(:message) { nil }
-
-        it "does not save" do
-          expect(imap).to_not have_received(:save)
-        end
+      it "updates the .imap file" do
+        expect(imap).to have_received(:update).with(33, flags: flags)
       end
     end
 
