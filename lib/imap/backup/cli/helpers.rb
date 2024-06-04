@@ -1,5 +1,6 @@
 require "thor"
 
+require "imap/backup/cli/options"
 require "imap/backup/configuration"
 require "imap/backup/configuration_not_found"
 
@@ -11,67 +12,8 @@ module Imap::Backup
   # Provides helper methods for CLI classes
   module CLI::Helpers
     def self.included(base)
-      base.class_eval do
-        def self.accounts_option
-          method_option(
-            "accounts",
-            type: :string,
-            desc: "a comma-separated list of accounts (defaults to all configured accounts)",
-            aliases: ["-a"]
-          )
-        end
-
-        def self.config_option
-          method_option(
-            "config",
-            type: :string,
-            desc: "supply the configuration file path (default: ~/.imap-backup/config.json)",
-            aliases: ["-c"]
-          )
-        end
-
-        def self.format_option
-          method_option(
-            "format",
-            type: :string,
-            desc: "the output type, 'text' for plain text or 'json'",
-            aliases: ["-f"]
-          )
-        end
-
-        def self.quiet_option
-          method_option(
-            "quiet",
-            type: :boolean,
-            desc: "silence all output",
-            aliases: ["-q"]
-          )
-        end
-
-        def self.refresh_option
-          method_option(
-            "refresh",
-            type: :boolean,
-            desc: "in the default 'keep all emails' mode, " \
-                  "updates flags for messages that are already downloaded",
-            aliases: ["-r"]
-          )
-        end
-
-        def self.verbose_option
-          method_option(
-            "verbose",
-            type: :boolean,
-            desc:
-              "increase the amount of logging. " \
-              "Without this option, the program gives minimal output. " \
-              "Using this option once gives more detailed output. " \
-              "Whereas, using this option twice also shows all IMAP network calls",
-            aliases: ["-v"],
-            repeatable: true
-          )
-        end
-      end
+      options = CLI::Options.new(base: base)
+      options.define_options
     end
 
     # Processes command-line parameters
