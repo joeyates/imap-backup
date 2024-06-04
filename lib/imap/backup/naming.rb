@@ -7,7 +7,7 @@ module Imap::Backup
     # The characters that cannot be used in file names
     INVALID_FILENAME_CHARACTERS = ":%;".freeze
     # A regular expression that captures each disallowed character
-    INVALID_FILENAME_CHARACTER_MATCH = /([#{INVALID_FILENAME_CHARACTERS}])/.freeze
+    INVALID_FILENAME_CHARACTER_MATCH = /([#{INVALID_FILENAME_CHARACTERS}])/
 
     # @param name [String] a folder name
     # @return [String] the supplied string iwth disallowed characters replaced

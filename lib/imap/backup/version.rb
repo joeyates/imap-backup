@@ -2,11 +2,11 @@ module Imap; end
 
 module Imap::Backup
   # @private
-  MAJOR    = 14
+  MAJOR    = 15
   # @private
-  MINOR    = 7
+  MINOR    = 0
   # @private
-  REVISION = 0
+  REVISION = 1
   # @private
   PRE      = nil
   # The application version

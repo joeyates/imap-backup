@@ -55,7 +55,7 @@ module Imap::Backup
 
     private
 
-    EMAIL_MATCHER = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]+$/i.freeze
+    EMAIL_MATCHER = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]+$/i
 
     attr_reader :highline
   end

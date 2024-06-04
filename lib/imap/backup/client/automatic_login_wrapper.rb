@@ -23,12 +23,12 @@ module Imap::Backup
     # Proxies calls to the client.
     # Before the first call does login
     # @return the return value of the client method called
-    def method_missing(method_name, *arguments, &block)
+    def method_missing(method_name, ...)
       if login_called
-        client.send(method_name, *arguments, &block)
+        client.send(method_name, ...)
       else
         do_first_login
-        client.send(method_name, *arguments, &block) if method_name != :login
+        client.send(method_name, ...) if method_name != :login
       end
     end
 

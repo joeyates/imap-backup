@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## 14.7.0 - 2024-06-04
+## 15.0.1 - 2024-06-04
 
 ### Changed
 
@@ -16,6 +16,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 * Update flags in a transaction, speeding up flag refreshes by avoiding
   repeated writes of the JSON metadata file. This is a change inspired by
   this pull request: https://github.com/joeyates/imap-backup/pull/200.
+
+* Deprecated Ruby 2.x Support
 
 ## 14.6.1 - 2024-03-30
 

@@ -52,7 +52,7 @@ module Imap::Backup
     describe "accounts" do
       it_behaves_like(
         "an action that requires an existing configuration",
-        action: ->(subject) { subject.accounts }
+        action: lambda(&:accounts)
       )
 
       it "lists configured emails" do

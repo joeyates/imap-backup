@@ -18,7 +18,7 @@ Gem::Specification.new do |gem|
 
   gem.executables   = gem.files.grep(%r{^bin/}).map { |f| File.basename(f) }
   gem.require_paths = ["lib"]
-  gem.required_ruby_version = ">= 2.7"
+  gem.required_ruby_version = ">= 3.0"
 
   gem.add_runtime_dependency "highline"
   gem.add_runtime_dependency "mail", "2.7.1"

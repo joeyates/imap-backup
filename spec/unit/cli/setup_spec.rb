@@ -17,7 +17,7 @@ module Imap::Backup
 
     it_behaves_like(
       "an action that doesn't require an existing configuration",
-      action: ->(subject) { subject.run }
+      action: lambda(&:run)
     )
 
     it "reruns the setup process" do

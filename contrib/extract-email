@@ -46,7 +46,7 @@ class Options
     "--account me@example.com " \
     "--folder INBOX " \
     "--uid 12345 " \
-    "--quiet"
+    "--quiet".freeze
 
   def parser
     @parser ||= OptionParser.new do |opts|

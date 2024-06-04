@@ -21,7 +21,7 @@ module Imap::Backup
 
     it_behaves_like(
       "an action that requires an existing configuration",
-      action: ->(subject) { subject.run }
+      action: lambda(&:run)
     )
 
     it "runs restore on the account" do
