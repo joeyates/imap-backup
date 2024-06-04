@@ -204,6 +204,8 @@ RSpec/IdenticalEqualityAssertion:
   Enabled: true
 RSpec/IndexedLet:
   Enabled: true
+RSpec/IsExpectedSpecify:
+  Enabled: true
 RSpec/LeakyConstantDeclaration:
   Enabled: false
 RSpec/LetSetup:
@@ -248,6 +250,8 @@ RSpec/RedundantAround:
 RSpec/RedundantPredicateMatcher:
   Enabled: true
 RSpec/RemoveConst:
+  Enabled: true
+RSpec/RepeatedSubjectCall:
   Enabled: true
 RSpec/SkipBlockInsideExample:
   Enabled: true
@@ -353,6 +357,8 @@ Style/MagicCommentFormat:
   Enabled: true
 Style/MapCompactWithConditionalBlock:
   Enabled: true
+Style/MapIntoArray:
+  Enabled: true
 Style/MapToHash:
   Enabled: true
 Style/MapToSet:
@@ -427,6 +433,8 @@ Style/ReturnNilInPredicateMethodDefinition:
   Enabled: true
 Style/SelectByRegexp:
   Enabled: true
+Style/SendWithLiteralMethodName:
+  Enabled: true
 Style/SingleArgumentDig:
   Enabled: true
 Style/SingleLineDoEndBlock:
@@ -439,6 +447,8 @@ Style/StringChars:
   Enabled: true
 Style/StringLiterals:
   EnforcedStyle: double_quotes
+Style/SuperArguments:
+  Enabled: true
 Style/SuperWithArgsParentheses:
   Enabled: true
 Style/SymbolArray:

@@ -81,7 +81,7 @@ module Imap::Backup
     def options
       @symbolized_options ||= # rubocop:disable Naming/MemoizedInstanceVariableName
         begin
-          options = super()
+          options = super
           options.each.with_object({}) do |(k, v), acc|
             key =
               if k.is_a?(String)
