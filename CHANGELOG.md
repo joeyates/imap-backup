@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 14.7.0 - 2024-06-04
+
+### Changed
+
+* Implemented update in transactions. Previous only appends were handled.
+  This allows actions which modify existing emails to be handled inside
+  transactions when using the 'delayed_metadata' strategy.
+
+* Update flags in a transaction, speeding up flag refreshes by avoiding
+  repeated writes of the JSON metadata file. This is a change inspired by
+  this pull request: https://github.com/joeyates/imap-backup/pull/200.
+
 ## 14.6.1 - 2024-03-30
 
 ### Changed

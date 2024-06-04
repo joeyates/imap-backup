@@ -4,9 +4,9 @@ module Imap::Backup
   # @private
   MAJOR    = 14
   # @private
-  MINOR    = 6
+  MINOR    = 7
   # @private
-  REVISION = 1
+  REVISION = 0
   # @private
   PRE      = nil
   # The application version
