@@ -32,7 +32,7 @@ module Imap::Backup
     # @yieldparam serializer [Serializer] the folder's serializer
     # @yieldparam folder [Account::Folder] the online folder
     # @return [Enumerator, void]
-    def each
+    def each(&block)
       return enum_for(:each) if !block_given?
 
       glob = File.join(source_local_path, "**", "*.imap")
@@ -40,7 +40,7 @@ module Imap::Backup
         name = source_folder_name(path)
         serializer = Serializer.new(source_local_path, name)
         folder = destination_folder_for_path(name)
-        yield serializer, folder
+        block.call(serializer, folder)
       end
     end
 

@@ -37,8 +37,8 @@ module Imap::Backup
       instance_double(Imap::Backup::Serializer::Message, uid: 1, body: "body", flags: [:MyFlag])
     end
 
-    def message_enumerator
-      yield missing_message
+    def message_enumerator(&block)
+      block.call(missing_message)
     end
 
     it "creates the folder" do

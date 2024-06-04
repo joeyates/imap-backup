@@ -13,9 +13,9 @@ module Imap::Backup
     # @param on_error [Proc] a block to call when an error occurs
     # @raise any error ocurring more than `limit` times
     # @return the result of any successful completion of the block
-    def retry_on_error(errors:, limit: 10, on_error: nil)
+    def retry_on_error(errors:, limit: 10, on_error: nil, &block)
       tries ||= 1
-      yield
+      block.call
     rescue *errors => e
       if tries < limit
         message = "#{e}, attempt #{tries} of #{limit}"

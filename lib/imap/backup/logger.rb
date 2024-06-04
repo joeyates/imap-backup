@@ -51,11 +51,11 @@ module Imap::Backup
     # Wraps a block, filtering output to standard error,
     # hidng passwords and outputs the results to standard out
     # @return [void]
-    def self.sanitize_stderr
+    def self.sanitize_stderr(&block)
       sanitizer = Text::Sanitizer.new($stdout)
       previous_stderr = $stderr
       $stderr = sanitizer
-      yield
+      block.call
     ensure
       sanitizer.flush
       $stderr = previous_stderr

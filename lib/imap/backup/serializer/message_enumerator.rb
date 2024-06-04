@@ -14,14 +14,14 @@ module Imap::Backup
     # @param uids [Array<Integer>] the message UIDs of the messages to iterate over
     # @yieldparam message [Serializer::Message]
     # @return [void]
-    def run(uids:)
+    def run(uids:, &block)
       uids.each do |uid_maybe_string|
         uid = uid_maybe_string.to_i
         message = imap.get(uid)
 
         next if !message
 
-        yield message
+        block.call(message)
       end
     end
 
