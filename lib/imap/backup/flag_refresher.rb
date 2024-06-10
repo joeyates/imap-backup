@@ -28,6 +28,13 @@ module Imap::Backup
 
     def refresh_block(uids)
       uids_and_flags = folder.fetch_multi(uids, ["FLAGS"])
+      if !uids_and_flags
+        Logger.logger.debug(
+          "[#{folder.name}] failed to fetch flags for #{uids} - " \
+          "cannot refresh flags"
+        )
+        return
+      end
       uids_and_flags.each do |uid_and_flags|
         uid = uid_and_flags[:uid]
         flags = uid_and_flags[:flags]
