@@ -46,14 +46,44 @@ we'll use `./my-data` here.
 If you have just one account, you can do as follows
 
 ```sh
-docker run -v ./my-data:/data -ti ghcr.io/joeyates/imap-backup:latest \
-  imap-backup single backup \
+docker run \
+  --volume ./my-data:/data \
   --dns 8.8.8.8 \
-  --email me@example.com --password mysecret --server imap.example.com \
-  --path /data/me_example.com
+  ghcr.io/joeyates/imap-backup:latest \
+  imap-backup single backup \
+    --email me@example.com \
+    --password mysecret \
+    --server imap.example.com \
+    --path /data/me_example.com
 ```
 
 Podman will work exactly the same.
+
+Notes:
+
+* If you're using Docker, add `--user $(id -u):$(id -g)` so that the files
+  created by the container are owned by you and not by root,
+* Pass imap-backup the `--password-environment-variable=VARIABLE_NAME` or
+  `--password-file=FILE` option to avoid having your password in
+  the command line history:
+
+```sh
+docker run --env THE_PASSWORD=$THE_PASSWORD \
+  ... \
+  imap-backup single backup \
+    --password-environment-variable=THE_PASSWORD \
+    ...
+```
+
+or
+
+```sh
+docker run \
+  ... \
+  imap-backup single backup \
+    --password-file=/data/password.txt \
+    ...
+```
 
 If you have multiple accounts, you can create a configuration file.
 
@@ -63,16 +93,27 @@ we'll use `./my-config` here.
 First, run the menu-driven setup program to configure your accounts
 
 ```sh
-docker run -v ./my-config:/config -v ./my-data:/data -ti ghcr.io/joeyates/imap-backup:latest \
+docker run \
+  --volume ./my-config:/config \
+  --volume ./my-data:/data \
   --dns 8.8.8.8 \
-  imap-backup setup -c /config/imap-backup.json
+  --tty \
+  --interactive \
+  ghcr.io/joeyates/imap-backup:latest \
+  imap-backup setup \
+    --config /config/imap-backup.json
 ```
 
 Then, run the backup
 
 ```sh
-docker run -v ./my-config:/config -v ./my-data:/data --dns 8.8.8.8 -ti ghcr.io/joeyates/imap-backup:latest \
-  imap-backup backup -c /config/imap-backup.json
+docker run \
+  --volume ./my-config:/config \
+  --volume ./my-data:/data \
+  --dns 8.8.8.8 \
+  ghcr.io/joeyates/imap-backup:latest \
+  imap-backup backup \
+    --config /config/imap-backup.json
 ```
 </details>
 
