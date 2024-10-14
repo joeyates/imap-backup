@@ -63,7 +63,7 @@ we'll use `./my-config` here.
 First, run the menu-driven setup program to configure your accounts
 
 ```sh
-docker run -ti -v ./my-config:/config -v ./my-data:/data -ti ghcr.io/joeyates/imap-backup:latest \
+docker run -v ./my-config:/config -v ./my-data:/data -ti ghcr.io/joeyates/imap-backup:latest \
   --dns 8.8.8.8 \
   imap-backup setup -c /config/imap-backup.json
 ```
@@ -71,8 +71,7 @@ docker run -ti -v ./my-config:/config -v ./my-data:/data -ti ghcr.io/joeyates/im
 Then, run the backup
 
 ```sh
-docker run -v ./my-config:/config -v ./my-data:/data -ti ghcr.io/joeyates/imap-backup:latest \
-  --dns 8.8.8.8 \
+docker run -v ./my-config:/config -v ./my-data:/data --dns 8.8.8.8 -ti ghcr.io/joeyates/imap-backup:latest \
   imap-backup backup -c /config/imap-backup.json
 ```
 </details>
