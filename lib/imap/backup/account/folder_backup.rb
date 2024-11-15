@@ -22,7 +22,7 @@ module Imap::Backup
     # @raise [RuntimeError] if the configured download strategy is incorrect
     # @return [void]
     def run
-      Logger.logger.debug "[#{folder.name}] running backup"
+      Logger.logger.debug "Running backup for folder '#{folder.name}'"
 
       folder_ok = folder_ok?
       return if !folder_ok
@@ -36,6 +36,7 @@ module Imap::Backup
       # After the transaction the serializer will have any appended messages
       # so we can check differences between the server and the local backup
       LocalOnlyMessageDeleter.new(folder, raw_serializer).run if account.mirror_mode
+      Logger.logger.debug "Backup for folder '#{folder.name}' complete"
     end
 
     private
@@ -47,12 +48,12 @@ module Imap::Backup
     def folder_ok?
       begin
         if !folder.exist?
-          Logger.logger.info "[#{folder.name}] skipping folder as it does not exist"
+          Logger.logger.info "Skipping backup for folder '#{folder.name}' as it does not exist"
           return false
         end
       rescue Encoding::UndefinedConversionError
         message = "Skipping backup for '#{folder.name}' " \
-                  "as it is not UTF-7 encoded correctly"
+                  "as it's name is not UTF-7 encoded correctly"
         Logger.logger.info message
         return false
       end

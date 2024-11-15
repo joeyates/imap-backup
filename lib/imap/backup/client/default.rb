@@ -27,6 +27,7 @@ module Imap::Backup
     # @return [Array<String>] the account folders
     def list
       root = provider_root
+      Logger.logger.debug "Listing all account folders"
       mailbox_lists = imap.list(root, "*")
 
       return [] if mailbox_lists.nil?
@@ -105,7 +106,9 @@ module Imap::Backup
     # in the reference.
     def provider_root
       @provider_root ||= begin
+        Logger.logger.debug "Fetching provider root"
         root_info = imap.list("", "")[0]
+        Logger.logger.debug "Provider root is '#{root_info.name}'"
         root_info.name
       end
     end

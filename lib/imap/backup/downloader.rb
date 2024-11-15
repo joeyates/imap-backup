@@ -19,7 +19,19 @@ module Imap::Backup
     # Runs the downloader
     # @return [void]
     def run
-      info("#{uids.count} new messages") if uids.any?
+      debug("#{serializer_uids.count} already messages already downloaded")
+      debug("#{folder_uids.count} messages on server")
+      local_only_count = (serializer_uids - folder_uids).count
+      if local_only_count.positive?
+        debug("#{local_only_count} downloaded messages no longer on server")
+      end
+
+      if uids.none?
+        debug("no new messages on server — skipping")
+        return
+      end
+
+      info("#{uids.count} new messages")
 
       uids.each_slice(multi_fetch_size).with_index do |block, i|
         multifetch_failed = download_block(block, i)
@@ -62,8 +74,8 @@ module Imap::Backup
         end
       if uids_and_bodies.nil?
         if multi_fetch_size > 1
-          uids = block.join(", ")
-          debug("Multi fetch failed for UIDs #{uids}, switching to single fetches")
+          uid_list = block.join(", ")
+          debug("Multi fetch failed for UIDs #{uid_list}, switching to single fetches")
           return true
         else
           debug("Fetch failed for UID #{block[0]} - skipping")
@@ -96,8 +108,16 @@ module Imap::Backup
       error(e)
     end
 
+    def folder_uids
+      @folder_uids ||= folder.uids
+    end
+
+    def serializer_uids
+      @serializer_uids ||= serializer.uids
+    end
+
     def uids
-      @uids ||= folder.uids - serializer.uids
+      @uids ||= folder_uids - serializer_uids
     end
 
     def debug(message)

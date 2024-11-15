@@ -31,11 +31,14 @@ module Imap::Backup
 
     # @raise any error that occurs more than 10 times
     def exist?
+      Logger.logger.debug "Checking whether folder '#{name}' exists"
       retry_on_error(errors: EXAMINE_RETRY_CLASSES) do
         examine
       end
+      Logger.logger.debug "Folder '#{name}' exists"
       true
     rescue FolderNotFound
+      Logger.logger.debug "Folder '#{name}' does not exist"
       false
     end
 
@@ -62,8 +65,11 @@ module Imap::Backup
     # @raise any error that occurs more than 10 times
     # @return [Array<Integer>] the folders message UIDs
     def uids
+      Logger.logger.debug "Fetching UIDs for folder '#{name}'"
       examine
-      client.uid_search(["ALL"]).sort
+      result = client.uid_search(["ALL"]).sort
+      Logger.logger.debug "#{result.count} UIDs found for folder '#{name}'"
+      result
     rescue FolderNotFound
       []
     rescue NoMethodError

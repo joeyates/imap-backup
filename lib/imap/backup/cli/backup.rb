@@ -24,6 +24,7 @@ module Imap::Backup
     #   @return [void]
     no_commands do
       def run
+        Logger.logger.debug "Loading configuration"
         config = load_config(**options)
         exit_code = nil
         accounts = requested_accounts(config)
@@ -31,6 +32,7 @@ module Imap::Backup
           Logger.logger.warn "No matching accounts found to backup"
           return
         end
+        Logger.logger.debug "Starting backup of #{accounts.count} accounts"
         accounts.each do |account|
           backup = Account::Backup.new(account: account, refresh: refresh)
           backup.run
@@ -43,6 +45,7 @@ module Imap::Backup
           Logger.logger.error message
           next
         end
+        Logger.logger.debug "Backup complete"
         exit(exit_code) if exit_code
       end
     end
