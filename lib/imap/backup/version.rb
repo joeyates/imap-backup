@@ -6,9 +6,9 @@ module Imap::Backup
   # @private
   MINOR    = 0
   # @private
-  REVISION = 2
+  REVISION = 3
   # @private
-  PRE      = nil
+  PRE      = "rc1".freeze
   # The application version
   VERSION  = [MAJOR, MINOR, REVISION, PRE].compact.map(&:to_s).join(".")
 end
