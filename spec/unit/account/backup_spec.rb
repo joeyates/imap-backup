@@ -22,7 +22,7 @@ module Imap::Backup
         reset_seen_flags_after_fetch: reset_seen_flags_after_fetch
       )
     end
-    let(:backup_folders) { instance_double(Account::BackupFolders, none?: false) }
+    let(:backup_folders) { instance_double(Account::BackupFolders, to_a: [folder]) }
     let(:client) { instance_double(Client::Default, login: nil) }
     let(:downloader) { instance_double(Downloader, run: nil) }
     let(:folder) do
@@ -52,7 +52,6 @@ module Imap::Backup
       allow(Account::FolderEnsurer).to receive(:new) { folder_ensurer }
       allow(Serializer).to receive(:new) { serializer }
       allow(serializer).to receive(:transaction).and_yield
-      allow(backup_folders).to receive(:each).and_yield(folder)
     end
 
     it "ensures the backup directory exists" do

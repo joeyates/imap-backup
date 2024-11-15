@@ -26,7 +26,7 @@ module Imap::Backup
       Account::LocalOnlyFolderDeleter.new(account: account).run if account.mirror_mode
       backup_folders = Account::BackupFolders.new(
         client: account.client, account: account
-      )
+      ).to_a
       if backup_folders.none?
         Logger.logger.warn "Account #{account.username}: No folders found to backup"
         return
