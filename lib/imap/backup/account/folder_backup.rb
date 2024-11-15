@@ -22,10 +22,10 @@ module Imap::Backup
     # @raise [RuntimeError] if the configured download strategy is incorrect
     # @return [void]
     def run
+      Logger.logger.debug "[#{folder.name}] running backup"
+
       folder_ok = folder_ok?
       return if !folder_ok
-
-      Logger.logger.debug "[#{folder.name}] running backup"
 
       serializer.apply_uid_validity(folder.uid_validity)
 
@@ -46,7 +46,10 @@ module Imap::Backup
 
     def folder_ok?
       begin
-        return false if !folder.exist?
+        if !folder.exist?
+          Logger.logger.info "[#{folder.name}] skipping folder as it does not exist"
+          return false
+        end
       rescue Encoding::UndefinedConversionError
         message = "Skipping backup for '#{folder.name}' " \
                   "as it is not UTF-7 encoded correctly"
