@@ -143,7 +143,9 @@ If that doesn't work, see the [detailed installation instructions](/docs/install
 
 <details>
 <summary>From Source Code</summary>
+  
 If you want to use imap-backup directly from the source code, see [here](/docs/installation/source.md).
+  
 </details>
 
 # Setup
