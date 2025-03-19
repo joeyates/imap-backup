@@ -119,6 +119,7 @@ docker run \
 
 <details>
 <summary>Homebrew (macOS)</summary>
+  
 ![Homebrew installs](https://img.shields.io/homebrew/installs/dm/imap-backup?label=Homebrew%20installs)
 
 If you have [Homebrew](https://brew.sh/), do this:
@@ -130,6 +131,7 @@ brew install imap-backup
 
 <details>
 <summary>As a Ruby Gem</summary>
+  
 * [Rubygem]
 
 ```sh
