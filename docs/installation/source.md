@@ -36,9 +36,10 @@ If you get something like
 ```
 imap-backup 14.4.4
 ```
+
 congratulations, you have succesfully built imap-backup.
 
-You ca now run the following to see the built-in help:
+You can now run the following to see the built-in help:
 
 ```sh
 bin/imap-backup help
