@@ -231,18 +231,6 @@ RSpec/NotToNot:
   Enabled: false
 RSpec/PendingWithoutReason:
   Enabled: true
-RSpec/Rails/AvoidSetupHook:
-  Enabled: false
-RSpec/Rails/HaveHttpStatus:
-  Enabled: false
-RSpec/Rails/InferredSpecType:
-  Enabled: false
-RSpec/Rails/MinitestAssertions:
-  Enabled: false
-RSpec/Rails/NegationBeValid:
-  Enabled: false
-RSpec/Rails/TravelAround:
-  Enabled: false
 RSpec/ReceiveMessages:
   Enabled: true
 RSpec/RedundantAround:
@@ -253,6 +241,8 @@ RSpec/RemoveConst:
   Enabled: true
 RSpec/RepeatedSubjectCall:
   Enabled: true
+RSpec/ReturnFromStub:
+  Enabled: false
 RSpec/SkipBlockInsideExample:
   Enabled: true
 RSpec/SortMetadata:
@@ -268,7 +258,17 @@ RSpec/SubjectDeclaration:
 RSpec/VerifiedDoubleReference:
   Enabled: true
 
-RSpec/ReturnFromStub:
+RSpec/Rails/AvoidSetupHook:
+  Enabled: false
+RSpec/Rails/HaveHttpStatus:
+  Enabled: false
+RSpec/Rails/InferredSpecType:
+  Enabled: false
+RSpec/Rails/MinitestAssertions:
+  Enabled: false
+RSpec/Rails/NegationBeValid:
+  Enabled: false
+RSpec/Rails/TravelAround:
   Enabled: false
 
 Security/IoMethods:
