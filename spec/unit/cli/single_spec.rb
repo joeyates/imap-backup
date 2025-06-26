@@ -9,7 +9,7 @@ module Imap::Backup
         allow(CLI::Single::Backup).to receive(:new) { backup }
       end
 
-      it "runs Direct" do
+      it "runs a single backup" do
         subject.backup
 
         expect(backup).to have_received(:run)
