@@ -12,6 +12,8 @@ module Imap::Backup
 
     autoload :Backup, "imap/backup/cli/backup"
     autoload :Local, "imap/backup/cli/local"
+    autoload :Migrate, "imap/backup/cli/migrate"
+    autoload :Mirror, "imap/backup/cli/mirror"
     autoload :Remote, "imap/backup/cli/remote"
     autoload :Restore, "imap/backup/cli/restore"
     autoload :Setup, "imap/backup/cli/setup"
@@ -21,28 +23,6 @@ module Imap::Backup
     autoload :Utils, "imap/backup/cli/utils"
 
     include Helpers
-
-    NAMESPACE_CONFIGURATION_DESCRIPTION = <<~DESC.freeze
-      Some IMAP servers use namespaces (i.e. prefixes like "INBOX"),
-      while others, while others concatenate the names of subfolders
-      with a charater ("delimiter") other than "/".
-
-      In these cases there are two choices.
-
-      You can use the `--automatic-namespaces` option.
-      This will query the source and detination servers for their
-      namespace configuration and will adapt paths accordingly.
-      This option requires that both the source and destination
-      servers are available and work with the provided parameters
-      and authentication.
-
-      If automatic configuration does not work as desired, there are the
-      `--source-prefix=`, `--source-delimiter=`,
-      `--destination-prefix=` and `--destination-delimiter=` parameters.
-      To check what values you should use, check the output of the
-      `imap-backup remote namespaces EMAIL` command.
-    DESC
-    private_constant :NAMESPACE_CONFIGURATION_DESCRIPTION
 
     default_task :backup
 
@@ -94,91 +74,31 @@ module Imap::Backup
       Backup.new(non_logging_options).run
     end
 
-    desc "local SUBCOMMAND [OPTIONS]", "View local info"
-    subcommand "local", Local
-
     desc(
-      "migrate SOURCE_EMAIL DESTINATION_EMAIL [OPTIONS]",
-      "Uploads backed-up emails from account SOURCE_EMAIL to account DESTINATION_EMAIL"
+      "copy SOURCE_EMAIL DESTINATION_EMAIL [OPTIONS]",
+      "Copies emails from the SOURCE account to the DESTINATION account, avoiding duplicates"
     )
     long_desc <<~DESC
-      All emails which have been backed up for the "source account" (SOURCE_EMAIL) are
-      uploaded to the "destination account" (DESTINATION_EMAIL).
+      This command copies messages from the SOURCE_EMAIL account
+      to the DESTINATION_EMAIL account. It keeps track of copied
+      messages and avoids duplicate copies.
 
-      Some configuration may be necessary, as follows:
-
-      #{NAMESPACE_CONFIGURATION_DESCRIPTION}
-
-      Finally, if you want to delete existing emails in destination folders,
-      use the `--reset` option. In this case, all existing emails are
-      deleted before uploading the migrated emails.
-    DESC
-    config_option
-    quiet_option
-    verbose_option
-    method_option(
-      "automatic-namespaces",
-      type: :boolean,
-      desc: "automatically choose delimiters and prefixes"
-    )
-    method_option(
-      "destination-delimiter",
-      type: :string,
-      desc: "the delimiter for destination folder names"
-    )
-    method_option(
-      "destination-prefix",
-      type: :string,
-      desc: "the prefix (namespace) to add to destination folder names",
-      aliases: ["-d"]
-    )
-    method_option(
-      "reset",
-      type: :boolean,
-      desc: "DANGER! This option deletes all messages from destination folders before uploading",
-      aliases: ["-r"]
-    )
-    method_option(
-      "source-delimiter",
-      type: :string,
-      desc: "the delimiter for source folder names"
-    )
-    method_option(
-      "source-prefix",
-      type: :string,
-      desc: "the prefix (namespace) to strip from source folder names",
-      aliases: ["-s"]
-    )
-    # Migrates emails from one account to another
-    # @return [void]
-    def migrate(source_email, destination_email)
-      non_logging_options = Imap::Backup::Logger.setup_logging(options)
-      Transfer.new(:migrate, source_email, destination_email, non_logging_options).run
-    end
-
-    desc(
-      "mirror SOURCE_EMAIL DESTINATION_EMAIL [OPTIONS]",
-      "Keeps the DESTINATION_EMAIL account aligned with the SOURCE_EMAIL account"
-    )
-    long_desc <<~DESC
-      This command updates the DESTINATION_EMAIL account's folders to have the same contents
-      as those on the SOURCE_EMAIL account.
+      Any other messages that are present on the DESTINATION_EMAIL account
+      are not affected.
 
       If a folder list is configured for the SOURCE_EMAIL account,
       only the folders indicated by the setting are copied.
 
       First, it runs the download of the SOURCE_EMAIL account.
-      If the SOURCE_EMAIL account is **not** configured to be in 'mirror' mode,
-      a warning is printed.
 
-      When the mirror command is used, for each folder that is processed,
+      When the copy command is used, for each folder that is processed,
       a new file is created alongside the normal backup files (.imap and .mbox)
       This file has a '.mirror' extension. This file contains a mapping of
       the known UIDs on the source account to those on the destination account.
 
       Some configuration may be necessary, as follows:
 
-      #{NAMESPACE_CONFIGURATION_DESCRIPTION}
+      #{Helpers::NAMESPACE_CONFIGURATION_DESCRIPTION}
     DESC
     config_option
     quiet_option
@@ -210,12 +130,18 @@ module Imap::Backup
       desc: "the prefix (namespace) to strip from source folder names",
       aliases: ["-s"]
     )
-    # Keeps one email account in line with another
+    # Copies messages from one email account to another
     # @return [void]
-    def mirror(source_email, destination_email)
+    def copy(source_email, destination_email)
       non_logging_options = Imap::Backup::Logger.setup_logging(options)
-      Transfer.new(:mirror, source_email, destination_email, non_logging_options).run
+      Transfer.new(:copy, source_email, destination_email, non_logging_options).run
     end
+
+    desc "local SUBCOMMAND [OPTIONS]", "View local info"
+    subcommand "local", Local
+
+    include Migrate
+    include Mirror
 
     desc "remote SUBCOMMAND [OPTIONS]", "View info about online accounts"
     subcommand "remote", Remote

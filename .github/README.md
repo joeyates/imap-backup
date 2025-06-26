@@ -27,8 +27,7 @@ There are two types of backups:
 
 # What You Can Do with a Backup
 
-* Migrate - use the local copy to populate emails on another account. This is a once-only action that deletes any existing emails on the destination account.
-* Mirror - make a destination account match the local copy. This action can be repeated.
+* Copy - copy messages from one account to another, tracking copies in order to avoid duplicates.
 * Restore - push the local copy back to the original account.
 
 See below for a [full list of commands](#commands).
@@ -189,13 +188,12 @@ and exported via [`utils export-to-thunderbird`](/docs/commands/utils-export-to-
 # Commands
 
 * [`backup`](/docs/commands/backup.md)
+* [`copy`](/docs/commands/copy.md)
 * [`local accounts`](/docs/commands/local-accounts.md)
 * [`local check`](/docs/commands/local-check.md)
 * [`local folders`](/docs/commands/local-folders.md)
 * [`local list`](/docs/commands/local-list.md)
 * [`local show`](/docs/commands/local-show.md)
-* [`migrate`](/docs/commands/migrate.md)
-* [`mirror`](/docs/commands/mirror.md)
 * [`remote folders`](/docs/commands/remote-folders.md)
 * [`restore`](/docs/commands/restore.md)
 * [`setup`](/docs/commands/setup.md)

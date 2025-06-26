@@ -13,7 +13,7 @@ module Imap::Backup
     include CLI::Helpers
 
     # The possible values for the action parameter
-    ACTIONS = %i(migrate mirror).freeze
+    ACTIONS = %i(copy migrate mirror).freeze
 
     def initialize(action, source_email, destination_email, options)
       @action = action
@@ -39,14 +39,17 @@ module Imap::Backup
       raise "Unknown action '#{action}'" if !ACTIONS.include?(action)
 
       process_options!
-      prepare_mirror if action == :mirror
+      warn_if_source_account_is_not_in_mirror_mode if action == :mirror
+      run_backup if %i(copy mirror).include?(action)
 
       folders.each do |serializer, folder|
         case action
+        when :copy
+          Mirror.new(serializer, folder, reset: false).run
         when :migrate
           Migrator.new(serializer, folder, reset: reset).run
         when :mirror
-          Mirror.new(serializer, folder).run
+          Mirror.new(serializer, folder, reset: true).run
         end
       end
     end
@@ -123,9 +126,7 @@ module Imap::Backup
       self.source_prefix ||= ""
     end
 
-    def prepare_mirror
-      warn_if_source_account_is_not_in_mirror_mode
-
+    def run_backup
       CLI::Backup.new(config: config_path, accounts: source_email).run
     end
 
