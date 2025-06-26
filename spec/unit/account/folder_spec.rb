@@ -1,5 +1,6 @@
 require "imap/backup/account/folder"
 
+require "ostruct"
 require "imap/backup/client/default"
 require "imap/backup/serializer/message"
 
@@ -55,21 +56,6 @@ module Imap::Backup
         end
       end
 
-      context "with no SEARCH response in Net::IMAP" do
-        let(:no_method_error) do
-          NoMethodError.new("Somethimes SEARCH responses come out undefined")
-        end
-
-        before do
-          allow(client).to receive(:examine).
-            with(encoded_folder_name).and_raise(missing_mailbox_error)
-        end
-
-        it "returns an empty array" do
-          expect(subject.uids).to eq([])
-        end
-      end
-
       context "when the UID search fails" do
         before do
           allow(client).to receive(:uid_search).and_raise(NoMethodError)
@@ -77,6 +63,29 @@ module Imap::Backup
 
         it "returns an empty array" do
           expect(subject.uids).to eq([])
+        end
+      end
+
+      context "when the first uid_search attempt fails with EOF" do
+        before do
+          outcomes = [-> { raise EOFError }, -> { uids }]
+          allow(client).to receive(:uid_search) { outcomes.shift.call }
+        end
+
+        it "retries" do
+          subject.uids
+
+          expect(client).to have_received(:uid_search).twice
+        end
+
+        it "succeeds" do
+          expect do
+            subject.uids
+          end.to_not(raise_error)
+        end
+
+        it "returns the correct result" do
+          expect(subject.uids).to eq(uids.reverse)
         end
       end
     end

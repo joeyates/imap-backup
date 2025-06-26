@@ -67,7 +67,10 @@ module Imap::Backup
     def uids
       Logger.logger.debug "Fetching UIDs for folder '#{name}'"
       examine
-      result = client.uid_search(["ALL"]).sort
+      result =
+        retry_on_error(errors: UID_SEARCH_RETRY_CLASSES) do
+          client.uid_search(["ALL"]).sort
+        end
       Logger.logger.debug "#{result.count} UIDs found for folder '#{name}'"
       result
     rescue FolderNotFound
@@ -177,6 +180,7 @@ module Imap::Backup
 
     BODY_ATTRIBUTE = "BODY[]".freeze
     UID_FETCH_RETRY_CLASSES = [::EOFError, ::Errno::ECONNRESET, ::IOError].freeze
+    UID_SEARCH_RETRY_CLASSES = [::EOFError, ::Errno::ECONNRESET, ::IOError].freeze
     APPEND_RETRY_CLASSES = [::Net::IMAP::BadResponseError].freeze
     CREATE_RETRY_CLASSES = [::Net::IMAP::BadResponseError].freeze
     EXAMINE_RETRY_CLASSES = [::Net::IMAP::BadResponseError].freeze
