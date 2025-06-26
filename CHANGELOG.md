@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 16.0.0 - 2024-06-26
+
+### Added
+
+* Added the new `imap-backup copy` command to replace the existing
+  `migrate` and `mirror` commands. The new command is simpler
+  than the exiting commands, while maintaining the principal functionality
+  that was previously available. `migrate` and `mirror` are now deprecated
+  and will be removed in a future release.
+
+### Changed
+
+* The libarary now uses `logger` and `ostruct` as external dependencies
+  as they have been extracted from th Ruby standard library.
+
 ## 15.0.1 - 2024-06-04
 
 ### Changed
