@@ -21,10 +21,12 @@ Gem::Specification.new do |gem|
   gem.required_ruby_version = ">= 3.0"
 
   gem.add_runtime_dependency "highline"
+  gem.add_runtime_dependency "logger"
   gem.add_runtime_dependency "mail", "2.7.1"
   gem.add_runtime_dependency "net-imap", ">= 0.3.2"
   gem.add_runtime_dependency "net-smtp"
   gem.add_runtime_dependency "os"
+  gem.add_runtime_dependency "ostruct"
   gem.add_runtime_dependency "rake"
   gem.add_runtime_dependency "thor", "~> 1.1"
   gem.add_runtime_dependency "thunderbird", "0.3.0"
