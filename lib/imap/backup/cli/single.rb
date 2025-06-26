@@ -88,7 +88,7 @@ module Imap::Backup
       "password-environment-variable",
       type: :string,
       desc: "an environment variable that is set to your password",
-      aliases: ["-e"]
+      aliases: ["-w"]
     )
     method_option(
       "password-file",
