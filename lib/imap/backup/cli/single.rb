@@ -137,7 +137,7 @@ module Imap::Backup
       "mirror",
       type: :boolean,
       desc: "if this option is given, " \
-            "emails that are removed from the server " \
+            "existing backed-up emails that are no longer on the server " \
             "will be removed from the local backup.",
       aliases: ["-m"]
     )
