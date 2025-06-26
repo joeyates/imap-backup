@@ -135,6 +135,107 @@ module Imap::Backup
       end
     end
 
+    describe "#single" do
+      let(:backup) { instance_double(CLI::Single::Backup, run: nil) }
+
+      before do
+        allow(CLI::Single::Backup).to receive(:new) { backup }
+      end
+
+      describe "backup - short options" do
+        it "accepts -e as a short option for --email" do
+          subject.invoke(Imap::Backup::CLI::Single, ["backup"], ["-e", "foo@example.com"])
+
+          expect(CLI::Single::Backup).to have_received(:new).
+            with(hash_including(email: "foo@example.com"))
+        end
+
+        it "accepts -s as a short option for --server" do
+          subject.invoke(Imap::Backup::CLI::Single, ["backup"], ["-s", "server"])
+
+          expect(CLI::Single::Backup).to have_received(:new).
+            with(hash_including(server: "server"))
+        end
+
+        it "accepts -p as a short option for --password" do
+          subject.invoke(Imap::Backup::CLI::Single, ["backup"], ["-p", "MyS3kr1t"])
+
+          expect(CLI::Single::Backup).to have_received(:new).
+            with(hash_including(password: "MyS3kr1t"))
+        end
+
+        it "accepts -w as a short option for --password-environment-variable" do
+          subject.invoke(Imap::Backup::CLI::Single, ["backup"], ["-w", "MY_PASSWORD"])
+
+          expect(CLI::Single::Backup).to have_received(:new).
+            with(hash_including(password_environment_variable: "MY_PASSWORD"))
+        end
+
+        it "accepts -W as a short option for --password-file" do
+          subject.invoke(Imap::Backup::CLI::Single, ["backup"], ["-W", "some/file/with/password"])
+
+          expect(CLI::Single::Backup).to have_received(:new).
+            with(hash_including(password_file: "some/file/with/password"))
+        end
+
+        it "accepts -P as a short option for --path" do
+          subject.invoke(Imap::Backup::CLI::Single, ["backup"], ["-P", "some/path"])
+
+          expect(CLI::Single::Backup).to have_received(:new).
+            with(hash_including(path: "some/path"))
+        end
+
+        it "accepts -F as a short option for --folder" do
+          subject.invoke(Imap::Backup::CLI::Single, ["backup"], ["-F", "a-folder"])
+
+          expect(CLI::Single::Backup).to have_received(:new).
+            with(hash_including(folder: ["a-folder"]))
+        end
+
+        it "accepts -b as a short option for --folder-blacklist" do
+          subject.invoke(Imap::Backup::CLI::Single, ["backup"], ["-b"])
+
+          expect(CLI::Single::Backup).to have_received(:new).
+            with(hash_including(folder_blacklist: true))
+        end
+
+        it "accepts -m as a short option for --mirror" do
+          subject.invoke(Imap::Backup::CLI::Single, ["backup"], ["-m"])
+
+          expect(CLI::Single::Backup).to have_received(:new).
+            with(hash_including(mirror: true))
+        end
+
+        it "accepts -n as a short option for --multi-fetch-size" do
+          subject.invoke(Imap::Backup::CLI::Single, ["backup"], ["-n", "99"])
+
+          expect(CLI::Single::Backup).to have_received(:new).
+            with(hash_including(multi_fetch_size: 99))
+        end
+
+        it "accepts -o as a short option for --connection-options" do
+          subject.invoke(Imap::Backup::CLI::Single, ["backup"], ["-o", '{"foo": "bar"}'])
+
+          expect(CLI::Single::Backup).to have_received(:new).
+            with(hash_including(connection_options: '{"foo": "bar"}'))
+        end
+
+        it "accepts -S as a short option for --download-strategy" do
+          subject.invoke(Imap::Backup::CLI::Single, ["backup"], ["-S", "direct"])
+
+          expect(CLI::Single::Backup).to have_received(:new).
+            with(hash_including(download_strategy: "direct"))
+        end
+
+        it "accepts -R as a short option for --reset-seen-flags-after-fetch" do
+          subject.invoke(Imap::Backup::CLI::Single, ["backup"], ["-R"])
+
+          expect(CLI::Single::Backup).to have_received(:new).
+            with(hash_including(reset_seen_flags_after_fetch: true))
+        end
+      end
+    end
+
     describe "#stats" do
       let(:stats) { instance_double(CLI::Stats, run: nil) }
 
