@@ -22,28 +22,6 @@ module Imap::Backup
 
     include Helpers
 
-    NAMESPACE_CONFIGURATION_DESCRIPTION = <<~DESC.freeze
-      Some IMAP servers use namespaces (i.e. prefixes like "INBOX"),
-      while others, while others concatenate the names of subfolders
-      with a charater ("delimiter") other than "/".
-
-      In these cases there are two choices.
-
-      You can use the `--automatic-namespaces` option.
-      This will query the source and detination servers for their
-      namespace configuration and will adapt paths accordingly.
-      This option requires that both the source and destination
-      servers are available and work with the provided parameters
-      and authentication.
-
-      If automatic configuration does not work as desired, there are the
-      `--source-prefix=`, `--source-delimiter=`,
-      `--destination-prefix=` and `--destination-delimiter=` parameters.
-      To check what values you should use, check the output of the
-      `imap-backup remote namespaces EMAIL` command.
-    DESC
-    private_constant :NAMESPACE_CONFIGURATION_DESCRIPTION
-
     default_task :backup
 
     # Overrides {https://www.rubydoc.info/gems/thor/Thor%2FBase%2FClassMethods:start Thor's method}
@@ -118,7 +96,7 @@ module Imap::Backup
 
       Some configuration may be necessary, as follows:
 
-      #{NAMESPACE_CONFIGURATION_DESCRIPTION}
+      #{Helpers::NAMESPACE_CONFIGURATION_DESCRIPTION}
     DESC
     config_option
     quiet_option
@@ -173,7 +151,7 @@ module Imap::Backup
 
       Some configuration may be necessary, as follows:
 
-      #{NAMESPACE_CONFIGURATION_DESCRIPTION}
+      #{Helpers::NAMESPACE_CONFIGURATION_DESCRIPTION}
 
       Finally, if you want to delete existing emails in destination folders,
       use the `--reset` option. In this case, all existing emails are
@@ -247,7 +225,7 @@ module Imap::Backup
 
       Some configuration may be necessary, as follows:
 
-      #{NAMESPACE_CONFIGURATION_DESCRIPTION}
+      #{Helpers::NAMESPACE_CONFIGURATION_DESCRIPTION}
     DESC
     config_option
     quiet_option
