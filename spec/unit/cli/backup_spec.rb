@@ -7,7 +7,7 @@ module Imap::Backup
   RSpec.describe CLI::Backup do
     subject { described_class.new({}) }
 
-    let(:account) { instance_double(Account, username: "me@example.com") }
+    let(:account) { instance_double(Account, username: "me@example.com", available_for_backup?: true) }
     let(:backup) { instance_double(Account::Backup, "backup", run: nil) }
 
     before do
@@ -28,7 +28,7 @@ module Imap::Backup
     end
 
     context "when one connection fails" do
-      let(:account2) { instance_double(Account, "account2") }
+      let(:account2) { instance_double(Account, "account2", available_for_backup?: true) }
 
       before do
         outcomes = [-> { raise "Foo" }, -> { true }]
@@ -52,6 +52,24 @@ module Imap::Backup
         expect do
           subject.run
         end.to raise_exception(SystemExit)
+      end
+    end
+
+    context "when accounts have different statuses" do
+      let(:active_account) { instance_double(Account, username: "active@example.com", available_for_backup?: true) }
+      let(:archived_account) { instance_double(Account, username: "archived@example.com", available_for_backup?: false) }
+      let(:offline_account) { instance_double(Account, username: "offline@example.com", available_for_backup?: false) }
+
+      before do
+        allow(subject).to receive(:requested_accounts) { [active_account, archived_account, offline_account] }
+      end
+
+      it "only runs backup for accounts available for backup" do
+        subject.run
+
+        expect(Account::Backup).to have_received(:new).with(account: active_account, refresh: false)
+        expect(Account::Backup).not_to have_received(:new).with(account: archived_account, refresh: anything)
+        expect(Account::Backup).not_to have_received(:new).with(account: offline_account, refresh: anything)
       end
     end
   end
