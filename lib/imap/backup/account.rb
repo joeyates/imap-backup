@@ -211,11 +211,7 @@ module Imap::Backup
     def multi_fetch_size
       @multi_fetch_size ||= begin
         int = @multi_fetch_size_orignal.to_i
-        if int.positive?
-          int
-        else
-          DEFAULT_MULTI_FETCH_SIZE
-        end
+        int.positive? ? int : DEFAULT_MULTI_FETCH_SIZE
       end
     end
 
