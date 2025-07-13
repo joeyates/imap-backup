@@ -219,6 +219,28 @@ module Imap::Backup
           expect(subject.to_h).to include({reset_seen_flags_after_fetch: true})
         end
       end
+
+      context "when status is set to non-default value" do
+        let(:options) { {username: "user", password: "pwd", status: "archived"} }
+
+        it "includes status" do
+          expect(subject.to_h).to include({status: "archived"})
+        end
+      end
+
+      context "when status is active (default)" do
+        let(:options) { {username: "user", password: "pwd", status: "active"} }
+
+        it "does not include status" do
+          expect(subject.to_h).not_to have_key(:status)
+        end
+      end
+
+      context "when status is not set" do
+        it "does not include status" do
+          expect(subject.to_h).not_to have_key(:status)
+        end
+      end
     end
 
     describe "#multi_fetch_size" do
@@ -312,6 +334,152 @@ module Imap::Backup
           expect do
             subject.connection_options = "NOT JSON"
           end.to raise_error(JSON::ParserError)
+        end
+      end
+    end
+
+    describe "#status" do
+      context "when status is not set" do
+        it "defaults to active" do
+          expect(subject.status).to eq("active")
+        end
+      end
+
+      context "when status is set" do
+        let(:options) { {username: "user", password: "pwd", status: "archived"} }
+
+        it "returns the set status" do
+          expect(subject.status).to eq("archived")
+        end
+      end
+    end
+
+    describe "#status=" do
+      %w[archived offline].each do |status|
+        context "when setting to #{status}" do
+          before { subject.status = status }
+
+          it "sets the status" do
+            expect(subject.status).to eq(status)
+          end
+
+          it "modifies the Account" do
+            expect(subject.modified?).to be true
+          end
+        end
+      end
+
+      context "when setting to active" do
+        before { subject.status = "active" }
+
+        it "sets the status" do
+          expect(subject.status).to eq("active")
+        end
+
+        it "does not modify the Account" do
+          expect(subject.modified?).to be false
+        end
+      end
+
+      context "when setting to an invalid status" do
+        it "raises an error" do
+          expect do
+            subject.status = "invalid"
+          end.to raise_error(ArgumentError, /status must be one of: active, archived, offline/)
+        end
+      end
+    end
+
+    describe "#active?" do
+      context "when status is active" do
+        let(:options) { {username: "user", password: "pwd", status: "active"} }
+
+        it "returns true" do
+          expect(subject.active?).to be true
+        end
+      end
+
+      context "when status is not active" do
+        let(:options) { {username: "user", password: "pwd", status: "archived"} }
+
+        it "returns false" do
+          expect(subject.active?).to be false
+        end
+      end
+    end
+
+    describe "#archived?" do
+      context "when status is archived" do
+        let(:options) { {username: "user", password: "pwd", status: "archived"} }
+
+        it "returns true" do
+          expect(subject.archived?).to be true
+        end
+      end
+
+      context "when status is not archived" do
+        let(:options) { {username: "user", password: "pwd", status: "active"} }
+
+        it "returns false" do
+          expect(subject.archived?).to be false
+        end
+      end
+    end
+
+    describe "#offline?" do
+      context "when status is offline" do
+        let(:options) { {username: "user", password: "pwd", status: "offline"} }
+
+        it "returns true" do
+          expect(subject.offline?).to be true
+        end
+      end
+
+      context "when status is not offline" do
+        let(:options) { {username: "user", password: "pwd", status: "active"} }
+
+        it "returns false" do
+          expect(subject.offline?).to be false
+        end
+      end
+    end
+
+    describe "#available_for_backup?" do
+      context "when status is active" do
+        let(:options) { {username: "user", password: "pwd", status: "active"} }
+
+        it "returns true" do
+          expect(subject.available_for_backup?).to be true
+        end
+      end
+
+      %w[archived offline].each do |status|
+        context "when status is #{status}" do
+          let(:options) { {username: "user", password: "pwd", status: status} }
+
+          it "returns false" do
+            expect(subject.available_for_backup?).to be false
+          end
+        end
+      end
+    end
+
+    describe "#available_for_migration?" do
+      %w[active archived].each do |status|
+        context "when status is #{status}" do
+          let(:options) { {username: "user", password: "pwd", status: status} }
+
+          it "returns true" do
+            expect(subject.available_for_migration?).to be true
+          end
+        end
+      end
+
+      context "when status is offline" do
+        let(:options) { {username: "user", password: "pwd", status: "offline"} }
+
+        it "returns false" do
+          expect(subject.available_for_migration?).to be false
         end
       end
     end

@@ -55,8 +55,22 @@ module Imap::Backup
     # client sets the '\Seen' flag while imap-backup is fetching, it is best
     # to only use it when required (i.e. for IMAP providers which always
     # mark messages as '\Seen' when accessed).
+    # Should 'Seen' flags be cached before fetchiong emails and
+    # rewritten to the server afterwards?
+    #
+    # Some IMAP providers, notably Apple Mail, set the '\Seen' flag
+    # on emails when they are fetched. By setting `:reset_seen_flags_after_fetch`,
+    # a workaround is activated which checks which emails are 'unseen' before
+    # and after the fetch, and removes the '\Seen' flag from those which have changed.
+    # As this check is susceptible to 'race conditions', i.e. when a different
+    # client sets the '\Seen' flag while imap-backup is fetching, it is best
+    # to only use it when required (i.e. for IMAP providers which always
+    # mark messages as '\Seen' when accessed).
     # @return [Boolean]
     attr_reader :reset_seen_flags_after_fetch
+    # The status of the account - controls backup and migration behavior
+    # @return [String] one of "active", "archived", or "offline"
+    attr_reader :status
 
     def initialize(options)
       check_options!(options)
@@ -72,6 +86,7 @@ module Imap::Backup
       @download_strategy = options[:download_strategy]
       @multi_fetch_size_orignal = options[:multi_fetch_size]
       @reset_seen_flags_after_fetch = options[:reset_seen_flags_after_fetch]
+      @status = options[:status] || "active"
       @client = nil
       @changes = {}
       @marked_for_deletion = false
@@ -133,6 +148,7 @@ module Imap::Backup
       if @reset_seen_flags_after_fetch
         h[:reset_seen_flags_after_fetch] = @reset_seen_flags_after_fetch
       end
+      h[:status] = @status if @status && @status != "active"
       h
     end
 
@@ -234,6 +250,43 @@ module Imap::Backup
       update(:reset_seen_flags_after_fetch, value)
     end
 
+    # Sets the status attribute and marks it as modified, storing the original value
+    #
+    # @param value [String] one of "active", "archived", or "offline"
+    # @raise [ArgumentError] if the value is not a valid status
+    # @return [void]
+    def status=(value)
+      valid_statuses = %w[active archived offline]
+      raise ArgumentError, "status must be one of: #{valid_statuses.join(', ')}" unless valid_statuses.include?(value)
+
+      update(:status, value)
+    end
+
+    # @return [Boolean] true if the account is active
+    def active?
+      @status == "active"
+    end
+
+    # @return [Boolean] true if the account is archived
+    def archived?
+      @status == "archived"
+    end
+
+    # @return [Boolean] true if the account is offline
+    def offline?
+      @status == "offline"
+    end
+
+    # @return [Boolean] true if the account is available for backup operations
+    def available_for_backup?
+      active?
+    end
+
+    # @return [Boolean] true if the account is available for migration operations
+    def available_for_migration?
+      active? || archived?
+    end
+
     private
 
     attr_reader :changes
@@ -241,7 +294,7 @@ module Imap::Backup
     REQUIRED_ATTRIBUTES = %i[password username].freeze
     OPTIONAL_ATTRIBUTES = %i[
       connection_options download_strategy folders folder_blacklist local_path mirror_mode
-      multi_fetch_size reset_seen_flags_after_fetch server
+      multi_fetch_size reset_seen_flags_after_fetch server status
     ].freeze
     KNOWN_ATTRIBUTES = REQUIRED_ATTRIBUTES + OPTIONAL_ATTRIBUTES
 
