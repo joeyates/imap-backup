@@ -20,7 +20,8 @@ module Imap::Backup
         modified?: modified,
         folder_blacklist: false,
         multi_fetch_size: multi_fetch_size,
-        reset_seen_flags_after_fetch: reset_seen_flags_after_fetch
+        reset_seen_flags_after_fetch: reset_seen_flags_after_fetch,
+        status: status
       )
     end
     let(:existing_password) { "password" }
@@ -29,6 +30,7 @@ module Imap::Backup
     let(:modified) { false }
     let(:multi_fetch_size) { 2 }
     let(:reset_seen_flags_after_fetch) { false }
+    let(:status) { "active" }
 
     [
       ["email", /email\s+user@example.com/],
@@ -96,6 +98,30 @@ module Imap::Backup
 
       it "indicates the flag is set" do
         expect(menu.header).to match(/^changes to unread flags will be reset/)
+      end
+    end
+
+    context "with status archived" do
+      let(:status) { "archived" }
+
+      it "shows the status" do
+        expect(menu.header).to match(/status\s+archived/)
+      end
+    end
+
+    context "with status offline" do
+      let(:status) { "offline" }
+
+      it "shows the status" do
+        expect(menu.header).to match(/status\s+offline/)
+      end
+    end
+
+    context "with status active" do
+      let(:status) { "active" }
+
+      it "does not show the status" do
+        expect(menu.header).not_to match(/status/)
       end
     end
   end
