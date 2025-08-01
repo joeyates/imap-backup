@@ -19,7 +19,7 @@ module Imap::Backup
     # Runs the downloader
     # @return [void]
     def run
-      debug("#{serializer_uids.count} already messages already downloaded")
+      debug("#{serializer_uids.count} messages already downloaded")
       debug("#{folder_uids.count} messages on server")
       local_only_count = (serializer_uids - folder_uids).count
       if local_only_count.positive?
