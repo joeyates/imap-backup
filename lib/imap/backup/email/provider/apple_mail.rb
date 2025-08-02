@@ -10,6 +10,11 @@ module Imap::Backup
       "imap.mail.me.com"
     end
 
+    # With Apple Mails's IMAP, passing "/" to list results in an empty list
+    def root
+      ""
+    end
+
     def sets_seen_flags_on_fetch?
       true
     end

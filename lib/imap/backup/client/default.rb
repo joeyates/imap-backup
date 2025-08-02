@@ -1,6 +1,7 @@
 require "forwardable"
 require "net/imap"
 
+require "imap/backup/email/provider"
 require "imap/backup/logger"
 
 module Imap; end
@@ -100,16 +101,25 @@ module Imap::Backup
       account.password.gsub(/./, "x")
     end
 
+    def provider
+      @provider ||= Email::Provider.for_address(account.username)
+    end
+
     # 6.3.8. LIST Command
     # An empty ("" string) mailbox name argument is a special request to
     # return the hierarchy delimiter and the root name of the name given
     # in the reference.
     def provider_root
       @provider_root ||= begin
-        Logger.logger.debug "Fetching provider root"
-        root_info = imap.list("", "")[0]
-        Logger.logger.debug "Provider root is '#{root_info.name}'"
-        root_info.name
+        if provider.root
+          Logger.logger.debug "Using fixed provider root '#{provider.root}'"
+          provider.root
+        else
+          Logger.logger.debug "Fetching provider root"
+          root_info = imap.list("", "")[0]
+          Logger.logger.debug "Provider root is '#{root_info.name}'"
+          root_info.name
+        end
       end
     end
   end

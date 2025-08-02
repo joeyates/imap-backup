@@ -12,6 +12,12 @@ module Imap::Backup
       end
     end
 
+    describe "#root" do
+      it "is an nil" do
+        expect(subject.root).to be_nil
+      end
+    end
+
     describe "#sets_seen_flags_on_fetch?" do
       it "is false" do
         expect(subject.sets_seen_flags_on_fetch?).to be false
