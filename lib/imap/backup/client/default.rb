@@ -18,10 +18,8 @@ module Imap::Backup
       responses uid_fetch uid_search uid_store
     )
 
-    def initialize(server, account, options)
+    def initialize(account)
       @account = account
-      @options = options
-      @server = server
       @state = nil
     end
 
@@ -84,8 +82,6 @@ module Imap::Backup
     private
 
     attr_reader :account
-    attr_reader :options
-    attr_reader :server
     attr_accessor :state
 
     def imap
@@ -105,6 +101,14 @@ module Imap::Backup
       @provider ||= Email::Provider.for_address(account.username)
     end
 
+    def options
+      @options ||= provider.options.merge(account.connection_options || {})
+    end
+
+    def server
+      @server ||= account.server || provider.host
+    end
+
     # 6.3.8. LIST Command
     # An empty ("" string) mailbox name argument is a special request to
     # return the hierarchy delimiter and the root name of the name given
@@ -116,7 +120,11 @@ module Imap::Backup
           provider.root
         else
           Logger.logger.debug "Fetching provider root"
-          root_info = imap.list("", "")[0]
+          result = imap.list("", "")
+          if result.empty?
+            raise "IMAP server did not return root folder for #{account.username}"
+          end
+          root_info = result[0]
           Logger.logger.debug "Provider root is '#{root_info.name}'"
           root_info.name
         end
