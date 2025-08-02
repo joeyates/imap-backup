@@ -189,7 +189,6 @@ module Imap::Backup
       client.examine(utf7_encoded_name)
     rescue Net::IMAP::NoResponseError
       Imap::Backup::Logger.logger.warn "Folder '#{name}' does not exist on server"
-      Imap::Backup::Logger.logger.warn caller.join("\n")
       raise FolderNotFound, "Folder '#{name}' does not exist on server"
     end
 
