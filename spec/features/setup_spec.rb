@@ -1,6 +1,6 @@
 require "features/helper"
 
-RSpec.describe "imap-backup setup", type: :aruba do
+RSpec.describe "imap-backup setup", :container, type: :aruba do
   let(:config_options) { {accounts: []} }
   let(:command) { "imap-backup setup" }
   let!(:setup) do

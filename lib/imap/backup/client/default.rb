@@ -1,6 +1,7 @@
 require "forwardable"
 require "net/imap"
 
+require "imap/backup/email/provider"
 require "imap/backup/logger"
 
 module Imap; end
@@ -17,10 +18,8 @@ module Imap::Backup
       responses uid_fetch uid_search uid_store
     )
 
-    def initialize(server, account, options)
+    def initialize(account)
       @account = account
-      @options = options
-      @server = server
       @state = nil
     end
 
@@ -32,7 +31,10 @@ module Imap::Backup
 
       return [] if mailbox_lists.nil?
 
-      mailbox_lists.map { |ml| extract_name(ml) }
+      ignored_tags = provider.folder_ignore_tags
+      mailbox_lists.
+        select { |ml| ml.attr & ignored_tags == [] }.
+        map { |ml| extract_name(ml) }
     end
 
     # Logs in to the account on the IMAP server
@@ -83,8 +85,6 @@ module Imap::Backup
     private
 
     attr_reader :account
-    attr_reader :options
-    attr_reader :server
     attr_accessor :state
 
     def imap
@@ -100,16 +100,37 @@ module Imap::Backup
       account.password.gsub(/./, "x")
     end
 
+    def provider
+      @provider ||= Email::Provider.for_address(account.username)
+    end
+
+    def options
+      @options ||= provider.options.merge(account.connection_options || {})
+    end
+
+    def server
+      @server ||= account.server || provider.host
+    end
+
     # 6.3.8. LIST Command
     # An empty ("" string) mailbox name argument is a special request to
     # return the hierarchy delimiter and the root name of the name given
     # in the reference.
     def provider_root
       @provider_root ||= begin
-        Logger.logger.debug "Fetching provider root"
-        root_info = imap.list("", "")[0]
-        Logger.logger.debug "Provider root is '#{root_info.name}'"
-        root_info.name
+        if provider.root
+          Logger.logger.debug "Using fixed provider root '#{provider.root}'"
+          provider.root
+        else
+          Logger.logger.debug "Fetching provider root"
+          result = imap.list("", "")
+          if result.empty?
+            raise "IMAP server did not return root folder for #{account.username}"
+          end
+          root_info = result[0]
+          Logger.logger.debug "Provider root is '#{root_info.name}'"
+          root_info.name
+        end
       end
     end
   end
