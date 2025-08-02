@@ -11,10 +11,9 @@ installing anything else.
 The image can be build in development as follows
 
 ```sh
-export GIT_TAG=$(git describe --tags $(git rev-list --tags --max-count=1))
 podman build \
   --file container/Containerfile \
-  --label imap-backup:latest \
+  --tag imap-backup:latest \
   --ignorefile ./container/.containerignore \
   .
 ```
