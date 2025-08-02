@@ -6,6 +6,11 @@ module Imap::Backup
 
   # Supplies defaults for email provider behaviour
   class Email::Provider::Base
+    # @return [Array<Symbol>] tags to ignore when listing folders
+    def folder_ignore_tags
+      []
+    end
+
     # @return [Hash] defaults for the Net::IMAP connection
     def options
       {port: 993, ssl: {min_version: OpenSSL::SSL::TLS1_2_VERSION}}

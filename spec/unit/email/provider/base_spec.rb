@@ -2,6 +2,12 @@ require "imap/backup/email/provider/base"
 
 module Imap::Backup
   RSpec.describe Email::Provider::Base do
+    describe "#folder_ignore_tags" do
+      it "returns an empty array" do
+        expect(subject.folder_ignore_tags).to eq([])
+      end
+    end
+
     describe "#options" do
       it "returns options" do
         expect(subject.options).to be_a(Hash)

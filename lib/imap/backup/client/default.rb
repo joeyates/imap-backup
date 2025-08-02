@@ -31,7 +31,10 @@ module Imap::Backup
 
       return [] if mailbox_lists.nil?
 
-      mailbox_lists.map { |ml| extract_name(ml) }
+      ignored_tags = provider.folder_ignore_tags
+      mailbox_lists.
+        select { |ml| ml.attr & ignored_tags == [] }.
+        map { |ml| extract_name(ml) }
     end
 
     # Logs in to the account on the IMAP server

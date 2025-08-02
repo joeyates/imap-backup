@@ -23,7 +23,7 @@ module Imap::Backup
     describe "#list" do
       context "with non-ASCII folder names" do
         let(:imap_folders) do
-          [instance_double(Net::IMAP::MailboxList, name: "Gel&APY-scht")]
+          [instance_double(Net::IMAP::MailboxList, attr: [], name: "Gel&APY-scht")]
         end
 
         it "converts them to UTF-8" do
@@ -54,6 +54,34 @@ module Imap::Backup
           subject.list
 
           expect(imap).to have_received(:list).with("", "")
+        end
+      end
+
+      context "when the provider is GMail" do
+        let(:username) { "me@gmail.com" }
+
+        let(:imap_folders) do
+          [
+            instance_double(Net::IMAP::MailboxList, attr: [:Noselect], name: "[Gmail]"),
+            instance_double(Net::IMAP::MailboxList, attr: [], name: "INBOX"),
+          ]
+        end
+
+        it "filters out NoSelect folders" do
+          expect(subject.list).to eq(["INBOX"])
+        end
+      end
+
+      context "when the provider is not GMail" do
+        let(:imap_folders) do
+          [
+            instance_double(Net::IMAP::MailboxList, attr: [:Noselect], name: "Foo"),
+            instance_double(Net::IMAP::MailboxList, attr: [], name: "INBOX"),
+          ]
+        end
+
+        it "filters out NoSelect folders" do
+          expect(subject.list).to eq(["Foo", "INBOX"])
         end
       end
 
