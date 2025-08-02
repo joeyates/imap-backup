@@ -38,7 +38,6 @@ module Imap::Backup
       Logger.logger.debug "Folder '#{name}' exists"
       true
     rescue FolderNotFound
-      Logger.logger.debug "Folder '#{name}' does not exist"
       false
     end
 
