@@ -13,6 +13,8 @@ module Imap::Backup
       @serializer = serializer
       @multi_fetch_size = multi_fetch_size
       @reset_seen_flags_after_fetch = reset_seen_flags_after_fetch
+      @folder_uids = nil
+      @serializer_uids = nil
       @uids = nil
     end
 
@@ -33,17 +35,7 @@ module Imap::Backup
 
       info("#{uids.count} new messages")
 
-      block_count = (uids.count / multi_fetch_size.to_f).ceil
-      uids.each_slice(multi_fetch_size).with_index do |block, i|
-        debug("Downloading #{block.count} messages (block #{i + 1}/#{block_count})")
-        multifetch_failed = download_block(block, i)
-        raise MultiFetchFailedError if multifetch_failed
-      end
-    rescue MultiFetchFailedError
-      @count = nil
-      @multi_fetch_size = 1
-      @uids = nil
-      retry
+      download
     rescue Net::IMAP::ByeResponseError
       folder.client.reconnect
       retry
@@ -55,6 +47,21 @@ module Imap::Backup
     attr_reader :serializer
     attr_reader :multi_fetch_size
     attr_reader :reset_seen_flags_after_fetch
+
+    def download
+      block_count = (uids.count / multi_fetch_size.to_f).ceil
+      uids.each_slice(multi_fetch_size).with_index do |block, i|
+        debug("Downloading #{block.count} messages (block #{i + 1}/#{block_count})")
+        multifetch_failed = download_block(block, i)
+        raise MultiFetchFailedError if multifetch_failed
+      end
+    rescue MultiFetchFailedError
+      @multi_fetch_size = 1
+      @uids = nil
+      @folder_uids = nil
+      @serializer_uids = nil
+      retry
+    end
 
     def download_block(block, index)
       uids_and_bodies =

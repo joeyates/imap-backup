@@ -117,21 +117,19 @@ module Imap::Backup
     # return the hierarchy delimiter and the root name of the name given
     # in the reference.
     def provider_root
-      @provider_root ||= begin
+      @provider_root ||=
         if provider.root
           Logger.logger.debug "Using fixed provider root '#{provider.root}'"
           provider.root
         else
           Logger.logger.debug "Fetching provider root"
           result = imap.list("", "")
-          if result.empty?
-            raise "IMAP server did not return root folder for #{account.username}"
-          end
+          raise "IMAP server did not return root folder for #{account.username}" if result.empty?
+
           root_info = result[0]
           Logger.logger.debug "Provider root is '#{root_info.name}'"
           root_info.name
         end
-      end
     end
   end
 end

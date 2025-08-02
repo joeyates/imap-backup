@@ -63,7 +63,7 @@ module Imap::Backup
         let(:imap_folders) do
           [
             instance_double(Net::IMAP::MailboxList, attr: [:Noselect], name: "[Gmail]"),
-            instance_double(Net::IMAP::MailboxList, attr: [], name: "INBOX"),
+            instance_double(Net::IMAP::MailboxList, attr: [], name: "INBOX")
           ]
         end
 
@@ -76,12 +76,12 @@ module Imap::Backup
         let(:imap_folders) do
           [
             instance_double(Net::IMAP::MailboxList, attr: [:Noselect], name: "Foo"),
-            instance_double(Net::IMAP::MailboxList, attr: [], name: "INBOX"),
+            instance_double(Net::IMAP::MailboxList, attr: [], name: "INBOX")
           ]
         end
 
         it "filters out NoSelect folders" do
-          expect(subject.list).to eq(["Foo", "INBOX"])
+          expect(subject.list).to eq(%w(Foo INBOX))
         end
       end
 
