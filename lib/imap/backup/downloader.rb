@@ -33,7 +33,9 @@ module Imap::Backup
 
       info("#{uids.count} new messages")
 
+      block_count = (uids.count / multi_fetch_size.to_f).ceil
       uids.each_slice(multi_fetch_size).with_index do |block, i|
+        debug("Downloading #{block.count} messages (block #{i + 1}/#{block_count})")
         multifetch_failed = download_block(block, i)
         raise MultiFetchFailedError if multifetch_failed
       end
