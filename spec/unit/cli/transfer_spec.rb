@@ -20,14 +20,16 @@ module Imap::Backup
         Account, "Source Account",
         local_path: "account1_path",
         mirror_mode: source_mirror_mode,
-        username: "source"
+        username: "source",
+        available_for_migration?: true
       )
     end
     let(:source_mirror_mode) { true }
     let(:destination_account) do
       instance_double(
         Account, "Destination Account",
-        username: "destination"
+        username: "destination",
+        available_for_migration?: true
       )
     end
     let(:serializer) { instance_double(Serializer) }
@@ -257,6 +259,44 @@ module Imap::Backup
             expect(Account::FolderMapper).to have_received(:new).
               with(hash_including({parameter => "x"}))
           end
+        end
+      end
+    end
+
+    context "when accounts have invalid status for migration" do
+      context "when source account is offline" do
+        let(:source_account) do
+          instance_double(
+            Account, "Source Account",
+            local_path: "account1_path",
+            mirror_mode: source_mirror_mode,
+            username: "source",
+            available_for_migration?: false,
+            status: "offline"
+          )
+        end
+
+        it "raises an error" do
+          expect do
+            subject.run
+          end.to raise_error(RuntimeError, /source.*not available for migration.*offline/)
+        end
+      end
+
+      context "when destination account is offline" do
+        let(:destination_account) do
+          instance_double(
+            Account, "Destination Account",
+            username: "destination",
+            available_for_migration?: false,
+            status: "offline"
+          )
+        end
+
+        it "raises an error" do
+          expect do
+            subject.run
+          end.to raise_error(RuntimeError, /destination.*not available for migration.*offline/)
         end
       end
     end

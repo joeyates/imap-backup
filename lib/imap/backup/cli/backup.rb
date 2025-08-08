@@ -28,6 +28,8 @@ module Imap::Backup
         config = load_config(**options)
         exit_code = nil
         accounts = requested_accounts(config)
+        # Filter to only include accounts available for backup
+        accounts = accounts.select(&:available_for_backup?)
         if accounts.none?
           Logger.logger.warn "No matching accounts found to backup"
           return
