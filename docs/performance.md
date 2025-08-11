@@ -48,4 +48,4 @@ more memory - equivalent to the size of the groups of messages
 that are downloaded.
 
 This behaviour may also exceed the rate limits on your email provider,
-so it's best to check before cranking it up!
+so it is best to check before cranking it up!
