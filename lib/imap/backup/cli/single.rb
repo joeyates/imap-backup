@@ -16,7 +16,7 @@ module Imap::Backup
 
     desc "backup [OPTIONS]", "Backup a single email account based on command-line parameters"
     long_desc <<~DESC
-      This is a "stand-alone" backup command that doesn't require
+      This is a "stand-alone" backup command that does not require
       a configuration file.
 
       At a minimum, you need to supply the email, the server and the
@@ -97,7 +97,7 @@ module Imap::Backup
             "Note that to make it easier to create such files, " \
             "trailing newlines will be removed. " \
             "If you happen to have a password that ends in a newline (!), " \
-            "you can't use this parameter.",
+            "you cannot use this parameter.",
       aliases: ["-W"]
     )
     method_option(
@@ -105,7 +105,7 @@ module Imap::Backup
       type: "string",
       desc: "the path of the directory where backups are to be saved. " \
             "If the directory does not exist, it will be created. " \
-            "If not set, this is set to a diretory under the current path " \
+            "If not set, this is set to a directory under the current path " \
             "which is derived from the username, by replacing '@' with '_'." \
             "If this path parameter is not indicated, " \
             "the default is the current directory plus the email " \

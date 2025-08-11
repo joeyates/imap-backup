@@ -16,7 +16,7 @@ a small virtual server or Raspberry Pi
 to run your backups, you can change "Download strategy".
 
 If your email provider supports it,
-and you don't have tight memory limits,
+and you do not have tight memory limits,
 increase "Multi-fetch size" for faster backups.
 
 # Delay download writes
