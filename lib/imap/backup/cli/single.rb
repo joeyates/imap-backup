@@ -105,7 +105,7 @@ module Imap::Backup
       type: "string",
       desc: "the path of the directory where backups are to be saved. " \
             "If the directory does not exist, it will be created. " \
-            "If not set, this is set to a diretory under the current path " \
+            "If not set, this is set to a directory under the current path " \
             "which is derived from the username, by replacing '@' with '_'." \
             "If this path parameter is not indicated, " \
             "the default is the current directory plus the email " \

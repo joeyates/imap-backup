@@ -12,7 +12,7 @@ by a configuration file created using `imap-backup setup`.
 
 By default, emails for all *configured* accounts are copied to disk.
 
-The backup is incremental and interruptable, so backups won't get messed up
+The backup is incremental and interruptible, so backups won't get messed up
 if your connection goes down during an operation.
 
 # Single Account Backups

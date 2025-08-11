@@ -61,7 +61,7 @@ module Imap::Backup
         end
       end
 
-      context "when the domain is unrecognized" do
+      context "when the domain is unrecognised" do
         let(:current_server) { nil }
         let(:provider) do
           instance_double(Email::Provider, provider: :default)

@@ -36,7 +36,7 @@ See below for a [full list of commands](#commands).
 
 <details>
 <summary>Docker or Podman</summary>
-If you have Docker or Podman installed, the easist way to use imap-backup
+If you have Docker or Podman installed, the easiest way to use imap-backup
 is via the container image.
 
 You'll need to choose a path on your computer where your backups will be saved,

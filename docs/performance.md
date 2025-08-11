@@ -43,7 +43,7 @@ By default, during backup, each message is downloaded one-by-one.
 Using this setting, you can download chunks of emails at a time,
 potentially speeding up the process.
 
-Using multi-fetch mean that the backup process *will* use
+Using multi-fetch means that the backup process *will* use
 more memory - equivalent to the size of the groups of messages
 that are downloaded.
 
