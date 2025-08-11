@@ -142,7 +142,7 @@ module Imap::Backup
     def toggle_reset_seen_flags_after_fetch(menu)
       menu_item =
         if account.reset_seen_flags_after_fetch
-          "do not fix changes to unread flags during download"
+          "don't fix changes to unread flags during download"
         else
           "fix changes to unread flags during download"
         end

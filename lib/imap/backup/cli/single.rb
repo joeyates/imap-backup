@@ -16,7 +16,7 @@ module Imap::Backup
 
     desc "backup [OPTIONS]", "Backup a single email account based on command-line parameters"
     long_desc <<~DESC
-      This is a "stand-alone" backup command that does not require
+      This is a "stand-alone" backup command that doesn't require
       a configuration file.
 
       At a minimum, you need to supply the email, the server and the
@@ -97,7 +97,7 @@ module Imap::Backup
             "Note that to make it easier to create such files, " \
             "trailing newlines will be removed. " \
             "If you happen to have a password that ends in a newline (!), " \
-            "you cannot use this parameter.",
+            "you can't use this parameter.",
       aliases: ["-W"]
     )
     method_option(

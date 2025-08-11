@@ -16,7 +16,7 @@ a small virtual server or Raspberry Pi
 to run your backups, you can change "Download strategy".
 
 If your email provider supports it,
-and you do not have tight memory limits,
+and you don't have tight memory limits,
 increase "Multi-fetch size" for faster backups.
 
 # Delay download writes
@@ -48,4 +48,4 @@ more memory - equivalent to the size of the groups of messages
 that are downloaded.
 
 This behaviour may also exceed the rate limits on your email provider,
-so it is best to check before cranking it up!
+so it's best to check before cranking it up!
