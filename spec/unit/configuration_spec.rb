@@ -113,7 +113,7 @@ module Imap::Backup
         expect(parsed[:accounts].first).to eq(
           {
             username: "username1", password: "password1",
-            multi_fetch_size: 1
+            multi_fetch_size: 1, status: "active"
           }
         )
       end

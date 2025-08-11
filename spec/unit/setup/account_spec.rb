@@ -15,7 +15,8 @@ module Imap::Backup
         local_path: local_path,
         connection_options: connection_options,
         folder_blacklist: false,
-        reset_seen_flags_after_fetch: reset_seen_flags_after_fetch
+        reset_seen_flags_after_fetch: reset_seen_flags_after_fetch,
+        status: "active"
       )
     end
     let(:account1) { instance_double(Account) }
@@ -62,6 +63,7 @@ module Imap::Backup
       before do
         allow(Kernel).to receive(:system)
         allow(Setup::Account::Header).to receive(:new) { header }
+        allow(account).to receive(:status=)
         allow(highline).to receive(:choose) do |&block|
           block.call(menu)
           throw :done

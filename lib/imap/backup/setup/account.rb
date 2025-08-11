@@ -56,6 +56,7 @@ module Imap::Backup
         choose_folders menu
         modify_multi_fetch_size menu
         toggle_reset_seen_flags_after_fetch menu
+        rotate_status menu
         delete_account menu
         menu.choice("(q) return to main menu") { throw :done }
         menu.hidden("quit") { throw :done }
@@ -148,6 +149,19 @@ module Imap::Backup
       new_value = account.reset_seen_flags_after_fetch ? nil : true
       menu.choice(menu_item) do
         account.reset_seen_flags_after_fetch = new_value
+      end
+    end
+
+    def rotate_status(menu)
+      current_status = account.status
+      statuses = %w[active archived offline]
+      current_index = statuses.index(current_status) || 0
+      next_index = (current_index + 1) % statuses.length
+      next_status = statuses[next_index]
+
+      menu_item = "change status (currently: #{current_status} -> #{next_status})"
+      menu.choice(menu_item) do
+        account.status = next_status
       end
     end
 

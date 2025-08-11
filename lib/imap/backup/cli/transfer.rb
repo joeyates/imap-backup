@@ -88,6 +88,16 @@ module Imap::Backup
       raise "Account '#{destination_email}' does not exist" if !destination_account
 
       raise "Account '#{source_email}' does not exist" if !source_account
+
+      if !source_account.available_for_migration?
+        raise "Account '#{source_email}' is not available for migration " \
+              "(status: #{source_account.status})"
+      end
+
+      return if destination_account.available_for_migration?
+
+      raise "Account '#{destination_email}' is not available for migration " \
+            "(status: #{destination_account.status})"
     end
 
     def choose_prefixes_and_delimiters!

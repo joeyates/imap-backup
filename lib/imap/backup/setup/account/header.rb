@@ -30,7 +30,8 @@ module Imap::Backup
         path,
         folders,
         multi_fetch,
-        reset_seen_flags_after_fetch
+        reset_seen_flags_after_fetch,
+        status_row
       ].compact
 
       menu.header = <<~HEADER.chomp
@@ -125,6 +126,12 @@ module Imap::Backup
       return nil if !account.reset_seen_flags_after_fetch
 
       ["changes to unread flags will be reset during download"]
+    end
+
+    def status_row
+      return nil if account.status == "active"
+
+      ["status", account.status]
     end
 
     def format_rows(rows)

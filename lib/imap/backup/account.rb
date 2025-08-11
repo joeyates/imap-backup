@@ -57,6 +57,12 @@ module Imap::Backup
     # mark messages as '\Seen' when accessed).
     # @return [Boolean]
     attr_reader :reset_seen_flags_after_fetch
+    # The status of the account - controls backup and migration behavior
+    # "active" - the account is available for backup and migration,
+    # "archived" - the account is available for migration, but not backup,
+    # "offline" - the account is not available for backup or migration.
+    # @return [String] one of "active" (the default), "archived", or "offline"
+    attr_reader :status
 
     def initialize(options)
       check_options!(options)
@@ -72,6 +78,7 @@ module Imap::Backup
       @download_strategy = options[:download_strategy]
       @multi_fetch_size_orignal = options[:multi_fetch_size]
       @reset_seen_flags_after_fetch = options[:reset_seen_flags_after_fetch]
+      @status = options[:status] || DEFAULT_STATUS
       @client = nil
       @changes = {}
       @marked_for_deletion = false
@@ -122,7 +129,11 @@ module Imap::Backup
 
     # @return [Hash] all Account data for serialization
     def to_h
-      h = {username: @username, password: @password}
+      h = {
+        username: @username,
+        password: @password,
+        status: status
+      }
       h[:local_path] = @local_path if @local_path
       h[:folders] = @folders if @folders
       h[:folder_blacklist] = true if @folder_blacklist
@@ -230,6 +241,44 @@ module Imap::Backup
       update(:reset_seen_flags_after_fetch, value)
     end
 
+    # Sets the status attribute and marks it as modified, storing the original value
+    #
+    # @param value [String] one of "active", "archived", or "offline"
+    # @raise [ArgumentError] if the value is not a valid status
+    # @return [void]
+    def status=(value)
+      if !VALID_STATUSES.include?(value)
+        raise ArgumentError, "status must be one of: #{VALID_STATUSES.join(', ')}"
+      end
+
+      update(:status, value)
+    end
+
+    # @return [Boolean] true if the account is active
+    def active?
+      @status == "active"
+    end
+
+    # @return [Boolean] true if the account is archived
+    def archived?
+      @status == "archived"
+    end
+
+    # @return [Boolean] true if the account is offline
+    def offline?
+      @status == "offline"
+    end
+
+    # @return [Boolean] true if the account is available for backup operations
+    def available_for_backup?
+      active?
+    end
+
+    # @return [Boolean] true if the account is available for migration operations
+    def available_for_migration?
+      active? || archived?
+    end
+
     private
 
     attr_reader :changes
@@ -237,9 +286,11 @@ module Imap::Backup
     REQUIRED_ATTRIBUTES = %i[password username].freeze
     OPTIONAL_ATTRIBUTES = %i[
       connection_options download_strategy folders folder_blacklist local_path mirror_mode
-      multi_fetch_size reset_seen_flags_after_fetch server
+      multi_fetch_size reset_seen_flags_after_fetch server status
     ].freeze
     KNOWN_ATTRIBUTES = REQUIRED_ATTRIBUTES + OPTIONAL_ATTRIBUTES
+    VALID_STATUSES = %w[active archived offline].freeze
+    DEFAULT_STATUS = "active".freeze
 
     def check_options!(options)
       missing_required = REQUIRED_ATTRIBUTES - options.keys
