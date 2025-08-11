@@ -44,7 +44,7 @@ module Imap::Backup
     # The name of the download strategy to adopt during backups
     # @return [String]
     attr_accessor :download_strategy
-    # Should 'Seen' flags be cached before fetchiong emails and
+    # Should 'Seen' flags be cached before fetching emails and
     # rewritten to the server afterwards?
     #
     # Some IMAP providers, notably Apple Mail, set the '\Seen' flag
