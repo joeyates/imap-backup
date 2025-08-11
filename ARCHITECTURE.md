@@ -4,7 +4,7 @@
 
 It is written in Ruby.
 
-Comands are processed by Thor modules -
+Commands are processed by Thor modules -
 under the CLI namespace.
 
 # Setup
@@ -19,7 +19,7 @@ the program saves emails on disk in mboxrd
 files.
 The format was chosen for two reasons:
 mboxrd does not suffer from the problems related to
-serializing 'From ' headers and
+serialising 'From ' headers and
 the Thunderbird email client uses this format.
 
 # Backup Strategies
@@ -27,15 +27,15 @@ the Thunderbird email client uses this format.
 The backup system saves a metadata file alongside
 the mboxrd file.
 This file contains information about each email:
-its length and offest in the mboxrd file.
-If this file is rewritten when each new messsage is downloaded,
+its length and offset in the mboxrd file.
+If this file is rewritten when each new message is downloaded,
 the backup slows down progressively as the mailbox grows.
 To avoid this problem, the default strategy is to only write
 metadata at the end of the download for each folder.
 
 # Mirroring
 
-If an account is mirrord to another server,
+If an account is mirrored to another server,
 the emails on each server are different.
 In order to know which email on the mirror relates to
 which email on the source account,

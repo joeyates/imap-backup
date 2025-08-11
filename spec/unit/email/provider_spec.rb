@@ -13,7 +13,7 @@ module Imap::Backup
           ["me.com", "Apple Mail me.com", Email::Provider::AppleMail],
           ["purelymail.com", "Purelymail", Email::Provider::Purelymail]
         ].each do |domain, name, klass|
-          it "recognizes #{name} addresses" do
+          it "recognises #{name} addresses" do
             address = "foo@#{domain}"
             expect(described_class.for_address(address)).to be_a(klass)
           end

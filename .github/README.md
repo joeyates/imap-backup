@@ -1,7 +1,7 @@
 ![Version](https://img.shields.io/gem/v/imap-backup?label=Version&logo=rubygems)
 [![Build Status](https://github.com/joeyates/imap-backup/actions/workflows/main.yml/badge.svg)][CI Status]
 ![Coverage](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/joeyates/b54fe758bfb405c04bef72dad293d707/raw/coverage.json)
-![License](https://img.shields.io/github/license/joeyates/imap-backup?color=brightgreen&label=License)
+![License](https://img.shields.io/github/license/joeyates/imap-backup?colour=brightgreen&label=License)
 [![Stars](https://img.shields.io/github/stars/joeyates/imap-backup?style=social)][GitHub Stars]
 ![Activity](https://img.shields.io/github/last-commit/joeyates/imap-backup/main)
 
@@ -36,7 +36,7 @@ See below for a [full list of commands](#commands).
 
 <details>
 <summary>Docker or Podman</summary>
-If you have Docker or Podman installed, the easist way to use imap-backup
+If you have Docker or Podman installed, the easiest way to use imap-backup
 is via the container image.
 
 You'll need to choose a path on your computer where your backups will be saved,

@@ -57,7 +57,7 @@ module Imap::Backup
     # mark messages as '\Seen' when accessed).
     # @return [Boolean]
     attr_reader :reset_seen_flags_after_fetch
-    # The status of the account - controls backup and migration behavior
+    # The status of the account - controls backup and migration behaviour
     # "active" - the account is available for backup and migration,
     # "archived" - the account is available for migration, but not backup,
     # "offline" - the account is not available for backup or migration.
