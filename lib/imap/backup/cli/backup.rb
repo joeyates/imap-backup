@@ -27,6 +27,7 @@ module Imap::Backup
         Logger.logger.debug "Loading configuration"
         config = load_config(**options)
         exit_code = nil
+        assign_env_vars(config, options)
         accounts = requested_accounts(config)
         # Filter to only include accounts available for backup
         accounts = accounts.select(&:available_for_backup?)

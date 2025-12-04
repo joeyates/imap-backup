@@ -1,3 +1,4 @@
+require "io/console"
 require "thor"
 
 require "imap/backup/cli/options"
@@ -37,6 +38,10 @@ module Imap::Backup
       To check what values you should use, check the output of the
       `imap-backup remote namespaces EMAIL` command.
     DESC
+
+    # @return [Regexp] regular expression matching an environment variable
+    #   starting with "$".
+    ENV_VAR_REGEX = /^\$([A-Za-z_][A-Za-z0-9_]*)$/
 
     # Processes command-line parameters
     # @return [Hash] the supplied command-line parameters with
@@ -93,6 +98,30 @@ module Imap::Backup
       else
         config.accounts
       end
+    end
+
+    # If the `env` option is provided, assign their values to the
+    # environment variables found in the application configuration for the
+    # `password` property.
+    # For variables present in the application configuration which are not
+    # set as environment variables, prompt the user for entering a password.
+    # @return [Configuration] the updated application configuration
+    def assign_env_vars(config, options)
+      return config unless options[:env]
+
+      config.accounts.each do |a|
+        env_var = a.password.match(ENV_VAR_REGEX)&.[](1)
+        next if env_var.nil?
+
+        if ENV.key?(env_var)
+          a.password = a.password.gsub(ENV_VAR_REGEX, ENV[env_var])
+        else
+          print "\nEnter your password: "
+          a.password = IO.console.noecho(&:gets)&.chomp
+        end
+      end
+
+      config
     end
   end
 end

@@ -15,8 +15,8 @@ module Imap::Backup
     subject { WithHelpers.new(options) }
 
     let(:email) { "email@example.com" }
-    let(:first_account) { instance_double(Account, username: email) }
-    let(:second_account) { instance_double(Account, username: "foo") }
+    let(:first_account) { instance_double(Account, username: email, password: "foo") }
+    let(:second_account) { instance_double(Account, username: "foo", password: "bar") }
     let(:accounts) { [first_account, second_account] }
     let(:config) { instance_double(Configuration, accounts: accounts) }
     let(:options) { {} }
@@ -102,6 +102,57 @@ module Imap::Backup
 
         it "returns all configured accounts" do
           expect(subject.requested_accounts(config)).to eq(accounts)
+        end
+      end
+    end
+
+    describe ".env_vars" do
+      let(:env_account1) { instance_double(Account, password: "$FOO") }
+      let(:env_account2) { instance_double(Account, password: "$BAR") }
+      let(:env_accounts) { [env_account1, env_account2] }
+      let(:env_cfg) { instance_double(Configuration, accounts: env_accounts) }
+      let(:options) { {env: "env"} }
+      let(:console) { double("IO::Console") }
+
+      before do
+        allow(env_account1).to receive(:password=)
+        allow(ENV).to receive(:key?).with("FOO").and_return(true)
+        allow(ENV).to receive("[]").with("FOO").and_return("bar")
+
+        allow(env_account2).to receive(:password=)
+        allow(ENV).to receive(:key?).with("BAR").and_return(false)
+        allow(IO).to receive(:console).and_return(console)
+        allow(console).to receive(:noecho).and_yield(double("IO", gets: "pwd"))
+        allow($stdout).to receive(:write).and_return(nil)
+      end
+
+      it "replaces environment variables for password fields" do
+        subject.assign_env_vars(env_cfg, options)
+
+        expect(env_account1).to have_received(:password=).with("bar")
+      end
+
+      context "when the environment variable is not set" do
+        it "prompt the user to enter the password" do
+          subject.assign_env_vars(env_cfg, options)
+
+          expect($stdout).to have_received(:write).with("\nEnter your password: ")
+          expect(env_account2).to have_received(:password=).with("pwd")
+        end
+      end
+
+      context "when there is no environment variable in configuration" do
+        it "returns the configuration as is" do
+          expect(subject.assign_env_vars(config, options)).to eq(config)
+        end
+      end
+
+      context "when the `env` command option is not set" do
+        let(:options) { {} }
+
+        it "returns the configuration as is" do
+          expect(subject.assign_env_vars(config, options)).to eq(config)
+          expect(subject.assign_env_vars(env_cfg, options)).to eq(env_cfg)
         end
       end
     end

@@ -26,6 +26,13 @@ module Imap::Backup
         }
       },
       {
+        name: "env",
+        parameters: {
+          type: :string, aliases: ["-e"],
+          desc: "enable environment variables for passwords in the configuration file"
+        }
+      },
+      {
         name: "format",
         parameters: {
           type: :string, desc: "the output type, 'text' for plain text or 'json'", aliases: ["-f"]

@@ -64,6 +64,7 @@ module Imap::Backup
     DESC
     accounts_option
     config_option
+    env_option
     quiet_option
     refresh_option
     verbose_option

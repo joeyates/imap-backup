@@ -23,6 +23,26 @@ In this case, it is up to you to create the directory for the configuration file
 
 # Account Setup
 
+## `modify password`
+
+Note that the password is held in plain text in the configuration file.
+
+You can avoid having your password held in plain text in the configuration file
+by providing an environment variable name preceded with a dollar sign, for
+example `$PASSWORD`.
+
+Then use the `backup` command with the `--env` (or `-e`) parameter:
+
+```sh
+imap-backup backup --env
+```
+
+> [!NOTE]
+> If the environment variable is not set – `$PASSWORD` in the above example –
+> you will get a password prompt when running `imap-backup backup --env`.
+> **Your password will not be stored**, it is entered temporarily and never
+> written to disk.
+
 ## `modify server`
 
 For GMail accounts, use `imap.gmail.com` as the 'server' setting.

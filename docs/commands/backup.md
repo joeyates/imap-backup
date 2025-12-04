@@ -21,6 +21,21 @@ As an alternative, if you only want to backup a single account,
 you can pass all the necessary parameters directly to the `single backup` command
 (see the [`single backup`](./single-backup.md) docs).
 
+# Environment variables
+
+For passwords only, it is possible to use an environment variable adding the
+`--env` (or `-e`) parameter. In such case, the value entered as password with
+`imap-backup setup`, or in the configuration file, must be a valid environment
+variable name preceded with a dollar sign, for example `$PASSWORD`.
+
+> [!NOTE]
+> The regular expression for valid names is `/^\$([A-Za-z_][A-Za-z0-9_]*)$/`.
+
+> [!NOTE]
+> If the environment variable is not set you will get a password prompt when
+> running `imap-backup backup --env`. **Your password will not be stored**,
+> it is entered temporarily and never written to disk.
+
 # Serialized Format
 
 Emails are stored on disk in [Mbox files](../files/mboxrd.md), one for each folder,
