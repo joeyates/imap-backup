@@ -1,4 +1,5 @@
 require "erb"
+require "json"
 require "tempfile"
 require "thor"
 

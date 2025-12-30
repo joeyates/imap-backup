@@ -61,7 +61,10 @@ module Imap::Backup
         let(:erb_content) { '{"accounts": [{"username": "test@example.com"}]}' }
         let(:rendered_json) { '{"accounts": [{"username": "test@example.com"}]}' }
         let(:options) { {erb_configuration: erb_path} }
-        let(:temp_file) { instance_double(Tempfile, write: nil, flush: nil, close: nil, path: "/tmp/tempfile.json", unlink: nil) }
+        let(:temp_file) do
+          instance_double(Tempfile, write: nil, flush: nil, close: nil, path: "/tmp/tempfile.json",
+                                    unlink: nil)
+        end
         let(:erb_config) { instance_double(Configuration, accounts: []) }
 
         before do
@@ -93,7 +96,7 @@ module Imap::Backup
         end
 
         context "when ERB template has syntax errors" do
-          let(:erb_content) { '<% if %>' }
+          let(:erb_content) { "<% if %>" }
 
           it "raises an error" do
             expect do
@@ -113,7 +116,7 @@ module Imap::Backup
         end
 
         context "when ERB template uses environment variables" do
-          let(:erb_content) { '{"accounts": [{"password": "<%= ENV["TEST_PASSWORD"] %>"}]}' }
+          let(:erb_content) { %q({"accounts": [{"password": "<%= ENV['TEST_PASSWORD'] %>"}]}) }
 
           before do
             ENV["TEST_PASSWORD"] = "secret123"
@@ -130,7 +133,7 @@ module Imap::Backup
         end
 
         context "when ERB has Ruby runtime errors" do
-          let(:erb_content) { '<%= 1 / 0 %>' }
+          let(:erb_content) { "<%= 1 / 0 %>" }
 
           it "raises an error" do
             expect do

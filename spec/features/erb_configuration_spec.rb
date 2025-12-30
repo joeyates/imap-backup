@@ -15,11 +15,13 @@ RSpec.describe "imap-backup with ERB configuration", :container, type: :aruba do
             "password": "<%= ENV['TEST_PASSWORD'] %>",
             "server": "<%= ENV['TEST_SERVER'] %>",
             "local_path": "<%= ENV['TEST_LOCAL_PATH'] %>",
-            "folders": ["#{folder}"],
+            "folders": ["<%= ENV['TEST_FOLDER'] %>"],
             "connection_options": <%= ENV['TEST_CONNECTION_OPTIONS'] %>
           }
         ]
       }
+    ERB
+  end
     ERB
   end
   let(:command) { "imap-backup stats #{account[:username]} --erb-configuration #{erb_config_path}" }
@@ -35,6 +37,7 @@ RSpec.describe "imap-backup with ERB configuration", :container, type: :aruba do
     ENV["TEST_PASSWORD"] = account[:password]
     ENV["TEST_SERVER"] = account[:server]
     ENV["TEST_LOCAL_PATH"] = account[:local_path]
+    ENV["TEST_FOLDER"] = folder
     ENV["TEST_CONNECTION_OPTIONS"] = account[:connection_options].to_json
 
     # Create ERB config file
@@ -50,6 +53,7 @@ RSpec.describe "imap-backup with ERB configuration", :container, type: :aruba do
     ENV.delete("TEST_PASSWORD")
     ENV.delete("TEST_SERVER")
     ENV.delete("TEST_LOCAL_PATH")
+    ENV.delete("TEST_FOLDER")
     ENV.delete("TEST_CONNECTION_OPTIONS")
   end
 
