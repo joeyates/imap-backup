@@ -62,16 +62,17 @@ module Imap::Backup
         let(:rendered_json) { '{"accounts": [{"username": "test@example.com"}]}' }
         let(:options) { {erb_configuration: erb_path} }
         let(:temp_file) { instance_double(Tempfile, write: nil, flush: nil, close: nil, path: "/tmp/tempfile.json", unlink: nil) }
+        let(:erb_config) { instance_double(Configuration, accounts: []) }
 
         before do
           allow(File).to receive(:exist?).with(erb_path).and_return(true)
           allow(File).to receive(:read).with(erb_path).and_return(erb_content)
           allow(Tempfile).to receive(:new).and_return(temp_file)
-          allow(Configuration).to receive(:new).with(path: temp_file.path).and_return(config)
+          allow(Configuration).to receive(:new).with(path: temp_file.path).and_return(erb_config)
         end
 
         it "processes the ERB template" do
-          expect(subject.load_config(**options)).to eq(config)
+          expect(subject.load_config(**options)).to eq(erb_config)
         end
 
         it "cleans up the temporary file" do

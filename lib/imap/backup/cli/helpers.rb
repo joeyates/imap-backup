@@ -151,7 +151,10 @@ module Imap::Backup
         temp_file.close
 
         # Load configuration from temporary file
-        Configuration.new(path: temp_file.path)
+        config = Configuration.new(path: temp_file.path)
+        # Force loading of data before temp file is deleted
+        config.accounts
+        config
       ensure
         # Clean up temporary file
         temp_file&.unlink
