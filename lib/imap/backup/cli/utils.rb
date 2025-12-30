@@ -23,6 +23,7 @@ module Imap::Backup
       "Skip downloading emails up to today for all configured folders"
     )
     config_option
+    erb_configuration_option
     quiet_option
     verbose_option
     # Creates fake downloaded emails so that only the account's future emails
@@ -52,6 +53,7 @@ module Imap::Backup
       DOC
     )
     config_option
+    erb_configuration_option
     quiet_option
     verbose_option
     method_option(

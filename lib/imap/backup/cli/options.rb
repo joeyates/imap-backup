@@ -26,6 +26,13 @@ module Imap::Backup
         }
       },
       {
+        name: "erb_configuration",
+        parameters: {
+          type: :string,
+          desc: "supply an ERB template file path for configuration"
+        }
+      },
+      {
         name: "format",
         parameters: {
           type: :string, desc: "the output type, 'text' for plain text or 'json'", aliases: ["-f"]

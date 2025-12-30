@@ -55,6 +55,99 @@ module Imap::Backup
           end.to raise_error(ConfigurationNotFound, /not found/)
         end
       end
+
+      context "when erb_configuration is supplied" do
+        let(:erb_path) { "/tmp/config.json.erb" }
+        let(:erb_content) { '{"accounts": [{"username": "test@example.com"}]}' }
+        let(:rendered_json) { '{"accounts": [{"username": "test@example.com"}]}' }
+        let(:options) { {erb_configuration: erb_path} }
+        let(:temp_file) { instance_double(Tempfile, write: nil, flush: nil, close: nil, path: "/tmp/tempfile.json", unlink: nil) }
+
+        before do
+          allow(File).to receive(:exist?).with(erb_path) { true }
+          allow(File).to receive(:read).with(erb_path) { erb_content }
+          allow(Tempfile).to receive(:new).and_return(temp_file)
+          allow(Configuration).to receive(:new).with(path: temp_file.path) { config }
+        end
+
+        it "processes the ERB template" do
+          expect(subject.load_config(**options)).to eq(config)
+        end
+
+        it "cleans up the temporary file" do
+          subject.load_config(**options)
+          expect(temp_file).to have_received(:unlink)
+        end
+
+        context "when the ERB file does not exist" do
+          before do
+            allow(File).to receive(:exist?).with(erb_path) { false }
+          end
+
+          it "raises an error" do
+            expect do
+              subject.load_config(**options)
+            end.to raise_error(ConfigurationNotFound, /ERB configuration file.*not found/)
+          end
+        end
+
+        context "when ERB template has syntax errors" do
+          let(:erb_content) { '<% if %>' }
+
+          it "raises an error" do
+            expect do
+              subject.load_config(**options)
+            end.to raise_error(/ERB template has syntax error/)
+          end
+        end
+
+        context "when ERB template renders invalid JSON" do
+          let(:erb_content) { '<%= "invalid json" %>' }
+
+          it "raises an error" do
+            expect do
+              subject.load_config(**options)
+            end.to raise_error(/ERB template rendered invalid JSON/)
+          end
+        end
+
+        context "when ERB template uses environment variables" do
+          let(:erb_content) { '{"accounts": [{"password": "<%= ENV["TEST_PASSWORD"] %>"}]}' }
+
+          before do
+            ENV["TEST_PASSWORD"] = "secret123"
+          end
+
+          after do
+            ENV.delete("TEST_PASSWORD")
+          end
+
+          it "substitutes environment variables" do
+            subject.load_config(**options)
+            expect(temp_file).to have_received(:write).with(/"password": "secret123"/)
+          end
+        end
+
+        context "when ERB has Ruby runtime errors" do
+          let(:erb_content) { '<%= 1 / 0 %>' }
+
+          it "raises an error" do
+            expect do
+              subject.load_config(**options)
+            end.to raise_error(/Error processing ERB template/)
+          end
+        end
+
+        context "when both config and erb_configuration are supplied" do
+          let(:options) { {config: "/tmp/config.json", erb_configuration: erb_path} }
+
+          it "raises an error" do
+            expect do
+              subject.load_config(**options)
+            end.to raise_error(/Cannot specify both --config and --erb-configuration/)
+          end
+        end
+      end
     end
 
     describe ".options" do

@@ -64,6 +64,7 @@ module Imap::Backup
     DESC
     accounts_option
     config_option
+    erb_configuration_option
     quiet_option
     refresh_option
     verbose_option
@@ -101,6 +102,7 @@ module Imap::Backup
       #{Helpers::NAMESPACE_CONFIGURATION_DESCRIPTION}
     DESC
     config_option
+    erb_configuration_option
     quiet_option
     verbose_option
     method_option(
@@ -153,6 +155,7 @@ module Imap::Backup
     DESC
     accounts_option
     config_option
+    erb_configuration_option
     quiet_option
     verbose_option
     method_option(
@@ -203,6 +206,7 @@ module Imap::Backup
         on the server).
     DESC
     config_option
+    erb_configuration_option
     format_option
     quiet_option
     verbose_option
