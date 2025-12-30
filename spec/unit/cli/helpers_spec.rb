@@ -64,10 +64,10 @@ module Imap::Backup
         let(:temp_file) { instance_double(Tempfile, write: nil, flush: nil, close: nil, path: "/tmp/tempfile.json", unlink: nil) }
 
         before do
-          allow(File).to receive(:exist?).with(erb_path) { true }
-          allow(File).to receive(:read).with(erb_path) { erb_content }
+          allow(File).to receive(:exist?).with(erb_path).and_return(true)
+          allow(File).to receive(:read).with(erb_path).and_return(erb_content)
           allow(Tempfile).to receive(:new).and_return(temp_file)
-          allow(Configuration).to receive(:new).with(path: temp_file.path) { config }
+          allow(Configuration).to receive(:new).with(path: temp_file.path).and_return(config)
         end
 
         it "processes the ERB template" do
@@ -81,7 +81,7 @@ module Imap::Backup
 
         context "when the ERB file does not exist" do
           before do
-            allow(File).to receive(:exist?).with(erb_path) { false }
+            allow(File).to receive(:exist?).with(erb_path).and_return(false)
           end
 
           it "raises an error" do

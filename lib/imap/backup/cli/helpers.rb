@@ -121,7 +121,7 @@ module Imap::Backup
     # @return [Configuration]
     def load_erb_config(erb_path, _options)
       # Check if file exists
-      if !File.exist?(erb_path)
+      unless File.exist?(erb_path)
         raise ConfigurationNotFound, "ERB configuration file '#{erb_path}' not found"
       end
 
