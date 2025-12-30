@@ -19,7 +19,7 @@ module Imap::Backup
     # @return [String] a description of the namespace configuration
     NAMESPACE_CONFIGURATION_DESCRIPTION = <<~DESC.freeze
       Some IMAP servers use namespaces (i.e. prefixes like "INBOX"),
-      while others, while others concatenate the names of subfolders
+      while others concatenate the names of subfolders
       with a charater ("delimiter") other than "/".
 
       In these cases there are two choices.
