@@ -97,7 +97,7 @@ module Imap::Backup
       end
 
       it "saves the version" do
-        expect(file).to receive(:write).with(/"version": "[\d\.]+"/)
+        expect(file).to receive(:write).with(/"version": "[\d.]+"/)
 
         subject.save
       end

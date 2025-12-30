@@ -196,7 +196,9 @@ module Imap::Backup
     def extract_uid(response)
       uid_data = response.data.code.data
       @uid_validity = uid_data.uidvalidity
-      uid_data.assigned_uids.first
+      # With net-imap >= 0.6, assigned_uids is a `Net::IMAP::SequenceSet`
+      uids = uid_data.assigned_uids.to_a
+      uids.to_a.first
     end
 
     def utf7_encoded_name
