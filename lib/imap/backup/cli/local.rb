@@ -17,6 +17,7 @@ module Imap::Backup
 
     desc "accounts [OPTIONS]", "List locally backed-up accounts"
     config_option
+    erb_configuration_option
     format_option
     quiet_option
     verbose_option
@@ -44,6 +45,7 @@ module Imap::Backup
     )
     accounts_option
     config_option
+    erb_configuration_option
     format_option
     quiet_option
     verbose_option
@@ -56,6 +58,7 @@ module Imap::Backup
 
     desc "folders EMAIL [OPTIONS]", "List backed up folders"
     config_option
+    erb_configuration_option
     format_option
     quiet_option
     verbose_option
@@ -78,6 +81,7 @@ module Imap::Backup
 
     desc "list EMAIL FOLDER [OPTIONS]", "List emails in a folder"
     config_option
+    erb_configuration_option
     format_option
     quiet_option
     verbose_option
@@ -108,6 +112,7 @@ module Imap::Backup
       the UID.
     DESC
     config_option
+    erb_configuration_option
     format_option
     quiet_option
     verbose_option

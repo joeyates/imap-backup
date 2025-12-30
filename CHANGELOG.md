@@ -5,6 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 16.3.0 - 2025-12-30
+
+### Added
+
+* An `--erb-configuration` option to allow the use of ERB templating
+  in the configuration file,
+* Support for net-imap >=6.
+
+## 16.2.0 - 2025-08-11
+
+### Added
+
+* Implemented support for setting accounts to "archived" or "offline" status
+  to prevent decommissioned accounts from being included in regular backups
+  while still allowing migration operations.
+
+## 16.1.0 - 2025-08-02
+
+### Changed
+
+* Skip GMail folders tagged as 'Noselect'.
+
 ## 16.0.0 - 2024-06-26
 
 ### Added

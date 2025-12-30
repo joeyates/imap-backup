@@ -1,3 +1,6 @@
+require "erb"
+require "json"
+require "tempfile"
 require "thor"
 
 require "imap/backup/cli/options"
@@ -60,9 +63,24 @@ module Imap::Backup
 
     # Loads the application configuration
     # @raise [ConfigurationNotFound] if the configuration file does not exist
+    # @raise [RuntimeError] if both config and erb_configuration are provided
+    # @raise [RuntimeError] if ERB template has syntax errors
+    # @raise [RuntimeError] if ERB template renders invalid JSON
     # @return [Configuration]
     def load_config(**options)
-      path = options[:config]
+      config_path = options[:config]
+      erb_config_path = options[:erb_configuration]
+
+      # Check mutual exclusivity
+      if config_path && erb_config_path
+        raise "Cannot specify both --config and --erb-configuration options"
+      end
+
+      # Handle ERB configuration
+      return load_erb_config(erb_config_path, options) if erb_config_path
+
+      # Handle regular JSON configuration
+      path = config_path
       require_exists = options.key?(:require_exists) ? options[:require_exists] : true
       if require_exists
         exists = Configuration.exist?(path: path)
@@ -92,6 +110,55 @@ module Imap::Backup
         config.accounts.filter { |a| emails.include?(a.username) }
       else
         config.accounts
+      end
+    end
+
+    private
+
+    # Processes an ERB template and loads it as configuration
+    # @raise [ConfigurationNotFound] if the ERB file does not exist
+    # @raise [RuntimeError] if ERB processing fails
+    # @raise [RuntimeError] if rendered output is invalid JSON
+    # @return [Configuration]
+    def load_erb_config(erb_path, _options)
+      # Check if file exists
+      unless File.exist?(erb_path)
+        raise ConfigurationNotFound, "ERB configuration file '#{erb_path}' not found"
+      end
+
+      begin
+        # Read and process ERB template
+        erb_content = File.read(erb_path)
+        erb = ERB.new(erb_content)
+        rendered_json = erb.result
+      rescue SyntaxError => e
+        raise "ERB template has syntax error: #{e.message}"
+      rescue StandardError => e
+        raise "Error processing ERB template: #{e.message}"
+      end
+
+      # Validate rendered JSON
+      begin
+        JSON.parse(rendered_json)
+      rescue JSON::ParserError => e
+        raise "ERB template rendered invalid JSON: #{e.message}"
+      end
+
+      # Create temporary file with rendered JSON
+      temp_file = Tempfile.new(["config", ".json"])
+      begin
+        temp_file.write(rendered_json)
+        temp_file.flush
+        temp_file.close
+
+        # Load configuration from temporary file
+        config = Configuration.new(path: temp_file.path)
+        # Force loading of data before temp file is deleted
+        config.accounts
+        config
+      ensure
+        # Clean up temporary file
+        temp_file&.unlink
       end
     end
   end

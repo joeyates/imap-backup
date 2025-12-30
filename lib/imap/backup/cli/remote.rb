@@ -15,6 +15,7 @@ module Imap::Backup
 
     desc "folders EMAIL [OPTIONS]", "List account folders"
     config_option
+    erb_configuration_option
     format_option
     quiet_option
     verbose_option
@@ -36,6 +37,7 @@ module Imap::Backup
       Lists the IMAP capabilities supported by the IMAP server.
     DESC
     config_option
+    erb_configuration_option
     format_option
     quiet_option
     verbose_option
@@ -57,6 +59,7 @@ module Imap::Backup
       the `imap-backup migrate` and `imap-backup mirror` commands.
     DESC
     config_option
+    erb_configuration_option
     format_option
     quiet_option
     verbose_option

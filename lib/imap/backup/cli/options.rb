@@ -26,6 +26,19 @@ module Imap::Backup
         }
       },
       {
+        name: "erb_configuration",
+        parameters: {
+          type: :string,
+          desc:
+          "supply an ERB template file path for configuration. " \
+          "This is an alternative to the --config option. " \
+          "The file will be processed with ERB before being parsed as JSON. " \
+          "This allows use of environment variables and other dynamic content. " \
+          "Note that using this option is a potential security risk as it allows " \
+          "execution of arbitrary code."
+        }
+      },
+      {
         name: "format",
         parameters: {
           type: :string, desc: "the output type, 'text' for plain text or 'json'", aliases: ["-f"]
