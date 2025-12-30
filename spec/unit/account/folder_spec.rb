@@ -276,9 +276,16 @@ module Imap::Backup
       end
       let(:message_date) { Time.new(2010, 10, 10, 9, 15, 22, 0) }
       let(:append_response) do
-        uid_data = instance_double(
-          Net::IMAP::UIDPlusData, uidvalidity: 1, assigned_uids: [2]
-        )
+        uid_data =
+          if Net::IMAP::VERSION >= "0.6.0"
+            instance_double(
+              Net::IMAP::AppendUIDData, uidvalidity: 1, assigned_uids: [2]
+            )
+          else
+            instance_double(
+              Net::IMAP::UIDPlusData, uidvalidity: 1, assigned_uids: [2]
+            )
+          end
         OpenStruct.new(data: OpenStruct.new(code: OpenStruct.new(data: uid_data)))
       end
 
