@@ -76,9 +76,7 @@ module Imap::Backup
       end
 
       # Handle ERB configuration
-      if erb_config_path
-        return load_erb_config(erb_config_path, options)
-      end
+      return load_erb_config(erb_config_path, options) if erb_config_path
 
       # Handle regular JSON configuration
       path = config_path
@@ -121,7 +119,7 @@ module Imap::Backup
     # @raise [RuntimeError] if ERB processing fails
     # @raise [RuntimeError] if rendered output is invalid JSON
     # @return [Configuration]
-    def load_erb_config(erb_path, options)
+    def load_erb_config(erb_path, _options)
       # Check if file exists
       if !File.exist?(erb_path)
         raise ConfigurationNotFound, "ERB configuration file '#{erb_path}' not found"
@@ -156,7 +154,7 @@ module Imap::Backup
         Configuration.new(path: temp_file.path)
       ensure
         # Clean up temporary file
-        temp_file.unlink if temp_file
+        temp_file&.unlink
       end
     end
   end
