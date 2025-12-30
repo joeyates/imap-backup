@@ -38,6 +38,7 @@ module Imap::Backup
         )
         long_desc LONG_DESCRIPTION
         config_option
+        erb_configuration_option
         quiet_option
         verbose_option
         method_option(

@@ -4,7 +4,7 @@ module Imap::Backup
   # @private
   MAJOR    = 16
   # @private
-  MINOR    = 2
+  MINOR    = 3
   # @private
   REVISION = 0
   # @private
