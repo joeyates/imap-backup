@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 16.4.0 - 2026-01-01
+
+### Changed
+
+* The Account local_path is now a required parameter.
+* Accounts are locked during operations that modify them: backup, restore, copy,
+  mirror, migrate, ignore history.
+* Ruby 3.0 and 3.1 are no longer supported.
+
+### Added
+
+* Ruby 4.0 to the CI matrix
+
 ## 16.3.0 - 2025-12-30
 
 ### Added
