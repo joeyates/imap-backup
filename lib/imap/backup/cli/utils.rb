@@ -33,15 +33,10 @@ module Imap::Backup
       Logger.setup_logging options
       config = load_config(**options)
       account = account(config, email)
+      locker ||= Account::Locker.new(account: account)
 
-      backup_folders = Account::BackupFolders.new(
-        client: account.client, account: account
-      )
-      backup_folders.each do |folder|
-        next if !folder.exist?
-
-        serializer = Serializer.new(account.local_path, folder.name)
-        do_ignore_folder_history(folder, serializer)
+      locker.with_lock do
+        ignore_account_history(account)
       end
     end
 
@@ -100,7 +95,19 @@ module Imap::Backup
 
     FAKE_EMAIL = "fake@email.com".freeze
 
-    def do_ignore_folder_history(folder, serializer)
+    def ignore_account_history(account)
+      backup_folders = Account::BackupFolders.new(
+        client: account.client, account: account
+      )
+      backup_folders.each do |folder|
+        next if !folder.exist?
+
+        serializer = Serializer.new(account.local_path, folder.name)
+        ignore_folder_history(folder, serializer)
+      end
+    end
+
+    def ignore_folder_history(folder, serializer)
       uids = folder.uids - serializer.uids
       Logger.logger.info "Folder '#{folder.name}' - #{uids.length} messages"
 

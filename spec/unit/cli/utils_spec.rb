@@ -1,6 +1,7 @@
 require "imap/backup/cli/utils"
 
 require "thunderbird"
+require "imap/backup/account/locker"
 require "imap/backup/client/default"
 require "imap/backup/configuration"
 require "support/shared_examples/an_action_that_handles_logger_options"
@@ -133,10 +134,13 @@ module Imap::Backup
           uids: %w(123 456)
         )
       end
+      let(:locker) { instance_double(Account::Locker, with_lock: nil) }
 
       before do
         allow(Account::BackupFolders).to receive(:new) { backup_folders }
         allow(backup_folders).to receive(:each).and_yield(folder)
+        allow(Account::Locker).to receive(:new).with(account: account) { locker }
+        allow(locker).to receive(:with_lock).and_yield
       end
 
       it_behaves_like(
@@ -145,6 +149,12 @@ module Imap::Backup
           subject.ignore_history("foo@example.com")
         end
       )
+
+      it "locks the account during the operation" do
+        subject.ignore_history(email)
+
+        expect(locker).to have_received(:with_lock)
+      end
 
       it "ensures the local UID validity matches the server" do
         subject.ignore_history(email)
