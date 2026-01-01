@@ -11,10 +11,10 @@ module Imap::Backup
       @reset = reset
     end
 
-    # If necessary, reates the destination folder,
+    # If necessary, creates the destination folder,
     # then deletes any messages in the destination folder
     # that are not in the local store,
-    # sets existing messages' flas
+    # sets existing messages' flags
     # then appends any missing messages
     # and saves the mapping file
     # @return [void]

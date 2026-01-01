@@ -1,5 +1,6 @@
 require "imap/backup/account/backup"
 
+require "imap/backup/account/locker"
 require "imap/backup/client/default"
 require "imap/backup/downloader"
 require "imap/backup/flag_refresher"

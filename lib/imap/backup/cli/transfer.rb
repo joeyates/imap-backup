@@ -1,4 +1,5 @@
 require "imap/backup/account/folder_mapper"
+require "imap/backup/account/locker"
 require "imap/backup/cli/backup"
 require "imap/backup/cli/helpers"
 require "imap/backup/logger"
@@ -23,9 +24,11 @@ module Imap::Backup
       @automatic_namespaces = nil
       @config_path = nil
       @destination_delimiter = nil
+      @destination_locker = nil
       @destination_prefix = nil
       @reset = nil
       @source_delimiter = nil
+      @source_locker = nil
       @source_prefix = nil
     end
 
@@ -34,22 +37,19 @@ module Imap::Backup
     #     or the source and destination accounts are the same,
     #     or either of the accounts is not configured,
     #     or incompatible namespace/delimiter parameters have been supplied
+    #     or one or both of the accounts is locked by another process.
     #   @return [void]
     def run
       raise "Unknown action '#{action}'" if !ACTIONS.include?(action)
 
       process_options!
       warn_if_source_account_is_not_in_mirror_mode if action == :mirror
+
       run_backup if %i(copy mirror).include?(action)
 
-      folders.each do |serializer, folder|
-        case action
-        when :copy
-          Mirror.new(serializer, folder, reset: false).run
-        when :migrate
-          Migrator.new(serializer, folder, reset: reset).run
-        when :mirror
-          Mirror.new(serializer, folder, reset: true).run
+      source_locker.with_lock do
+        destination_locker.with_lock do
+          perform_action_on_folders
         end
       end
     end
@@ -67,6 +67,19 @@ module Imap::Backup
     attr_accessor :source_delimiter
     attr_reader :source_email
     attr_accessor :source_prefix
+
+    def perform_action_on_folders
+      folders.each do |serializer, folder|
+        case action
+        when :copy
+          Mirror.new(serializer, folder, reset: false).run
+        when :migrate
+          Migrator.new(serializer, folder, reset: reset).run
+        when :mirror
+          Mirror.new(serializer, folder, reset: true).run
+        end
+      end
+    end
 
     def process_options!
       self.automatic_namespaces = options[:automatic_namespaces] || false
@@ -174,6 +187,14 @@ module Imap::Backup
 
     def source_account
       config.accounts.find { |a| a.username == source_email }
+    end
+
+    def source_locker
+      @source_locker ||= Account::Locker.new(account: source_account)
+    end
+
+    def destination_locker
+      @destination_locker ||= Account::Locker.new(account: destination_account)
     end
   end
 end
