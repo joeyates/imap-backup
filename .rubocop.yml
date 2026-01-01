@@ -8,7 +8,7 @@ AllCops:
     - "vendor/**/*"
   DisplayCopNames:
     Enabled: true
-  TargetRubyVersion: 3.0
+  TargetRubyVersion: 3.2
 
 Gemspec/AddRuntimeDependency:
   Enabled: true

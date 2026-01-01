@@ -50,8 +50,8 @@ module Imap::Backup
     attr_reader :email
     attr_reader :options
 
-    def restore(account, **options)
-      restore = Account::Restore.new(account: account, **options)
+    def restore(account, **)
+      restore = Account::Restore.new(account: account, **)
       restore.run
     end
 

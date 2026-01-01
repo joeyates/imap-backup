@@ -18,7 +18,7 @@ Gem::Specification.new do |gem|
 
   gem.executables   = gem.files.grep(%r{^bin/}).map { |f| File.basename(f) }
   gem.require_paths = ["lib"]
-  gem.required_ruby_version = ">= 3.0"
+  gem.required_ruby_version = ">= 3.2"
 
   gem.add_dependency "highline"
   gem.add_dependency "logger"
