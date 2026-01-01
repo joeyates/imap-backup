@@ -168,6 +168,14 @@ module Imap::Backup
       update(:local_path, value)
     end
 
+    # @raise [RuntimeError] if the local_path is not set
+    # @return [String] the path to the lockfile for the account
+    def lockfile_path
+      raise "local_path is not set" if !local_path
+
+      File.join(local_path, "imap-backup.lock")
+    end
+
     # @raise [RuntimeError] if the supplied value is not an Array
     # @return [void]
     def folders=(value)

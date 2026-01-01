@@ -285,6 +285,26 @@ module Imap::Backup
       end
     end
 
+    describe "#lockfile_path" do
+      context "when local_path is set" do
+        let(:options) { {username: "user", password: "pwd", local_path: "local_path"} }
+
+        it "returns the correct lockfile path" do
+          expect(subject.lockfile_path).to eq("local_path/imap-backup.lock")
+        end
+      end
+
+      context "when local_path is not set" do
+        let(:options) { {username: "user", password: "pwd", local_path: nil} }
+
+        it "raises an error" do
+          expect do
+            subject.lockfile_path
+          end.to raise_error(RuntimeError, /local_path is not set/)
+        end
+      end
+    end
+
     describe "#multi_fetch_size" do
       let(:options) do
         {
