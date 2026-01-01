@@ -111,8 +111,6 @@ module Imap::Backup
 
     private
 
-    VERSION_2_1 = "2.1".freeze
-
     attr_reader :pathname
 
     def ensure_loaded!

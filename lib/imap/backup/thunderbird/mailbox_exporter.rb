@@ -51,6 +51,7 @@ module Imap::Backup
     private
 
     EXPORT_PREFIX = "imap-backup".freeze
+    private_constant :EXPORT_PREFIX
 
     attr_reader :email
     attr_reader :serializer

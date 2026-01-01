@@ -22,7 +22,7 @@ module Imap::Backup
       return nil if actual.nil?
 
       mask = ~limit & 0o777
-      return if (actual & mask).zero?
+      return if actual.nobits?(mask)
 
       message = format(
         "Permissions on '%<filename>s' " \

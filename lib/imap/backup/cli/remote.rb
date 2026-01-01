@@ -109,9 +109,12 @@ module Imap::Backup
       Kernel.puts list.to_json
     end
 
+    NAMESPACE_TEMPLATE = "%-10<name>s %-10<prefix>s %<delim>s".freeze
+    private_constant :NAMESPACE_TEMPLATE
+
     def list_namespaces(namespaces)
       Kernel.puts format(
-        "%-10<name>s %-10<prefix>s %<delim>s",
+        NAMESPACE_TEMPLATE,
         {name: "Name", prefix: "Prefix", delim: "Delimiter"}
       )
       list_namespace namespaces, :personal
@@ -122,7 +125,7 @@ module Imap::Backup
     def list_namespace(namespaces, name)
       info = namespace_info(namespaces.send(name).first, quote: true)
       if info
-        Kernel.puts format("%-10<name>s %-10<prefix>s %<delim>s", name: name, **info)
+        Kernel.puts format(NAMESPACE_TEMPLATE, name: name, **info)
       else
         Kernel.puts format("%-10<name>s (Not defined)", name: name)
       end

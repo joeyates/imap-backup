@@ -4,11 +4,17 @@ require "imap/backup/configuration"
 
 # rubocop:disable RSpec/BeforeAfterAll
 
+# Use exponentially-spaced values so we get an even plot on a logarithmic scale
+COUNTS = 0.upto(12).map { |p| (Math::E ** p).round }
+RUNS = 4
+
 RSpec.describe "imap-backup backup performance", :container, :performance, type: :aruba do
-  # Use exponentially-spaced values so we get an even plot on a logarithmic scale
-  counts = 0.upto(12).map { |p| (Math::E ** p).round }
-  runs = 4
-  results = []
+  let(:results) do
+    COUNTS.reduce({}, COUNTS) do |memo, count|
+      memo[count] = []
+      memo
+    end
+  end
 
   before(:all) do
     test_server.folders.each do |folder|
@@ -16,7 +22,7 @@ RSpec.describe "imap-backup backup performance", :container, :performance, type:
 
       test_server.delete_folder folder
     end
-    counts.each do |count|
+    COUNTS.each do |count|
       folder = "bulk-#{count}"
       test_server.create_folder folder
       message = {from: "address@example.org", subject: "Test 1", body: "body 1\nHi"}
@@ -24,12 +30,11 @@ RSpec.describe "imap-backup backup performance", :container, :performance, type:
     end
   end
 
-  counts.each do |message_count|
+  COUNTS.each do |message_count|
     context "with #{message_count} emails" do
-      count_runs = {count: message_count}
       Imap::Backup::Configuration::DOWNLOAD_STRATEGIES.each do |strategy|
         context "with #{strategy[:key]} download strategy" do
-          1.upto(runs) do |run|
+          1.upto(RUNS) do |run|
             context "with run #{run}" do
               let(:account_config) do
                 test_server_connection_parameters.merge(
@@ -58,6 +63,7 @@ RSpec.describe "imap-backup backup performance", :container, :performance, type:
                 run_command_and_stop "imap-backup backup"
                 t_finish_run
                 time_taken = t_finish_run - t_start_run
+                count_runs = results[message_count]
                 count_runs[strategy[:key]] ||= []
                 count_runs[strategy[:key]] << time_taken
                 email = account_config[:username]
@@ -68,7 +74,6 @@ RSpec.describe "imap-backup backup performance", :container, :performance, type:
           end
         end
       end
-      results << count_runs
     end
   end
 

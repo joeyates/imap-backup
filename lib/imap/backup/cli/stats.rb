@@ -37,6 +37,7 @@ module Imap::Backup
       {name: :local, width: 8, alignment: :right}
     ].freeze
     ALIGNMENT_FORMAT_SYMBOL = {left: "-", right: " "}.freeze
+    private_constant :TEXT_COLUMNS, :ALIGNMENT_FORMAT_SYMBOL
 
     attr_reader :email
     attr_reader :options

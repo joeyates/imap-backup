@@ -141,6 +141,7 @@ module Imap::Backup
     private
 
     MAX_SUBJECT = 60
+    private_constant :MAX_SUBJECT
 
     def list_emails_as_json(serializer)
       emails = serializer.each_message.map do |message|

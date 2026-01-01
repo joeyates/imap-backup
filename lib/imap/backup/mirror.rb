@@ -29,6 +29,7 @@ module Imap::Backup
     private
 
     CHUNK_SIZE = 100
+    private_constant :CHUNK_SIZE
 
     attr_reader :serializer
     attr_reader :folder

@@ -4,6 +4,7 @@ require "imap/backup/account/client_factory"
 
 module Imap; end
 
+# rubocop:disable Metrics/ClassLength
 module Imap::Backup
   # Contains the attributes relating to an email account.
   class Account
@@ -299,6 +300,11 @@ module Imap::Backup
     KNOWN_ATTRIBUTES = REQUIRED_ATTRIBUTES + OPTIONAL_ATTRIBUTES
     VALID_STATUSES = %w[active archived offline].freeze
     DEFAULT_STATUS = "active".freeze
+    private_constant :REQUIRED_ATTRIBUTES,
+                     :OPTIONAL_ATTRIBUTES,
+                     :KNOWN_ATTRIBUTES,
+                     :VALID_STATUSES,
+                     :DEFAULT_STATUS
 
     def check_options!(options)
       missing_required = REQUIRED_ATTRIBUTES - options.keys

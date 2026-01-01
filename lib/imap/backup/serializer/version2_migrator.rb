@@ -101,7 +101,7 @@ module Imap::Backup
           end
         end
 
-        next if lines.count.zero?
+        next if lines.none?
 
         message = {
           uid: uids[messages.count],

@@ -47,6 +47,7 @@ class Options
     "--folder INBOX " \
     "--uid 12345 " \
     "--quiet".freeze
+  private_constant :USAGE
 
   def parser
     @parser ||= OptionParser.new do |opts|

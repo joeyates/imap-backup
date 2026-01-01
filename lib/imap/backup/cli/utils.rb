@@ -94,6 +94,7 @@ module Imap::Backup
     private
 
     FAKE_EMAIL = "fake@email.com".freeze
+    private_constant :FAKE_EMAIL
 
     def ignore_account_history(account)
       backup_folders = Account::BackupFolders.new(

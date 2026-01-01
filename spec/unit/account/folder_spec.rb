@@ -4,7 +4,6 @@ require "ostruct"
 require "imap/backup/client/default"
 require "imap/backup/serializer/message"
 
-# rubocop:disable RSpec/PredicateMatcher
 module Imap::Backup
   RSpec.describe Account::Folder do
     subject { described_class.new(client, folder_name) }

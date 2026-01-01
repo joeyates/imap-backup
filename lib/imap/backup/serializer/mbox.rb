@@ -109,7 +109,7 @@ module Imap::Backup
     # Sets the mailbox file's updated time to the current time
     # @return [void]
     def touch
-      File.open(pathname, "a") {}
+      FileUtils.touch(pathname)
     end
 
     private

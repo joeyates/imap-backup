@@ -13,6 +13,7 @@ module Imap::Backup
   # Tracks the latest folder selection in order to avoid repeated calls
   class Client::Default
     extend Forwardable
+
     def_delegators :imap, *%i(
       append authenticate capability create expunge namespace
       responses uid_fetch uid_search uid_store

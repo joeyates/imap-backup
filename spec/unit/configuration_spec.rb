@@ -1,7 +1,5 @@
 require "imap/backup/configuration"
 
-# rubocop:disable RSpec/PredicateMatcher
-
 module Imap::Backup
   RSpec.describe Configuration do
     let(:directory) { "/base/path" }
