@@ -232,6 +232,7 @@ RSpec.describe "imap-backup backup", :container, type: :aruba do
         server: ENV.fetch("DOCKER_HOST_IMAP", "localhost"),
         username: "inexistent@example.com",
         password: "pizza",
+        local_path: "local_path_bad",
         connection_options: {
           ssl: {verify_mode: 0}
         }
@@ -243,6 +244,32 @@ RSpec.describe "imap-backup backup", :container, type: :aruba do
       run_command_and_stop command, fail_on_error: false
 
       expect(last_command_started).to have_exit_status(111)
+    end
+
+    it "completes other backups" do
+      run_command_and_stop command, fail_on_error: false
+
+      expect(mbox_content(email, folder)).to eq(messages_as_mbox)
+    end
+  end
+
+  context "when an account is badly configured" do
+    let(:config_options) { {accounts: [bad_config, account_config]} }
+    let(:bad_config) do
+      {
+        username: "inexistent@example.com",
+        password: "pizza"
+        # no `local_path`
+      }
+    end
+    let(:command) { "bash -c 'imap-backup backup'" }
+
+    it "logs an error message" do
+      run_command_and_stop command, fail_on_error: false
+
+      expect(last_command_started).to have_output(
+        /Skipping invalid account in config: Missing required options: local_path/
+      )
     end
 
     it "completes other backups" do

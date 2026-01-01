@@ -21,6 +21,9 @@ RSpec.describe "imap-backup setup - adding an account", type: :aruba do
 
   it "saves account info" do
     config = parsed_config
+
+    expect(config[:accounts].size).to eq(2)
+
     account = config[:accounts].last
 
     expect(account[:username]).to eq("new@example.com")

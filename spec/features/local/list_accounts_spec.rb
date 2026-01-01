@@ -1,7 +1,9 @@
 require "features/helper"
 
 RSpec.describe "imap-backup local accounts", type: :aruba do
-  let(:config_options) { {accounts: [{username: "me@example.com", password: "password1"}]} }
+  let(:config_options) do
+    {accounts: [{username: "me@example.com", password: "password1", local_path: "local_path"}]}
+  end
   let(:command) { "imap-backup local accounts" }
 
   before do
@@ -25,7 +27,12 @@ RSpec.describe "imap-backup local accounts", type: :aruba do
   context "when a config path is supplied" do
     let(:custom_config_path) { File.join(File.expand_path("~/.imap-backup"), "foo.json") }
     let(:config_options) do
-      {path: custom_config_path, accounts: [{username: "other@example.com", password: "password1"}]}
+      {
+        path: custom_config_path,
+        accounts: [
+          {username: "other@example.com", password: "password1", local_path: "local_path"}
+        ]
+      }
     end
     let(:command) { "imap-backup local accounts --config #{custom_config_path}" }
 

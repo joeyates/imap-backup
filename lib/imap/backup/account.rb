@@ -283,9 +283,9 @@ module Imap::Backup
 
     attr_reader :changes
 
-    REQUIRED_ATTRIBUTES = %i[password username].freeze
+    REQUIRED_ATTRIBUTES = %i[password username local_path].freeze
     OPTIONAL_ATTRIBUTES = %i[
-      connection_options download_strategy folders folder_blacklist local_path mirror_mode
+      connection_options download_strategy folders folder_blacklist mirror_mode
       multi_fetch_size reset_seen_flags_after_fetch server status
     ].freeze
     KNOWN_ATTRIBUTES = REQUIRED_ATTRIBUTES + OPTIONAL_ATTRIBUTES
