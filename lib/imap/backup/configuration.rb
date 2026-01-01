@@ -68,7 +68,10 @@ module Imap::Backup
         ensure_loaded!
         accounts = data[:accounts].map do |attr|
           Account.new(attr)
-        end
+        rescue ArgumentError => e
+          Logger.logger.error("Skipping invalid account in config: #{e.message}")
+          nil
+        end.compact
         inject_global_attributes(accounts)
       end
     end
@@ -107,8 +110,6 @@ module Imap::Backup
     end
 
     private
-
-    VERSION_2_1 = "2.1".freeze
 
     attr_reader :pathname
 

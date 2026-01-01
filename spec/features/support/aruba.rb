@@ -131,7 +131,13 @@ RSpec.configure do |config|
   config.include LocalHelpers, type: :aruba
 
   config.before(:example, type: :aruba) do |example|
-    FileUtils.rm_rf "./tmp/home" if File.directory?("./tmp/home")
     set_environment_variable("FEATURE_SPEC_ID", example.id)
+  end
+
+  config.around(:example, type: :aruba) do |example|
+    example.run
+  ensure
+    FileUtils.rm_rf("./tmp/aruba")
+    FileUtils.rm_rf("./tmp/home")
   end
 end

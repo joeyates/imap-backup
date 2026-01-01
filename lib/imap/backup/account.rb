@@ -4,6 +4,7 @@ require "imap/backup/account/client_factory"
 
 module Imap; end
 
+# rubocop:disable Metrics/ClassLength
 module Imap::Backup
   # Contains the attributes relating to an email account.
   class Account
@@ -168,6 +169,14 @@ module Imap::Backup
       update(:local_path, value)
     end
 
+    # @raise [RuntimeError] if the local_path is not set
+    # @return [String] the path to the lockfile for the account
+    def lockfile_path
+      raise "local_path is not set" if !local_path
+
+      File.join(local_path, "imap-backup.lock")
+    end
+
     # @raise [RuntimeError] if the supplied value is not an Array
     # @return [void]
     def folders=(value)
@@ -283,14 +292,19 @@ module Imap::Backup
 
     attr_reader :changes
 
-    REQUIRED_ATTRIBUTES = %i[password username].freeze
+    REQUIRED_ATTRIBUTES = %i[password username local_path].freeze
     OPTIONAL_ATTRIBUTES = %i[
-      connection_options download_strategy folders folder_blacklist local_path mirror_mode
+      connection_options download_strategy folders folder_blacklist mirror_mode
       multi_fetch_size reset_seen_flags_after_fetch server status
     ].freeze
     KNOWN_ATTRIBUTES = REQUIRED_ATTRIBUTES + OPTIONAL_ATTRIBUTES
     VALID_STATUSES = %w[active archived offline].freeze
     DEFAULT_STATUS = "active".freeze
+    private_constant :REQUIRED_ATTRIBUTES,
+                     :OPTIONAL_ATTRIBUTES,
+                     :KNOWN_ATTRIBUTES,
+                     :VALID_STATUSES,
+                     :DEFAULT_STATUS
 
     def check_options!(options)
       missing_required = REQUIRED_ATTRIBUTES - options.keys

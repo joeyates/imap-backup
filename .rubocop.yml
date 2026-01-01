@@ -1,6 +1,6 @@
 inherit_from: .rubocop_todo.yml
 
-require: rubocop-rspec
+plugins: rubocop-rspec
 
 AllCops:
   Exclude:
@@ -8,17 +8,12 @@ AllCops:
     - "vendor/**/*"
   DisplayCopNames:
     Enabled: true
-  TargetRubyVersion: 3.0
+  TargetRubyVersion: 3.2
 
-Capybara:
-  Enabled: false
-
-Capybara/RSpec/PredicateMatcher:
-  Enabled: false
-
-FactoryBot:
-  Enabled: false
-
+Gemspec/AddRuntimeDependency:
+  Enabled: true
+Gemspec/AttributeAssignment:
+  Enabled: true
 Gemspec/DeprecatedAttributeAssignment:
   Enabled: true
 Gemspec/DevelopmentDependencies:
@@ -30,6 +25,8 @@ Layout/DotPosition:
   EnforcedStyle: trailing
 Layout/EmptyLinesAroundAttributeAccessor:
    Enabled: true
+Layout/EmptyLinesAfterModuleInclusion:
+  Enabled: true
 Layout/LineContinuationLeadingSpace:
   Enabled: true
 Layout/LineContinuationSpacing:
@@ -57,6 +54,8 @@ Lint/AmbiguousOperatorPrecedence:
   Enabled: true
 Lint/AmbiguousRange:
   Enabled: true
+Lint/ArrayLiteralInRegexp:
+  Enabled: true
 Lint/BinaryOperatorWithIdenticalOperands:
   Enabled: true
 Lint/ConstantDefinitionInBlock: # TODO
@@ -66,6 +65,10 @@ Lint/ConstantDefinitionInBlock: # TODO
     - "spec/unit/imap/backup/account/folder_spec.rb"
     - "spec/unit/imap/backup/setup/account_spec.rb"
 Lint/ConstantOverwrittenInRescue:
+  Enabled: true
+Lint/ConstantReassignment:
+  Enabled: true
+Lint/CopDirectiveSyntax:
   Enabled: true
 Lint/DeprecatedConstants:
   Enabled: true
@@ -83,6 +86,8 @@ Lint/DuplicateRegexpCharacterClassElement:
   Enabled: true
 Lint/DuplicateRescueException:
   Enabled: true
+Lint/DuplicateSetElement:
+  Enabled: true
 Lint/EmptyBlock: # TODO
   Enabled: false
 Lint/EmptyClass: # TODO
@@ -92,6 +97,8 @@ Lint/EmptyConditionalBody:
 Lint/EmptyInPattern:
   Enabled: true
 Lint/FloatComparison:
+  Enabled: true
+Lint/HashNewWithKeywordArgumentsAsDefault:
   Enabled: true
 Lint/IncompatibleIoSelectWithFiberScheduler:
   Enabled: true
@@ -113,6 +120,8 @@ Lint/NoReturnInBeginEndBlocks:
   Enabled: true
 Lint/NumberedParameterAssignment:
   Enabled: true
+Lint/NumericOperationWithConstantResult:
+  Enabled: true
 Lint/OrAssignmentToConstant:
   Enabled: true
 Lint/OutOfRangeRegexpRef:
@@ -123,6 +132,8 @@ Lint/RedundantDirGlobSort:
   Enabled: true
 Lint/RedundantRegexpQuantifiers:
   Enabled: true
+Lint/RedundantTypeConversion:
+  Enabled: true
 Lint/RefinementImportMethods:
   Enabled: true
 Lint/RequireRangeParentheses:
@@ -131,7 +142,11 @@ Lint/RequireRelativeSelfPath:
   Enabled: true
 Lint/SelfAssignment:
   Enabled: true
+Lint/SharedMutableDefault:
+  Enabled: true
 Lint/StructNewOverride:
+  Enabled: true
+Lint/SuppressedExceptionInNumberConversion:
   Enabled: true
 Lint/SymbolConversion:
   Enabled: true
@@ -141,12 +156,24 @@ Lint/TopLevelReturnWithArgument:
   Enabled: true
 Lint/TripleQuotes:
   Enabled: true
+Lint/UnescapedBracketInRegexp:
+  Enabled: true
 Lint/UnexpectedBlockArity:
   Enabled: true
 Lint/UnmodifiedReduceAccumulator:
   Enabled: true
 Lint/UnreachableLoop:
   Enabled: true
+Lint/UselessConstantScoping:
+  Enabled: true
+Lint/UselessDefaultValueArgument:
+  Enabled: true
+Lint/UselessDefined:
+  Enabled: true
+Lint/UselessNumericOperation:
+  Enabled: true
+Lint/UselessOr:
+  Enabled: true 
 Lint/UselessRescue:
   Enabled: true
 Lint/UselessRuby2Keywords:
@@ -172,6 +199,8 @@ Metrics/ModuleLength:
 
 Naming/BlockForwarding:
   Enabled: true
+Naming/PredicateMethod:
+  Enabled: false
 
 RSpec/BeEmpty:
   Enabled: true
@@ -199,10 +228,8 @@ RSpec/ExcessiveDocstringSpacing:
   Enabled: true
 RSpec/Eq:
   Enabled: true
-RSpec/FilePath:
+RSpec/IncludeExamples:
   Enabled: true
-  Exclude:
-    - spec/unit/email/provider/gmail_spec.rb
 RSpec/IdenticalEqualityAssertion:
   Enabled: true
 RSpec/IndexedLet:
@@ -211,6 +238,8 @@ RSpec/IsExpectedSpecify:
   Enabled: true
 RSpec/LeakyConstantDeclaration:
   Enabled: false
+RSpec/LeakyLocalVariable:
+  Enabled: true
 RSpec/LetSetup:
   Enabled: false
 RSpec/MatchArray:
@@ -234,6 +263,8 @@ RSpec/NotToNot:
   Enabled: false
 RSpec/PendingWithoutReason:
   Enabled: true
+RSpec/PredicateMatcher:
+  Enabled: false
 RSpec/ReceiveMessages:
   Enabled: true
 RSpec/RedundantAround:
@@ -261,32 +292,25 @@ RSpec/SubjectDeclaration:
 RSpec/VerifiedDoubleReference:
   Enabled: true
 
-RSpec/Rails/AvoidSetupHook:
-  Enabled: false
-RSpec/Rails/HaveHttpStatus:
-  Enabled: false
-RSpec/Rails/InferredSpecType:
-  Enabled: false
-RSpec/Rails/MinitestAssertions:
-  Enabled: false
-RSpec/Rails/NegationBeValid:
-  Enabled: false
-RSpec/Rails/TravelAround:
-  Enabled: false
-
 Security/IoMethods:
   Enabled: true
 
 Style/AccessorGrouping:
   Enabled: true
   EnforcedStyle: separated
+Style/AmbiguousEndlessMethodDefinition:
+  Enabled: true                          
 Style/ArgumentsForwarding:
   Enabled: true
 Style/ArrayCoercion:
   Enabled: true
 Style/ArrayIntersect:
   Enabled: true
+Style/ArrayIntersectWithSingleElement:
+  Enabled: true
 Style/BisectedAttrAccessor:
+  Enabled: true
+Style/BitwisePredicate:
   Enabled: true
 Style/CaseLikeIf:
   Enabled: true
@@ -294,11 +318,19 @@ Style/ClassAndModuleChildren:
   Enabled: false
 Style/CollectionCompact:
   Enabled: true
+Style/CollectionQuerying:
+  Enabled: true
+Style/CombinableDefined:
+  Enabled: true
+Style/ComparableBetween:
+  Enabled: true
 Style/ComparableClamp:
   Enabled: true
 Style/ConcatArrayLiterals:
   Enabled: true
 Style/DataInheritance:
+  Enabled: true
+Style/DigChain:
   Enabled: true
 Style/DirEmpty:
   Enabled: true
@@ -314,6 +346,8 @@ Style/EmptyHeredoc:
   Enabled: true
 Style/EmptyMethod:
   EnforcedStyle: expanded
+Style/EmptyStringInsideInterpolation:
+  Enabled: true
 Style/EndlessMethod:
   Enabled: true
 Style/EnvHome:
@@ -328,7 +362,11 @@ Style/FetchEnvVar:
   Enabled: true
 Style/FileEmpty:
   Enabled: true
+Style/FileNull:
+  Enabled: true
 Style/FileRead:
+  Enabled: true
+Style/FileTouch:
   Enabled: true
 Style/FileWrite: # TODO
   Enabled: false
@@ -344,7 +382,11 @@ Style/HashEachMethods:
   Enabled: true
 Style/HashExcept:
   Enabled: true
+Style/HashFetchChain:
+  Enabled: true
 Style/HashLikeCase:
+  Enabled: true
+Style/HashSlice:
   Enabled: true
 Style/HashTransformKeys:
   Enabled: true
@@ -353,6 +395,12 @@ Style/HashTransformValues:
 Style/IfWithBooleanLiteralBranches:
   Enabled: true
 Style/InPatternThen:
+  Enabled: true
+Style/ItAssignment:
+  Enabled: true
+Style/ItBlockParameter:
+  Enabled: true
+Style/KeywordArgumentsMerging:
   Enabled: true
 Style/Lambda:
   EnforcedStyle: literal
@@ -367,6 +415,8 @@ Style/MapToHash:
 Style/MapToSet:
   Enabled: true
 Style/MinMaxComparison:
+  Enabled: true
+Style/ModuleMemberExistenceCheck:
   Enabled: true
 Style/MultilineInPatternThen:
   Enabled: true
@@ -398,6 +448,8 @@ Style/RedundantArgument:
   Enabled: true
 Style/RedundantArrayConstructor:
   Enabled: true
+Style/RedundantArrayFlatten:
+  Enabled: true
 Style/RedundantAssignment:
   Enabled: true
 Style/RedundantConstantBase:
@@ -414,9 +466,13 @@ Style/RedundantFileExtensionInRequire:
   Enabled: true
 Style/RedundantFilterChain:
   Enabled: true
+Style/RedundantFormat:
+  Enabled: true
 Style/RedundantHeredocDelimiterQuotes:
   Enabled: true
 Style/RedundantInitialize:
+  Enabled: true
+Style/RedundantInterpolationUnfreeze:
   Enabled: true
 Style/RedundantLineContinuation:
   Enabled: true
@@ -433,6 +489,8 @@ Style/RedundantSelfAssignmentBranch:
 Style/RedundantStringEscape:
   Enabled: true
 Style/ReturnNilInPredicateMethodDefinition:
+  Enabled: true
+Style/SafeNavigationChainLength:
   Enabled: true
 Style/SelectByRegexp:
   Enabled: true

@@ -1,5 +1,6 @@
 require "imap/backup/account/backup"
 
+require "imap/backup/account/locker"
 require "imap/backup/client/default"
 require "imap/backup/downloader"
 require "imap/backup/flag_refresher"
@@ -16,6 +17,7 @@ module Imap::Backup
         username: "username",
         client: client,
         local_path: "local_path",
+        lockfile_path: "lockfile_path",
         mirror_mode: mirror_mode,
         multi_fetch_size: 42,
         download_strategy: "direct",
@@ -42,6 +44,7 @@ module Imap::Backup
     let(:local_only_message_deleter) { instance_double(LocalOnlyMessageDeleter, run: nil) }
     let(:folder_ensurer) { instance_double(Account::FolderEnsurer, run: nil) }
     let(:serializer) { instance_double(Serializer, apply_uid_validity: nil) }
+    let(:locker) { instance_double(Account::Locker, with_lock: nil) }
 
     before do
       allow(Downloader).to receive(:new) { downloader }
@@ -52,12 +55,20 @@ module Imap::Backup
       allow(Account::FolderEnsurer).to receive(:new) { folder_ensurer }
       allow(Serializer).to receive(:new) { serializer }
       allow(serializer).to receive(:transaction).and_yield
+      allow(Account::Locker).to receive(:new).with(account: account) { locker }
+      allow(locker).to receive(:with_lock).and_yield
     end
 
     it "ensures the backup directory exists" do
       subject.run
 
       expect(folder_ensurer).to have_received(:run)
+    end
+
+    it "locks the account during backup" do
+      subject.run
+
+      expect(locker).to have_received(:with_lock)
     end
 
     it "runs the downloader" do

@@ -2,6 +2,7 @@ require "imap/backup/account/backup_folders"
 require "imap/backup/account/folder_backup"
 require "imap/backup/account/folder_ensurer"
 require "imap/backup/account/local_only_folder_deleter"
+require "imap/backup/account/locker"
 
 module Imap; end
 
@@ -22,19 +23,17 @@ module Imap::Backup
       # start the connection so we get logging messages in the right order
       account.client.login
 
-      run_pre_backup_tasks
-      backup_folders = Account::BackupFolders.new(
-        client: account.client, account: account
-      ).to_a
+      ensure_folder
+      delete_local_only_folders if account.mirror_mode
+
       if backup_folders.none?
         Logger.logger.warn "No folders found to backup for account '#{account.username}'"
         return
       end
-      Logger.logger.debug "Starting backup of #{backup_folders.count} folders"
-      backup_folders.each do |folder|
-        Account::FolderBackup.new(account: account, folder: folder, refresh: refresh).run
+
+      locker.with_lock do
+        perform_backup
       end
-      Logger.logger.debug "Backup of account '#{account.username}' complete"
     end
 
     private
@@ -42,9 +41,30 @@ module Imap::Backup
     attr_reader :account
     attr_reader :refresh
 
-    def run_pre_backup_tasks
+    def backup_folders
+      @backup_folders ||= Account::BackupFolders.new(
+        client: account.client, account: account
+      ).to_a
+    end
+
+    def delete_local_only_folders
+      Account::LocalOnlyFolderDeleter.new(account: account).run
+    end
+
+    def ensure_folder
       Account::FolderEnsurer.new(account: account).run
-      Account::LocalOnlyFolderDeleter.new(account: account).run if account.mirror_mode
+    end
+
+    def locker
+      @locker ||= Account::Locker.new(account: account)
+    end
+
+    def perform_backup
+      Logger.logger.debug "Starting backup of #{backup_folders.count} folders"
+      backup_folders.each do |folder|
+        Account::FolderBackup.new(account: account, folder: folder, refresh: refresh).run
+      end
+      Logger.logger.debug "Backup of account '#{account.username}' complete"
     end
   end
 end

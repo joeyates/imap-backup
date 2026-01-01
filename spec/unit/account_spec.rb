@@ -6,7 +6,7 @@ module Imap::Backup
   RSpec.describe Account do
     subject { described_class.new(options) }
 
-    let(:options) { {username: "user", password: "pwd"} }
+    let(:options) { {username: "user", password: "pwd", local_path: "local_path"} }
 
     describe "#initialize" do
       context "with valid options" do
@@ -66,12 +66,15 @@ module Imap::Backup
         it "raises an error" do
           expect do
             described_class.new(options)
-          end.to raise_error(ArgumentError, /Missing required options: password, username/)
+          end.to raise_error(ArgumentError,
+                             /Missing required options: password, username, local_path/)
         end
       end
 
       context "with invalid options" do
-        let(:options) { {username: "a", password: "b", not_a_valid_option: "value"} }
+        let(:options) do
+          {username: "a", password: "b", local_path: "local_path", not_a_valid_option: "value"}
+        end
 
         it "raises an error" do
           expect do
@@ -83,7 +86,12 @@ module Imap::Backup
 
     describe "#connection_options" do
       context "when the supplied connection_options is a String" do
-        let(:options) { {username: "user", password: "pwd", connection_options: '{"foo": "bar"}'} }
+        let(:options) do
+          {
+            username: "user", password: "pwd", local_path: "local_path",
+            connection_options: '{"foo": "bar"}'
+          }
+        end
 
         it "returns the parsed connection_options" do
           expect(subject.connection_options).to eq({foo: "bar"})
@@ -91,7 +99,12 @@ module Imap::Backup
       end
 
       context "when the supplied connection_options is a Hash" do
-        let(:options) { {username: "user", password: "pwd", connection_options: {foo: "bar"}} }
+        let(:options) do
+          {
+            username: "user", password: "pwd", local_path: "local_path",
+            connection_options: {foo: "bar"}
+          }
+        end
 
         it "returns the connection_options" do
           expect(subject.connection_options).to eq({foo: "bar"})
@@ -161,19 +174,18 @@ module Imap::Backup
 
     describe "#to_h" do
       it "returns a Hash representation" do
-        expect(subject.to_h).to include({username: "user", password: "pwd"})
-      end
-
-      context "when local_path is set" do
-        let(:options) { {username: "user", password: "pwd", local_path: "local_path"} }
-
-        it "includes local_path" do
-          expect(subject.to_h).to include({local_path: "local_path"})
-        end
+        expect(subject.to_h).to include(
+          {
+            username: "user", password: "pwd",
+            local_path: "local_path"
+          }
+        )
       end
 
       context "when folders is set" do
-        let(:options) { {username: "user", password: "pwd", folders: ["folder"]} }
+        let(:options) do
+          {username: "user", password: "pwd", local_path: "local_path", folders: ["folder"]}
+        end
 
         it "includes folders" do
           expect(subject.to_h).to include({folders: ["folder"]})
@@ -181,7 +193,9 @@ module Imap::Backup
       end
 
       context "when mirror_mode is set" do
-        let(:options) { {username: "user", password: "pwd", mirror_mode: true} }
+        let(:options) do
+          {username: "user", password: "pwd", local_path: "local_path", mirror_mode: true}
+        end
 
         it "includes mirror_mode" do
           expect(subject.to_h).to include({mirror_mode: true})
@@ -189,7 +203,9 @@ module Imap::Backup
       end
 
       context "when multi_fetch_size is set" do
-        let(:options) { {username: "user", password: "pwd", multi_fetch_size: "3"} }
+        let(:options) do
+          {username: "user", password: "pwd", local_path: "local_path", multi_fetch_size: "3"}
+        end
 
         it "includes multi_fetch_size" do
           expect(subject.to_h).to include({multi_fetch_size: 3})
@@ -197,7 +213,9 @@ module Imap::Backup
       end
 
       context "when server is set" do
-        let(:options) { {username: "user", password: "pwd", server: "server"} }
+        let(:options) do
+          {username: "user", password: "pwd", local_path: "local_path", server: "server"}
+        end
 
         it "includes server" do
           expect(subject.to_h).to include({server: "server"})
@@ -205,7 +223,12 @@ module Imap::Backup
       end
 
       context "when connection_options is set" do
-        let(:options) { {username: "user", password: "pwd", connection_options: '{"foo": "bar"}'} }
+        let(:options) do
+          {
+            username: "user", password: "pwd", local_path: "local_path",
+            connection_options: '{"foo": "bar"}'
+          }
+        end
 
         it "includes connection_options" do
           expect(subject.to_h).to include({connection_options: {foo: "bar"}})
@@ -213,7 +236,12 @@ module Imap::Backup
       end
 
       context "when reset_seen_flags_after_fetch is set" do
-        let(:options) { {username: "user", password: "pwd", reset_seen_flags_after_fetch: true} }
+        let(:options) do
+          {
+            username: "user", password: "pwd", local_path: "local_path",
+            reset_seen_flags_after_fetch: true
+          }
+        end
 
         it "includes reset_seen_flags_after_fetch" do
           expect(subject.to_h).to include({reset_seen_flags_after_fetch: true})
@@ -221,7 +249,9 @@ module Imap::Backup
       end
 
       context "when status is active" do
-        let(:options) { {username: "user", password: "pwd", status: "active"} }
+        let(:options) do
+          {username: "user", password: "pwd", local_path: "local_path", status: "active"}
+        end
 
         it "does not include status" do
           expect(subject.to_h).to include({status: "active"})
@@ -229,7 +259,9 @@ module Imap::Backup
       end
 
       context "when status is archived" do
-        let(:options) { {username: "user", password: "pwd", status: "archived"} }
+        let(:options) do
+          {username: "user", password: "pwd", local_path: "local_path", status: "archived"}
+        end
 
         it "includes status" do
           expect(subject.to_h).to include({status: "archived"})
@@ -237,7 +269,9 @@ module Imap::Backup
       end
 
       context "when status is offline" do
-        let(:options) { {username: "user", password: "pwd", status: "offline"} }
+        let(:options) do
+          {username: "user", password: "pwd", local_path: "local_path", status: "offline"}
+        end
 
         it "includes status" do
           expect(subject.to_h).to include({status: "offline"})
@@ -251,8 +285,33 @@ module Imap::Backup
       end
     end
 
+    describe "#lockfile_path" do
+      context "when local_path is set" do
+        let(:options) { {username: "user", password: "pwd", local_path: "local_path"} }
+
+        it "returns the correct lockfile path" do
+          expect(subject.lockfile_path).to eq("local_path/imap-backup.lock")
+        end
+      end
+
+      context "when local_path is not set" do
+        let(:options) { {username: "user", password: "pwd", local_path: nil} }
+
+        it "raises an error" do
+          expect do
+            subject.lockfile_path
+          end.to raise_error(RuntimeError, /local_path is not set/)
+        end
+      end
+    end
+
     describe "#multi_fetch_size" do
-      let(:options) { {username: "user", password: "pwd", multi_fetch_size: multi_fetch_size} }
+      let(:options) do
+        {
+          username: "user", password: "pwd", local_path: "local_path",
+          multi_fetch_size: multi_fetch_size
+        }
+      end
       let(:multi_fetch_size) { 10 }
 
       it "returns the initialized value" do
@@ -294,7 +353,7 @@ module Imap::Backup
       [:connection_options, '{"some": "option"}', {some: "option"}]
     ].each do |attribute, value, expected|
       describe "setting ##{attribute}=" do
-        let(:options) { {username: "original", password: "original"} }
+        let(:options) { {username: "original", password: "original", local_path: "original"} }
 
         before { subject.send(:"#{attribute}=", value) }
 
@@ -354,7 +413,9 @@ module Imap::Backup
       end
 
       context "when status is set" do
-        let(:options) { {username: "user", password: "pwd", status: "archived"} }
+        let(:options) do
+          {username: "user", password: "pwd", local_path: "local_path", status: "archived"}
+        end
 
         it "returns the set status" do
           expect(subject.status).to eq("archived")
@@ -400,7 +461,9 @@ module Imap::Backup
 
     describe "#active?" do
       context "when status is active" do
-        let(:options) { {username: "user", password: "pwd", status: "active"} }
+        let(:options) do
+          {username: "user", password: "pwd", local_path: "local_path", status: "active"}
+        end
 
         it "returns true" do
           expect(subject.active?).to be true
@@ -408,7 +471,9 @@ module Imap::Backup
       end
 
       context "when status is not active" do
-        let(:options) { {username: "user", password: "pwd", status: "archived"} }
+        let(:options) do
+          {username: "user", password: "pwd", local_path: "local_path", status: "archived"}
+        end
 
         it "returns false" do
           expect(subject.active?).to be false
@@ -418,7 +483,9 @@ module Imap::Backup
 
     describe "#archived?" do
       context "when status is archived" do
-        let(:options) { {username: "user", password: "pwd", status: "archived"} }
+        let(:options) do
+          {username: "user", password: "pwd", local_path: "local_path", status: "archived"}
+        end
 
         it "returns true" do
           expect(subject.archived?).to be true
@@ -426,7 +493,9 @@ module Imap::Backup
       end
 
       context "when status is not archived" do
-        let(:options) { {username: "user", password: "pwd", status: "active"} }
+        let(:options) do
+          {username: "user", password: "pwd", local_path: "local_path", status: "active"}
+        end
 
         it "returns false" do
           expect(subject.archived?).to be false
@@ -436,7 +505,9 @@ module Imap::Backup
 
     describe "#offline?" do
       context "when status is offline" do
-        let(:options) { {username: "user", password: "pwd", status: "offline"} }
+        let(:options) do
+          {username: "user", password: "pwd", local_path: "local_path", status: "offline"}
+        end
 
         it "returns true" do
           expect(subject.offline?).to be true
@@ -444,7 +515,9 @@ module Imap::Backup
       end
 
       context "when status is not offline" do
-        let(:options) { {username: "user", password: "pwd", status: "active"} }
+        let(:options) do
+          {username: "user", password: "pwd", local_path: "local_path", status: "active"}
+        end
 
         it "returns false" do
           expect(subject.offline?).to be false
@@ -454,7 +527,9 @@ module Imap::Backup
 
     describe "#available_for_backup?" do
       context "when status is active" do
-        let(:options) { {username: "user", password: "pwd", status: "active"} }
+        let(:options) do
+          {username: "user", password: "pwd", local_path: "local_path", status: "active"}
+        end
 
         it "returns true" do
           expect(subject.available_for_backup?).to be true
@@ -463,7 +538,9 @@ module Imap::Backup
 
       %w[archived offline].each do |status|
         context "when status is #{status}" do
-          let(:options) { {username: "user", password: "pwd", status: status} }
+          let(:options) do
+            {username: "user", password: "pwd", local_path: "local_path", status: status}
+          end
 
           it "returns false" do
             expect(subject.available_for_backup?).to be false
@@ -475,7 +552,9 @@ module Imap::Backup
     describe "#available_for_migration?" do
       %w[active archived].each do |status|
         context "when status is #{status}" do
-          let(:options) { {username: "user", password: "pwd", status: status} }
+          let(:options) do
+            {username: "user", password: "pwd", local_path: "local_path", status: status}
+          end
 
           it "returns true" do
             expect(subject.available_for_migration?).to be true
@@ -484,7 +563,9 @@ module Imap::Backup
       end
 
       context "when status is offline" do
-        let(:options) { {username: "user", password: "pwd", status: "offline"} }
+        let(:options) do
+          {username: "user", password: "pwd", local_path: "local_path", status: "offline"}
+        end
 
         it "returns false" do
           expect(subject.available_for_migration?).to be false

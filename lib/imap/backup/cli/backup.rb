@@ -64,6 +64,8 @@ module Imap::Backup
       case exception
       when Net::IMAP::NoResponseError, Errno::ECONNREFUSED
         111
+      when Lockfile::LockfileExistsError
+        112
       else
         1
       end

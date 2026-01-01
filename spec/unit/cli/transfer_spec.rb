@@ -2,6 +2,7 @@ require "imap/backup/cli/transfer"
 
 require "net/imap"
 require "imap/backup/account/folder"
+require "imap/backup/account/locker"
 require "imap/backup/serializer"
 
 module Imap::Backup
@@ -38,6 +39,8 @@ module Imap::Backup
     let(:mirror) { instance_double(Mirror, run: nil) }
     let(:backup) { instance_double(CLI::Backup, "backup_1", run: nil) }
     let(:folder_mapper) { instance_double(Account::FolderMapper) }
+    let(:source_locker) { instance_double(Account::Locker, "Source locker", with_lock: nil) }
+    let(:destination_locker) { instance_double(Account::Locker, "Destination locker", with_lock: nil) }
 
     before do
       allow(Configuration).to receive(:exist?) { true }
@@ -47,12 +50,28 @@ module Imap::Backup
       allow(Mirror).to receive(:new) { mirror }
       allow(Account::FolderMapper).to receive(:new) { folder_mapper }
       allow(folder_mapper).to receive(:each).and_yield(serializer, folder)
+      allow(Account::Locker).to receive(:new).with(account: source_account) { source_locker }
+      allow(Account::Locker).to receive(:new).with(account: destination_account) { destination_locker }
+      allow(source_locker).to receive(:with_lock).and_yield
+      allow(destination_locker).to receive(:with_lock).and_yield
     end
 
     it_behaves_like(
       "an action that requires an existing configuration",
       action: lambda(&:run)
     )
+
+    it "locks the source account" do
+      subject.run
+
+      expect(source_locker).to have_received(:with_lock)
+    end
+
+    it "locks the destination account" do
+      subject.run
+
+      expect(destination_locker).to have_received(:with_lock)
+    end
 
     context "when in migrate mode" do
       it "migrates each folder" do

@@ -184,6 +184,13 @@ module Imap::Backup
     CREATE_RETRY_CLASSES = [::Net::IMAP::BadResponseError].freeze
     EXAMINE_RETRY_CLASSES = [::Net::IMAP::BadResponseError].freeze
     PERMITTED_FLAGS = %i(Answered Draft Flagged Seen).freeze
+    private_constant :BODY_ATTRIBUTE,
+                     :UID_FETCH_RETRY_CLASSES,
+                     :UID_SEARCH_RETRY_CLASSES,
+                     :APPEND_RETRY_CLASSES,
+                     :CREATE_RETRY_CLASSES,
+                     :EXAMINE_RETRY_CLASSES,
+                     :PERMITTED_FLAGS
 
     def examine
       client.examine(utf7_encoded_name)

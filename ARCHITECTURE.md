@@ -7,6 +7,11 @@ It is written in Ruby.
 Commands are processed by Thor modules -
 under the CLI namespace.
 
+# Dependencies
+
+Runtime dependencies are listed in `./imap-backup.gemspec`
+while development dependencies are listed in `./Gemfile`.
+
 # Setup
 
 The setup program uses the highline gem to

@@ -56,6 +56,7 @@ module Imap::Backup
     private
 
     EMAIL_MATCHER = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]+$/i
+    private_constant :EMAIL_MATCHER
 
     attr_reader :highline
   end

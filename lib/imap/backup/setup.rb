@@ -91,6 +91,7 @@ module Imap::Backup
       Imap::Backup::Account.new(
         username: username,
         password: "",
+        local_path: nil,
         folders: []
       ).tap do |a|
         provider = Imap::Backup::Email::Provider.for_address(username)

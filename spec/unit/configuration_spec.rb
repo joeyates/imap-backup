@@ -1,7 +1,5 @@
 require "imap/backup/configuration"
 
-# rubocop:disable RSpec/PredicateMatcher
-
 module Imap::Backup
   RSpec.describe Configuration do
     let(:directory) { "/base/path" }
@@ -11,8 +9,8 @@ module Imap::Backup
     let(:configuration) { {accounts: accounts.map(&:to_h)}.to_json }
     let(:accounts) do
       [
-        Account.new({username: "username1", password: "password1"}),
-        Account.new({username: "username2", password: "password2"})
+        Account.new({username: "username1", password: "password1", local_path: "local_path1"}),
+        Account.new({username: "username2", password: "password2", local_path: "local_path2"})
       ]
     end
     let(:permission_checker) { instance_double(Serializer::PermissionChecker, run: nil) }
@@ -113,6 +111,7 @@ module Imap::Backup
         expect(parsed[:accounts].first).to eq(
           {
             username: "username1", password: "password1",
+            local_path: "local_path1",
             multi_fetch_size: 1, status: "active"
           }
         )
@@ -184,10 +183,15 @@ module Imap::Backup
       end
     end
 
-    context "when a folders are stored as Hashes" do
+    context "when folders are stored as Hashes" do
       let(:file) { instance_double(File, write: nil) }
       let(:configuration) do
-        {accounts: [{username: "account", password: "ciao", folders: [{name: "foo"}]}]}.to_json
+        {
+          accounts: [{
+            username: "account", password: "ciao", local_path: "local_path",
+            folders: [{name: "foo"}]
+          }]
+        }.to_json
       end
 
       before do
