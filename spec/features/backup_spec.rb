@@ -307,4 +307,21 @@ RSpec.describe "imap-backup backup", :container, type: :aruba do
       expect(content).to eq(messages_as_mbox)
     end
   end
+
+  context "when an account is locked by an active process" do
+    let(:command) { "bash -c 'imap-backup backup'" }
+    let(:lockfile) { Imap::Backup::Lockfile.new(path: account.lockfile_path) }
+
+    # Lock the account so it seems another backup process is running
+    around do |example|
+      FileUtils.mkdir_p(account.local_path)
+      lockfile.with_lock { example.run }
+    end
+
+    it "exits with a failure status" do
+      run_command_and_stop command, fail_on_error: false
+
+      expect(last_command_started).to have_exit_status(112)
+    end
+  end
 end
