@@ -1,4 +1,5 @@
 require "imap/backup/account/folder_mapper"
+require "imap/backup/account/locker"
 require "imap/backup/uploader"
 
 module Imap; end
@@ -12,13 +13,16 @@ module Imap::Backup
       @account = account
       @destination_delimiter = delimiter
       @destination_prefix = prefix
+      @locker = nil
     end
 
     # Runs the restore operation
     # @return [void]
     def run
-      folders.each do |serializer, folder|
-        Uploader.new(folder, serializer).run
+      locker.with_lock do
+        folders.each do |serializer, folder|
+          Uploader.new(folder, serializer).run
+        end
       end
     end
 
@@ -39,6 +43,10 @@ module Imap::Backup
 
     def folders
       Account::FolderMapper.new(**enumerator_options)
+    end
+
+    def locker
+      @locker ||= Account::Locker.new(account: account)
     end
   end
 end
