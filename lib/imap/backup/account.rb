@@ -131,19 +131,19 @@ module Imap::Backup
     # @return [Hash] all Account data for serialization
     def to_h
       h = {
-        username: @username,
-        password: @password,
+        username: username,
+        password: password,
         status: status
       }
-      h[:local_path] = @local_path if @local_path
-      h[:folders] = @folders if @folders
-      h[:folder_blacklist] = true if @folder_blacklist
-      h[:mirror_mode] = true if @mirror_mode
-      h[:server] = @server if @server
-      h[:connection_options] = @connection_options if connection_options
+      h[:local_path] = local_path if local_path
+      h[:folders] = folders if folders
+      h[:folder_blacklist] = true if folder_blacklist
+      h[:mirror_mode] = true if mirror_mode
+      h[:server] = server if server
+      h[:connection_options] = connection_options if connection_options
       h[:multi_fetch_size] = multi_fetch_size
-      if @reset_seen_flags_after_fetch
-        h[:reset_seen_flags_after_fetch] = @reset_seen_flags_after_fetch
+      if reset_seen_flags_after_fetch
+        h[:reset_seen_flags_after_fetch] = reset_seen_flags_after_fetch
       end
       h
     end
