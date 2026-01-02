@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# This script extracts line coverage data from the SimpleCov JSON output
+# and formats it into a more concise representation.
+# Usage: bin/line-coverage
+# Output is a JSON array of objects with 'file' and 'lines' keys.
+# Each 'lines' value is an array of objects with 'line' and 'count' keys.
+# Lines without code are skipped.
+# Example output:
+# [
+#   {
+#     "file": "lib/some_file.rb",
+#     "lines": [
+#       {"line": 10, "count": 3},
+#       {"line": 11, "count": 0},
+#       ...
+#     ]
+#   },
+#   ...
+# ]
+# Note: Requires 'jq' to be installed.
+# The script assumes the SimpleCov JSON report is located at 'coverage/coverage.json'
+# relative to the project root.
+
+project_root="$(realpath "$(dirname "$(realpath "$0")")/..")"
+json_path="${project_root}/coverage/coverage.json"
+
+if [[ ! -f "${json_path}" ]]; then
+  echo "No coverage.json file found at ${json_path}"
+  exit 1
+fi
+
+ROOT="${project_root}" jq -r '
+  .coverage
+  | to_entries
+  | map({
+    file:
+      .key
+      | ltrimstr($ENV.ROOT + "/"),
+    lines:
+      .value.lines
+      | to_entries
+      | map(select(.value!=null))
+      | map({line: (.key + 1), count: .value})
+  })' "${json_path}"
