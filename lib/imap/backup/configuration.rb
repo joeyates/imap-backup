@@ -32,6 +32,7 @@ module Imap::Backup
       File.exist?(path || default_pathname)
     end
 
+    # @param path [String, nil] optional path to the configuration file
     def initialize(path: nil)
       @pathname = path || self.class.default_pathname
       @download_strategy = nil

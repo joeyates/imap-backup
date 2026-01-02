@@ -10,6 +10,7 @@ module Imap::Backup
 
   # Returns an IMAP client set up for the supplied account
   class Account::ClientFactory
+    # @param account [Account] the account whose credentials configure the client
     def initialize(account:)
       @account = account
     end

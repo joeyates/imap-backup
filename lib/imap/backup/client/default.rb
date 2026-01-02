@@ -19,6 +19,7 @@ module Imap::Backup
       responses uid_fetch uid_search uid_store
     )
 
+    # @param account [Account] the account whose server is accessed
     def initialize(account)
       @account = account
       @state = nil

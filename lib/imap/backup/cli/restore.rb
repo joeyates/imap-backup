@@ -14,6 +14,13 @@ module Imap::Backup
     include Thor::Actions
     include CLI::Helpers
 
+    # @param email [String, nil] optional email address identifying the account to restore
+    # @param options [Hash] CLI options controlling output
+    # @option opts [String] :config (nil) the path to the configuration file
+    # @option opts [String] :erb_configuration (nil) the path to the ERB configuration file
+    # @option opts [Array<String>] :accounts (nil) the accounts to restore
+    # @option opts [String] :delimiter ("/") the destination folder delimiter
+    # @option opts [String] :prefix ("") a prefix applied to restored folder names
     def initialize(email = nil, options)
       super([])
       @email = email

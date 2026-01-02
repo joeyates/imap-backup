@@ -12,6 +12,22 @@ module Imap::Backup
 
   # Runs a backup without relying on existing configuration
   class CLI::Single::Backup
+    # @param options [Hash] CLI options controlling output
+    # @option opts [String] :config (nil) the path to the configuration file
+    # @option opts [String] :erb_configuration (nil) the path to the ERB configuration file
+    # @option opts [String] :email the email address identifying the account to backup
+    # @option opts [String] :password (nil) the password for the account
+    # @option opts [String] :password_environment_variable (nil) the name of an environment variable containing the password
+    # @option opts [String] :password_file (nil) the path to a file containing the password
+    # @option opts [String] :server the IMAP server address
+    # @option opts [String] :download_strategy (nil) the download strategy to use, either "delay" or "direct"
+    # @option opts [Boolean] :folder_blacklist (false) whether to treat folder list as a blacklist
+    # @option opts [Array<String>] :folder ([]) the folders to backup
+    # @option opts [String] :path (nil) the local path to store the backup
+    # @option opts [Boolean] :mirror (false) whether to run in mirror mode
+    # @option opts [Integer] :multi_fetch_size (nil) the number of messages to fetch in a single operation
+    # @option opts [Boolean] :refresh (false) whether to force refresh of folder metadata:w
+    # @option opts [Boolean] :reset_seen_flags_after_fetch (false) whether to reset seen flags after fetching messages
     def initialize(options)
       @options = options
       @password = nil

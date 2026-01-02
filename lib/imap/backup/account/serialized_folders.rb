@@ -13,6 +13,7 @@ module Imap::Backup
   class Account::SerializedFolders
     include Enumerable
 
+    # @param account [Account] the account whose serialized folders are iterated
     def initialize(account:)
       @account = account
     end

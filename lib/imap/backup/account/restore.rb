@@ -9,6 +9,9 @@ module Imap::Backup
 
   # Restores all backed up folders to the server
   class Account::Restore
+    # @param account [Account] the account whose backups will be restored
+    # @param delimiter [String] the destination folder delimiter
+    # @param prefix [String] a prefix applied to restored folder names
     def initialize(account:, delimiter: "/", prefix: "")
       @account = account
       @destination_delimiter = delimiter

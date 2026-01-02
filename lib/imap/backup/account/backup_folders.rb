@@ -9,6 +9,8 @@ module Imap::Backup
   class Account::BackupFolders
     include Enumerable
 
+    # @param client [Client::AutomaticLoginWrapper] the IMAP client that lists folders
+    # @param account [Account] the account whose folders are being backed up
     def initialize(client:, account:)
       @client = client
       @account = account

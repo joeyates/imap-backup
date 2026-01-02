@@ -15,6 +15,10 @@ module Imap::Backup
     include Thor::Actions
     include CLI::Helpers
 
+    # @param options [Hash] CLI options controlling output
+    # @option opts [String] :config (nil) the path to the configuration file
+    # @option opts [String] :erb_configuration (nil) the path to the ERB configuration file
+    # @option opts [Boolean] :refresh (false) whether to force refresh of folder metadata
     def initialize(options)
       super([])
       @options = options

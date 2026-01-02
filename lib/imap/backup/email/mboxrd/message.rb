@@ -35,6 +35,7 @@ module Imap::Backup
       # @return [String] the original message body
       attr_reader :supplied_body
 
+      # @param supplied_body [String] the original RFC 2822 message text
       def initialize(supplied_body)
         @supplied_body = supplied_body.clone
       end

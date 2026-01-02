@@ -13,6 +13,9 @@ module Imap::Backup
     include Thor::Actions
     include CLI::Helpers
 
+    # @param options [Hash] CLI options controlling output
+    # @option opts [String] :config (nil) the path to the configuration file
+    # @option opts [String] :erb_configuration (nil) the path to the ERB configuration file
     def initialize(options)
       super([])
       @options = options

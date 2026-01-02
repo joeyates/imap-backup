@@ -9,6 +9,11 @@ module Imap::Backup
     include Thor::Actions
     include CLI::Helpers
 
+    # @param email [String] the email address identifying the account to inspect
+    # @param options [Hash] CLI options controlling output
+    # @option opts [String] :config (nil) the path to the configuration file
+    # @option opts [String] :erb_configuration (nil) the path to the ERB configuration file
+    # @option opts [String] :format ("text") the output format, either "text" or "json"
     def initialize(email, options)
       super([])
       @email = email

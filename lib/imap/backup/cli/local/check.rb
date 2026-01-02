@@ -14,6 +14,11 @@ module Imap::Backup
   class CLI::Local::Check
     include CLI::Helpers
 
+    # @param options [Hash] CLI options controlling output
+    # @option opts [String] :config (nil) the path to the configuration file
+    # @option opts [String] :erb_configuration (nil) the path to the ERB configuration file
+    # @option opts [Boolean] :delete_corrupt (false) whether to delete corrupt folders
+    # @option opts [String] :format ("text") the output format, either "text" or "json"
     def initialize(options)
       @options = options
     end

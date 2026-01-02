@@ -5,6 +5,9 @@ module Imap; end
 module Imap::Backup
   # Synchronises a folder between a source and destination
   class Mirror
+    # @param serializer [Serializer] the source of backed-up messages
+    # @param folder [Account::Folder] the destination folder to mirror into
+    # @param reset [Boolean] true to delete destination-only messages first
     def initialize(serializer, folder, reset: false)
       @serializer = serializer
       @folder = folder

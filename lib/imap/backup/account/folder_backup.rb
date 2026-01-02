@@ -12,6 +12,9 @@ module Imap::Backup
 
   # Implements backup for a single folder
   class Account::FolderBackup
+    # @param account [Account] the account that owns the folder
+    # @param folder [Account::Folder] the online folder being backed up
+    # @param refresh [Boolean] true to refresh metadata regardless of mirror mode
     def initialize(account:, folder:, refresh: false)
       @account = account
       @folder = folder

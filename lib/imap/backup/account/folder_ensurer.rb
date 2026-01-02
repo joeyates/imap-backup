@@ -8,6 +8,7 @@ module Imap::Backup
 
   # Handles creation of directories for backup storage
   class Account::FolderEnsurer
+    # @param account [Account] the account to check
     def initialize(account:)
       @account = account
     end

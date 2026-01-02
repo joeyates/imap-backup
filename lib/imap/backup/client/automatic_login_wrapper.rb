@@ -15,6 +15,7 @@ module Imap::Backup
     # @return [Client]
     attr_reader :client
 
+    # @param client [Client::Default] the client to wrap and lazily log in
     def initialize(client:)
       @client = client
       @login_called = false

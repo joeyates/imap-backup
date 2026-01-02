@@ -9,6 +9,7 @@ module Imap::Backup
   class Account::Locker
     attr_reader :account
 
+    # @param account [Account] the account whose backup must be locked
     def initialize(account:)
       @account = account
     end
