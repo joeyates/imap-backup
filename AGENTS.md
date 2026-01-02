@@ -11,7 +11,10 @@
 
 ## Modules and Classes
 
-- Format modules as follows:
+- Use accessors for class instance variables.
+- Avoid accessing instance variables directly (with @) except in `initialize` and
+  in memoized getters.
+- Format classes and modules as follows:
 
 ```ruby
 module Imap; end
@@ -28,8 +31,12 @@ end
 
 ## Testing
 
-- In specs, prefer one assertion per example.
+- In tests, prefer one assertion per example.
 - Avoid `double`, use `instance_double`.
-- To get path for a unit spec, take the code path and remove the initial
+- To get path for a unit test, take the code path and remove the initial
   `lib/imap/backup/` add a `spec/unit/` prefix and add the suffix `_spec.rb`.
   Example: `lib/imap/backup/foo/bar.rb` → `spec/unit/foo/bar_spec.rb`.
+- When creating new tests, use existing tests in the same directory as examples,
+  if available.
+- Never test private methods, instead write tests for public methods that exercise the
+  private methods.
