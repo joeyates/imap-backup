@@ -9,6 +9,10 @@ SimpleCov.start do
   coverage_dir(File.join(__dir__, "coverage"))
 
   enable_coverage :branch
+
+  if ENV['CI']
+    formatter SimpleCov::Formatter::SimpleFormatter
+  end
 end
 
 SimpleCov.at_exit do
