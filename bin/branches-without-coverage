@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# This script reports uncovered branches per file using bin/branch-coverage output.
+# Usage: bin/branches-without-coverage
+# Output is a JSON array of objects with 'file' and 'branches' keys.
+# Each 'branches' value is an array of branch objects that have zero coverage.
+# Example output:
+# [
+#   {
+#     "file": "lib/some_file.rb",
+#     "branches": [
+#       {"start_line": 10, "end_line": 10, "type": "else", "coverage": 0},
+#       ...
+#     ]
+#   },
+#   ...
+# ]
+# Note: Requires 'jq' to be installed.
+
+script_dir="$(realpath "$(dirname "$0")")"
+branch_coverage_script="${script_dir}/branch-coverage"
+
+if [[ ! -x "${branch_coverage_script}" ]]; then
+  echo "branch-coverage script not found at ${branch_coverage_script}" >&2
+  exit 1
+fi
+
+"${branch_coverage_script}" | jq '
+  map({
+    file: .file,
+    branches: (
+      .branches
+      | map(select(.coverage == 0))
+    )
+  })
+  | map(select((.branches | length) > 0))
+'
