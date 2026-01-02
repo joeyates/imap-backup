@@ -8,8 +8,6 @@ SimpleCov.start do
 
   add_filter "/spec/"
 
-  coverage_dir(File.join(__dir__, "coverage"))
-
   enable_coverage :branch
 
   if ENV['CI']
