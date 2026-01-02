@@ -12,7 +12,7 @@ module Imap::Backup
     # @return [Array[Symbol]] the message's flags
     attr_accessor :flags
     # @return [Integer] the length of the message (as stored on disk)
-    attr_reader :length
+    attr_accessor :length
     # @return [Integer] the start of the message inside the mailbox file
     attr_reader :offset
     # @return [Integer] the message's UID

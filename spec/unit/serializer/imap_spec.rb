@@ -41,6 +41,102 @@ module Imap::Backup
       end
     end
 
+    describe "#transaction" do
+      let(:logger) { instance_double(::Logger, error: nil, info: nil) }
+
+      before do
+        allow(Imap::Backup::Logger).to receive(:logger).and_return(logger)
+      end
+
+      context "when the block completes" do
+        it "persists any changes after the block" do
+          subject.transaction do
+            subject.update(42, length: 77_777)
+          end
+
+          expect(file).to have_received(:write).
+            with(/"length":77777/)
+        end
+      end
+
+      context "when the block raises an error" do
+        let(:action) do
+          proc do
+            subject.transaction do
+              subject.append(123, 321, flags: [:Flagged])
+              raise "Boom"
+            end
+          end
+        end
+
+        it "re-raises the error" do
+          expect { action.call }.to raise_error(RuntimeError, /Boom/)
+        end
+
+        it "rolls back the changes" do
+          expect(subject).to receive(:rollback).and_call_original
+
+          begin
+            action.call
+          rescue RuntimeError
+          end
+        end
+
+        it "logs the failure" do
+          begin
+            action.call
+          rescue RuntimeError
+          end
+
+          expect(logger).to have_received(:error).
+            with("Imap::Backup::Serializer::Imap handling RuntimeError")
+        end
+
+        it "does not write to disk" do
+          begin
+            action.call
+          rescue RuntimeError
+          end
+
+          expect(file).to_not have_received(:write)
+        end
+      end
+
+      context "when a nested transaction is attempted" do
+        let(:nested_action) do
+          proc do
+            subject.transaction do
+              subject.transaction {}
+            end
+          end
+        end
+
+        it "raises a helpful error" do
+          expect { nested_action.call }.
+            to raise_error(RuntimeError, /nested transactions are not supported/)
+        end
+
+        it "rolls back the outer transaction" do
+          expect(subject).to receive(:rollback).and_call_original
+
+          begin
+            nested_action.call
+          rescue RuntimeError
+          end
+        end
+
+        it "logs the nested transaction failure" do
+          begin
+            nested_action.call
+          rescue RuntimeError
+          end
+
+          expect(logger).to have_received(:error).
+            with("Imap::Backup::Serializer::Imap handling RuntimeError")
+        end
+      end
+    end
+
     describe "#valid?" do
       context "when the metadata file has the correct data" do
         it "is true" do
@@ -121,6 +217,90 @@ module Imap::Backup
             expect do
               subject.append(123, 300)
             end.to raise_error(RuntimeError, /without a uid_validity/)
+          end
+        end
+      end
+    end
+
+    describe "#get" do
+      context "when the UID exists" do
+        it "returns a Serializer::Message" do
+          result = subject.get(42)
+
+          expect(result).to be_a(Serializer::Message)
+        end
+
+        it "returns the correct message" do
+          result = subject.get(42)
+
+          expect(result.uid).to eq(42)
+        end
+
+        it "returns a duplicate of the stored message" do
+          stored = subject.messages.first
+          result = subject.get(42)
+
+          expect(result).to_not be(stored)
+        end
+      end
+
+      context "when the UID does not exist" do
+        it "returns nil" do
+          result = subject.get(99)
+
+          expect(result).to be_nil
+        end
+      end
+    end
+
+    describe "#update" do
+      context "when updating the message length" do
+        before { subject.update(42, length: 77_777) }
+
+        it "updates the length" do
+          updated = subject.get(42)
+
+          expect(updated.length).to eq(77_777)
+        end
+
+        it "saves the file" do
+          expect(file).to have_received(:write).
+            with(/"length":77777/)
+        end
+      end
+
+      context "when updating the message flags" do
+        before { subject.update(42, flags: [:Seen, :Flagged]) }
+
+        it "updates the flags" do
+          updated = subject.get(42)
+
+          expect(updated.flags).to eq([:Seen, :Flagged])
+        end
+
+        it "saves the file" do
+          expect(file).to have_received(:write).
+            with(/"flags":\["Seen","Flagged"\]/)
+        end
+      end
+
+      context "when the UID is missing" do
+        it "raises an error" do
+          expect do
+            subject.update(99, length: 10)
+          end.to raise_error(RuntimeError, /UID 99 not found/)
+        end
+
+        context "after attempting to update" do
+          before do
+            begin
+              subject.update(99, flags: [:Flagged])
+            rescue RuntimeError
+            end
+          end
+
+          it "does not save the file" do
+            expect(file).to_not have_received(:write)
           end
         end
       end
