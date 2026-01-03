@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# This script checks for methods in the codebase that lack parameter documentation.
+
+yard list --query 'object.is_a?(CodeObjects::MethodObject) && parameters.any? && !tag(:param)'
