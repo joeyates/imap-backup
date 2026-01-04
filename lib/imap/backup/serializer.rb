@@ -9,7 +9,6 @@ require "imap/backup/serializer/integrity_checker"
 require "imap/backup/serializer/imap"
 require "imap/backup/serializer/mbox"
 require "imap/backup/serializer/message_enumerator"
-require "imap/backup/serializer/version2_migrator"
 require "imap/backup/serializer/unused_name_finder"
 
 module Imap; end
@@ -88,14 +87,11 @@ module Imap::Backup
       block.call
     end
 
-    # Checks that the metadata files are valid, migrates the metadata file
-    # from older versions, if necessary,
+    # Checks that the metadata files are valid,
     # or deletes any existing files if the pair are not valid.
     # @return [Boolean] indicates whether there are existing, valid files
     def validate!
       return true if @validated
-
-      optionally_migrate2to3
 
       imap_valid = imap.valid?
       mbox_valid = mbox.valid?
@@ -263,21 +259,6 @@ module Imap::Backup
           ensure_containing_directory
           Serializer::Imap.new(folder_path)
         end
-    end
-
-    def optionally_migrate2to3
-      migrator = Version2Migrator.new(folder_path)
-      return if !migrator.required?
-
-      Logger.logger.info <<~MESSAGE
-        Local metadata for folder '#{folder_path}' is currently stored in the version 2 format.
-
-        Migrating to the version 3 format...
-      MESSAGE
-
-      migrator.run
-      # Ensure new metadata gets loaded
-      @imap = nil
     end
 
     def ensure_containing_directory

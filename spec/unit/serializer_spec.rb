@@ -1,21 +1,6 @@
 require "imap/backup/serializer"
 
 RSpec.shared_examples "a method that checks for invalid serialization" do
-  context "with version 2 metadata files" do
-    let(:version2_migrator) do
-      instance_double(Imap::Backup::Serializer::Version2Migrator, required?: true, run: false)
-    end
-
-    before do
-      allow(Imap::Backup::Serializer::Version2Migrator).to receive(:new) { version2_migrator }
-      action.call
-    end
-
-    it "migrates to version 3" do
-      expect(version2_migrator).to have_received(:run)
-    end
-  end
-
   context "when either file is invalid" do
     let(:imap_valid) { true }
     let(:mbox_valid) { true }
