@@ -68,10 +68,12 @@ module Imap::Backup
         let(:erb_config) { instance_double(Configuration, accounts: []) }
 
         before do
-          allow(File).to receive(:exist?).with(erb_path).and_return(true)
-          allow(File).to receive(:read).with(erb_path).and_return(erb_content)
-          allow(Tempfile).to receive(:new).and_return(temp_file)
-          allow(Configuration).to receive(:new).with(path: temp_file.path).and_return(erb_config)
+          allow(File).to receive(:exist?).with(erb_path) { true }
+          allow(File).to receive(:read).with(erb_path) { erb_content }
+          allow(Tempfile).to receive(:new) { temp_file }
+          allow(Configuration).
+            to receive(:new).
+              with(path: temp_file.path) { erb_config }
         end
 
         it "processes the ERB template" do
@@ -85,7 +87,7 @@ module Imap::Backup
 
         context "when the ERB file does not exist" do
           before do
-            allow(File).to receive(:exist?).with(erb_path).and_return(false)
+            allow(File).to receive(:exist?).with(erb_path) { false }
           end
 
           it "raises an error" do
@@ -151,6 +153,18 @@ module Imap::Backup
             end.to raise_error(/Cannot specify both --config and --erb-configuration/)
           end
         end
+
+        context "when the temporary file cannot be created" do
+          before do
+            allow(Tempfile).to receive(:new) { nil }
+          end
+
+          it "skips unlinking the file" do
+            expect do
+              subject.load_config(**options)
+            end.to raise_error(NoMethodError)
+          end
+        end
       end
     end
 
@@ -167,6 +181,41 @@ module Imap::Backup
 
         it "replaces them with underscores" do
           expect(result.keys).to eq([:some_option])
+        end
+      end
+
+      context "when keys are already symbols" do
+        let(:options) { {foo: 1} }
+
+        it "leaves them untouched" do
+          expect(result[:foo]).to eq(1)
+        end
+      end
+
+      context "when the superclass already provides symbol keys" do
+        let(:symbol_helper_base) do
+          Class.new do
+            def initialize(raw_options)
+              @raw_options = raw_options
+            end
+
+            def options
+              @raw_options
+            end
+          end
+        end
+        let(:symbol_helper_class) do
+          options_helper = instance_double(Imap::Backup::CLI::Options, define_options: nil)
+          allow(Imap::Backup::CLI::Options).to receive(:new) { options_helper }
+
+          Class.new(symbol_helper_base) do
+            include CLI::Helpers
+          end
+        end
+        let(:symbol_subject) { symbol_helper_class.new(foo: 1) }
+
+        it "does not alter symbol keys" do
+          expect(symbol_subject.options[:foo]).to eq(1)
         end
       end
     end

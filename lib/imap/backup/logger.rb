@@ -49,7 +49,7 @@ module Imap::Backup
     end
 
     # Wraps a block, filtering output to standard error,
-    # hidng passwords and outputs the results to standard out
+    # hiding passwords, and outputs the results to standard out
     # @return [void]
     def self.sanitize_stderr(&block)
       sanitizer = Text::Sanitizer.new($stdout)

@@ -110,7 +110,7 @@ module Imap::Backup
         it "reports that the namespace is not defined" do
           subject.namespaces(account.username)
 
-          expect(Kernel).to have_received(:puts).with(%r(other\s+\(Not defined\)))
+          expect(Kernel).to have_received(:puts).with(/other\s+\(Not defined\)/)
         end
       end
     end

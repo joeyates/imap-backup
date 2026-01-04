@@ -14,7 +14,7 @@ end
 
 desc "Run feature specs"
 RSpec::Core::RakeTask.new(:spec_feature) do |task|
-  task.pattern = "spec/feature/**/*_spec.rb"
+  task.pattern = "spec/features/**/*_spec.rb"
 end
 
 desc "Run non-container specs"
@@ -26,4 +26,4 @@ RuboCop::RakeTask.new(:rubocop) do |task|
   task.options = ["--config", ".rubocop.yml"]
 end
 
-task :test => [:spec, :rubocop]
+task test: [:spec, :rubocop]

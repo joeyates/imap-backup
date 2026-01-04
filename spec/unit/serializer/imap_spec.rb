@@ -39,13 +39,37 @@ module Imap::Backup
           expect(subject.messages).to eq([])
         end
       end
+
+      context "when the 'messages' key is missing" do
+        let(:existing) { {version: version, uid_validity: 99} }
+
+        it "ignores the file" do
+          expect(subject.messages).to eq([])
+        end
+      end
+
+      context "when 'messages' is not an array" do
+        let(:existing) { {version: version, uid_validity: 99, messages: "oops"} }
+
+        it "ignores the file" do
+          expect(subject.messages).to eq([])
+        end
+      end
+
+      context "when the 'version' key is missing" do
+        let(:existing) { {uid_validity: 99, messages: []} }
+
+        it "ignores the file" do
+          expect(subject.messages).to eq([])
+        end
+      end
     end
 
     describe "#transaction" do
       let(:logger) { instance_double(::Logger, error: nil, info: nil) }
 
       before do
-        allow(Imap::Backup::Logger).to receive(:logger).and_return(logger)
+        allow(Imap::Backup::Logger).to receive(:logger) { logger }
       end
 
       context "when the block completes" do
@@ -76,27 +100,18 @@ module Imap::Backup
         it "rolls back the changes" do
           expect(subject).to receive(:rollback).and_call_original
 
-          begin
-            action.call
-          rescue RuntimeError
-          end
+          expect { action.call }.to raise_error(RuntimeError)
         end
 
         it "logs the failure" do
-          begin
-            action.call
-          rescue RuntimeError
-          end
+          expect { action.call }.to raise_error(RuntimeError)
 
           expect(logger).to have_received(:error).
             with("Imap::Backup::Serializer::Imap handling RuntimeError")
         end
 
         it "does not write to disk" do
-          begin
-            action.call
-          rescue RuntimeError
-          end
+          expect { action.call }.to raise_error(RuntimeError)
 
           expect(file).to_not have_received(:write)
         end
@@ -119,20 +134,24 @@ module Imap::Backup
         it "rolls back the outer transaction" do
           expect(subject).to receive(:rollback).and_call_original
 
-          begin
-            nested_action.call
-          rescue RuntimeError
-          end
+          expect { nested_action.call }.to raise_error(RuntimeError)
         end
 
         it "logs the nested transaction failure" do
-          begin
-            nested_action.call
-          rescue RuntimeError
-          end
+          expect { nested_action.call }.to raise_error(RuntimeError)
 
           expect(logger).to have_received(:error).
             with("Imap::Backup::Serializer::Imap handling RuntimeError")
+        end
+      end
+
+      context "when the transaction is rolled back manually" do
+        it "does not save" do
+          subject.transaction do
+            subject.rollback
+          end
+
+          expect(file).to_not have_received(:write)
         end
       end
     end
@@ -253,6 +272,12 @@ module Imap::Backup
       end
     end
 
+    describe "#uids" do
+      it "returns all message UIDs" do
+        expect(subject.uids).to eq([42])
+      end
+    end
+
     describe "#update" do
       context "when updating the message length" do
         before { subject.update(42, length: 77_777) }
@@ -291,15 +316,12 @@ module Imap::Backup
           end.to raise_error(RuntimeError, /UID 99 not found/)
         end
 
-        context "after attempting to update" do
-          before do
-            begin
-              subject.update(99, flags: [:Flagged])
-            rescue RuntimeError
-            end
-          end
-
+        context "when updating raises an error" do
           it "does not save the file" do
+            expect do
+              subject.update(99, flags: [:Flagged])
+            end.to raise_error(RuntimeError)
+
             expect(file).to_not have_received(:write)
           end
         end
@@ -385,23 +407,53 @@ module Imap::Backup
     end
 
     describe "#update_uid" do
-      before { subject.update_uid(42, 57) }
+      context "when renaming to a new UID" do
+        before { subject.update_uid(42, 57) }
 
-      it "sets the UID" do
-        added = subject.get(57)
+        it "sets the UID" do
+          added = subject.get(57)
 
-        expect(added).to be_a(Serializer::Message)
-      end
+          expect(added).to be_a(Serializer::Message)
+        end
 
-      it "saves the file" do
-        expect(file).to have_received(:write).
-          with(/\{"uid":57,"offset":0,"length":12345,"flags":\["AFlag"\]\}/)
+        it "saves the file" do
+          expect(file).to have_received(:write).
+            with(/\{"uid":57,"offset":0,"length":12345,"flags":\["AFlag"\]\}/)
+        end
       end
 
       context "when the UID is not present" do
         let(:existing) { {uid_validity: 99, messages: [{length: 10, offset: 0, uid: 33}]} }
 
         it "doesn't save the file" do
+          subject.update_uid(42, 57)
+
+          expect(file).to_not have_received(:write)
+        end
+      end
+
+      context "when the new UID already exists" do
+        let(:existing) do
+          {
+            version: version,
+            uid_validity: 99,
+            messages: [
+              {uid: 42, offset: 0, length: 12_345, flags: [:AFlag]},
+              {uid: 77, offset: 12_345, length: 222, flags: [:Seen]}
+            ]
+          }
+        end
+
+        it "raises an error" do
+          expect do
+            subject.update_uid(42, 77)
+          end.to raise_error(RuntimeError, /UID 77 already exists/)
+        end
+
+        it "does not save the file" do
+          expect { subject.update_uid(42, 77) }.
+            to raise_error(RuntimeError)
+
           expect(file).to_not have_received(:write)
         end
       end

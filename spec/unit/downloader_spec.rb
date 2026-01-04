@@ -1,5 +1,7 @@
 require "imap/backup/downloader"
 
+require "ostruct"
+
 module Imap::Backup
   RSpec.describe Downloader do
     describe "#run" do
@@ -96,6 +98,17 @@ module Imap::Backup
         end
       end
 
+      context "when there are no new messages" do
+        let(:remote_uids) { %w(111) }
+        let(:local_uids) { %w(111) }
+
+        it "does not fetch anything" do
+          expect(folder).to_not receive(:fetch_multi)
+
+          subject.run
+        end
+      end
+
       context "when appending messages raise errors" do
         let(:remote_uids) { %w(111 999) }
 
@@ -141,6 +154,22 @@ module Imap::Backup
 
         it "resets seen flags set during fetch" do
           expect(folder).to have_received(:remove_flags).with([33], [:Seen])
+        end
+      end
+
+      context "with reset_seen_flags_after_fetch but no changes" do
+        let(:options) { {reset_seen_flags_after_fetch: true} }
+
+        before do
+          allow_fetch_multi(uid: "111", body: body)
+          allow(folder).to receive(:unseen).and_return([33], [33])
+          allow(folder).to receive(:remove_flags)
+
+          subject.run
+        end
+
+        it "does not reset flags" do
+          expect(folder).to_not have_received(:remove_flags)
         end
       end
 

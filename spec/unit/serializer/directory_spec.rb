@@ -33,6 +33,18 @@ module Imap::Backup
       expect(FileUtils).to have_received(:chmod)
     end
 
+    context "when permissions are already correct" do
+      let(:file_mode) do
+        instance_double(FileMode, mode: described_class::DIRECTORY_PERMISSIONS)
+      end
+
+      it "doesn't change permissions" do
+        subject.ensure_exists
+
+        expect(FileUtils).to_not have_received(:chmod)
+      end
+    end
+
     context "when on Windows" do
       let(:windows) { true }
 

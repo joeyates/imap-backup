@@ -60,6 +60,37 @@ module Imap::Backup
 
         expect(Kernel).to have_received(:puts).with(email)
       end
+
+      context "when JSON format is requested" do
+        before do
+          allow(subject).to receive(:options) { {format: "json"} }
+        end
+
+        it "prints JSON" do
+          subject.accounts
+
+          expect(Kernel).to have_received(:puts).with(/"username":"foo@example.com"/)
+        end
+      end
+    end
+
+    describe "check" do
+      let(:non_logging_options) { {quiet: true} }
+      let(:check) { instance_double(CLI::Local::Check, run: nil) }
+      let(:logger_options) { {verbose: true} }
+
+      before do
+        allow(subject).to receive(:options) { logger_options }
+        allow(Imap::Backup::Logger).to receive(:setup_logging).
+          with(logger_options) { non_logging_options }
+        allow(CLI::Local::Check).to receive(:new).with(non_logging_options) { check }
+      end
+
+      it "runs the integrity check" do
+        subject.check
+
+        expect(check).to have_received(:run)
+      end
     end
 
     describe "folders" do
@@ -77,11 +108,27 @@ module Imap::Backup
 
         expect(Kernel).to have_received(:puts).with(%("bar"))
       end
+
+      context "when JSON format is requested" do
+        before do
+          allow(serialized_folders).to receive(:map) { [{name: "bar"}] }
+          allow(subject).to receive(:options) { {format: "json"} }
+        end
+
+        it "prints JSON" do
+          subject.folders(email)
+
+          expect(Kernel).to have_received(:puts).with(/"name":"bar"/)
+        end
+      end
     end
 
     describe "list" do
       before do
-        allow(serialized_folders).to receive(:find) { [serializer, folder] }
+        allow(serialized_folders).to receive(:find) do |&block|
+          block&.call(serializer, folder)
+          [serializer, folder]
+        end
       end
 
       it_behaves_like(
@@ -104,11 +151,38 @@ module Imap::Backup
           expect(Kernel).to have_received(:puts).with(/\sA{57}\.\.\./)
         end
       end
+
+      context "when JSON format is requested" do
+        before do
+          allow(subject).to receive(:options) { {format: "json"} }
+        end
+
+        it "prints JSON" do
+          subject.list(email, "bar")
+
+          expect(Kernel).to have_received(:puts).with(/"subject":"Ciao"/)
+        end
+      end
+
+      context "when the folder does not exist" do
+        before do
+          allow(serialized_folders).to receive(:find) { nil }
+        end
+
+        it "raises an error" do
+          expect do
+            subject.list(email, "missing")
+          end.to raise_error(RuntimeError, /Folder 'missing' not found/)
+        end
+      end
     end
 
     describe "show" do
       before do
-        allow(serialized_folders).to receive(:find) { [serializer, folder] }
+        allow(serialized_folders).to receive(:find) do |&block|
+          block&.call(serializer, folder)
+          [serializer, folder]
+        end
       end
 
       it_behaves_like(
@@ -137,6 +211,42 @@ module Imap::Backup
           subject.show(email, "bar", uids.join(","))
 
           expect(Kernel).to have_received(:puts).with(/\| UID: 123 /)
+        end
+      end
+
+      context "when JSON format is requested" do
+        let(:json_message) do
+          instance_double(
+            Serializer::Message,
+            uid: 123,
+            date: Date.today,
+            subject: "subject",
+            body: "body",
+            to_h: {uid: 123}
+          )
+        end
+
+        before do
+          allow(serializer).to receive(:each_message).with(uids) { [json_message] }
+          allow(subject).to receive(:options) { {format: "json"} }
+        end
+
+        it "prints JSON" do
+          subject.show(email, "bar", uids.join(","))
+
+          expect(Kernel).to have_received(:puts).with(/"uid":123/)
+        end
+      end
+
+      context "when the folder cannot be found" do
+        before do
+          allow(serialized_folders).to receive(:find) { nil }
+        end
+
+        it "raises an error" do
+          expect do
+            subject.show(email, "missing", "1")
+          end.to raise_error(RuntimeError, /Folder 'missing' not found/)
         end
       end
     end

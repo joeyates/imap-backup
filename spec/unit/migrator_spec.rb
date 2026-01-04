@@ -72,5 +72,17 @@ module Imap::Backup
         expect { subject.run }.to_not raise_error
       end
     end
+
+    context "when a message is nil" do
+      before do
+        allow(serializer).to receive(:each_message) { [nil].enum_for(:each) }
+      end
+
+      it "skips uploads" do
+        subject.run
+
+        expect(folder).to_not have_received(:append)
+      end
+    end
   end
 end

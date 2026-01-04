@@ -76,6 +76,13 @@ module Imap::Backup
       BAD
     end
 
+    describe ".clean_serialized" do
+      it "returns the string when no From header is present" do
+        raw = "Subject: Hi"
+        expect(described_class.clean_serialized(raw)).to eq(raw)
+      end
+    end
+
     describe ".from_serialized" do
       let(:serialized_message) { "From foo@a.com\n#{imap_message}" }
       let(:imap_message) { "Delivered-To: me@example.com\nFrom Me\n" }
@@ -133,6 +140,22 @@ module Imap::Backup
           end.to_not raise_error
         end
       end
+
+      context "when the body already has trailing blank lines" do
+        let(:message_body) { "From: Foo\n\n" }
+
+        it "does not add extra blank lines" do
+          expect(subject.to_serialized).to end_with("\n\n")
+        end
+      end
+
+      context "when the body is missing blank lines" do
+        let(:message_body) { "From: Foo" }
+
+        it "adds them" do
+          expect(subject.to_serialized).to end_with("\n\n")
+        end
+      end
     end
 
     describe "From" do
@@ -168,6 +191,28 @@ module Imap::Backup
           expect(subject.to_serialized).to start_with("From #{from}\n")
         end
       end
+
+      context "when only envelope_from is available" do
+        let(:mail_double) do
+          instance_double(
+            Mail::Message,
+            date: date,
+            subject: "subject",
+            from: [],
+            sender: nil,
+            envelope_from: from,
+            return_path: nil
+          )
+        end
+
+        before do
+          allow(subject).to receive(:parsed) { mail_double }
+        end
+
+        it "uses the envelope address" do
+          expect(subject.to_serialized).to start_with("From #{from} ")
+        end
+      end
     end
 
     describe "#date" do
@@ -183,6 +228,12 @@ module Imap::Backup
         it "returns nil" do
           expect(subject.date).to be_nil
         end
+      end
+    end
+
+    describe "#subject" do
+      it "returns the parsed subject" do
+        expect(subject.subject).to eq("Re: no subject")
       end
     end
 

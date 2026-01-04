@@ -123,6 +123,22 @@ module Imap::Backup
         end
       end
 
+      context "when modifying global options" do
+        let(:global_options) { instance_double(Setup::GlobalOptions, run: nil) }
+
+        before do
+          allow(input).to receive(:gets).and_return("3\n", "q\n")
+          allow(Setup::GlobalOptions).
+            to receive(:new).with(config: config) { global_options }
+        end
+
+        it "runs the global options flow" do
+          subject.run
+
+          expect(global_options).to have_received(:run)
+        end
+      end
+
       context "when editing accounts" do
         let(:account) do
           instance_double(Setup::Account, run: nil)

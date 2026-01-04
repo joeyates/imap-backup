@@ -121,6 +121,29 @@ module Imap::Backup
 
         expect(exporter).to have_received(:run)
       end
+
+      context "when force is supplied" do
+        let(:options) { {force: true} }
+
+        it "passes the flag to the exporter" do
+          command
+
+          expect(Thunderbird::MailboxExporter).to have_received(:new).
+            with(email, anything, default_install, force: true)
+        end
+      end
+
+      context "when no serialized folders exist" do
+        before do
+          allow(serialized_folders).to receive(:none?) { true }
+        end
+
+        it "raises an error" do
+          expect do
+            command
+          end.to raise_error(RuntimeError, /No serialized folders/)
+        end
+      end
     end
 
     describe "#ignore_history" do
@@ -174,6 +197,30 @@ module Imap::Backup
           subject.invoke(:ignore_history, ["foo@example.com"], options)
         end
       )
+
+      context "when a folder does not exist" do
+        before do
+          allow(folder).to receive(:exist?) { false }
+        end
+
+        it "skips it" do
+          subject.ignore_history(email)
+
+          expect(Serializer).to_not have_received(:new)
+        end
+      end
+
+      context "when a folder no longer exists" do
+        before do
+          allow(folder).to receive(:exist?) { false }
+        end
+
+        it "skips the folder" do
+          subject.ignore_history(email)
+
+          expect(Serializer).to_not have_received(:new)
+        end
+      end
     end
   end
 end

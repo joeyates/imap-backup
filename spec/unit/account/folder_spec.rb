@@ -340,6 +340,17 @@ module Imap::Backup
           expect(client).to have_received(:append).twice
         end
       end
+
+      context "when the message does not have a date" do
+        let(:message_date) { nil }
+
+        it "passes nil to the IMAP call" do
+          expect(client).to receive(:append).
+            with(anything, anything, anything, nil)
+
+          subject.append(message)
+        end
+      end
     end
 
     describe "#set_flags" do
@@ -381,6 +392,21 @@ module Imap::Backup
       end
     end
 
+    describe "#delete_multi" do
+      let(:uids_to_delete) { [1, 2, 3] }
+
+      before { subject.delete_multi(uids_to_delete) }
+
+      it "marks the supplied messages as deleted" do
+        expect(client).
+          to have_received(:uid_store).with(uids_to_delete, "+FLAGS", [:Deleted])
+      end
+
+      it "expunges the folder" do
+        expect(client).to have_received(:expunge)
+      end
+    end
+
     describe "#clear" do
       before { subject.clear }
 
@@ -395,6 +421,15 @@ module Imap::Backup
 
       it "deletes marked emails" do
         expect(client).to have_received(:expunge)
+      end
+
+      context "when there are no messages" do
+        let(:uids) { [] }
+
+        it "does nothing" do
+          expect(client).to_not have_received(:uid_store)
+          expect(client).to_not have_received(:expunge)
+        end
       end
     end
 

@@ -30,6 +30,18 @@ module Imap::Backup
 
         expect(output.string).to eq("C: RUBY99 LOGIN xx) [PASSWORD REDACTED]\n")
       end
+
+      it "does not emit text without a newline" do
+        subject.print("unfinished")
+
+        expect(output.string).to eq("")
+      end
+
+      it "handles multiple newline-delimited chunks" do
+        subject.print("first line\nsecond line\n")
+
+        expect(output.string).to eq("first line\nsecond line\n")
+      end
     end
 
     describe "#flush" do
@@ -38,6 +50,12 @@ module Imap::Backup
         subject.flush
 
         expect(output.string).to eq("before\nC: RUBY99 LOGIN xx) [PASSWORD REDACTED]\n")
+      end
+
+      it "does nothing when the buffer is empty" do
+        subject.flush
+
+        expect(output.string).to eq("")
       end
     end
   end

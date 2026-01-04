@@ -65,6 +65,16 @@ module Imap::Backup
       expect { subject.run }.to_not raise_error
     end
 
+    context "when the serializer yields nil" do
+      let(:missing_message) { nil }
+
+      it "skips uploads" do
+        subject.run
+
+        expect(folder).to_not have_received(:append)
+      end
+    end
+
     context "with messages that are present on server" do
       let(:existing_message) do
         instance_double(Email::Mboxrd::Message, supplied_body: "existing message")

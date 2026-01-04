@@ -4,6 +4,62 @@ require "support/shared_examples/an_action_that_handles_logger_options"
 
 module Imap::Backup
   RSpec.describe CLI do
+    describe ".start" do
+      let(:cli_instance) { instance_double(described_class, version: nil) }
+
+      before do
+        allow(described_class).to receive(:new) { cli_instance }
+        allow(Thor).to receive(:start)
+      end
+
+      it "prints version information and exits when --version is supplied" do
+        block = -> { described_class.start(["--version"]) }
+
+        expect { block.call }.to raise_error(SystemExit) do |error|
+          expect(error.status).to eq(0)
+        end
+
+        expect(cli_instance).to have_received(:version)
+      end
+
+      it "exits immediately" do
+        begin
+          described_class.start(["--version"])
+        rescue SystemExit
+          # don't exit the test runner!
+        end
+
+        expect(Thor).not_to have_received(:start)
+      end
+
+      it "moves help in front of the requested subcommand" do
+        original_argv = ARGV.dup
+        begin
+          ARGV.replace(%w[help local folders])
+
+          described_class.start([])
+
+          expect(Thor).to have_received(:start).with([])
+          expect(ARGV[0..2]).to eq(%w[local help folders])
+        ensure
+          ARGV.replace(original_argv)
+        end
+      end
+
+      it "leaves help order untouched when there is no subcommand" do
+        original_argv = ARGV.dup
+        begin
+          ARGV.replace(["backup"])
+
+          described_class.start([])
+
+          expect(ARGV).to eq(["backup"])
+        ensure
+          ARGV.replace(original_argv)
+        end
+      end
+    end
+
     describe ".exit_on_failure?" do
       it "is true" do
         expect(described_class.exit_on_failure?).to be true
@@ -31,6 +87,32 @@ module Imap::Backup
       ) do
         it "does not pass the option to the class" do
           expect(CLI::Backup).to have_received(:new).with({})
+        end
+      end
+    end
+
+    describe "#copy" do
+      let(:transfer) { instance_double(CLI::Transfer, run: nil) }
+
+      before do
+        allow(CLI::Transfer).to receive(:new) { transfer }
+      end
+
+      it "runs transfer" do
+        subject.invoke(:copy, %w[source destination])
+
+        expect(transfer).to have_received(:run)
+      end
+
+      it_behaves_like(
+        "an action that handles Logger options",
+        action: ->(subject, options) do
+          subject.invoke(:copy, %w[source destination], options)
+        end
+      ) do
+        it "does not pass the option to the class" do
+          expect(CLI::Transfer).
+            to have_received(:new).with(:copy, "source", "destination", {})
         end
       end
     end
@@ -258,6 +340,21 @@ module Imap::Backup
         it "does not pass the option to the class" do
           expect(CLI::Stats).to have_received(:new).with("me@example.com", {})
         end
+      end
+    end
+
+    describe "#version" do
+      let(:version) { "99.99.99" }
+
+      before do
+        stub_const("Imap::Backup::VERSION", version)
+        allow(Kernel).to receive(:puts)
+      end
+
+      it "prints the version string" do
+        subject.version
+
+        expect(Kernel).to have_received(:puts).with("imap-backup #{version}")
       end
     end
   end

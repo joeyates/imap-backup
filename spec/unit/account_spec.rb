@@ -136,7 +136,7 @@ module Imap::Backup
     describe "#namespaces" do
       let(:client) { instance_double(Client::Default, namespace: ["INBOX"]) }
 
-      before { allow(subject).to receive(:client).and_return(client) }
+      before { allow(subject).to receive(:client) { client } }
 
       it "returns namespaces" do
         expect(subject.namespaces).to eq(["INBOX"])
@@ -146,7 +146,7 @@ module Imap::Backup
     describe "#capabilities" do
       let(:client) { instance_double(Client::Default, capability: ["IMAP4rev1"]) }
 
-      before { allow(subject).to receive(:client).and_return(client) }
+      before { allow(subject).to receive(:client) { client } }
 
       it "returns capabilities" do
         expect(subject.capabilities).to eq(["IMAP4rev1"])

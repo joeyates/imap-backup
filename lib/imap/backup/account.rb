@@ -66,17 +66,23 @@ module Imap::Backup
     attr_reader :status
 
     # @param options [Hash] Account attributes
-    # @option opts [String] :username the username of the account (usually the same as the email address)
+    # @option opts [String] :username the username of the account (usually the same as the email
+    #   address)
     # @option opts [String] :password the password of the account
     # @option opts [String] :local_path the path where backups will be saved
-    # @option opts [Array<String>] :folders (nil) the list of folders that have been configured for the Account
+    # @option opts [Array<String>] :folders (nil) the list of folders that have been configured for
+    #   the Account
     # @option opts [Boolean] :folder_blacklist (false) whether the folders attribute is a blacklist
     # @option opts [Boolean] :mirror_mode (false) whether to run in mirror mode
     # @option opts [String] :server the address of the IMAP server
-    # @option opts [Hash] :connection_options (nil) additional connection options for the IMAP server
-    # @option opts [String] :download_strategy (nil) the name of the download strategy to adopt during backups
-    # @option opts [Integer] :multi_fetch_size (nil) the number of emails to fetch from the IMAP server at a time
-    # @option opts [Boolean] :reset_seen_flags_after_fetch (false) whether to reset seen flags after fetching messages
+    # @option opts [Hash] :connection_options (nil) additional connection options for the IMAP
+    #   server
+    # @option opts [String] :download_strategy (nil) the name of the download strategy to adopt
+    #   during backups
+    # @option opts [Integer] :multi_fetch_size (nil) the number of emails to fetch from the IMAP
+    #   server at a time
+    # @option opts [Boolean] :reset_seen_flags_after_fetch (false) whether to reset seen flags after
+    #   fetching messages
     # @option opts [String] :status ("active") the status of the account
     def initialize(options)
       check_options!(options)
@@ -146,7 +152,7 @@ module Imap::Backup
       h = {
         username: username,
         password: password,
-        status: status,
+        status: status
       }
       h[:local_path] = local_path if local_path
       h[:folders] = folders if folders
@@ -216,7 +222,8 @@ module Imap::Backup
     # Extra options to be passed to the IMAP server when connecting
     # @return [Hash, void]
     def connection_options
-      @connection_options ||= case @supplied_connection_options
+      @connection_options ||=
+        case @supplied_connection_options
         when String
           JSON.parse(@supplied_connection_options, symbolize_names: true)
         else
@@ -229,10 +236,10 @@ module Imap::Backup
       # Ensure we've loaded the connection_options
       connection_options
       parsed = if value == ""
-          nil
-        else
-          JSON.parse(value, symbolize_names: true)
-        end
+                 nil
+               else
+                 JSON.parse(value, symbolize_names: true)
+               end
       update(:connection_options, parsed)
     end
 
@@ -241,9 +248,9 @@ module Imap::Backup
     # @return [Integer]
     def multi_fetch_size
       @multi_fetch_size ||= begin
-          int = @multi_fetch_size_orignal.to_i
-          int.positive? ? int : DEFAULT_MULTI_FETCH_SIZE
-        end
+        int = @multi_fetch_size_orignal.to_i
+        int.positive? ? int : DEFAULT_MULTI_FETCH_SIZE
+      end
     end
 
     # Sets the multi_fetch_size attribute and marks it as modified, storing the original value.
@@ -268,7 +275,7 @@ module Imap::Backup
     # @return [void]
     def status=(value)
       if !VALID_STATUSES.include?(value)
-        raise ArgumentError, "status must be one of: #{VALID_STATUSES.join(", ")}"
+        raise ArgumentError, "status must be one of: #{VALID_STATUSES.join(', ')}"
       end
 
       update(:status, value)
@@ -320,11 +327,11 @@ module Imap::Backup
     def check_options!(options)
       missing_required = REQUIRED_ATTRIBUTES - options.keys
       if missing_required.any?
-        raise ArgumentError, "Missing required options: #{missing_required.join(", ")}"
+        raise ArgumentError, "Missing required options: #{missing_required.join(', ')}"
       end
 
       unknown = options.keys - KNOWN_ATTRIBUTES
-      raise ArgumentError, "Unknown options: #{unknown.join(", ")}" if unknown.any?
+      raise ArgumentError, "Unknown options: #{unknown.join(', ')}" if unknown.any?
     end
 
     def update(field, value)
@@ -338,7 +345,7 @@ module Imap::Backup
         end
       else
         current = instance_variable_get(key)
-        changes[field] = { from: current, to: value } if value != current
+        changes[field] = {from: current, to: value} if value != current
       end
 
       @client = nil

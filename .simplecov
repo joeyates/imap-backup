@@ -10,13 +10,15 @@ SimpleCov.start do
 
   enable_coverage :branch
 
-  if ENV['CI']
+  if ENV["CI"]
     formatter SimpleCov::Formatter::SimpleFormatter
   else
-    formatter SimpleCov::Formatter::MultiFormatter.new([
-      SimpleCov::Formatter::HTMLFormatter,
-      SimpleCov::Formatter::JSONFormatter
-    ])
+    formatter SimpleCov::Formatter::MultiFormatter.new(
+      [
+        SimpleCov::Formatter::HTMLFormatter,
+        SimpleCov::Formatter::JSONFormatter
+      ]
+    )
   end
 end
 

@@ -24,7 +24,8 @@ module Imap::Backup
         reset_seen_flags_after_fetch: reset_seen_flags_after_fetch
       )
     end
-    let(:backup_folders) { instance_double(Account::BackupFolders, to_a: [folder]) }
+    let(:backup_folders) { instance_double(Account::BackupFolders, to_a: backup_folders_result) }
+    let(:backup_folders_result) { [folder] }
     let(:client) { instance_double(Client::Default, login: nil) }
     let(:downloader) { instance_double(Downloader, run: nil) }
     let(:folder) do
@@ -162,6 +163,26 @@ module Imap::Backup
         subject.run
 
         expect(downloader).to_not have_received(:run)
+      end
+    end
+
+    context "when no folders are available" do
+      let(:backup_folders_result) { [] }
+
+      before { allow(Logger.logger).to receive(:warn) }
+
+      it "does not lock" do
+        subject.run
+
+        expect(locker).to_not have_received(:with_lock)
+      end
+
+      it "prints a warning" do
+        subject.run
+
+        expect(Logger.logger).
+          to have_received(:warn).
+          with("No folders found to backup for account 'username'")
       end
     end
   end

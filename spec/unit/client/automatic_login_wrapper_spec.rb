@@ -54,5 +54,13 @@ module Imap::Backup
         expect(client).to have_received(:login).twice
       end
     end
+
+    describe "#respond_to?" do
+      it "delegates to the client" do
+        allow(client).to receive(:respond_to?).with(:foo) { true }
+
+        expect(subject.respond_to?(:foo)).to be true
+      end
+    end
   end
 end

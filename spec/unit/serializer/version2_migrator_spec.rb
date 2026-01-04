@@ -80,7 +80,7 @@ module Imap::Backup
     end
 
     context "when the there is no uid_validity" do
-      let(:metadata) { {version: 99, uids: []} }
+      let(:metadata) { {version: 2, uids: []} }
 
       it "is false" do
         expect(subject.run).to be false
@@ -99,6 +99,25 @@ module Imap::Backup
       let(:mailbox_messages) { ["From me", "From you"] }
 
       it "is false" do
+        expect(subject.run).to be false
+      end
+    end
+
+    context "when messages contain body lines" do
+      let(:mailbox_messages) { ["From me\n", "Line one\n", "From you\n"] }
+      let(:metadata) { {version: 2, uids: [33, 34], uid_validity: 123} }
+
+      it "counts the bytes including intermediate lines" do
+        subject.run
+
+        expect(imap).to have_received(:append).with(34, "From you\n".length)
+      end
+    end
+
+    context "when the mailbox file is empty" do
+      let(:mailbox_messages) { [] }
+
+      it "returns false" do
         expect(subject.run).to be false
       end
     end

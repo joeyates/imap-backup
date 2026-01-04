@@ -55,6 +55,16 @@ module Imap::Backup
       end
     end
 
+    context "when no --server option is set" do
+      let(:options) { {email: "me", password: "plain"} }
+
+      it "fails" do
+        expect do
+          subject.run
+        end.to raise_error(Thor::RequiredArgumentMissingError, /--server/)
+      end
+    end
+
     context "when --password is supplied" do
       let(:options) { {email: "me", password: "plain", server: "host"} }
 
@@ -279,6 +289,17 @@ module Imap::Backup
 
         expect(Account).to have_received(:new).
           with(hash_including(download_strategy: "direct"))
+      end
+    end
+
+    context "when the download strategy is 'delay'" do
+      let(:options) { good_options.merge(download_strategy: "delay") }
+
+      it "maps to delay_metadata" do
+        subject.run
+
+        expect(Account).to have_received(:new).
+          with(hash_including(download_strategy: "delay_metadata"))
       end
     end
 

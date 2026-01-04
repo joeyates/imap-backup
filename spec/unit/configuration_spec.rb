@@ -49,6 +49,30 @@ module Imap::Backup
       end
     end
 
+    describe "#accounts" do
+      context "when an account entry is invalid" do
+        let(:configuration) do
+          {accounts: [{username: "broken"}]}.to_json
+        end
+        let(:logger) { instance_double(::Logger, error: nil) }
+
+        before do
+          allow(Imap::Backup::Logger).to receive(:logger) { logger }
+        end
+
+        it "logs the problem" do
+          subject.accounts
+
+          expect(logger).to have_received(:error).
+            with(/Skipping invalid account/)
+        end
+
+        it "discards the invalid entry" do
+          expect(subject.accounts).to eq([])
+        end
+      end
+    end
+
     describe "#modified?" do
       context "with modified accounts" do
         before { subject.accounts[0].username = "changed" }
@@ -69,6 +93,14 @@ module Imap::Backup
       context "without accounts flagged 'modified'" do
         it "is false" do
           expect(subject.modified?).to be_falsey
+        end
+      end
+
+      context "when only the download strategy changes" do
+        before { subject.download_strategy = "direct" }
+
+        it "is true" do
+          expect(subject.modified?).to be_truthy
         end
       end
     end
@@ -152,6 +184,23 @@ module Imap::Backup
         end
       end
 
+      context "when the directory already has private permissions" do
+        let(:directory_exists) { true }
+        let(:file_mode) { instance_double(Imap::Backup::FileMode, mode: 0o700) }
+
+        before do
+          allow(OS).to receive(:windows?) { false }
+          allow(Imap::Backup::FileMode).to receive(:new).
+            with(filename: directory) { file_mode }
+        end
+
+        it "does not change the directory permissions" do
+          subject.save
+
+          expect(FileUtils).to_not have_received(:chmod).with(0o700, directory)
+        end
+      end
+
       context "when on UNIX" do
         before do
           allow(OS).to receive(:windows?) { false }
@@ -171,6 +220,18 @@ module Imap::Backup
           end
         end
       end
+
+      context "when on Windows" do
+        before do
+          allow(OS).to receive(:windows?) { true }
+        end
+
+        it "does not change permissions" do
+          subject.save
+
+          expect(FileUtils).to_not have_received(:chmod)
+        end
+      end
     end
 
     describe "#download_strategy" do
@@ -180,6 +241,52 @@ module Imap::Backup
         it "defaults to delayed metadata" do
           expect(subject.download_strategy).to eq "delay_metadata"
         end
+      end
+
+      context "when the file stores a known strategy" do
+        let(:configuration) do
+          {accounts: [], download_strategy: "direct"}.to_json
+        end
+
+        it "returns the stored strategy" do
+          expect(subject.download_strategy).to eq("direct")
+        end
+      end
+
+      context "when the file stores an unknown strategy" do
+        let(:configuration) do
+          {accounts: [], download_strategy: "bogus"}.to_json
+        end
+
+        it "falls back to the default" do
+          expect(subject.download_strategy).to eq(described_class::DEFAULT_STRATEGY)
+        end
+      end
+    end
+
+    describe "#download_strategy=" do
+      it "raises when the strategy is not recognised" do
+        expect do
+          subject.download_strategy = "bogus"
+        end.to raise_error(RuntimeError, "Unknown strategy 'bogus'")
+      end
+
+      it "marks itself as modified when changing the strategy" do
+        subject.download_strategy = "direct"
+
+        expect(subject.download_strategy_modified?).to be true
+      end
+    end
+
+    context "when running on Windows" do
+      before do
+        allow(OS).to receive(:windows?) { true }
+      end
+
+      it "does not run the permission checker" do
+        subject.accounts
+
+        expect(permission_checker).to_not have_received(:run)
       end
     end
 
@@ -210,6 +317,30 @@ module Imap::Backup
             \]
             /x
           )
+      end
+    end
+
+    context "when folders are stored as plain strings" do
+      let(:file) { instance_double(File, write: nil) }
+      let(:configuration) do
+        {
+          accounts: [{
+            username: "account", password: "ciao", local_path: "local_path",
+            folders: %w[foo bar]
+          }]
+        }.to_json
+      end
+
+      before do
+        allow(File).to receive(:open).and_call_original
+        allow(File).to receive(:open).with(file_path, "w").and_yield(file)
+      end
+
+      it "keeps the list intact" do
+        subject.save
+
+        expect(file).to have_received(:write).
+          with(/"folders":\s+\[\s+"foo",\s+"bar"/x)
       end
     end
   end

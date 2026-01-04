@@ -6,21 +6,46 @@ module Imap::Backup
   RSpec.describe Client::Default do
     subject { described_class.new(account) }
 
+    let(:password) { "secret" }
     let(:account) do
       instance_double(
-        Account, username: username, server: "imap.example.com", connection_options: {}
+        Account,
+        username: username,
+        password: password,
+        server: "imap.example.com",
+        connection_options: {}
       )
     end
 
     let(:username) { "me@example.com" }
-    let(:imap) { instance_double(Net::IMAP, list: imap_folders) }
+    let(:imap) do
+      instance_double(
+        Net::IMAP,
+        list: imap_folders,
+        login: nil,
+        disconnect: nil,
+        select: nil,
+        examine: nil
+      )
+    end
     let(:imap_folders) { [] }
+    let(:logger) { instance_double(::Logger, debug: nil) }
 
     before do
       allow(Net::IMAP).to receive(:new) { imap }
+      allow(Imap::Backup::Logger).to receive(:logger) { logger }
     end
 
     describe "#list" do
+      context "when the server returns nothing" do
+        let(:imap_folders) { nil }
+        let(:username) { "user@mac.com" }
+
+        it "is empty" do
+          expect(subject.list).to eq([])
+        end
+      end
+
       context "with non-ASCII folder names" do
         let(:imap_folders) do
           [instance_double(Net::IMAP::MailboxList, attr: [], name: "Gel&APY-scht")]
@@ -87,7 +112,7 @@ module Imap::Backup
 
       context "when the provider does not respond with its root" do
         before do
-          allow(imap).to receive(:list).and_return([])
+          allow(imap).to receive(:list) { [] }
         end
 
         it "fails" do
@@ -121,6 +146,57 @@ module Imap::Backup
         subject.select("foo")
 
         expect(imap).to have_received(:select).once
+      end
+    end
+
+    describe "#login" do
+      before do
+        subject.login
+      end
+
+      it "passes the credentials to the server" do
+        expect(imap).to have_received(:login).with(username, password)
+      end
+
+      it "logs the masked password" do
+        expect(logger).to have_received(:debug).
+          with("Logging in: #{username}/#{'x' * password.length}")
+      end
+    end
+
+    describe "#reconnect" do
+      before do
+        allow(imap).to receive(:login)
+        subject.reconnect
+      end
+
+      it "disconnects first" do
+        expect(imap).to have_received(:disconnect)
+      end
+
+      it "logs in again" do
+        expect(imap).to have_received(:login)
+      end
+    end
+
+    describe "#username" do
+      it "returns the account username" do
+        expect(subject.username).to eq(username)
+      end
+    end
+
+    describe "#disconnect" do
+      before do
+        subject.select("mailbox")
+        subject.disconnect
+      end
+
+      it "disconnects the IMAP session" do
+        expect(imap).to have_received(:disconnect)
+      end
+
+      it "clears the cached state" do
+        expect(subject.send(:state)).to be_nil
       end
     end
   end

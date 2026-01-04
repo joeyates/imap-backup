@@ -11,10 +11,13 @@ module Imap
       let(:account) do
         instance_double(Account, lockfile_path: lockfile_path, local_path: "local_path")
       end
-      let(:lockfile) { instance_double(Lockfile, exists?: false) }
+      let(:lockfile) { instance_double(Lockfile, exists?: false, remove: nil) }
+      let(:folder_ensurer) { instance_double(Account::FolderEnsurer, run: nil) }
 
       before do
         allow(Imap::Backup::Lockfile).to receive(:new).with(path: lockfile_path) { lockfile }
+        allow(Account::FolderEnsurer).to receive(:new) { folder_ensurer }
+        allow(lockfile).to receive(:with_lock).and_yield
       end
 
       describe "#initialize" do
@@ -31,12 +34,18 @@ module Imap
         end
 
         it "calls the supplied the block" do
-          allow(lockfile).to receive(:with_lock).and_yield
-
           yielded = false
           subject.with_lock { yielded = true }
 
           expect(yielded).to be true
+        end
+
+        context "when the lockfile does not exist" do
+          it "ensures the account folders exist" do
+            expect(Account::FolderEnsurer).to receive(:new).with(account: account)
+
+            subject.with_lock {}
+          end
         end
 
         context "when the lockfile exists and is stale" do
@@ -48,8 +57,6 @@ module Imap
           it "removes the lockfile" do
             expect(lockfile).to receive(:remove)
 
-            allow(lockfile).to receive(:with_lock).and_yield
-
             subject.with_lock {}
           end
 
@@ -58,20 +65,20 @@ module Imap
               "Stale lockfile '#{account.lockfile_path}' found. Removing it."
             )
 
-            allow(lockfile).to receive(:remove)
-            allow(lockfile).to receive(:with_lock).and_yield
-
             subject.with_lock {}
           end
 
           it "calls the supplied the block" do
-            allow(lockfile).to receive(:remove)
-            allow(lockfile).to receive(:with_lock).and_yield
-
             yielded = false
             subject.with_lock { yielded = true }
 
             expect(yielded).to be true
+          end
+
+          it "does not ensure the account folders exist" do
+            expect(Account::FolderEnsurer).not_to receive(:new)
+
+            subject.with_lock {}
           end
         end
 

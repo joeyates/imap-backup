@@ -74,7 +74,6 @@ module Imap::Backup
         it "prints the folder statistics as JSON" do
           subject.run
 
-          puts output_lines.inspect
           expect(output_lines).to eq([expected_stats.to_json])
         end
       end
@@ -90,26 +89,11 @@ module Imap::Backup
         it "prints the header and formatted rows" do
           subject.run
 
-          expected_header = [
-            format("%-20s", "folder"),
-            format("%-8s", "remote"),
-            format("%-8s", "both"),
-            format("%-8s", "local")
-          ].join("|")
-          underline = [
-            "-" * 20,
-            "-" * 8,
-            "-" * 8,
-            "-" * 8
-          ].join("|")
-          expected_row = [
-            format("%-20s", "INBOX"),
-            format("% 8s", 1),
-            format("% 8s", 2),
-            format("% 8s", 1)
-          ].join("|")
-          expected_output = ["#{expected_header}\n#{underline}", expected_row]
-          puts output_lines.inspect
+          expected_output = [
+            "folder              |remote  |both    |local   \n" \
+            "--------------------|--------|--------|--------",
+            "INBOX               |       1|       2|       1"
+          ]
 
           expect(output_lines).to eq(expected_output)
         end
