@@ -7,7 +7,7 @@ This is especially useful for older, deprecated Ruby versions
 which are often difficult to install due to openssl
 compatibility problems.
 
-The supplied `dev/ruby-compose.yml` starts the same
+The supplied `dev/containerized/compose.yml` starts the same
 two IMAP servers that are run under development and CI
 alongside a container with your chosen Ruby version.
 
@@ -20,15 +20,15 @@ Do the following from the project's root directory:
 
 ```sh
 export RUBY_VERSION=[VERSION]
-podman-compose --file dev/ruby-compose.yml build
-podman-compose --file dev/ruby-compose.yml up -d
+podman-compose --file dev/containerized/compose.yml build
+podman-compose --file dev/containerized/compose.yml up -d
 podman attach imap-backup
 ```
 
 ...and stop the server afterwards:
 
 ```sh
-podman-compose --file dev/ruby-compose.yml down
+podman-compose --file dev/containerized/compose.yml down
 ```
 
 # Setup Project
