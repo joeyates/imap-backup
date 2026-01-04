@@ -9,6 +9,7 @@ require "imap/backup/serializer/integrity_checker"
 require "imap/backup/serializer/imap"
 require "imap/backup/serializer/mbox"
 require "imap/backup/serializer/message_enumerator"
+require "imap/backup/serializer/path"
 require "imap/backup/serializer/unused_name_finder"
 
 module Imap; end
@@ -16,14 +17,6 @@ module Imap; end
 module Imap::Backup
   # Handles serialization for a folder
   class Serializer
-    # @param path [String] an account's backup path
-    # @param folder [String] a folder name
-    # @return [String] the full path to a serialized folder (without file extensions)
-    def self.folder_path_for(path:, folder:)
-      relative = File.join(path, folder)
-      File.expand_path(relative)
-    end
-
     extend Forwardable
 
     def_delegator :mbox, :pathname, :mbox_pathname
@@ -195,7 +188,7 @@ module Imap::Backup
     # @return [void]
     def filter(&block)
       temp_name = Serializer::UnusedNameFinder.new(serializer: self).run
-      temp_folder_path = self.class.folder_path_for(path: path, folder: temp_name)
+      temp_folder_path = Serializer::Path.from(path: path, folder: temp_name)
       new_mbox = Serializer::Mbox.new(temp_folder_path)
       new_imap = Serializer::Imap.new(temp_folder_path)
       new_imap.uid_validity = imap.uid_validity
@@ -214,7 +207,7 @@ module Imap::Backup
 
     # @return [String] the path to the serialized folder (without file extensions)
     def folder_path
-      self.class.folder_path_for(path: path, folder: sanitized)
+      Serializer::Path.from(path: path, folder: sanitized)
     end
 
     # @return [String] The folder's name adapted for using as a file name
@@ -232,7 +225,7 @@ module Imap::Backup
     private
 
     def rename(new_name)
-      destination = self.class.folder_path_for(path: path, folder: new_name)
+      destination = Serializer::Path.from(path: path, folder: new_name)
       relative = File.dirname(new_name)
       directory = Serializer::Directory.new(path, relative)
       directory.ensure_exists

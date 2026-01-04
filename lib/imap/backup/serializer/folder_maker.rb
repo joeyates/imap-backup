@@ -1,4 +1,5 @@
 require "fileutils"
+require "imap/backup/serializer/path"
 
 module Imap; end
 
@@ -38,7 +39,7 @@ module Imap::Backup
     attr_reader :permissions
 
     def full_path
-      File.join(base, path)
+      Serializer::Path.from(path: base, folder: path, expand: false)
     end
   end
 end

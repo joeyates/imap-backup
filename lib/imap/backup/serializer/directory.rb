@@ -2,6 +2,7 @@ require "os"
 
 require "imap/backup/file_mode"
 require "imap/backup/serializer/folder_maker"
+require "imap/backup/serializer/path"
 
 module Imap; end
 
@@ -44,8 +45,7 @@ module Imap::Backup
     attr_reader :path
 
     def full_path
-      containing_directory = File.join(path, relative)
-      File.expand_path(containing_directory)
+      Serializer::Path.from(path: path, folder: relative)
     end
   end
 end
