@@ -57,19 +57,25 @@ $ docker-compose -f dev/compose.yml up -d
 Then, run all specs
 
 ```sh
-$ rspec
+$ rake spec
 ```
 
-To exclude container-based tests
+To run **just** the unit specs
 
 ```sh
-$ rspec --tag ~container
+$ rake spec_unit
 ```
 
 To run **just** the feature specs
 
 ```sh
-rspec spec/features/**/*_spec.rb
+$ rake spec_feature
+```
+
+To exclude the slow container-based tests
+
+```sh
+$ rake spec_non_container
 ```
 
 ## Full Test Run
@@ -77,7 +83,7 @@ rspec spec/features/**/*_spec.rb
 The full test run includes RSpec specs **and** Rubocop checks
 
 ```sh
-rake
+rake test
 ```
 
 # Test Debugging

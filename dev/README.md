@@ -56,7 +56,7 @@ imap-backup help
 # Run tests
 
 ```sh
-rake
+rake test
 ```
 
 # Connect to the Test IMAP Server
