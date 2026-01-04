@@ -5,6 +5,9 @@ module Imap; end
 module Imap::Backup
   # Copies a folder of backed-up emails to an online folder
   class Migrator
+    # @param serializer [Serializer] the local folder to migrate
+    # @param folder [Account::Folder] the destination folder on the server
+    # @param reset [Boolean] true to clear the destination before uploading
     def initialize(serializer, folder, reset: false)
       @folder = folder
       @reset = reset

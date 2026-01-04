@@ -1,4 +1,5 @@
-- The `ARCHITECTURE.md` file contains a description of the project.
+- The `ARCHITECTURE.md` file contains a description of the project,
+- `docs/tesing.md` explains how to run tests.
 
 # Ruby Code
 
@@ -11,7 +12,10 @@
 
 ## Modules and Classes
 
-- Format modules as follows:
+- Use accessors for class instance variables.
+- Avoid accessing instance variables directly (with @) except in `initialize` and
+  in memoized getters.
+- Format classes and modules as follows:
 
 ```ruby
 module Imap; end
@@ -26,10 +30,18 @@ module Imap::Backup
 end
 ```
 
-## Testing
+# Testing
 
-- In specs, prefer one assertion per example.
+- Use `bin/unit-test-path` to obtain the unit tast path for a code file.
+- When creating new tests, use existing tests in the same directory as examples,
+  if available.
+- In tests, prefer one assertion per example.
+- Never test private methods, instead write tests for public methods that exercise the
+  private methods.
 - Avoid `double`, use `instance_double`.
-- To get path for a unit spec, take the code path and remove the initial
-  `lib/imap/backup/` add a `spec/unit/` prefix and add the suffix `_spec.rb`.
-  Example: `lib/imap/backup/foo/bar.rb` → `spec/unit/foo/bar_spec.rb`.
+- When returning a value from RSPec's `allow` use a block, don't use `and_return`.
+
+## Test Coverage
+
+- To decide where tests are needed, use `bin/lines-without-coverage`. If all lines
+  are covered, use `bin/branches-without-covarage`.

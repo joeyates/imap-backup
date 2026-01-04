@@ -139,6 +139,16 @@ module Imap::Backup
       end
     end
 
+    context "when the action is unknown" do
+      let(:action) { :other }
+
+      it "fails" do
+        expect do
+          subject.run
+        end.to raise_error(RuntimeError, /Unknown action/)
+      end
+    end
+
     context "when source and destination emails are the same" do
       let(:destination) { "source" }
 
@@ -317,6 +327,21 @@ module Imap::Backup
             subject.run
           end.to raise_error(RuntimeError, /destination.*not available for migration.*offline/)
         end
+      end
+    end
+
+    context "when an unsupported action slips through validation" do
+      let(:action) { :sync }
+
+      before do
+        stub_const("Imap::Backup::CLI::Transfer::ACTIONS", %i(copy migrate mirror sync))
+      end
+
+      it "ignores the folder operations" do
+        subject.run
+
+        expect(migrator).not_to have_received(:run)
+        expect(mirror).not_to have_received(:run)
       end
     end
   end

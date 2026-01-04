@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# This script reports uncovered line numbers per file using bin/line-coverage output.
+# Usage: bin/lines-without-coverage
+# Output is a JSON array of objects with 'file' and 'lines' keys.
+# Each 'lines' value is an array of line numbers that have zero coverage.
+# Example output:
+# [
+#   {
+#     "file": "lib/some_file.rb",
+#     "lines": [11, 15, 20]
+#   },
+#   ...
+# ]
+# Note: Requires 'jq' to be installed.
+
+script_dir="$(realpath "$(dirname "$0")")"
+line_coverage_script="${script_dir}/line-coverage"
+
+if [[ ! -x "${line_coverage_script}" ]]; then
+  echo "line-coverage script not found at ${line_coverage_script}" >&2
+  exit 1
+fi
+
+"${line_coverage_script}" | jq '
+  map({
+    file: .file,
+    lines: (
+      .lines
+      | map(select(.count == 0) | .line)
+    )
+  })
+  | map(select((.lines | length) > 0))
+'

@@ -133,6 +133,26 @@ module Imap::Backup
       end
     end
 
+    describe "#namespaces" do
+      let(:client) { instance_double(Client::Default, namespace: ["INBOX"]) }
+
+      before { allow(subject).to receive(:client) { client } }
+
+      it "returns namespaces" do
+        expect(subject.namespaces).to eq(["INBOX"])
+      end
+    end
+
+    describe "#capabilities" do
+      let(:client) { instance_double(Client::Default, capability: ["IMAP4rev1"]) }
+
+      before { allow(subject).to receive(:client) { client } }
+
+      it "returns capabilities" do
+        expect(subject.capabilities).to eq(["IMAP4rev1"])
+      end
+    end
+
     describe "#modified?" do
       context "with changes" do
         it "is true" do
@@ -182,6 +202,14 @@ module Imap::Backup
         )
       end
 
+      context "when local_path is nil" do
+        let(:options) { {username: "user", password: "pwd", local_path: nil} }
+
+        it "omits local_path" do
+          expect(subject.to_h).not_to include(:local_path)
+        end
+      end
+
       context "when folders is set" do
         let(:options) do
           {username: "user", password: "pwd", local_path: "local_path", folders: ["folder"]}
@@ -199,6 +227,22 @@ module Imap::Backup
 
         it "includes mirror_mode" do
           expect(subject.to_h).to include({mirror_mode: true})
+        end
+      end
+
+      context "when folder_blacklist is not set" do
+        before { subject.folder_blacklist = nil }
+
+        it "omits folder_blacklist" do
+          expect(subject.to_h).not_to include(:folder_blacklist)
+        end
+      end
+
+      context "when folder_blacklist is set" do
+        before { subject.folder_blacklist = true }
+
+        it "includes folder_blacklist" do
+          expect(subject.to_h[:folder_blacklist]).to be true
         end
       end
 
@@ -349,8 +393,11 @@ module Imap::Backup
       [:local_path, "local_path", "local_path"],
       [:multi_fetch_size, "2", 2],
       [:server, "server", "server"],
+      [:folder_blacklist, true, true],
+      [:mirror_mode, true, true],
       [:folders, ["folder"], ["folder"]],
-      [:connection_options, '{"some": "option"}', {some: "option"}]
+      [:connection_options, '{"some": "option"}', {some: "option"}],
+      [:reset_seen_flags_after_fetch, true, true]
     ].each do |attribute, value, expected|
       describe "setting ##{attribute}=" do
         let(:options) { {username: "original", password: "original", local_path: "original"} }
@@ -401,6 +448,40 @@ module Imap::Backup
           expect do
             subject.connection_options = "NOT JSON"
           end.to raise_error(JSON::ParserError)
+        end
+      end
+
+      context "when the supplied value is empty" do
+        before { subject.connection_options = "" }
+
+        it "sets connection_options to nil" do
+          expect(subject.connection_options).to be_nil
+        end
+      end
+    end
+
+    describe "setting an attribute multiple times" do
+      context "when reverting to the original value" do
+        it "clears modifications" do
+          subject.username = "new"
+          subject.username = "user"
+
+          expect(subject.modified?).to be false
+        end
+      end
+
+      context "when updating with another new value" do
+        before do
+          subject.username = "new"
+          subject.username = "newer"
+        end
+
+        it "applies the latest value" do
+          expect(subject.username).to eq("newer")
+        end
+
+        it "remains modified" do
+          expect(subject.modified?).to be true
         end
       end
     end

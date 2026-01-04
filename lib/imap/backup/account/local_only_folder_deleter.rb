@@ -10,6 +10,7 @@ module Imap::Backup
   # This is used in mirror mode, where local copies are only kept as long as they
   # exist on the server.
   class Account::LocalOnlyFolderDeleter
+    # @param account [Account] the account whose serialized folders are being pruned
     def initialize(account:)
       @account = account
     end

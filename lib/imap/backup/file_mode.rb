@@ -3,6 +3,7 @@ module Imap; end
 module Imap::Backup
   # Accesses a file's access permissions
   class FileMode
+    # @param filename [String] the file whose permissions will be checked
     def initialize(filename:)
       @filename = filename
     end

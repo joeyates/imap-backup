@@ -5,6 +5,8 @@ module Imap; end
 module Imap::Backup
   # Deletes locally backed-up emails that are no longer on the server
   class LocalOnlyMessageDeleter
+    # @param folder [Account::Folder] the remote folder used to detect missing UIDs
+    # @param serializer [Serializer] the local serializer that may contain stale messages
     def initialize(folder, serializer)
       @folder = folder
       @serializer = serializer

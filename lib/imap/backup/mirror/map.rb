@@ -7,6 +7,8 @@ module Imap::Backup
 
   # Keeps track of the mapping between source and destination UIDs
   class Mirror::Map
+    # @param pathname [String] the path to the on-disk UID map
+    # @param destination [String] the destination account identifier
     def initialize(pathname:, destination:)
       @pathname = pathname
       @destination = destination
@@ -18,7 +20,6 @@ module Imap::Backup
     end
 
     # @return [Boolean] whether the supplied values match the existing
-    #  UID validity values
     def check_uid_validities(source:, destination:)
       store
       return false if source != source_uid_validity

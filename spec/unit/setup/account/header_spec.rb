@@ -13,17 +13,19 @@ module Imap::Backup
         username: "user@example.com",
         password: existing_password,
         local_path: "/backup/path",
-        folders: ["my_folder"],
+        folders: folders,
         mirror_mode: mirror_mode,
         server: "imap.example.com",
         connection_options: connection_options,
         modified?: modified,
-        folder_blacklist: false,
+        folder_blacklist: folder_blacklist,
         multi_fetch_size: multi_fetch_size,
         reset_seen_flags_after_fetch: reset_seen_flags_after_fetch,
         status: status
       )
     end
+    let(:folders) { ["my_folder"] }
+    let(:folder_blacklist) { false }
     let(:existing_password) { "password" }
     let(:mirror_mode) { nil }
     let(:connection_options) { nil }
@@ -122,6 +124,39 @@ module Imap::Backup
 
       it "does not show the status" do
         expect(menu.header).not_to match(/status/)
+      end
+    end
+
+    context "when including all folders" do
+      let(:folders) { [] }
+      let(:folder_blacklist) { false }
+
+      before { subject.run }
+
+      it "mentions that all folders are included" do
+        expect(menu.header).to match(/include\s+\(all folders\)/)
+      end
+    end
+
+    context "when excluding folders without selections" do
+      let(:folder_blacklist) { true }
+      let(:folders) { [] }
+
+      it "warns about excluding everything" do
+        subject.run
+
+        expect(menu.header).
+          to match(/exclude\s+\(all folders\) <- you have opted/)
+      end
+    end
+
+    context "when the multi-fetch size is one" do
+      let(:multi_fetch_size) { 1 }
+
+      before { subject.run }
+
+      it "omits the multi-fetch row" do
+        expect(menu.header).not_to match(/^multi-fetch/)
       end
     end
   end

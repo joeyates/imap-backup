@@ -1,14 +1,24 @@
+require "thor"
+
 require "imap/backup/account/backup_folders"
+require "imap/backup/cli/helpers"
 require "imap/backup/serializer"
 
 module Imap; end
 
 module Imap::Backup
+  class CLI < Thor; end
+
   # Prints various statistics about an account and its backup
   class CLI::Stats < Thor
     include Thor::Actions
     include CLI::Helpers
 
+    # @param email [String] the email address identifying the account to inspect
+    # @param options [Hash] CLI options controlling output
+    # @option opts [String] :config (nil) the path to the configuration file
+    # @option opts [String] :erb_configuration (nil) the path to the ERB configuration file
+    # @option opts [String] :format ("text") the output format, either "text" or "json"
     def initialize(email, options)
       super([])
       @email = email

@@ -108,7 +108,11 @@ module Imap::Backup
         save: nil,
         uid_validity: existing_uid_validity,
         "uid_validity=": nil,
-        update: nil
+        update: nil,
+        update_uid: nil,
+        get: message,
+        messages: metadata_messages,
+        uids: existing_uids
       )
     end
     let(:mbox) do
@@ -122,12 +126,31 @@ module Imap::Backup
     let(:folder_name) { "folder/sub" }
     let(:folder_path) { File.expand_path(File.join("folder_path", folder_name)) }
     let(:existing_uid_validity) { nil }
+    let(:existing_uids) { [1, 2] }
+    let(:metadata_messages) { [{uid: 1}] }
+    let(:message) { instance_double(Serializer::Message) }
     let(:directory) { instance_double(Serializer::Directory, ensure_exists: nil) }
 
     before do
       allow(Serializer::Imap).to receive(:new) { imap }
       allow(Serializer::Mbox).to receive(:new) { mbox }
       allow(Serializer::Directory).to receive(:new) { directory }
+    end
+
+    describe "#transaction" do
+      it "yields to the supplied block" do
+        called = false
+
+        subject.transaction { called = true }
+
+        expect(called).to be true
+      end
+
+      it "returns the block's value" do
+        result = subject.transaction { :ok }
+
+        expect(result).to eq(:ok)
+      end
     end
 
     describe "#validate!" do
@@ -243,6 +266,69 @@ module Imap::Backup
         subject.append("uid", "message", [])
 
         expect(appender).to have_received(:append)
+      end
+    end
+
+    describe "#get" do
+      let(:action) { -> { subject.get(123) } }
+
+      it_behaves_like "a method that checks for invalid serialization"
+      it_behaves_like "a method sets up the folder directory"
+      it_behaves_like "a method that sanitizes folder paths"
+
+      it "returns the message metadata" do
+        expect(subject.get(123)).to eq(message)
+      end
+    end
+
+    describe "#messages" do
+      let(:action) { -> { subject.messages } }
+
+      it_behaves_like "a method that checks for invalid serialization"
+      it_behaves_like "a method sets up the folder directory"
+      it_behaves_like "a method that sanitizes folder paths"
+
+      it "returns the messages" do
+        expect(subject.messages).to eq(metadata_messages)
+      end
+    end
+
+    describe "#uid_validity" do
+      let(:existing_uid_validity) { 17 }
+      let(:action) { -> { subject.uid_validity } }
+
+      it_behaves_like "a method that checks for invalid serialization"
+      it_behaves_like "a method sets up the folder directory"
+      it_behaves_like "a method that sanitizes folder paths"
+
+      it "returns the uid_validity" do
+        expect(subject.uid_validity).to eq(17)
+      end
+    end
+
+    describe "#uids" do
+      let(:action) { -> { subject.uids } }
+
+      it_behaves_like "a method that checks for invalid serialization"
+      it_behaves_like "a method sets up the folder directory"
+      it_behaves_like "a method that sanitizes folder paths"
+
+      it "returns the uids" do
+        expect(subject.uids).to eq(existing_uids)
+      end
+    end
+
+    describe "#update_uid" do
+      let(:action) { -> { subject.update_uid(10, 11) } }
+
+      it_behaves_like "a method that checks for invalid serialization"
+      it_behaves_like "a method sets up the folder directory"
+      it_behaves_like "a method that sanitizes folder paths"
+
+      it "updates the message metadata" do
+        subject.update_uid(10, 11)
+
+        expect(imap).to have_received(:update_uid).with(10, 11)
       end
     end
 

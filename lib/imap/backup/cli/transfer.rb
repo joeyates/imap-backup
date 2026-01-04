@@ -16,6 +16,9 @@ module Imap::Backup
     # The possible values for the action parameter
     ACTIONS = %i(copy migrate mirror).freeze
 
+    # @param action [Symbol] one of ACTIONS describing the transfer mode
+    # @param source_email [String] the email of the source account
+    # @param destination_email [String] the email of the destination account
     def initialize(action, source_email, destination_email, options)
       @action = action
       @source_email = source_email

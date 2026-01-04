@@ -1,12 +1,16 @@
 require "imap/backup/cli/backup"
 
+require "ostruct"
+
 require "imap/backup/account"
 require "imap/backup/configuration"
+require "imap/backup/lockfile"
 
 module Imap::Backup
   RSpec.describe CLI::Backup do
-    subject { described_class.new({}) }
+    subject { described_class.new(options) }
 
+    let(:options) { {} }
     let(:account) do
       instance_double(Account, username: "me@example.com", available_for_backup?: true)
     end
@@ -82,6 +86,67 @@ module Imap::Backup
           with(account: archived_account, refresh: anything)
         expect(Account::Backup).not_to have_received(:new).
           with(account: offline_account, refresh: anything)
+      end
+    end
+
+    context "when no accounts are available" do
+      before do
+        allow(Logger.logger).to receive(:warn)
+        allow(subject).to receive(:requested_accounts) { [] }
+      end
+
+      it "warns and exits early" do
+        subject.run
+
+        expect(Logger.logger).
+          to have_received(:warn).
+          with("No matching accounts found to backup")
+        expect(Account::Backup).to_not have_received(:new)
+      end
+    end
+
+    context "when the refresh option is supplied" do
+      let(:options) { {refresh: true} }
+
+      it "passes the refresh flag to the account backup" do
+        subject.run
+
+        expect(Account::Backup).to have_received(:new).
+          with(account: account, refresh: true)
+      end
+    end
+
+    context "when the IMAP server rejects the request" do
+      let(:imap_error) do
+        Net::IMAP::NoResponseError.new(
+          OpenStruct.new({data: OpenStruct.new({text: "Temporary failure"})})
+        )
+      end
+
+      before do
+        allow(backup).to receive(:run).and_raise(imap_error)
+      end
+
+      it "exits with a custom failure code" do
+        block = -> { subject.run }
+
+        expect { block.call }.to raise_error(SystemExit) do |error|
+          expect(error.status).to eq(111)
+        end
+      end
+    end
+
+    context "when the account is locked elsewhere" do
+      before do
+        allow(backup).to receive(:run).and_raise(Lockfile::LockfileExistsError.new("locked"))
+      end
+
+      it "exits with the lock failure code" do
+        block = -> { subject.run }
+
+        expect { block.call }.to raise_error(SystemExit) do |error|
+          expect(error.status).to eq(112)
+        end
       end
     end
   end

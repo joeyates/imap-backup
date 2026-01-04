@@ -70,6 +70,7 @@ module Imap::Backup
       }
     ].freeze
 
+    # @param base [Thor] the command class receiving the options
     def initialize(base:)
       @base = base
     end

@@ -14,6 +14,13 @@ module Imap::Backup
     include Thor::Actions
     include CLI::Helpers
 
+    # @param email [String, nil] optional email address identifying the account to restore
+    # @param options [Hash] CLI options controlling output
+    # @option opts [String] :config (nil) the path to the configuration file
+    # @option opts [String] :erb_configuration (nil) the path to the ERB configuration file
+    # @option opts [Array<String>] :accounts (nil) the accounts to restore
+    # @option opts [String] :delimiter ("/") the destination folder delimiter
+    # @option opts [String] :prefix ("") a prefix applied to restored folder names
     def initialize(email = nil, options)
       super([])
       @email = email
@@ -30,9 +37,6 @@ module Imap::Backup
         when email && !options.key?(:accounts)
           account = account(config, email)
           restore(account, **restore_options)
-        when !email && !options.key?(:accounts)
-          Logger.logger.info "Calling restore without an EMAIL parameter is deprecated"
-          config.accounts.each { |a| restore(a) }
         when email && options.key?(:accounts)
           raise "Missing EMAIL parameter"
         when !email && options.key?(:accounts)
@@ -41,6 +45,9 @@ module Imap::Backup
             "please pass a single EMAIL parameter"
           )
           requested_accounts(config).each { |a| restore(a) }
+        else
+          Logger.logger.info "Calling restore without an EMAIL parameter is deprecated"
+          config.accounts.each { |a| restore(a) }
         end
       end
     end

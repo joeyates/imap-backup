@@ -28,6 +28,26 @@ module Imap::Backup
       expect(subject.run).to be_nil
     end
 
+    context "when the metadata file is invalid" do
+      let(:imap_valid) { false }
+
+      it "fails" do
+        expect do
+          subject.run
+        end.to raise_error(Serializer::FolderIntegrityError, /.imap file 'imap' is corrupt/)
+      end
+    end
+
+    context "when the mailbox file is missing" do
+      let(:mbox_exists) { false }
+
+      it "fails" do
+        expect do
+          subject.run
+        end.to raise_error(Serializer::FolderIntegrityError, /.mbox file 'mbox' is missing/)
+      end
+    end
+
     context "when the folder is empty" do
       let(:messages) { [] }
       let(:body1) { "" }

@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# This script starts/stops the development environment using
+# `dev/compose.yml`.
+# Usage: bin/dev [up|down|restart|logs|ps|exec SERVICE COMMAND...]
+# Example: bin/dev up
+# Note: Requires Podman and Podman Compose to be installed.
+
+project_root="$(realpath "$(dirname "$(realpath "$0")")/..")"
+compose_file="${project_root}/dev/compose.yml"
+
+function podman_compose() {
+  podman-compose -f "$compose_file" -p dev "$@"
+}
+
+case "${1:-}" in
+  up)
+    podman_compose up -d
+    ;;
+  down)
+    podman_compose down
+    ;;
+  restart)
+    podman_compose down
+    podman_compose up -d
+    ;;
+  logs)
+    podman_compose logs -f --tail=100
+    ;;
+  ps)
+    podman_compose ps
+    ;;
+  exec)
+    shift
+    podman_compose exec "$@"
+    ;;
+  *)
+    echo "Usage: $0 [up|down|restart|logs|ps|exec SERVICE COMMAND...]"
+    exit 1
+    ;;
+esac

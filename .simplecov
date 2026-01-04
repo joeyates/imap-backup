@@ -1,3 +1,5 @@
+require "simplecov_json_formatter"
+
 SimpleCov.start do
   command_name ENV.fetch("SIMPLECOV_COMMAND_NAME")
 
@@ -6,9 +8,18 @@ SimpleCov.start do
 
   add_filter "/spec/"
 
-  coverage_dir(File.join(__dir__, "coverage"))
-
   enable_coverage :branch
+
+  if ENV["CI"]
+    formatter SimpleCov::Formatter::SimpleFormatter
+  else
+    formatter SimpleCov::Formatter::MultiFormatter.new(
+      [
+        SimpleCov::Formatter::HTMLFormatter,
+        SimpleCov::Formatter::JSONFormatter
+      ]
+    )
+  end
 end
 
 SimpleCov.at_exit do

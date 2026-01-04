@@ -46,6 +46,7 @@ module Imap::Backup
       let(:options) { {} }
 
       before do
+        allow(Logger.logger).to receive(:info)
         allow(subject).to receive(:requested_accounts) { [account] }
       end
 
@@ -53,6 +54,13 @@ module Imap::Backup
         subject.run
 
         expect(restore).to have_received(:run)
+      end
+
+      it "logs the deprecation warning" do
+        subject.run
+
+        expect(Logger.logger).to have_received(:info).
+          with(/Calling restore without an EMAIL parameter is deprecated/)
       end
     end
 
@@ -72,6 +80,7 @@ module Imap::Backup
       let(:options) { {accounts: "email2"} }
 
       before do
+        allow(Logger.logger).to receive(:info)
         allow(subject).to receive(:requested_accounts) { [account] }
       end
 
@@ -79,6 +88,13 @@ module Imap::Backup
         subject.run
 
         expect(restore).to have_received(:run)
+      end
+
+      it "logs the warning" do
+        subject.run
+
+        expect(Logger.logger).to have_received(:info).
+          with(/Calling restore with the --account option is deprecated/)
       end
     end
   end

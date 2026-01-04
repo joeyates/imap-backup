@@ -3,6 +3,9 @@ FROM docker.io/library/ruby:$RUBY_VERSION-buster
 
 ARG BUNDLER_VERSION=2.4.22
 
+# Buster sources are now archived
+COPY sources.list /etc/apt/sources.list
+
 # Install dependencies
 RUN \
   apt-get update && \

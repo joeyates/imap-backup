@@ -11,6 +11,12 @@ module Imap::Backup
 
   # Implements a folder enumerator for backed-up accounts
   class Account::FolderMapper
+    # @param account [Account] the account whose local folders are being iterated
+    # @param destination [Account] the destination account
+    # @param destination_delimiter [String] the delimiter to use for destination folder names
+    # @param destination_prefix [String] a prefix applied to destination folder names
+    # @param source_delimiter [String] the delimiter used in the source account
+    # @param source_prefix [String] a prefix applied to source folder names
     def initialize(
       account:,
       destination:,

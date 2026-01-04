@@ -1,3 +1,4 @@
+require "stringio"
 require "imap/backup/logger"
 
 module Imap::Backup
@@ -74,6 +75,53 @@ module Imap::Backup
         it "unsets the Net::IMAP debug flag" do
           expect(Net::IMAP.debug).to be false
         end
+      end
+    end
+
+    describe ".sanitize_stderr" do
+      let(:sanitizer) { instance_double(Text::Sanitizer) }
+
+      before do
+        allow(Text::Sanitizer).to receive(:new).with($stdout) { sanitizer }
+        allow(sanitizer).to receive(:flush)
+        allow(sanitizer).to receive(:write)
+        @original_stderr = $stderr
+      end
+
+      it "yields with the sanitized stderr" do
+        yielded = nil
+
+        described_class.sanitize_stderr do
+          yielded = $stderr
+        end
+
+        expect(yielded).to be(sanitizer)
+      end
+
+      it "restores stderr after the block" do
+        described_class.sanitize_stderr {}
+
+        expect($stderr).to be(@original_stderr)
+      end
+
+      it "flushes the sanitizer" do
+        expect(sanitizer).to receive(:flush)
+
+        described_class.sanitize_stderr {}
+      end
+    end
+
+    describe ".count" do
+      it "starts from one" do
+        expect(described_class.count([])).to eq(1)
+      end
+
+      it "increments for true flags" do
+        expect(described_class.count([true, true])).to eq(3)
+      end
+
+      it "decrements for false flags" do
+        expect(described_class.count([false, false])).to eq(-1)
       end
     end
   end

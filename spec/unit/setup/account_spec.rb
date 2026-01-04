@@ -6,6 +6,7 @@ module Imap::Backup
   RSpec.describe Setup::Account do
     subject { described_class.new(config, account, highline) }
 
+    let(:account_status) { "active" }
     let(:account) do
       instance_double(
         Account,
@@ -14,11 +15,12 @@ module Imap::Backup
         mirror_mode: mirror_mode,
         local_path: local_path,
         connection_options: connection_options,
-        folder_blacklist: false,
+        folder_blacklist: folder_blacklist,
         reset_seen_flags_after_fetch: reset_seen_flags_after_fetch,
-        status: "active"
+        status: account_status
       )
     end
+    let(:folder_blacklist) { false }
     let(:account1) { instance_double(Account) }
     let(:accounts) { [account, account1] }
     let(:existing_password) { "password" }
@@ -200,6 +202,24 @@ module Imap::Backup
         end
       end
 
+      describe "choosing 'choose folders to exclude from backups'" do
+        let(:folder_blacklist) { true }
+        let(:chooser) do
+          instance_double(Setup::FolderChooser, run: nil)
+        end
+
+        before do
+          allow(Setup::FolderChooser).
+            to receive(:new) { chooser }
+          subject.run
+          menu.choices["choose folders to exclude from backups"].call
+        end
+
+        it "edits folders" do
+          expect(chooser).to have_received(:run)
+        end
+      end
+
       describe "choosing 'modify multi-fetch size'" do
         let(:supplied) { "10" }
 
@@ -248,6 +268,14 @@ module Imap::Backup
 
         it "updates the server" do
           expect(account).to have_received(:"server=").with(server)
+        end
+
+        context "when the user cancels" do
+          let(:server) { nil }
+
+          it "keeps the existing value" do
+            expect(account).not_to have_received(:"server=")
+          end
         end
       end
 
@@ -303,6 +331,20 @@ module Imap::Backup
           it "reports the problem" do
             expect(Kernel).to have_received(:puts).
               with(/Malformed/)
+          end
+        end
+
+        context "when the user cancels input" do
+          before do
+            allow(highline).to receive(:ask).with("connections options (as JSON): ") { nil }
+            allow(account).to receive(:"connection_options=")
+
+            subject.run
+            menu.choices["modify connection options"].call
+          end
+
+          it "does not update the account" do
+            expect(account).to_not have_received(:"connection_options=")
           end
         end
       end
@@ -361,6 +403,62 @@ module Imap::Backup
 
           it "unsets the flag" do
             expect(account).to have_received(:reset_seen_flags_after_fetch=).with(nil)
+          end
+        end
+      end
+
+      describe "toggling folder inclusion mode" do
+        before do
+          allow(account).to receive(:folder_blacklist=)
+          subject.run
+        end
+
+        it "enables blacklist mode" do
+          menu.choices["toggle folder inclusion mode (whitelist/blacklist)"].call
+
+          expect(account).to have_received(:folder_blacklist=).with(true)
+        end
+
+        context "when blacklist mode is already enabled" do
+          let(:folder_blacklist) { true }
+
+          it "disables the blacklist" do
+            menu.choices["toggle folder inclusion mode (whitelist/blacklist)"].call
+
+            expect(account).to have_received(:folder_blacklist=).with(nil)
+          end
+        end
+      end
+
+      describe "choosing 'change status'" do
+        before do
+          allow(account).to receive(:status=)
+          subject.run
+        end
+
+        it "moves from active to archived" do
+          menu.choices["change status (currently: active -> archived)"].call
+
+          expect(account).to have_received(:status=).with("archived")
+        end
+
+        context "when the current status is archived" do
+          let(:account_status) { "archived" }
+
+          it "moves to offline" do
+            menu.choices["change status (currently: archived -> offline)"].call
+
+            expect(account).to have_received(:status=).with("offline")
+          end
+        end
+
+        context "when the current status is offline" do
+          let(:account_status) { "offline" }
+
+          it "wraps back to active" do
+            menu.choices["change status (currently: offline -> active)"].call
+
+            expect(account).to have_received(:status=).with("active")
           end
         end
       end

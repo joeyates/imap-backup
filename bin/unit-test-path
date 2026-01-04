@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# This script maps code paths to their corresponding unit test paths.
+# Usage: ./bin/unit-test-path <code-file-path>
+
+code_file="$1"
+sed -e 's|^lib/imap/backup/|spec/unit/|' \
+    -e 's|\.rb$|_spec.rb|' <<< "$code_file"

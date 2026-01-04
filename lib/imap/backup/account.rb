@@ -65,6 +65,25 @@ module Imap::Backup
     # @return [String] one of "active" (the default), "archived", or "offline"
     attr_reader :status
 
+    # @param options [Hash] Account attributes
+    # @option opts [String] :username the username of the account (usually the same as the email
+    #   address)
+    # @option opts [String] :password the password of the account
+    # @option opts [String] :local_path the path where backups will be saved
+    # @option opts [Array<String>] :folders (nil) the list of folders that have been configured for
+    #   the Account
+    # @option opts [Boolean] :folder_blacklist (false) whether the folders attribute is a blacklist
+    # @option opts [Boolean] :mirror_mode (false) whether to run in mirror mode
+    # @option opts [String] :server the address of the IMAP server
+    # @option opts [Hash] :connection_options (nil) additional connection options for the IMAP
+    #   server
+    # @option opts [String] :download_strategy (nil) the name of the download strategy to adopt
+    #   during backups
+    # @option opts [Integer] :multi_fetch_size (nil) the number of emails to fetch from the IMAP
+    #   server at a time
+    # @option opts [Boolean] :reset_seen_flags_after_fetch (false) whether to reset seen flags after
+    #   fetching messages
+    # @option opts [String] :status ("active") the status of the account
     def initialize(options)
       check_options!(options)
       @username = options[:username]
@@ -131,19 +150,19 @@ module Imap::Backup
     # @return [Hash] all Account data for serialization
     def to_h
       h = {
-        username: @username,
-        password: @password,
+        username: username,
+        password: password,
         status: status
       }
-      h[:local_path] = @local_path if @local_path
-      h[:folders] = @folders if @folders
-      h[:folder_blacklist] = true if @folder_blacklist
-      h[:mirror_mode] = true if @mirror_mode
-      h[:server] = @server if @server
-      h[:connection_options] = @connection_options if connection_options
+      h[:local_path] = local_path if local_path
+      h[:folders] = folders if folders
+      h[:folder_blacklist] = true if folder_blacklist
+      h[:mirror_mode] = true if mirror_mode
+      h[:server] = server if server
+      h[:connection_options] = connection_options if connection_options
       h[:multi_fetch_size] = multi_fetch_size
-      if @reset_seen_flags_after_fetch
-        h[:reset_seen_flags_after_fetch] = @reset_seen_flags_after_fetch
+      if reset_seen_flags_after_fetch
+        h[:reset_seen_flags_after_fetch] = reset_seen_flags_after_fetch
       end
       h
     end
@@ -216,12 +235,11 @@ module Imap::Backup
     def connection_options=(value)
       # Ensure we've loaded the connection_options
       connection_options
-      parsed =
-        if value == ""
-          nil
-        else
-          JSON.parse(value, symbolize_names: true)
-        end
+      parsed = if value == ""
+                 nil
+               else
+                 JSON.parse(value, symbolize_names: true)
+               end
       update(:connection_options, parsed)
     end
 

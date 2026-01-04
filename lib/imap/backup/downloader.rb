@@ -8,6 +8,10 @@ module Imap::Backup
     # @private
     class MultiFetchFailedError < StandardError; end
 
+    # @param folder [Account::Folder] the remote folder to download from
+    # @param serializer [Serializer] the local serializer that stores messages
+    # @param multi_fetch_size [Integer] how many messages to fetch per batch
+    # @param reset_seen_flags_after_fetch [Boolean] true to restore unseen flags after fetch
     def initialize(folder, serializer, multi_fetch_size: 1, reset_seen_flags_after_fetch: false)
       @folder = folder
       @serializer = serializer

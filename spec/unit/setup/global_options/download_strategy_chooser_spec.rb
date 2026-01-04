@@ -49,5 +49,23 @@ module Imap::Backup
 
       expect(Kernel).to have_received(:puts).with(/This setting/)
     end
+
+    context "when a strategy matches the current value" do
+      let(:config) do
+        instance_double(
+          Configuration,
+          download_strategy: "direct",
+          "download_strategy=": nil
+        )
+      end
+
+      it "marks the entry as current" do
+        allow(input).to receive(:gets) { "q\n" }
+
+        subject.run
+
+        expect(output.string).to match(/write straight to disk <- current/)
+      end
+    end
   end
 end

@@ -11,6 +11,8 @@ module Imap::Backup
 
   # Carries out the backup of the configured folders of the account
   class Account::Backup
+    # @param account [Account] the account to back up
+    # @param refresh [Boolean] true to refresh folder metadata even if mirror is disabled
     def initialize(account:, refresh: false)
       @account = account
       @refresh = refresh

@@ -23,6 +23,8 @@ module Imap::Backup
     # @return [String] the name of the folder
     attr_reader :name
 
+    # @param client [Client::Default] the IMAP client used to talk to the server
+    # @param name [String] the UTF-7 encoded folder name
     def initialize(client, name)
       @client = client
       @name = name

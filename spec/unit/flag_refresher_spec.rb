@@ -21,7 +21,7 @@ module Imap::Backup
 
     context "when the fetch fails" do
       it "logs a warning" do
-        allow(folder).to receive(:fetch_multi).with([1, 2], ["FLAGS"]).and_return(nil)
+        allow(folder).to receive(:fetch_multi).with([1, 2], ["FLAGS"]) { nil }
         expect(Logger.logger).
           to receive(:debug).
           with("[#{folder.name}] failed to fetch flags for [1, 2] - cannot refresh flags")

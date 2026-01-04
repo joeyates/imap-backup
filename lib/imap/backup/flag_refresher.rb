@@ -6,6 +6,8 @@ module Imap::Backup
     # The number of messages to process at a time
     CHUNK_SIZE = 100
 
+    # @param folder [Account::Folder] the remote folder whose flags are refreshed
+    # @param serializer [Serializer] the local serializer providing stored UIDs
     def initialize(folder, serializer)
       @folder = folder
       @serializer = serializer
