@@ -1,167 +1,45 @@
 require "imap/backup/serializer"
+require "imap/backup/serializer/imap"
+require "imap/backup/serializer/message"
 require "imap/backup/serializer/files/path"
 
-RSpec.shared_examples "a method that checks for invalid serialization" do
-  context "when either file is invalid" do
-    let(:imap_valid) { true }
-    let(:mbox_valid) { true }
-
-    before do
-      allow(imap).to receive(:pathname) { "imap pathname" }
-      allow(imap).to receive(:valid?) { imap_valid }
-      allow(imap).to receive(:exist?) { true }
-      allow(imap).to receive(:delete)
-      allow(mbox).to receive(:pathname) { "mbox pathname" }
-      allow(mbox).to receive(:valid?) { mbox_valid }
-      allow(mbox).to receive(:exist?) { true }
-      allow(mbox).to receive(:delete)
-
-      action.call
-    end
-
-    context "when the imap file is not valid" do
-      let(:imap_valid) { false }
-
-      it "deletes the imap file" do
-        expect(imap).to have_received(:delete).at_least(:once)
-      end
-
-      it "deletes the mbox file" do
-        expect(mbox).to have_received(:delete).at_least(:once)
-      end
-    end
-
-    context "when the mbox file is not valid" do
-      let(:mbox_valid) { false }
-
-      it "deletes the imap file" do
-        expect(imap).to have_received(:delete).at_least(:once)
-      end
-
-      it "deletes the mbox file" do
-        expect(mbox).to have_received(:delete).at_least(:once)
-      end
-    end
-  end
-end
-
 module Imap::Backup
-  RSpec.shared_examples "a method sets up the folder directory" do
-    it "ensures the folder's containing directory exists" do
-      action.call
-
-      expect(directory).to have_received(:ensure_exists).at_least(:once)
-    end
-
-    context "when the directory contains invalid characters" do
-      let(:folder_name) { "a:b/sub" }
-      let(:sanitized_name) { "a%3a;b/sub" }
-      let(:sanitized_files_path) do
-        instance_double(
-          Serializer::Files::Path,
-          "sanitized Files::Path",
-          base_path: "serializer_path",
-          folder_name: sanitized_name,
-          to_s: File.join("serializer_path", sanitized_name)
-        )
-      end
-
-      before do
-        allow(Serializer::Files::Path).to receive(:new).with(
-          base_path: "serializer_path", folder_name: sanitized_name
-        ) { sanitized_files_path }
-      end
-
-      it "creates it using valid characters" do
-        action.call
-
-        expect(Serializer::Directory).
-          to have_received(:new).
-          with(files_path: sanitized_files_path).
-          at_least(:once)
-      end
-    end
-  end
-
-  RSpec.shared_examples "a method that sanitizes folder paths" do
-    let(:folder_name) { "a:b/%;::" }
-    let(:sanitized_name) { "a%3a;b/%25;%3b;%3a;%3a;" }
-    let(:sanitized_files_path) do
-      instance_double(
-        Serializer::Files::Path,
-        "sanitized Files::Path",
-        base_path: "serializer_path",
-        folder_name: sanitized_name
-      )
-    end
-
-    before do
-      allow(Serializer::Files::Path).to receive(:new).with(
-        base_path: "serializer_path", folder_name: sanitized_name
-      ) { sanitized_files_path }
-    end
-
-    it "sanitizes the .imap path" do
-      action.call
-
-      expect(Serializer::Imap).to have_received(:new).with(
-        files_path: sanitized_files_path
-      )
-    end
-
-    it "sanitizes the .mbox path" do
-      action.call
-
-      expect(Serializer::Mbox).to have_received(:new).with(files_path: sanitized_files_path)
-    end
-  end
-
   RSpec.describe Serializer do
-    subject { described_class.new(files_path: path) }
+    subject { described_class.new(files_path: files_path) }
 
-    let(:path) do
+    let(:files) do
       instance_double(
-        Serializer::Files::Path,
+        Serializer::Files, "Files",
+        files_path: files_path,
+        imap: imap,
+        rename: nil,
+        reload: nil,
+        uid_validity: existing_uid_validity,
+        "uid_validity=": nil,
+        uids: existing_uids,
+        validate!: nil
+      )
+    end
+    let(:imap) { instance_double(Serializer::Imap, "Imap") }
+    let(:files_path) do
+      instance_double(
+        Serializer::Files::Path, "Files::Path",
         base_path: "serializer_path",
         folder_name: folder_name,
         to_s: File.join("serializer_path", folder_name)
       )
     end
-    let(:folder_name) { "folder" }
-    let(:imap) do
-      instance_double(
-        Serializer::Imap,
-        valid?: true,
-        rename: nil,
-        save: nil,
-        uid_validity: existing_uid_validity,
-        "uid_validity=": nil,
-        update: nil,
-        update_uid: nil,
-        get: message,
-        messages: metadata_messages,
-        uids: existing_uids
-      )
-    end
-    let(:mbox) do
-      instance_double(
-        Serializer::Mbox,
-        valid?: true,
-        rename: nil,
-        touch: nil
-      )
-    end
+    let(:enumerator) { instance_double(Serializer::MessageEnumerator, run: nil) }
     let(:folder_name) { "folder_name" }
     let(:existing_uid_validity) { nil }
     let(:existing_uids) { [1, 2] }
-    let(:metadata_messages) { [{uid: 1}] }
     let(:message) { instance_double(Serializer::Message) }
     let(:directory) { instance_double(Serializer::Directory, ensure_exists: nil) }
 
     before do
-      allow(Serializer::Imap).to receive(:new) { imap }
-      allow(Serializer::Mbox).to receive(:new) { mbox }
+      allow(Serializer::Files).to receive(:new).with(files_path: files_path) { files }
       allow(Serializer::Directory).to receive(:new) { directory }
+      allow(Serializer::MessageEnumerator).to receive(:new).with(imap: imap) { enumerator }
     end
 
     describe "#transaction" do
@@ -184,15 +62,11 @@ module Imap::Backup
       let(:result) { subject.apply_uid_validity("new") }
       let(:action) { -> { result } }
 
-      it_behaves_like "a method that checks for invalid serialization"
-      it_behaves_like "a method sets up the folder directory"
-      it_behaves_like "a method that sanitizes folder paths"
-
       context "when there is no existing uid_validity" do
         it "sets the metadata file's uid_validity" do
           result
 
-          expect(imap).to have_received(:"uid_validity=").with("new")
+          expect(files).to have_received(:"uid_validity=").with("new")
         end
       end
 
@@ -202,33 +76,27 @@ module Imap::Backup
         it "does nothing" do
           result
 
-          expect(imap).to_not have_received(:"uid_validity=")
+          expect(files).to_not have_received(:"uid_validity=")
         end
       end
 
       context "when the new value is different from the old value" do
         let(:existing_uid_validity) { "existing_uid_validity" }
-        let(:unused_name_finder) { instance_double(Serializer::UnusedNameFinder, run: "new_name") }
+        let(:unused_name_finder) { instance_double(Serializer::UnusedNameFinder, run: new_folder_path) }
         let(:new_folder_path) { "serializer_path/new_name" }
 
         before do
           allow(Serializer::UnusedNameFinder).to receive(:new) { unused_name_finder }
         end
 
-        it "renames the existing mailbox" do
+        it "renames the existing files" do
           result
 
-          expect(mbox).to have_received(:rename).with(new_folder_path)
-        end
-
-        it "renames the existing metadata file" do
-          result
-
-          expect(imap).to have_received(:rename).with(new_folder_path)
+          expect(files).to have_received(:rename).with(new_folder_path)
         end
 
         it "returns the new name for the old folder" do
-          expect(result).to eq("new_name")
+          expect(result).to eq(new_folder_path)
         end
       end
     end
@@ -236,26 +104,20 @@ module Imap::Backup
     describe "#force_uid_validity" do
       let(:action) { -> { subject.force_uid_validity("new") } }
 
-      it_behaves_like "a method that checks for invalid serialization"
-      it_behaves_like "a method sets up the folder directory"
-
       it "sets the metadata file's uid_validity" do
         subject.force_uid_validity("new")
 
-        expect(imap).to have_received(:"uid_validity=").with("new")
+        expect(files).to have_received(:"uid_validity=").with("new")
       end
     end
 
     describe "#append" do
       before do
-        allow(Serializer::Appender).to receive(:new) { appender }
+        allow(Serializer::Appender).to receive(:new).with(files: files) { appender }
       end
 
       let(:action) { -> { subject.append("uid", "message", []) } }
       let(:appender) { instance_double(Serializer::Appender, append: nil) }
-
-      it_behaves_like "a method that checks for invalid serialization"
-      it_behaves_like "a method sets up the folder directory"
 
       it "runs the Appender" do
         subject.append("uid", "message", [])
@@ -264,132 +126,34 @@ module Imap::Backup
       end
     end
 
-    describe "#get" do
-      let(:action) { -> { subject.get(123) } }
-
-      it_behaves_like "a method that checks for invalid serialization"
-      it_behaves_like "a method sets up the folder directory"
-      it_behaves_like "a method that sanitizes folder paths"
-
-      it "returns the message metadata" do
-        expect(subject.get(123)).to eq(message)
-      end
-    end
-
-    describe "#messages" do
-      let(:action) { -> { subject.messages } }
-
-      it_behaves_like "a method that checks for invalid serialization"
-      it_behaves_like "a method sets up the folder directory"
-      it_behaves_like "a method that sanitizes folder paths"
-
-      it "returns the messages" do
-        expect(subject.messages).to eq(metadata_messages)
-      end
-    end
-
-    describe "#uid_validity" do
-      let(:existing_uid_validity) { 17 }
-      let(:action) { -> { subject.uid_validity } }
-
-      it_behaves_like "a method that checks for invalid serialization"
-      it_behaves_like "a method sets up the folder directory"
-      it_behaves_like "a method that sanitizes folder paths"
-
-      it "returns the uid_validity" do
-        expect(subject.uid_validity).to eq(17)
-      end
-    end
-
-    describe "#uids" do
-      let(:action) { -> { subject.uids } }
-
-      it_behaves_like "a method that checks for invalid serialization"
-      it_behaves_like "a method sets up the folder directory"
-      it_behaves_like "a method that sanitizes folder paths"
-
-      it "returns the uids" do
-        expect(subject.uids).to eq(existing_uids)
-      end
-    end
-
-    describe "#update_uid" do
-      let(:action) { -> { subject.update_uid(10, 11) } }
-
-      it_behaves_like "a method that checks for invalid serialization"
-      it_behaves_like "a method sets up the folder directory"
-      it_behaves_like "a method that sanitizes folder paths"
-
-      it "updates the message metadata" do
-        subject.update_uid(10, 11)
-
-        expect(imap).to have_received(:update_uid).with(10, 11)
-      end
-    end
-
-    describe "#update" do
-      let(:flags) { [:Foo] }
-
-      before do
-        subject.update(33, flags: flags)
-      end
-
-      it "updates the .imap file" do
-        expect(imap).to have_received(:update).with(33, flags: flags)
-      end
-    end
-
-    describe "#each_message" do
-      before do
-        allow(Serializer::MessageEnumerator).to receive(:new) { message_enumerator }
-      end
-
-      let(:action) { -> { subject.each_message([]) {} } }
-      let(:message_enumerator) { instance_double(Serializer::MessageEnumerator, run: nil) }
-
-      it_behaves_like "a method that checks for invalid serialization"
-      it_behaves_like "a method sets up the folder directory"
-
-      it "runs the MessageEnumerator" do
-        subject.each_message([]) {}
-
-        expect(message_enumerator).to have_received(:run)
-      end
-
-      context "when called without a block" do
-        it "returns an Enumerator" do
-          expect(subject.each_message([])).to be_a(Enumerator)
-        end
-      end
-    end
-
     describe "#filter" do
       let(:appender) { instance_double(Serializer::Appender, append: nil) }
-      let(:old_imap) do
+      let(:files) do
         instance_double(
-          Serializer::Imap, "Old Imap",
-          uid_validity: 1,
-          uids: [1],
-          valid?: true,
+          Serializer::Files, "Old Files",
+          delete: nil,
           get: message,
-          delete: nil,
-          files_path: old_files_path
+          imap: imap,
+          files_path: files_path,
+          uid_validity: 1,
+          uids: [1]
         )
       end
-      let(:old_mbox) do
+      let(:files_path) do
         instance_double(
-          Serializer::Mbox, "Old Mbox",
-          delete: nil,
-          files_path: old_files_path,
-          valid?: true
+          Serializer::Files::Path, "Files Path",
+          base_path: "serializer_path", folder_name: folder_name
         )
       end
-      let(:imap) do
-        instance_double(Serializer::Imap, "New Imap", "uid_validity=": nil, rename: nil)
+      let(:temp_files) do
+        instance_double(Serializer::Files, "New Files", "uid_validity=": nil, rename: nil)
       end
-      let(:mbox) { instance_double(Serializer::Mbox, "New Mbox", rename: nil) }
-      let(:old_files_path) { instance_double(Serializer::Files::Path, "Old Files Path", base_path: "serializer_path", folder_name: folder_name) }
-      let(:temp_files_path) { instance_double(Serializer::Files::Path, "Temp Files Path", base_path: "serializer_path", folder_name: unused_name) }
+      let(:temp_files_path) do
+        instance_double(
+          Serializer::Files::Path, "Temp Files Path",
+          base_path: "serializer_path", folder_name: unused_name
+        )
+      end
       let(:message) { instance_double(Serializer::Message, uid: 1, body: "body", flags: []) }
       let(:keep) { true }
       let(:unused) { instance_double(Serializer::UnusedNameFinder, run: unused_name) }
@@ -398,12 +162,11 @@ module Imap::Backup
       before do
         allow(Serializer::Appender).to receive(:new) { appender }
         allow(Serializer::UnusedNameFinder).to receive(:new) { unused }
-        allow(Serializer::Imap).to receive(:new).with(files_path: old_files_path) { old_imap }
-        allow(Serializer::Mbox).to receive(:new).with(files_path: old_files_path) { old_mbox }
-        allow(Serializer::Imap).to receive(:new).with(files_path: temp_files_path) { imap }
-        allow(Serializer::Mbox).to receive(:new).with(files_path: temp_files_path) { mbox }
-        allow(Serializer::Files::Path).to receive(:new).with(base_path: "serializer_path", folder_name: folder_name) { old_files_path }
-        allow(Serializer::Files::Path).to receive(:new).with(base_path: "serializer_path", folder_name: unused_name) { temp_files_path }
+        allow(Serializer::Files).to receive(:new).with(files_path: temp_files_path) { temp_files }
+        allow(Serializer::Files::Path).to receive(:new).
+          with(base_path: "serializer_path", folder_name: unused_name) { temp_files_path }
+        allow(enumerator).to receive(:run).with(uids: [1]).and_yield(message)
+
         subject.filter { keep }
       end
 
@@ -411,20 +174,12 @@ module Imap::Backup
         expect(appender).to have_received(:append)
       end
 
-      it "deletes the old imap" do
-        expect(old_imap).to have_received(:delete)
+      it "deletes the old files" do
+        expect(files).to have_received(:delete)
       end
 
-      it "deletes the old mbox" do
-        expect(old_mbox).to have_received(:delete)
-      end
-
-      it "renames the new imap" do
-        expect(imap).to have_received(:rename).with(old_files_path)
-      end
-
-      it "renames the new mbox" do
-        expect(mbox).to have_received(:rename).with(old_files_path)
+      it "renames the new files" do
+        expect(temp_files).to have_received(:rename).with(files_path)
       end
 
       context "when the block returns false" do

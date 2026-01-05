@@ -7,11 +7,9 @@ module Imap::Backup
 
   # Appends messages to the local store
   class Serializer::Appender
-    # @param imap [Serializer::Imap] the metadata serializer for the folder
-    # @param mbox [Serializer::Mbox] the folder's mailbox
-    def initialize(imap:, mbox:)
-      @imap = imap
-      @mbox = mbox
+    # @param files [Serializer::Files] the folder's files
+    def initialize(files:)
+      @files = files
     end
 
     # Adds a message to the metadata file and the mailbox.
@@ -29,7 +27,7 @@ module Imap::Backup
       existing = imap.get(uid)
       if existing
         Logger.logger.debug(
-          "[#{imap.files_path}] message #{uid} already downloaded - skipping"
+          "[#{files.files_path}] message #{uid} already downloaded - skipping"
         )
         return
       end
@@ -40,7 +38,7 @@ module Imap::Backup
         raise wrap_error(
           error: e,
           note: "failed to serialize message",
-          files_path: imap.files_path,
+          files_path: files.files_path,
           uid: uid,
           message: message
         )
@@ -53,7 +51,7 @@ module Imap::Backup
         raise wrap_error(
           error: e,
           note: "failed to append message",
-          files_path: imap.files_path,
+          files_path: files.files_path,
           uid: uid,
           message: message
         )
@@ -62,8 +60,15 @@ module Imap::Backup
 
     private
 
-    attr_reader :imap
-    attr_reader :mbox
+    attr_reader :files
+
+    def imap
+      files.imap
+    end
+
+    def mbox
+      files.mbox
+    end
 
     def wrap_error(error:, note:, files_path:, uid:, message:)
       <<-ERROR.gsub(/^\s*/m, "")

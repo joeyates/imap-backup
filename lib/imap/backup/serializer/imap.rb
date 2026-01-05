@@ -14,10 +14,12 @@ module Imap::Backup
     # The version number to store in the metadata file
     CURRENT_VERSION = 3
 
-    # @return [Serializer::Files::Path] The path of the imap metadata file, without the '.imap' extension
+    # @return [Serializer::Files::Path] The path of the imap metadata file, without the '.imap'
+    #   extension
     attr_reader :files_path
 
-    # @param files_path [Serializer::Files::Path] The path of the imap metadata file, without the '.imap' extension
+    # @param files_path [Serializer::Files::Path] The path of the imap metadata file, without
+    #   the '.imap' extension
     def initialize(files_path:)
       @files_path = files_path
       @loaded = false

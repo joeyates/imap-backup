@@ -14,6 +14,8 @@ module Imap::Backup
 
     def_delegator :imap, :update
 
+    attr_reader :files_path
+
     def initialize(files_path:)
       @files_path = files_path
       @directory_ensured = false
@@ -50,6 +52,21 @@ module Imap::Backup
       reload
     end
 
+    # Enumerates over a series of messages.
+    # When called without a block, returns an Enumerator
+    # @param required_uids [Array<Integer>] the UIDs of the message to enumerate over
+    # @return [Enumerator, void]
+    def each_message(required_uids = nil, &block)
+      return enum_for(:each_message, required_uids) if !block
+
+      required_uids ||= uids
+
+      validate!
+
+      enumerator = Serializer::MessageEnumerator.new(imap: imap)
+      enumerator.run(uids: required_uids, &block)
+    end
+
     # Get message metadata
     # @param uid [Integer] a message UID
     # @return [Serializer::Message]
@@ -62,27 +79,6 @@ module Imap::Backup
     def messages
       validate!
       imap.messages
-    end
-
-    # @return [Integer] the UID validity for the folder
-    def uid_validity
-      validate!
-      imap.uid_validity
-    end
-
-    # @return [Array<Integer>] The uids of all messages
-    def uids
-      validate!
-      imap.uids
-    end
-
-    # Update a message's metadata, replacing its UID
-    # @param old [Integer] the existing message UID
-    # @param new [Integer] the new UID to apply to the message
-    # @return [void]
-    def update_uid(old, new)
-      validate!
-      imap.update_uid(old, new)
     end
 
     # Forces a reload of the serialized files
@@ -106,6 +102,33 @@ module Imap::Backup
       imap.rename destination
     end
 
+    # @return [Integer] the UID validity for the folder
+    def uid_validity
+      validate!
+      imap.uid_validity
+    end
+
+    def uid_validity=(value)
+      validate!
+      imap.uid_validity = value
+      mbox.touch
+    end
+
+    # @return [Array<Integer>] The uids of all messages
+    def uids
+      validate!
+      imap.uids
+    end
+
+    # Update a message's metadata, replacing its UID
+    # @param old [Integer] the existing message UID
+    # @param new [Integer] the new UID to apply to the message
+    # @return [void]
+    def update_uid(old, new)
+      validate!
+      imap.update_uid(old, new)
+    end
+
     # Checks that the metadata files are valid,
     # or deletes any existing files if the pair are not valid.
     # @return [Boolean] indicates whether there are existing, valid files
@@ -120,8 +143,6 @@ module Imap::Backup
       end
       warn_imap = !imap_valid && imap.exist?
       Logger.logger.info("Metadata file '#{imap.pathname}' is invalid") if warn_imap
-      warn_mbox = !mbox_valid && mbox.exist?
-      Logger.logger.info("Mailbox '#{mbox.pathname}' is invalid") if warn_mbox
 
       delete
 
@@ -130,13 +151,10 @@ module Imap::Backup
 
     private
 
-    attr_reader :files_path
-
     def ensure_directory
       return if @directory_ensured
 
       Serializer::Directory.new(files_path: sanitized_path).ensure_exists
-
       @directory_ensured = true
     end
 

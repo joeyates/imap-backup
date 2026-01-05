@@ -6,8 +6,16 @@ require "imap/backup/serializer/message"
 
 module Imap::Backup
   RSpec.describe Serializer::Appender do
-    subject { described_class.new(imap: imap, mbox: mbox) }
+    subject { described_class.new(files: files) }
 
+    let(:files) do
+      instance_double(
+        Serializer::Files,
+        imap: imap,
+        mbox: mbox,
+        files_path: files_path
+      )
+    end
     let(:imap) do
       instance_double(
         Serializer::Imap, uid_validity: existing_uid_validity, rollback: nil, files_path: files_path
