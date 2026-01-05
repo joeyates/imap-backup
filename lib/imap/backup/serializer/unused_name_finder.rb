@@ -1,4 +1,3 @@
-require "imap/backup/serializer"
 require "imap/backup/serializer/files/path"
 
 module Imap; end
@@ -25,8 +24,9 @@ module Imap::Backup
         path = Serializer::Files::Path.new(
           base_path: serializer.path, folder_name: folder
         )
-        test = Serializer.new(files_path: path)
-        break if !test.validate!
+        imap_path = "#{path}.imap"
+        mbox_path = "#{path}.mbox"
+        break if !File.exist?(imap_path) && !File.exist?(mbox_path)
 
         digit += 1
       end
