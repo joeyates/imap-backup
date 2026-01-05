@@ -25,7 +25,7 @@ module Imap::Backup
       end
 
       Serializer::FolderMaker.new(
-        folder_path: files_path,
+        files_path: files_path,
         permissions: Serializer::Directory::DIRECTORY_PERMISSIONS
       ).run
     end

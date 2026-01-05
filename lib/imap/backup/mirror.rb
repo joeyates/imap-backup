@@ -106,7 +106,7 @@ module Imap::Backup
     end
 
     def map_pathname
-      "#{serializer.folder_path}.mirror"
+      "#{serializer.files_path}.mirror"
     end
 
     def destination_email

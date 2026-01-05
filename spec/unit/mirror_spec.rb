@@ -11,7 +11,7 @@ module Imap::Backup
     let(:serializer) do
       instance_double(
         Serializer,
-        folder_path: "/tmp/source",
+        files_path: "files_path",
         uid_validity: 10,
         uids: source_uids,
         get: serializer_message

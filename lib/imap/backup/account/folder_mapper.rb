@@ -3,6 +3,7 @@ require "pathname"
 
 require "imap/backup/account/folder"
 require "imap/backup/serializer"
+require "imap/backup/serializer/files/path"
 
 module Imap; end
 
@@ -44,7 +45,10 @@ module Imap::Backup
       glob = File.join(source_local_path, "**", "*.imap")
       Pathname.glob(glob) do |path|
         name = source_folder_name(path)
-        serializer = Serializer.new(source_local_path, name)
+        path = Serializer::Files::Path.new(
+          base_path: source_local_path, folder_name: name
+        )
+        serializer = Serializer.new(files_path: path)
         folder = destination_folder_for_path(name)
         block.call(serializer, folder)
       end

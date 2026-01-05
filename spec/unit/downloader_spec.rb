@@ -1,5 +1,8 @@
 require "imap/backup/downloader"
 
+require "imap/backup/account/folder"
+require "imap/backup/serializer"
+
 require "ostruct"
 
 module Imap::Backup

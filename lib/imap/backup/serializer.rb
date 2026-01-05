@@ -23,11 +23,10 @@ module Imap::Backup
       mbox
       check_integrity!
       delete
-      folder_path
+      files_path
       get
       messages
       reload
-      sanitized
       update
       update_uid
       uid_validity
@@ -35,17 +34,21 @@ module Imap::Backup
       validate!
     ]
 
-    # @return [String] a folder name
-    attr_reader :folder
-    # @return [String] an account's backup path
-    attr_reader :path
+    # @return [Serializer::Files::Path] The path of the folder
+    attr_reader :files_path
 
-    # @param path [String] an account's backup path
-    # @param folder [String] a folder name
-    def initialize(path, folder)
-      @path = path
-      @folder = folder
+    # @param files_path [Serializer::Files::Path] the path of the folder
+    def initialize(files_path:)
+      @files_path = files_path
       @validated = nil
+    end
+
+    def folder
+      files_path.folder_name
+    end
+
+    def path
+      files_path.base_path
     end
 
     # Calls the supplied block without implementing transactional behaviour.
@@ -72,8 +75,6 @@ module Imap::Backup
     #
     # @return [String, nil] The name of the new folder
     def apply_uid_validity(value)
-      files.validate!
-
       case
       when uid_validity.nil?
         internal_force_uid_validity(value)
@@ -105,7 +106,7 @@ module Imap::Backup
     def append(uid, message, flags)
       files.validate!
 
-      appender = Serializer::Appender.new(folder: sanitized, imap: imap, mbox: mbox)
+      appender = Serializer::Appender.new(imap: imap, mbox: mbox)
       appender.append(uid: uid, message: message, flags: flags)
     end
 
@@ -130,10 +131,9 @@ module Imap::Backup
     # @return [void]
     def filter(&block)
       temp_name = Serializer::UnusedNameFinder.new(serializer: self).run
-      temp_path = Serializer::Files::Path.new(base_path: path, folder_name: temp_name)
-      temp_folder_path = temp_path.to_s
-      new_mbox = Serializer::Mbox.new(temp_folder_path)
-      new_imap = Serializer::Imap.new(temp_folder_path)
+      temp_files_path = Serializer::Files::Path.new(base_path: path, folder_name: temp_name)
+      new_mbox = Serializer::Mbox.new(files_path: temp_files_path)
+      new_imap = Serializer::Imap.new(files_path: temp_files_path)
       new_imap.uid_validity = imap.uid_validity
       appender = Serializer::Appender.new(folder: temp_name, imap: new_imap, mbox: new_mbox)
       enumerator = Serializer::MessageEnumerator.new(imap: imap)
@@ -141,8 +141,8 @@ module Imap::Backup
         keep = block.call(message)
         appender.append(uid: message.uid, message: message.body, flags: message.flags) if keep
       end
-      imap_folder_path = imap.folder_path
-      mbox_folder_path = mbox.folder_path
+      imap_folder_path = imap.files_path
+      mbox_folder_path = mbox.files_path
       files.delete
       new_imap.rename imap_folder_path
       new_mbox.rename mbox_folder_path
@@ -151,7 +151,7 @@ module Imap::Backup
     private
 
     def files
-      @files ||= Serializer::Files.new(path: path, folder: folder)
+      @files ||= Serializer::Files.new(files_path: files_path)
     end
 
     def internal_force_uid_validity(value)

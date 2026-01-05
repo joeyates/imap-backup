@@ -1,6 +1,7 @@
 require "imap/backup/account/folder"
 require "imap/backup/logger"
 require "imap/backup/serializer"
+require "imap/backup/serializer/files/path"
 
 module Imap; end
 
@@ -77,7 +78,10 @@ module Imap::Backup
       )
       @folder = Account::Folder.new(folder.client, new_name)
       folder.create
-      @serializer = Serializer.new(serializer.path, new_name)
+      path = Serializer::Files::Path.new(
+        base_path: serializer.path, folder_name: new_name
+      )
+      @serializer = Serializer.new(files_path: path)
       serializer.force_uid_validity(@folder.uid_validity)
     end
   end

@@ -7,6 +7,7 @@ require "imap/backup/cli/helpers"
 require "imap/backup/logger"
 require "imap/backup/serializer"
 require "imap/backup/thunderbird/mailbox_exporter"
+require "imap/backup/serializer/files/path"
 
 module Imap; end
 
@@ -103,7 +104,10 @@ module Imap::Backup
       backup_folders.each do |folder|
         next if !folder.exist?
 
-        serializer = Serializer.new(account.local_path, folder.name)
+        path = Serializer::Files::Path.new(
+          base_path: account.local_path, folder_name: folder.name
+        )
+        serializer = Serializer.new(files_path: path)
         ignore_folder_history(folder, serializer)
       end
     end

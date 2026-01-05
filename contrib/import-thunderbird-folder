@@ -18,6 +18,7 @@ end
 require "imap/backup/logger"
 require "imap/backup/configuration"
 require "imap/backup/serializer"
+require "imap/backup/serializer/files/path"
 require "thunderbird/mbox"
 
 class Options
@@ -79,7 +80,10 @@ raise "No account found for email address '#{options.email}'" if account.nil?
 
 mbox = Thunderbird::Mbox.new(path: options.mbox_path)
 
-serializer = Imap::Backup::Serializer.new(account.local_path, options.folder)
+path = Imap::Backup::Serializer::Files::Path.new(
+  base_path: account.local_path, folder_name: options.folder
+)
+serializer = Imap::Backup::Serializer.new(files_path: path)
 serializer.force_uid_validity(mbox.uid_validity)
 
 mbox.each do |id, message|

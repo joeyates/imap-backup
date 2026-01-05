@@ -104,11 +104,11 @@ module Imap::Backup
     end
 
     def mbox
-      @mbox ||= Serializer::Mbox.new(serializer.folder_path)
+      @mbox ||= Serializer::Mbox.new(files_path: serializer.files_path)
     end
 
     def imap
-      @imap ||= Serializer::Imap.new(serializer.folder_path)
+      @imap ||= Serializer::Imap.new(files_path: serializer.files_path)
     end
 
     def tsx

@@ -1,4 +1,5 @@
 require "imap/backup/serializer"
+require "imap/backup/serializer/files/path"
 
 module Imap; end
 
@@ -21,7 +22,10 @@ module Imap::Backup
       loop do
         extra = digit.zero? ? "" : "-#{digit}"
         folder = "#{serializer.folder}-#{serializer.uid_validity}#{extra}"
-        test = Serializer.new(serializer.path, folder)
+        path = Serializer::Files::Path.new(
+          base_path: serializer.path, folder_name: folder
+        )
+        test = Serializer.new(files_path: path)
         break if !test.validate!
 
         digit += 1

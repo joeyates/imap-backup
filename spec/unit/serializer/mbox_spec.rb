@@ -2,10 +2,10 @@ require "imap/backup/serializer/mbox"
 
 module Imap::Backup
   RSpec.describe Serializer::Mbox do
-    subject { described_class.new(folder_path) }
+    subject { described_class.new(files_path: files_path) }
 
-    let(:folder_path) { "folder_path" }
-    let(:pathname) { "folder_path.mbox" }
+    let(:files_path) { "files_path" }
+    let(:pathname) { "files_path.mbox" }
     let(:exists) { true }
     let(:file) { instance_double(File, truncate: nil, write: nil) }
     let(:stat) { instance_double(File::Stat, size: 99) }
@@ -85,8 +85,8 @@ module Imap::Backup
     end
 
     describe "#pathname" do
-      it "is the folder_path plus .mbox" do
-        expect(subject.pathname).to eq("folder_path.mbox")
+      it "is the files_path plus .mbox" do
+        expect(subject.pathname).to eq("files_path.mbox")
       end
     end
 
@@ -126,18 +126,18 @@ module Imap::Backup
           expect(File).to have_received(:rename)
         end
 
-        it "sets the folder_path" do
-          expect(subject.folder_path).to eq("new_name")
+        it "sets the files_path" do
+          expect(subject.files_path).to eq("new_name")
         end
       end
 
       context "when the mailbox doesn't exist" do
         let(:exists) { false }
 
-        it "sets the folder_path" do
+        it "sets the files_path" do
           subject.rename("new_name")
 
-          expect(subject.folder_path).to eq("new_name")
+          expect(subject.files_path).to eq("new_name")
         end
       end
     end

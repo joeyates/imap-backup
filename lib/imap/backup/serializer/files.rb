@@ -12,40 +12,27 @@ module Imap::Backup
   class Serializer::Files
     extend Forwardable
 
-    def_delegator :mbox, :pathname, :mbox_pathname
     def_delegator :imap, :update
 
-    def initialize(path:, folder:)
-      @path = path
-      @folder = folder
+    def initialize(files_path:)
+      @files_path = files_path
       @directory_ensured = false
       @imap = nil
       @mbox = nil
-      @folder_path = nil
       @sanitized = nil
-    end
-
-    def sanitized
-      @sanitized ||= Naming.to_local_path(folder)
-    end
-
-    def folder_path
-      @folder_path ||= Serializer::Files::Path.new(
-        base_path: path, folder_name: sanitized
-      ).to_s
     end
 
     def imap
       @imap ||= begin
         ensure_directory
-        Serializer::Imap.new(folder_path)
+        Serializer::Imap.new(files_path: sanitized_path)
       end
     end
 
     def mbox
       @mbox ||= begin
         ensure_directory
-        Serializer::Mbox.new(folder_path)
+        Serializer::Mbox.new(files_path: sanitized_path)
       end
     end
 
@@ -107,13 +94,13 @@ module Imap::Backup
 
     def rename(new_name)
       destination = Serializer::Files::Path.new(
-        base_path: path, folder_name: new_name
+        base_path: files_path.base_path, folder_name: new_name
       ).to_s
       relative = File.dirname(new_name)
       directory_path = Serializer::Files::Path.new(
-        base_path: path, folder_name: relative
+        base_path: files_path.base_path, folder_name: relative
       )
-      directory = Serializer::Directory.new(folder_path: directory_path)
+      directory = Serializer::Directory.new(files_path: directory_path)
       directory.ensure_exists
       mbox.rename destination
       imap.rename destination
@@ -143,19 +130,24 @@ module Imap::Backup
 
     private
 
-    attr_reader :folder
-    attr_reader :path
+    attr_reader :files_path
 
     def ensure_directory
       return if @directory_ensured
 
-      relative = File.dirname(sanitized)
-      directory_path = Serializer::Files::Path.new(
-        base_path: path, folder_name: relative
-      )
-      directory = Serializer::Directory.new(folder_path: directory_path)
-      directory.ensure_exists
+      Serializer::Directory.new(files_path: sanitized_path).ensure_exists
+
       @directory_ensured = true
+    end
+
+    def sanitized
+      @sanitized ||= Naming.to_local_path(files_path.folder_name)
+    end
+
+    def sanitized_path
+      @sanitized_path ||= Serializer::Files::Path.new(
+        base_path: files_path.base_path, folder_name: sanitized
+      )
     end
   end
 end

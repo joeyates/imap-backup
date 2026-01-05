@@ -2,14 +2,21 @@ require "imap/backup/serializer/files"
 
 module Imap::Backup
   RSpec.describe Serializer::Files do
-    subject { described_class.new(path: "/path/to/backup", folder: "INBOX") }
+    subject { described_class.new(files_path: path) }
 
+    let(:path) do
+      instance_double(
+        Serializer::Files::Path,
+        base_path: "/path/to/backup",
+        folder_name: "INBOX"
+      )
+    end
     let(:directory) { instance_double(Serializer::Directory, ensure_exists: true) }
     let(:imap) { instance_double(Serializer::Imap, valid?: true) }
     let(:mbox) { instance_double(Serializer::Mbox, valid?: true) }
 
     before do
-      allow(Serializer::Directory).to receive(:new) { directory}
+      allow(Serializer::Directory).to receive(:new) { directory }
       allow(Serializer::Imap).to receive(:new) { imap }
       allow(Serializer::Mbox).to receive(:new) { mbox }
     end

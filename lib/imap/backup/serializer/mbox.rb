@@ -8,11 +8,11 @@ module Imap::Backup
   # Stores messages
   class Serializer::Mbox
     # @return [String] The path of the mailbox file, without the '.mbox' extension
-    attr_reader :folder_path
+    attr_reader :files_path
 
-    # @param folder_path [String] The path of the mailbox file, without the '.mbox' extension
-    def initialize(folder_path)
-      @folder_path = folder_path
+    # @param files_path [String] The path of the mailbox file, without the '.mbox' extension
+    def initialize(files_path:)
+      @files_path = files_path
       @tsx = nil
     end
 
@@ -89,7 +89,7 @@ module Imap::Backup
 
     # @return [String] The full path name of the mailbox
     def pathname
-      "#{folder_path}.mbox"
+      "#{files_path}.mbox"
     end
 
     # Renames the mailbox, if it exists,
@@ -99,10 +99,10 @@ module Imap::Backup
     def rename(new_path)
       if exist?
         old_pathname = pathname
-        @folder_path = new_path
+        @files_path = new_path
         File.rename(old_pathname, pathname)
       else
-        @folder_path = new_path
+        @files_path = new_path
       end
     end
 

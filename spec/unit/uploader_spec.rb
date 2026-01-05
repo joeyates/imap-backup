@@ -112,6 +112,11 @@ module Imap::Backup
             uid_validity: "new uid validity"
           )
         end
+        let(:new_files_path) do
+          instance_double(
+            Serializer::Files::Path, "New Files Path"
+          )
+        end
         let(:updated_serializer) do
           instance_double(
             Serializer, "Updated Serializer",
@@ -123,8 +128,12 @@ module Imap::Backup
         before do
           allow(Account::Folder).to receive(:new).
             with(folder.client, "new name") { renamed_folder }
+          allow(Serializer::Files::Path).to receive(:new).
+            with(
+              base_path: "local/account/path", folder_name: "new name"
+            ) { new_files_path }
           allow(Serializer).to receive(:new).
-            with(serializer.path, "new name") { updated_serializer }
+            with(files_path: new_files_path) { updated_serializer }
         end
 
         it "creates the new folder" do
