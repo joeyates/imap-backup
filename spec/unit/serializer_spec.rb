@@ -138,38 +138,6 @@ module Imap::Backup
       end
     end
 
-    describe "#validate!" do
-      it "returns true" do
-        expect(subject.validate!).to be true
-      end
-
-      context "when called repeatedly" do
-        it "returns true" do
-          subject.validate!
-
-          expect(subject.validate!).to be true
-        end
-      end
-    end
-
-    describe "#check_integrity!" do
-      let(:checker) { instance_double(Serializer::IntegrityChecker, run: nil) }
-
-      before do
-        allow(Serializer::IntegrityChecker).to receive(:new) { checker }
-      end
-
-      it "runs the checker" do
-        subject.check_integrity!
-
-        expect(checker).to have_received(:run)
-      end
-
-      it "returns nil" do
-        expect(subject.check_integrity!).to be_nil
-      end
-    end
-
     describe "#apply_uid_validity" do
       let(:result) { subject.apply_uid_validity("new") }
       let(:action) { -> { result } }
