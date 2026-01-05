@@ -3,7 +3,7 @@ require "imap/backup/serializer/directory"
 require "imap/backup/serializer/imap"
 require "imap/backup/serializer/integrity_checker"
 require "imap/backup/serializer/mbox"
-require "imap/backup/serializer/path"
+require "imap/backup/serializer/files/path"
 
 module Imap; end
 
@@ -30,7 +30,9 @@ module Imap::Backup
     end
 
     def folder_path
-      @folder_path ||= Serializer::Path.from(path: path, folder: sanitized)
+      @folder_path ||= Serializer::Files::Path.new(
+        base_path: path, folder_name: sanitized
+      ).to_s
     end
 
     def imap
@@ -104,9 +106,14 @@ module Imap::Backup
     end
 
     def rename(new_name)
-      destination = Serializer::Path.from(path: path, folder: new_name)
+      destination = Serializer::Files::Path.new(
+        base_path: path, folder_name: new_name
+      ).to_s
       relative = File.dirname(new_name)
-      directory = Serializer::Directory.new(path, relative)
+      directory_path = Serializer::Files::Path.new(
+        base_path: path, folder_name: relative
+      )
+      directory = Serializer::Directory.new(folder_path: directory_path)
       directory.ensure_exists
       mbox.rename destination
       imap.rename destination
@@ -143,7 +150,10 @@ module Imap::Backup
       return if @directory_ensured
 
       relative = File.dirname(sanitized)
-      directory = Serializer::Directory.new(path, relative)
+      directory_path = Serializer::Files::Path.new(
+        base_path: path, folder_name: relative
+      )
+      directory = Serializer::Directory.new(folder_path: directory_path)
       directory.ensure_exists
       @directory_ensured = true
     end

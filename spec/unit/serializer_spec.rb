@@ -60,7 +60,10 @@ module Imap::Backup
 
         expect(Serializer::Directory).
           to have_received(:new).
-          with(anything, "a%3a;b").
+          with(folder_path: have_attributes(
+            base_path: "serializer_path",
+            folder_name: "a%3a;b"
+          )).
           at_least(:once)
       end
     end

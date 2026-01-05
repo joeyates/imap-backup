@@ -2,7 +2,7 @@ require "os"
 
 require "imap/backup/file_mode"
 require "imap/backup/serializer/folder_maker"
-require "imap/backup/serializer/path"
+require "imap/backup/serializer/files/path"
 
 module Imap; end
 
@@ -14,22 +14,21 @@ module Imap::Backup
     # The desired permissions for all directories that store backups
     DIRECTORY_PERMISSIONS = 0o700
 
-    # @param path [String] The base path of the account backup
-    # @param relative [String] The path relative from the base
+    # @param files_path [Serializer::Files::Path] path components for the directory
     #
     # @return [void]
-    def initialize(path, relative)
-      @path = path
-      @relative = relative
+    def initialize(files_path:)
+      @files_path = files_path
     end
 
     # Creates the directory, if present and sets it's access permissions
     #
     # @return [void]
     def ensure_exists
+      full_path = files_path.to_s
       if !File.directory?(full_path)
         Serializer::FolderMaker.new(
-          base: path, path: relative, permissions: DIRECTORY_PERMISSIONS
+          files_path: files_path, permissions: DIRECTORY_PERMISSIONS
         ).run
       end
 
@@ -41,11 +40,6 @@ module Imap::Backup
 
     private
 
-    attr_reader :relative
-    attr_reader :path
-
-    def full_path
-      Serializer::Path.from(path: path, folder: relative)
-    end
+    attr_reader :files_path
   end
 end

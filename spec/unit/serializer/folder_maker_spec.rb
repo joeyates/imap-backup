@@ -2,12 +2,15 @@ require "imap/backup/serializer/folder_maker"
 
 module Imap::Backup
   RSpec.describe Serializer::FolderMaker do
-    subject { described_class.new(base: base, path: path, permissions: permissions) }
+    subject { described_class.new(files_path: files_path, permissions: permissions) }
 
     let(:base) { "base" }
     let(:path) { "sub/path" }
+    let(:files_path) do
+      Serializer::Files::Path.new(base_path: base, folder_name: path)
+    end
     let(:permissions) { 0o222 }
-    let(:full_path) { File.join(base, path) }
+    let(:full_path) { files_path.to_s }
     let(:exists) { false }
 
     before do
@@ -21,14 +24,14 @@ module Imap::Backup
     it "creates the path" do
       subject.run
 
-      expect(FileUtils).to have_received(:mkdir_p).with("base/sub/path")
+      expect(FileUtils).to have_received(:mkdir_p).with(full_path)
     end
 
     it "sets permissions on the path" do
       subject.run
 
       expect(FileUtils).to have_received(:chmod).with(0o222, "base/sub")
-      expect(FileUtils).to have_received(:chmod).with(0o222, "base/sub/path")
+      expect(FileUtils).to have_received(:chmod).with(0o222, full_path)
     end
 
     context "when an empty path is supplied" do

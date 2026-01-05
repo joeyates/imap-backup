@@ -1,5 +1,6 @@
 require "imap/backup/serializer/directory"
 require "imap/backup/serializer/folder_maker"
+require "imap/backup/serializer/files/path"
 
 module Imap; end
 
@@ -13,15 +14,18 @@ module Imap::Backup
       @account = account
     end
 
-    # Creates the account's base directory and sets its permissions
+    # Ensures the account's base directory exists and sets its permissions
     # @raise [RuntimeError] is the account's backup path is not set
     # @return [void]
     def run
       raise "The backup path for #{account.username} is not set" if !account.local_path
 
+      if !parent_exists?
+        raise "The backup path's parent directory '#{files_path.base_path}' does not exist"
+      end
+
       Serializer::FolderMaker.new(
-        base: File.dirname(account.local_path),
-        path: File.basename(account.local_path),
+        folder_path: files_path,
         permissions: Serializer::Directory::DIRECTORY_PERMISSIONS
       ).run
     end
@@ -29,5 +33,20 @@ module Imap::Backup
     private
 
     attr_reader :account
+
+    def files_path
+      @files_path ||= begin
+        base_path = File.dirname(account.local_path)
+        folder_name = File.basename(account.local_path)
+        Serializer::Files::Path.new(
+          base_path: base_path,
+          folder_name: folder_name
+        )
+      end
+    end
+
+    def parent_exists?
+      File.directory?(files_path.base_path)
+    end
   end
 end

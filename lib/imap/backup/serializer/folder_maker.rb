@@ -1,5 +1,5 @@
 require "fileutils"
-require "imap/backup/serializer/path"
+require "imap/backup/serializer/files/path"
 
 module Imap; end
 
@@ -8,12 +8,10 @@ module Imap::Backup
 
   # Creates directories
   class Serializer::FolderMaker
-    # @param base [String] The base directory of the account
-    # @param path [String] The path to the folder, relative to the base
+    # @param files_path [Serializer::Files::Path] the folder path components
     # @param permissions [Integer] The permissions to set on the folder
-    def initialize(base:, path:, permissions:)
-      @base = base
-      @path = path
+    def initialize(files_path:, permissions:)
+      @files_path = files_path
       @permissions = permissions
     end
 
@@ -21,11 +19,11 @@ module Imap::Backup
     # ensuring the desired permissions.
     # @return [void]
     def run
-      parts = path.split("/")
+      parts = files_path.folder_name.split("/")
       return if parts.empty?
 
-      FileUtils.mkdir_p(full_path)
-      full = base
+      FileUtils.mkdir_p(files_path.to_s)
+      full = files_path.base_path
       parts.each do |part|
         full = File.join(full, part)
         FileUtils.chmod permissions, full
@@ -34,12 +32,7 @@ module Imap::Backup
 
     private
 
-    attr_reader :base
-    attr_reader :path
+    attr_reader :files_path
     attr_reader :permissions
-
-    def full_path
-      Serializer::Path.from(path: base, folder: path)
-    end
   end
 end

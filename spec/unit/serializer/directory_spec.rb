@@ -2,15 +2,18 @@ require "imap/backup/serializer/directory"
 
 module Imap::Backup
   RSpec.describe Serializer::Directory do
-    subject { described_class.new("directory_path", "relative") }
+    subject { described_class.new(files_path: files_path) }
 
+    let(:files_path) do
+      Serializer::Files::Path.new(base_path: "directory_path", folder_name: "relative")
+    end
     let(:windows) { false }
     let(:file_mode) { instance_double(FileMode, mode: 0o600) }
     let(:folder_maker) { instance_double(Serializer::FolderMaker, run: nil) }
     let(:exists) { true }
 
     before do
-      allow(File).to receive(:directory?).with(/relative/) { exists }
+      allow(File).to receive(:directory?).with(files_path.to_s) { exists }
       allow(Serializer::FolderMaker).to receive(:new) { folder_maker }
       allow(OS).to receive(:windows?) { windows }
       allow(FileMode).to receive(:new) { file_mode }
