@@ -167,7 +167,7 @@ module Imap::Backup
       context "when the new value is different from the old value" do
         let(:existing_uid_validity) { "existing" }
         let(:unused_name_finder) { instance_double(Serializer::UnusedNameFinder, run: "new_name") }
-        let(:new_folder_path) { File.expand_path(File.join("serializer_path/new_name")) }
+        let(:new_folder_path) { "serializer_path/new_name" }
 
         before do
           allow(Serializer::UnusedNameFinder).to receive(:new) { unused_name_finder }

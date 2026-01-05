@@ -39,7 +39,7 @@ module Imap::Backup
     attr_reader :permissions
 
     def full_path
-      Serializer::Path.from(path: base, folder: path, expand: false)
+      Serializer::Path.from(path: base, folder: path)
     end
   end
 end

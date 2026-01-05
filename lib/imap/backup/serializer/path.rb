@@ -5,11 +5,8 @@ module Imap::Backup
     module Path
       module_function
 
-      def from(path:, folder:, expand: true)
-        relative = File.join(path, folder)
-        return relative if !expand
-
-        File.expand_path(relative)
+      def from(path:, folder:)
+        File.join(path, folder)
       end
     end
   end
