@@ -28,7 +28,11 @@ module Imap::Backup
         Account::FolderEnsurer.new(account: account).run
       end
 
-      lockfile.with_lock do
+      begin
+        lockfile.with_lock do
+          block.call
+        end
+      rescue Lockfile::ProcessStartTimeUnavailableError
         block.call
       end
     end

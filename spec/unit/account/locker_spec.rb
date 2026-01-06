@@ -94,6 +94,18 @@ module Imap
             end.to raise_error("Lockfile '#{account.lockfile_path}' exists and is not stale.")
           end
         end
+
+        context "when the process start time is unavailable" do
+          it "calls the supplied block" do
+            allow(lockfile).to receive(:with_lock).
+              and_raise(Lockfile::ProcessStartTimeUnavailableError)
+
+            yielded = false
+            subject.with_lock { yielded = true }
+
+            expect(yielded).to be true
+          end
+        end
       end
     end
   end

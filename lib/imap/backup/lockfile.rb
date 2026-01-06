@@ -7,6 +7,7 @@ module Imap::Backup
   class Lockfile
     # An error that is thrown if a lockfile already exists
     class LockfileExistsError < StandardError; end
+    class ProcessStartTimeUnavailableError < StandardError; end
 
     attr_reader :path
 
@@ -53,7 +54,9 @@ module Imap::Backup
 
       return true if proc_table_entry.nil?
 
-      proc_table_entry.starttime != starttime
+      other_starttime = starttime(proc_table_entry)
+
+      other_starttime != starttime
     end
 
     private
@@ -62,9 +65,11 @@ module Imap::Backup
       pid = Process.pid
       proc_table_entry = Sys::ProcTable.ps(pid: pid)
 
-      raise "Unable to get process info for PID #{pid}" if proc_table_entry.nil?
+      if proc_table_entry.nil?
+        raise ProcessStartTimeUnavailableError, "Unable to get process info for PID #{pid}"
+      end
 
-      starttime = proc_table_entry.starttime
+      starttime = starttime(proc_table_entry)
 
       data = {
         pid: pid,
@@ -73,6 +78,17 @@ module Imap::Backup
 
       json_data = JSON.generate(data)
       File.write(path, json_data)
+    end
+
+    def starttime(proc_table_entry)
+      case
+      when proc_table_entry.respond_to?(:starttime)
+        proc_table_entry.starttime
+      when proc_table_entry.respond_to?(:start_tvsec)
+        proc_table_entry.start_tvsec
+      else
+        raise ProcessStartTimeUnavailableError, "Proctable entry structure unknown"
+      end
     end
   end
 end
