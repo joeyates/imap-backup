@@ -30,6 +30,19 @@ jobs:
         bundler-cache: true
     - name: Run the default task
       run: bundle exec rake test
+    - name: Read Coverage
+      run: |
+        echo "COVERAGE=$(cat coverage/coverage_percent.txt)%" >> $GITHUB_ENV
+    - name: Create Coverage Badge
+      if: ${{ matrix.ruby == '4.0' }}
+      uses: schneegans/dynamic-badges-action@v1.7.0
+      with:
+        auth: ${{ secrets.BADGES_GIST_ACCESS }}
+        gistID: ${{ vars.IMAP_BACKUP_COVERAGE_GIST_ID }}
+        filename: coverage.json
+        label: Coverage
+        message: ${{ env.COVERAGE }}
+        color: brightgreen
 
     services:
       imap:
