@@ -7,7 +7,14 @@ module Imap::Backup
     let(:lockfile_path) { "test.lock" }
     # We don't mock Process.pid because we want to use the real value in Process.kill
     let(:pid) { Process.pid }
-    let(:proc_info) { instance_double(Struct::ProcTableStruct, starttime: starttime) }
+    let(:proc_info) do
+      case RUBY_PLATFORM
+      when /darwin/
+        instance_double(Struct::ProcTableStruct, start_tvsec: starttime)
+      else
+        instance_double(Struct::ProcTableStruct, starttime: starttime)
+      end
+    end
     let(:starttime) { 456 }
 
     before do
@@ -42,6 +49,16 @@ module Imap::Backup
           expect do
             subject.with_lock {}
           end.to raise_error("Lockfile already exists at #{lockfile_path}")
+        end
+      end
+
+      context "when starttime is not available" do
+        let(:proc_info) { "Unknown platform's proc info" }
+
+        it "raises" do
+          expect do
+            subject.with_lock {}
+          end.to raise_error(Lockfile::ProcessStartTimeUnavailableError)
         end
       end
 
@@ -140,7 +157,14 @@ module Imap::Backup
         end
 
         context "when the PID exists with a different starttime" do
-          let(:other_proc_info) { instance_double(Struct::ProcTableStruct, starttime: starttime + 1) }
+          let(:other_proc_info) do
+            case RUBY_PLATFORM
+            when /darwin/
+              instance_double(Struct::ProcTableStruct, start_tvsec: starttime + 1)
+            else
+              instance_double(Struct::ProcTableStruct, starttime: starttime + 1)
+            end
+          end
 
           before do
             allow(Sys::ProcTable).to receive(:ps).with(pid: pid) { other_proc_info }
