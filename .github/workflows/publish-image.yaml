@@ -33,12 +33,13 @@ jobs:
         with:
           image: ${{ env.IMAGE_NAME }}
           tags: latest ${{ github.sha }} ${{ env.GIT_TAG }}
+          labels: |
+            ${{ env.IMAGE_NAME }}:latest
+            org.opencontainers.image.description="A tool to back up and sync IMAP accounts"
           extra-args: |
             --ignorefile ./container/.containerignore
           containerfiles: |
             ./container/Containerfile
-          labels: |
-            ${{ env.IMAGE_NAME }}:latest
 
       # Check that imap-backup runs
       - name: Test Image
