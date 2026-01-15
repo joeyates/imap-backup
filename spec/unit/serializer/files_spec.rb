@@ -1,3 +1,4 @@
+require "imap/backup/serializer/directory_maker"
 require "imap/backup/serializer/files"
 require "imap/backup/serializer/message"
 require "imap/backup/serializer/message_enumerator"
@@ -51,7 +52,7 @@ module Imap::Backup
     it "ensures the folder's containing directory exists" do
       action.call
 
-      expect(directory).to have_received(:ensure_exists).at_least(:once)
+      expect(directory_maker).to have_received(:run).at_least(:once)
     end
 
     context "when the directory contains invalid characters" do
@@ -76,7 +77,7 @@ module Imap::Backup
       it "creates it using valid characters" do
         action.call
 
-        expect(Serializer::Directory).
+        expect(Serializer::DirectoryMaker).
           to have_received(:new).
           with(files_path: sanitized_files_path).
           at_least(:once)
@@ -122,18 +123,31 @@ module Imap::Backup
 
     let(:files_path) do
       instance_double(
-        Serializer::Files::Path, "Files::Path",
+        Serializer::Files::Path, "Supplied",
         base_path: "serializer_path",
         folder_name: folder_name
       )
     end
-    let(:directory) { instance_double(Serializer::Directory, ensure_exists: true) }
+    let(:sanitized_files_path) do
+      instance_double(
+        Serializer::Files::Path, "Sanitized",
+        base_path: "serializer_path",
+        folder_name: sanitized_name
+      )
+    end
+    let(:directory_maker) { instance_double(Serializer::DirectoryMaker, run: true) }
     let(:imap) { instance_double(Serializer::Imap, valid?: true) }
     let(:mbox) { instance_double(Serializer::Mbox, valid?: true) }
-    let(:folder_name) { "INBOX/subfolder" }
+    let(:folder_name) { "INBOX/sub:folder" }
+    let(:sanitized_name) { "INBOX/sub%3a;folder" }
 
     before do
-      allow(Serializer::Directory).to receive(:new) { directory }
+      allow(Serializer::Files::Path).to receive(:new).with(
+        base_path: "serializer_path", folder_name: sanitized_name
+      ) { sanitized_files_path }
+      allow(Serializer::DirectoryMaker).to receive(:new).with(
+        files_path: sanitized_files_path
+      ) { directory_maker }
       allow(Serializer::Imap).to receive(:new) { imap }
       allow(Serializer::Mbox).to receive(:new) { mbox }
     end

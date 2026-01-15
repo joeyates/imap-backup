@@ -13,25 +13,26 @@ module Imap::Backup
     end
 
     # Finds the name
-    # @return [String] the name
+    # @return [Serializer::Files::Path] the unused folder name
     def run
       digit = 0
-      folder = nil
+      files_path = nil
 
       loop do
         extra = digit.zero? ? "" : "-#{digit}"
-        folder = "#{serializer.folder}-#{serializer.uid_validity}#{extra}"
-        path = Serializer::Files::Path.new(
-          base_path: serializer.path, folder_name: folder
+        folder = "#{serializer.files_path.folder_name}-#{serializer.uid_validity}#{extra}"
+        files_path = Serializer::Files::Path.new(
+          base_path: serializer.files_path.base_path,
+          folder_name: folder
         )
-        imap_path = "#{path}.imap"
-        mbox_path = "#{path}.mbox"
+        imap_path = "#{files_path}.imap"
+        mbox_path = "#{files_path}.mbox"
         break if !File.exist?(imap_path) && !File.exist?(mbox_path)
 
         digit += 1
       end
 
-      folder
+      files_path
     end
 
     private

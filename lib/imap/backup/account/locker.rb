@@ -1,4 +1,3 @@
-require "imap/backup/account/folder_ensurer"
 require "imap/backup/lockfile"
 
 module Imap; end
@@ -25,7 +24,7 @@ module Imap::Backup
         Logger.logger.info("Stale lockfile '#{account.lockfile_path}' found. Removing it.")
         lockfile.remove
       else
-        Account::FolderEnsurer.new(account: account).run
+        Serializer::DirectoryMaker.new(files_path: account.files_path).run
       end
 
       begin

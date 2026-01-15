@@ -3,8 +3,6 @@ require "imap/backup/account/backup"
 require "imap/backup/account/locker"
 require "imap/backup/client/default"
 require "imap/backup/downloader"
-require "imap/backup/flag_refresher"
-require "imap/backup/local_only_message_deleter"
 require "imap/backup/serializer"
 
 module Imap::Backup
@@ -16,10 +14,9 @@ module Imap::Backup
         Account,
         username: "username",
         client: client,
-        local_path: "local_path",
+        files_path: files_path,
         lockfile_path: "lockfile_path",
         mirror_mode: mirror_mode,
-        multi_fetch_size: 42,
         download_strategy: "direct",
         reset_seen_flags_after_fetch: reset_seen_flags_after_fetch
       )
@@ -27,7 +24,6 @@ module Imap::Backup
     let(:backup_folders) { instance_double(Account::BackupFolders, to_a: backup_folders_result) }
     let(:backup_folders_result) { [folder] }
     let(:client) { instance_double(Client::Default, login: nil) }
-    let(:downloader) { instance_double(Downloader, run: nil) }
     let(:folder) do
       instance_double(
         Account::Folder,
@@ -42,28 +38,29 @@ module Imap::Backup
     let(:reset_seen_flags_after_fetch) { false }
     let(:flag_refresher) { instance_double(FlagRefresher, run: nil) }
     let(:local_only_folder_deleter) { instance_double(Account::LocalOnlyFolderDeleter, run: nil) }
-    let(:local_only_message_deleter) { instance_double(LocalOnlyMessageDeleter, run: nil) }
-    let(:folder_ensurer) { instance_double(Account::FolderEnsurer, run: nil) }
     let(:serializer) { instance_double(Serializer, apply_uid_validity: nil) }
     let(:locker) { instance_double(Account::Locker, with_lock: nil) }
+    let(:directory_maker) { instance_double(Serializer::DirectoryMaker, run: nil) }
+    let(:files_path) { instance_double(Serializer::Files::Path, base_path: "local_path", folder_name: nil) }
+    let(:folder_backup) { instance_double(Account::FolderBackup, run: nil) }
 
     before do
-      allow(Downloader).to receive(:new) { downloader }
       allow(Account::BackupFolders).to receive(:new) { backup_folders }
-      allow(FlagRefresher).to receive(:new) { flag_refresher }
+      allow(Account::FolderBackup).to receive(:new) { folder_backup }
       allow(Account::LocalOnlyFolderDeleter).to receive(:new) { local_only_folder_deleter }
-      allow(LocalOnlyMessageDeleter).to receive(:new) { local_only_message_deleter }
-      allow(Account::FolderEnsurer).to receive(:new) { folder_ensurer }
-      allow(Serializer).to receive(:new) { serializer }
-      allow(serializer).to receive(:transaction).and_yield
       allow(Account::Locker).to receive(:new).with(account: account) { locker }
+      allow(Downloader).to receive(:new) { downloader }
+      allow(LocalOnlyMessageDeleter).to receive(:new) { local_only_message_deleter }
+      allow(Serializer).to receive(:new) { serializer }
+      allow(Serializer::DirectoryMaker).to receive(:new) { directory_maker }
+      allow(serializer).to receive(:transaction).and_yield
       allow(locker).to receive(:with_lock).and_yield
     end
 
     it "ensures the backup directory exists" do
-      subject.run
+      expect(directory_maker).to receive(:run)
 
-      expect(folder_ensurer).to have_received(:run)
+      subject.run
     end
 
     it "locks the account during backup" do
@@ -72,35 +69,16 @@ module Imap::Backup
       expect(locker).to have_received(:with_lock)
     end
 
-    it "runs the downloader" do
+    it "runs folder backups" do
       subject.run
 
-      expect(downloader).to have_received(:run)
+      expect(folder_backup).to have_received(:run)
     end
 
     it "doesn't delete unwanted local folders" do
       subject.run
 
       expect(local_only_folder_deleter).to_not have_received(:run)
-    end
-
-    it "doesn't delete unwanted local messages" do
-      subject.run
-
-      expect(local_only_message_deleter).to_not have_received(:run)
-    end
-
-    it "doesn't refresh flags" do
-      subject.run
-
-      expect(flag_refresher).to_not have_received(:run)
-    end
-
-    it "passes the multi_fetch_size" do
-      subject.run
-
-      expect(Downloader).to have_received(:new).
-        with(anything, anything, hash_including(multi_fetch_size: 42))
     end
 
     context "when in mirror_mode" do
@@ -110,59 +88,6 @@ module Imap::Backup
         subject.run
 
         expect(local_only_folder_deleter).to have_received(:run)
-      end
-
-      it "deletes unwanted local messages" do
-        subject.run
-
-        expect(local_only_message_deleter).to have_received(:run)
-      end
-
-      it "refreshes flags" do
-        subject.run
-
-        expect(flag_refresher).to have_received(:run)
-      end
-    end
-
-    context "when refresh is true" do
-      let(:refresh) { true }
-
-      it "refreshes flags" do
-        subject.run
-
-        expect(flag_refresher).to have_received(:run)
-      end
-    end
-
-    context "when reset_seen_flags_after_fetch is set" do
-      let(:reset_seen_flags_after_fetch) { true }
-
-      it "passes reset_seen_flags_after_fetch" do
-        subject.run
-
-        expect(Downloader).to have_received(:new).
-          with(anything, anything, hash_including(reset_seen_flags_after_fetch: true))
-      end
-    end
-
-    context "when a folder does not exist" do
-      let(:folder_exists) { false }
-
-      it "does not run the downloader" do
-        expect(downloader).to_not receive(:run)
-
-        subject.run
-      end
-    end
-
-    context "when a folder name is badly encoded" do
-      it "skips the folder" do
-        allow(folder).to receive(:exist?).and_raise(Encoding::UndefinedConversionError)
-
-        subject.run
-
-        expect(downloader).to_not have_received(:run)
       end
     end
 

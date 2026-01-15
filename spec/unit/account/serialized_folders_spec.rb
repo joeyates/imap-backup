@@ -12,18 +12,15 @@ module Imap::Backup
       )
     end
     let(:client) { instance_double(Client::Default) }
-    let(:ensurer) { instance_double(Account::FolderEnsurer, run: nil) }
     let(:paths) { [Pathname.new("/backups/INBOX.imap")] }
     let(:serializer) { instance_double(Serializer) }
     let(:folder) { instance_double(Account::Folder) }
+    let(:directory_maker) { instance_double(Serializer::DirectoryMaker, run: nil) }
 
     before do
-      allow(Account::FolderEnsurer).
-        to receive(:new).
-          with(account: account) { ensurer }
-      allow(ensurer).to receive(:run)
       allow(Pathname).to receive(:glob) { paths }
       allow(Serializer).to receive(:new) { serializer }
+      allow(Serializer::DirectoryMaker).to receive(:new) { directory_maker }
       allow(Account::Folder).to receive(:new) { folder }
     end
 

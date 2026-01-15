@@ -3,7 +3,6 @@ require "forwardable"
 require "imap/backup/email/mboxrd/message"
 require "imap/backup/logger"
 require "imap/backup/serializer/appender"
-require "imap/backup/serializer/directory"
 require "imap/backup/serializer/files"
 require "imap/backup/serializer/imap"
 require "imap/backup/serializer/mbox"
@@ -110,8 +109,7 @@ module Imap::Backup
     # @param block [block] the block to call
     # @return [void]
     def filter(&block)
-      temp_name = Serializer::UnusedNameFinder.new(serializer: self).run
-      temp_files_path = Serializer::Files::Path.new(base_path: path, folder_name: temp_name)
+      temp_files_path = Serializer::UnusedNameFinder.new(serializer: self).run
       temp_files = Serializer::Files.new(files_path: temp_files_path)
       temp_files.uid_validity = files.uid_validity
       appender = Serializer::Appender.new(files: temp_files)
@@ -121,7 +119,7 @@ module Imap::Backup
         appender.append(uid: message.uid, message: message.body, flags: message.flags) if keep
       end
       files.delete
-      temp_files.rename files.files_path
+      temp_files.rename files_path
     end
 
     private
@@ -131,18 +129,18 @@ module Imap::Backup
     end
 
     def apply_new_uid_validity(value)
-      new_name = rename_existing_folder
+      new_files_path = rename_existing_folder
       # Clear memoization so we get updated data
       files.reload
       files.uid_validity = value
 
-      new_name
+      new_files_path.folder_name
     end
 
     def rename_existing_folder
-      new_name = Serializer::UnusedNameFinder.new(serializer: self).run
-      files.rename new_name
-      new_name
+      new_files_path = Serializer::UnusedNameFinder.new(serializer: self).run
+      files.rename new_files_path
+      new_files_path
     end
   end
 end

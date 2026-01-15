@@ -1,5 +1,5 @@
 require "imap/backup/naming"
-require "imap/backup/serializer/directory"
+require "imap/backup/serializer/directory_maker"
 require "imap/backup/serializer/imap"
 require "imap/backup/serializer/integrity_checker"
 require "imap/backup/serializer/mbox"
@@ -16,25 +16,26 @@ module Imap::Backup
 
     attr_reader :files_path
 
+    # @param files_path [Serializer::Files::Path] the path of the folder
     def initialize(files_path:)
       @files_path = files_path
       @directory_ensured = false
       @imap = nil
       @mbox = nil
-      @sanitized = nil
+      @sanitized_files_path = nil
     end
 
     def imap
       @imap ||= begin
         ensure_directory
-        Serializer::Imap.new(files_path: sanitized_path)
+        Serializer::Imap.new(files_path: sanitized_files_path)
       end
     end
 
     def mbox
       @mbox ||= begin
         ensure_directory
-        Serializer::Mbox.new(files_path: sanitized_path)
+        Serializer::Mbox.new(files_path: sanitized_files_path)
       end
     end
 
@@ -88,18 +89,13 @@ module Imap::Backup
       @mbox = nil
     end
 
-    def rename(new_name)
-      destination = Serializer::Files::Path.new(
-        base_path: files_path.base_path, folder_name: new_name
-      ).to_s
-      relative = File.dirname(new_name)
-      directory_path = Serializer::Files::Path.new(
-        base_path: files_path.base_path, folder_name: relative
-      )
-      directory = Serializer::Directory.new(files_path: directory_path)
-      directory.ensure_exists
-      mbox.rename destination
-      imap.rename destination
+    # Renames the serialized files
+    # @param new_files_path [Serializer::Files::Path] the new path of the folder
+    # @return [void]
+    def rename(new_files_path)
+      Serializer::DirectoryMaker.new(files_path: new_files_path).run
+      mbox.rename new_files_path
+      imap.rename new_files_path
     end
 
     # @return [Integer] the UID validity for the folder
@@ -154,7 +150,7 @@ module Imap::Backup
     def ensure_directory
       return if @directory_ensured
 
-      Serializer::Directory.new(files_path: sanitized_path).ensure_exists
+      Serializer::DirectoryMaker.new(files_path: sanitized_files_path).run
       @directory_ensured = true
     end
 
@@ -162,8 +158,8 @@ module Imap::Backup
       @sanitized ||= Naming.to_local_path(files_path.folder_name)
     end
 
-    def sanitized_path
-      @sanitized_path ||= Serializer::Files::Path.new(
+    def sanitized_files_path
+      @sanitized_files_path ||= Serializer::Files::Path.new(
         base_path: files_path.base_path, folder_name: sanitized
       )
     end

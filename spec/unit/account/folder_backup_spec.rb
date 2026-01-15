@@ -12,8 +12,8 @@ module Imap::Backup
         download_strategy: download_strategy,
         local_path: "/backups",
         mirror_mode: mirror_mode,
-        multi_fetch_size: 2,
-        reset_seen_flags_after_fetch: false
+        multi_fetch_size: 42,
+        reset_seen_flags_after_fetch: reset_seen_flags_after_fetch
       )
     end
     let(:client) { instance_double(Client::Default) }
@@ -29,6 +29,7 @@ module Imap::Backup
     let(:mirror_mode) { false }
     let(:refresh) { false }
     let(:download_strategy) { "direct" }
+    let(:reset_seen_flags_after_fetch) { false }
     let(:raw_serializer) do
       instance_double(
         Serializer,
@@ -66,6 +67,13 @@ module Imap::Backup
       subject.run
 
       expect(downloader).to have_received(:run)
+    end
+
+    it "passes the multi_fetch_size" do
+      subject.run
+
+      expect(Downloader).to have_received(:new).
+        with(anything, anything, hash_including(multi_fetch_size: 42))
     end
 
     context "when the folder does not exist" do
@@ -148,6 +156,17 @@ module Imap::Backup
         subject.run
 
         expect(flag_refresher).to have_received(:run)
+      end
+    end
+
+    context "when reset_seen_flags_after_fetch is set" do
+      let(:reset_seen_flags_after_fetch) { true }
+
+      it "passes reset_seen_flags_after_fetch" do
+        subject.run
+
+        expect(Downloader).to have_received(:new).
+          with(anything, anything, hash_including(reset_seen_flags_after_fetch: true))
       end
     end
   end

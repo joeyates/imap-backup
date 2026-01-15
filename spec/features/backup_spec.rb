@@ -6,7 +6,7 @@ RSpec.describe "imap-backup backup", :container, type: :aruba do
   include_context "message-fixtures"
 
   let(:backup_folders) { [folder] }
-  let(:folder) { "stuff-to-backup" }
+  let(:folder) { "some-parent.stuff-to-backup" }
   let(:messages_as_mbox) do
     to_mbox_entry(**message_one) + to_mbox_entry(**message_two)
   end

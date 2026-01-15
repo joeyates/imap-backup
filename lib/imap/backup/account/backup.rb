@@ -1,6 +1,5 @@
 require "imap/backup/account/backup_folders"
 require "imap/backup/account/folder_backup"
-require "imap/backup/account/folder_ensurer"
 require "imap/backup/account/local_only_folder_deleter"
 require "imap/backup/account/locker"
 
@@ -25,7 +24,7 @@ module Imap::Backup
       # start the connection so we get logging messages in the right order
       account.client.login
 
-      ensure_folder
+      ensure_directory
       delete_local_only_folders if account.mirror_mode
 
       if backup_folders.none?
@@ -53,8 +52,8 @@ module Imap::Backup
       Account::LocalOnlyFolderDeleter.new(account: account).run
     end
 
-    def ensure_folder
-      Account::FolderEnsurer.new(account: account).run
+    def ensure_directory
+      Serializer::DirectoryMaker.new(files_path: account.files_path).run
     end
 
     def locker

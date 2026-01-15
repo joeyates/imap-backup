@@ -38,7 +38,6 @@ module Imap::Backup
 
     before do
       allow(Serializer::Files).to receive(:new).with(files_path: files_path) { files }
-      allow(Serializer::Directory).to receive(:new) { directory }
       allow(Serializer::MessageEnumerator).to receive(:new).with(imap: imap) { enumerator }
     end
 
@@ -82,21 +81,29 @@ module Imap::Backup
 
       context "when the new value is different from the old value" do
         let(:existing_uid_validity) { "existing_uid_validity" }
-        let(:unused_name_finder) { instance_double(Serializer::UnusedNameFinder, run: new_folder_path) }
+        let(:unused_name_finder) { instance_double(Serializer::UnusedNameFinder, run: new_files_path) }
         let(:new_folder_path) { "serializer_path/new_name" }
+        let(:new_files_path) do
+          instance_double(
+            Serializer::Files::Path, "New Files Path",
+            base_path: "serializer_path", folder_name: "new_name"
+          )
+        end
 
         before do
+          allow(Serializer::Files::Path).to receive(:new).
+            with(base_path: "serializer_path", folder_name: "new_name") { new_files_path }
           allow(Serializer::UnusedNameFinder).to receive(:new) { unused_name_finder }
         end
 
         it "renames the existing files" do
           result
 
-          expect(files).to have_received(:rename).with(new_folder_path)
+          expect(files).to have_received(:rename).with(new_files_path)
         end
 
-        it "returns the new name for the old folder" do
-          expect(result).to eq(new_folder_path)
+        it "returns the new files path" do
+          expect(result).to eq(new_files_path.folder_name)
         end
       end
     end
@@ -156,7 +163,7 @@ module Imap::Backup
       end
       let(:message) { instance_double(Serializer::Message, uid: 1, body: "body", flags: []) }
       let(:keep) { true }
-      let(:unused) { instance_double(Serializer::UnusedNameFinder, run: unused_name) }
+      let(:unused) { instance_double(Serializer::UnusedNameFinder, run: temp_files_path) }
       let(:unused_name) { "temp" }
 
       before do
