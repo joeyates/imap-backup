@@ -4,7 +4,6 @@ require "imap/backup/account/client_factory"
 
 module Imap; end
 
-# rubocop:disable Metrics/ClassLength
 module Imap::Backup
   # Contains the attributes relating to an email account.
   class Account
