@@ -2,9 +2,9 @@ require "imap/backup/serializer/imap"
 
 module Imap::Backup
   RSpec.describe Serializer::Imap do
-    subject { described_class.new(folder_path) }
+    subject { described_class.new(files_path: files_path) }
 
-    let(:folder_path) { "folder_path" }
+    let(:files_path) { "folder_path" }
     let(:pathname) { "folder_path.imap" }
     let(:exists) { true }
     let(:existing) do
@@ -356,8 +356,8 @@ module Imap::Backup
       end
 
       context "when the metadata file exists" do
-        it "sets the folder_path" do
-          expect(subject.folder_path).to eq("new_path")
+        it "sets the files_path" do
+          expect(subject.files_path).to eq("new_path")
         end
 
         it "renames the metadata file" do
@@ -368,8 +368,8 @@ module Imap::Backup
       context "when the metadata file isn't valid" do
         let(:exists) { false }
 
-        it "sets the folder_path" do
-          expect(subject.folder_path).to eq("new_path")
+        it "sets the files_path" do
+          expect(subject.files_path).to eq("new_path")
         end
 
         it "doesn't try to rename the metadata file" do

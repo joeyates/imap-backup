@@ -4,6 +4,7 @@ require "imap/backup/flag_refresher"
 require "imap/backup/local_only_message_deleter"
 require "imap/backup/logger"
 require "imap/backup/serializer"
+require "imap/backup/serializer/files/path"
 
 module Imap; end
 
@@ -86,7 +87,12 @@ module Imap::Backup
     end
 
     def raw_serializer
-      @raw_serializer ||= Serializer.new(account.local_path, folder.name)
+      @raw_serializer ||= begin
+        path = Serializer::Files::Path.new(
+          base_path: account.local_path, folder_name: folder.name
+        )
+        Serializer.new(files_path: path)
+      end
     end
   end
 end

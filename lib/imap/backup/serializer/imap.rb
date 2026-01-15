@@ -14,12 +14,14 @@ module Imap::Backup
     # The version number to store in the metadata file
     CURRENT_VERSION = 3
 
-    # @return [String] The path of the imap metadata file, without the '.imap' extension
-    attr_reader :folder_path
+    # @return [Serializer::Files::Path] The path of the imap metadata file, without the '.imap'
+    #   extension
+    attr_reader :files_path
 
-    # @param folder_path [String] The path of the imap metadata file, without the '.imap' extension
-    def initialize(folder_path)
-      @folder_path = folder_path
+    # @param files_path [Serializer::Files::Path] The path of the imap metadata file, without
+    #   the '.imap' extension
+    def initialize(files_path:)
+      @files_path = files_path
       @loaded = false
       @uid_validity = nil
       @messages = nil
@@ -61,7 +63,7 @@ module Imap::Backup
 
     # @return [String] The full path name of the metadata file
     def pathname
-      "#{folder_path}.imap"
+      "#{files_path}.imap"
     end
 
     def exist?
@@ -136,15 +138,16 @@ module Imap::Backup
 
     # Renames the metadata file, if it exists,
     # otherwise, simply stores the new name
-    # @param new_path [String] the new path (without extension)
+    # @param new_path [Serializer::Files::Path] the new path
     # @return [void]
     def rename(new_path)
       if exist?
         old_pathname = pathname
-        @folder_path = new_path
-        File.rename(old_pathname, pathname)
+        @files_path = new_path
+        new_pathname = pathname
+        File.rename(old_pathname, new_pathname)
       else
-        @folder_path = new_path
+        @files_path = new_path
       end
     end
 
@@ -260,7 +263,7 @@ module Imap::Backup
     end
 
     def mbox
-      @mbox ||= Serializer::Mbox.new(folder_path)
+      @mbox ||= Serializer::Mbox.new(files_path: files_path)
     end
 
     def tsx

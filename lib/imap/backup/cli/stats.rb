@@ -3,6 +3,7 @@ require "thor"
 require "imap/backup/account/backup_folders"
 require "imap/backup/cli/helpers"
 require "imap/backup/serializer"
+require "imap/backup/serializer/files/path"
 
 module Imap; end
 
@@ -63,7 +64,10 @@ module Imap::Backup
       backup_folders.map do |folder|
         next if !folder.exist?
 
-        serializer = Serializer.new(account.local_path, folder.name)
+        path = Serializer::Files::Path.new(
+          base_path: account.local_path, folder_name: folder.name
+        )
+        serializer = Serializer.new(files_path: path)
         local_uids = serializer.uids
         Logger.logger.debug("[Stats] fetching email list for '#{folder.name}'")
         remote_uids = folder.uids

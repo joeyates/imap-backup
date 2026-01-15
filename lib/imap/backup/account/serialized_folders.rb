@@ -1,8 +1,9 @@
 require "pathname"
 
 require "imap/backup/account/folder"
-require "imap/backup/account/folder_ensurer"
 require "imap/backup/serializer"
+require "imap/backup/serializer/directory_maker"
+require "imap/backup/serializer/files/path"
 
 module Imap; end
 
@@ -27,7 +28,10 @@ module Imap::Backup
 
       glob.each do |path|
         name = path.relative_path_from(base).to_s[0..-6]
-        serializer = Serializer.new(account.local_path, name)
+        files_path = Serializer::Files::Path.new(
+          base_path: account.local_path, folder_name: name
+        )
+        serializer = Serializer.new(files_path: files_path)
         folder = Account::Folder.new(account.client, name)
         block.call(serializer, folder)
       end
@@ -41,7 +45,10 @@ module Imap::Backup
 
       glob.each do |path|
         name = path.relative_path_from(base).to_s[0..-6]
-        serializer = Serializer.new(account.local_path, name)
+        files_path = Serializer::Files::Path.new(
+          base_path: account.local_path, folder_name: name
+        )
+        serializer = Serializer.new(files_path: files_path)
         block.call(serializer)
       end
     end
@@ -69,7 +76,10 @@ module Imap::Backup
 
     def glob
       @glob ||= begin
-        Account::FolderEnsurer.new(account: account).run
+        files_path = Serializer::Files::Path.new(
+          base_path: account.local_path, folder_name: nil
+        )
+        Serializer::DirectoryMaker.new(files_path: files_path).run
 
         pattern = File.join(account.local_path, "**", "*.imap")
         Pathname.glob(pattern)

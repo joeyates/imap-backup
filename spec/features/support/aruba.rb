@@ -3,6 +3,7 @@ require "json"
 
 require "imap/backup/serializer"
 require "imap/backup/serializer/mbox"
+require "imap/backup/serializer/files/path"
 
 Aruba.configure do |config|
   config.home_directory = File.expand_path("./tmp/home")
@@ -49,7 +50,10 @@ module LocalHelpers
     raise "Account not found" if !account
 
     FileUtils.mkdir_p account.local_path
-    serializer = Imap::Backup::Serializer.new(account.local_path, folder)
+    path = Imap::Backup::Serializer::Files::Path.new(
+      base_path: account.local_path, folder_name: folder
+    )
+    serializer = Imap::Backup::Serializer.new(files_path: path)
     serializer.force_uid_validity uid_validity
   end
 
@@ -66,7 +70,10 @@ module LocalHelpers
     raise "Account not found" if !account
 
     FileUtils.mkdir_p account.local_path
-    serializer = Imap::Backup::Serializer.new(account.local_path, folder)
+    path = Imap::Backup::Serializer::Files::Path.new(
+      base_path: account.local_path, folder_name: folder
+    )
+    serializer = Imap::Backup::Serializer.new(files_path: path)
     serializer.force_uid_validity("42") if !serializer.uid_validity
     serialized = to_serialized(from: from, subject: subject, body: body)
     serializer.append uid, serialized, flags

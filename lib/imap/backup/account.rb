@@ -188,6 +188,11 @@ module Imap::Backup
       update(:local_path, value)
     end
 
+    # @return [Serializer::Files::Path] the base files path for the account
+    def files_path
+      Serializer::Files::Path.new(base_path: local_path, folder_name: nil)
+    end
+
     # @raise [RuntimeError] if the local_path is not set
     # @return [String] the path to the lockfile for the account
     def lockfile_path

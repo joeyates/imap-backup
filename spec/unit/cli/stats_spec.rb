@@ -39,6 +39,7 @@ module Imap::Backup
       let(:local_uids) { [2, 3, 4] }
       let(:remote_uids) { [1, 2, 3] }
       let(:serializer) { instance_double(Serializer, uids: local_uids) }
+      let(:path) { instance_double(Serializer::Files::Path) }
       let(:expected_stats) do
         [
           {
@@ -59,8 +60,9 @@ module Imap::Backup
         allow(backup_folders).to receive(:map) do |&block|
           folders.map { |folder| block.call(folder) }
         end
-        allow(Serializer).to receive(:new).
-          with(account.local_path, existing_folder.name) { serializer }
+        allow(Serializer::Files::Path).to receive(:new).
+          with(base_path: account.local_path, folder_name: existing_folder.name) { path }
+        allow(Serializer).to receive(:new).with(files_path: path) { serializer }
       end
 
       context "when format is json" do

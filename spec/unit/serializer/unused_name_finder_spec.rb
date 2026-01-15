@@ -1,36 +1,45 @@
 require "imap/backup/serializer/unused_name_finder"
 
+require "imap/backup/serializer"
+
 module Imap::Backup
   RSpec.describe Serializer::UnusedNameFinder do
     subject { described_class.new(serializer: serializer) }
 
     let(:serializer) do
-      instance_double(Serializer, folder: "folder", uid_validity: 999, path: "serializer_path")
+      instance_double(Serializer, uid_validity: uid_validity, files_path: files_path)
     end
+    let(:files_path) do
+      Serializer::Files::Path.new(base_path: base_path, folder_name: folder)
+    end
+    let(:uid_validity) { 999 }
     let(:test_serializer) { instance_double(Serializer, validate!: default_serializer_validates) }
     let(:default_serializer_validates) { false }
-    let(:new_name) { "folder-#{serializer.uid_validity}" }
+    let(:base_path) { "serializer_path" }
+    let(:folder) { "folder" }
+    let(:new_name) { "#{folder}-#{uid_validity}" }
     let(:result) { subject.run }
 
     before do
-      allow(Serializer).to receive(:new).with(anything, new_name) { test_serializer }
+      allow(File).to receive(:exist?).with("#{base_path}/#{new_name}.imap") { false }
+      allow(File).to receive(:exist?).with("#{base_path}/#{new_name}.mbox") { false }
     end
 
-    it "returns the folder name with the uid_validity appended" do
-      expect(result).to eq(new_name)
+    it "returns a files path with a folder name with the uid_validity appended" do
+      expect(result.folder_name).to eq(new_name)
     end
 
     context "when the default rename is not possible" do
-      let(:default_serializer_validates) { true }
-      let(:test_serializer1) { instance_double(Serializer, validate!: false) }
-      let(:new_name1) { "folder-#{serializer.uid_validity}-1" }
+      let(:new_name1) { "#{folder}-#{uid_validity}-1" }
 
       before do
-        allow(Serializer).to receive(:new).with(anything, new_name1) { test_serializer1 }
+        allow(File).to receive(:exist?).with("#{base_path}/#{new_name}.imap") { true }
+        allow(File).to receive(:exist?).with("#{base_path}/#{new_name1}.imap") { false }
+        allow(File).to receive(:exist?).with("#{base_path}/#{new_name1}.mbox") { false }
       end
 
       it "appends a numeral" do
-        expect(result).to eq(new_name1)
+        expect(result.folder_name).to eq(new_name1)
       end
     end
   end

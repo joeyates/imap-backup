@@ -1,18 +1,30 @@
 require "imap/backup/serializer/appender"
+require "imap/backup/serializer/files/path"
 require "imap/backup/serializer/imap"
 require "imap/backup/serializer/mbox"
 require "imap/backup/serializer/message"
 
 module Imap::Backup
   RSpec.describe Serializer::Appender do
-    subject { described_class.new(folder: "appender_path", imap: imap, mbox: mbox) }
+    subject { described_class.new(files: files) }
 
+    let(:files) do
+      instance_double(
+        Serializer::Files,
+        imap: imap,
+        mbox: mbox,
+        files_path: files_path
+      )
+    end
     let(:imap) do
-      instance_double(Serializer::Imap, uid_validity: existing_uid_validity, rollback: nil)
+      instance_double(
+        Serializer::Imap, uid_validity: existing_uid_validity, rollback: nil, files_path: files_path
+      )
     end
     let(:mbox) do
       instance_double(Serializer::Mbox, append: nil, rollback: nil)
     end
+    let(:files_path) { instance_double(Serializer::Files::Path, base_path: "appender_path") }
     let(:existing_uid_validity) { "42" }
     let(:mboxrd_message) do
       instance_double(Email::Mboxrd::Message, to_serialized: "serialized")

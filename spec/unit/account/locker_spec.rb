@@ -1,6 +1,7 @@
 require "imap/backup/account/locker"
 require "imap/backup/account"
 require "imap/backup/lockfile"
+require "imap/backup/serializer/directory_maker"
 
 module Imap
   module Backup
@@ -9,14 +10,15 @@ module Imap
 
       let(:lockfile_path) { "lockfile_path" }
       let(:account) do
-        instance_double(Account, lockfile_path: lockfile_path, local_path: "local_path")
+        instance_double(Account, lockfile_path: lockfile_path, files_path: files_path)
       end
       let(:lockfile) { instance_double(Lockfile, exists?: false, remove: nil) }
-      let(:folder_ensurer) { instance_double(Account::FolderEnsurer, run: nil) }
+      let(:directory_maker) { instance_double(Serializer::DirectoryMaker, run: nil) }
+      let(:files_path) { instance_double(Serializer::Files::Path, base_path: "local_path", folder_name: nil) }
 
       before do
-        allow(Imap::Backup::Lockfile).to receive(:new).with(path: lockfile_path) { lockfile }
-        allow(Account::FolderEnsurer).to receive(:new) { folder_ensurer }
+        allow(Lockfile).to receive(:new).with(path: lockfile_path) { lockfile }
+        allow(Serializer::DirectoryMaker).to receive(:new).with(files_path: files_path) { directory_maker }
         allow(lockfile).to receive(:with_lock).and_yield
       end
 
@@ -42,7 +44,7 @@ module Imap
 
         context "when the lockfile does not exist" do
           it "ensures the account folders exist" do
-            expect(Account::FolderEnsurer).to receive(:new).with(account: account)
+            expect(directory_maker).to receive(:run)
 
             subject.with_lock {}
           end
@@ -76,7 +78,7 @@ module Imap
           end
 
           it "does not ensure the account folders exist" do
-            expect(Account::FolderEnsurer).not_to receive(:new)
+            expect(Serializer::DirectoryMaker).not_to receive(:new)
 
             subject.with_lock {}
           end

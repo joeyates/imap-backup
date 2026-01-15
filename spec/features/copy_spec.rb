@@ -3,8 +3,8 @@ require "features/helper"
 RSpec.describe "imap-backup copy", :container, type: :aruba do
   include_context "message-fixtures"
 
-  let(:source_folder) { "my_folder" }
-  let(:destination_folder) { "other_public.my_folder" }
+  let(:source_folder) { "some-parent.my_folder" }
+  let(:destination_folder) { "other_public.some-parent.my_folder" }
   let(:mirror_file_path) do
     File.join(test_server_connection_parameters[:local_path], "#{source_folder}.mirror")
   end
