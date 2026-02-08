@@ -261,6 +261,10 @@ RSpec/NoExpectationExample:
   Enabled: true
 RSpec/NotToNot:
   Enabled: false
+RSpec/Output:
+  Enabled: true
+  Exclude:
+  - spec/performance/**/*
 RSpec/PendingWithoutReason:
   Enabled: true
 RSpec/PredicateMatcher:
@@ -342,6 +346,8 @@ Style/DoubleNegation:
   Enabled: false
 Style/EmptyCaseCondition:
   Enabled: false
+Style/EmptyClassDefinition:
+  Enabled: true
 Style/EmptyHeredoc:
   Enabled: true
 Style/EmptyMethod:
@@ -424,6 +430,8 @@ Style/NegatedIf:
   Enabled: false
 Style/NegatedIfElseCondition:
   Enabled: true
+Style/NegativeArrayIndex:
+  Enabled: true
 Style/NestedFileDirname:
   Enabled: true
 Style/NilLambda: # TODO
@@ -489,6 +497,8 @@ Style/RedundantSelfAssignmentBranch:
 Style/RedundantStringEscape:
   Enabled: true
 Style/ReturnNilInPredicateMethodDefinition:
+  Enabled: true
+Style/ReverseFind:
   Enabled: true
 Style/SafeNavigationChainLength:
   Enabled: true
