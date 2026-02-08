@@ -6,7 +6,7 @@ require "imap/backup/serializer"
 require "ostruct"
 
 module Imap::Backup
-  RSpec.describe Downloader do
+  RSpec.describe Downloader, :silence_logging do
     describe "#run" do
       subject { described_class.new(folder, serializer, **options) }
 

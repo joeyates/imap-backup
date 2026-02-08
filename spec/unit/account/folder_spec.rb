@@ -5,7 +5,7 @@ require "imap/backup/client/default"
 require "imap/backup/serializer/message"
 
 module Imap::Backup
-  RSpec.describe Account::Folder do
+  RSpec.describe Account::Folder, :silence_logging do
     subject { described_class.new(client, folder_name) }
 
     let(:client) do

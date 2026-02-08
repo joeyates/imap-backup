@@ -156,7 +156,7 @@ class TestEmailServer
     actual = folders.map(&:name).sort
     extra = actual - expected
     extra.each do |name|
-      puts "Unexpected folder '#{name}' found - deleting"
+      warn "Unexpected folder '#{name}' found - deleting"
       delete_folder name
     end
   end

@@ -18,7 +18,7 @@ class Retrier
 end
 
 module Imap::Backup
-  RSpec.describe RetryOnError do
+  RSpec.describe RetryOnError, :silence_logging do
     describe "#retry_on_error" do
       subject { Retrier.new }
 

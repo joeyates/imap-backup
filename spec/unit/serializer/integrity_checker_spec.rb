@@ -4,7 +4,7 @@ require "imap/backup/serializer/mbox"
 require "imap/backup/serializer/message"
 
 module Imap::Backup
-  RSpec.describe Serializer::IntegrityChecker do
+  RSpec.describe Serializer::IntegrityChecker, :silence_logging do
     subject { described_class.new(imap: imap, mbox: mbox) }
 
     let(:imap) do

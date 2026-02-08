@@ -130,18 +130,41 @@ module Imap::Backup
     end
 
     def thunderbird_profile(name = nil)
+      Logger.logger.info("[CLI::Utils] Fetching Thunderbird profile")
       profiles = ::Thunderbird::Profiles.new
+      Logger.logger.debug("[CLI::Utils] Found #{profiles.installs.count} Thunderbird install(s)")
       if name
+        Logger.logger.debug("[CLI::Utils] Using profile name '#{name}'")
         profiles.profile(name)
       else
-        if profiles.installs.count > 1
-          raise <<~MESSAGE
-            Thunderbird has multiple installs, so no default profile exists.
-            Please supply a profile name
-          MESSAGE
-        end
+        choose_default_profile(profiles)
+      end
+    end
 
-        profiles.installs[0].default
+    def choose_default_profile(profiles)
+      Logger.logger.debug("[CLI::Utils] No profile name supplied, so looking for default profile")
+      case profiles.installs.count
+      when 0
+        raise "No Thunderbird installs found, so no default profile exists"
+      when 1
+        install = profiles.installs.first
+        Logger.logger.debug(
+          "[CLI::Utils] Only one Thunderbird install found '#{install.title}', " \
+          "so using its default profile"
+        )
+
+        profile = install.default_profile
+        raise "Thunderbird install '#{install.title}' does not have a default profile" if !profile
+
+        Logger.logger.debug(
+          "[CLI::Utils] Default profile '#{profile.title}' has path '#{profile.root}'"
+        )
+        profile
+      else
+        raise <<~MESSAGE
+          Thunderbird has multiple installs, so no default profile exists.
+          Please supply a profile name
+        MESSAGE
       end
     end
   end

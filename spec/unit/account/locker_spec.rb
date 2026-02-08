@@ -5,7 +5,7 @@ require "imap/backup/serializer/directory_maker"
 
 module Imap
   module Backup
-    RSpec.describe Account::Locker do
+    RSpec.describe Account::Locker, :silence_logging do
       subject { described_class.new(account: account) }
 
       let(:lockfile_path) { "lockfile_path" }

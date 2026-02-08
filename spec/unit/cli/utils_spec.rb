@@ -34,6 +34,7 @@ module Imap::Backup
       allow(Configuration).to receive(:exist?) { true }
       allow(Configuration).to receive(:new) { config }
       allow(Serializer).to receive(:new) { serializer }
+      stub_logger
     end
 
     describe "#export_to_thunderbird" do
@@ -43,9 +44,13 @@ module Imap::Backup
         instance_double(::Thunderbird::Profiles, installs: installs, profile: named_profile)
       end
       let(:installs) { [install1] }
-      let(:install1) { instance_double(::Thunderbird::Install, default: default_install) }
-      let(:default_install) { "default" }
-      let(:named_profile) { "named" }
+      let(:install1) do
+        instance_double(
+          ::Thunderbird::Install, title: "Thunderbird install", default_profile: default_profile
+        )
+      end
+      let(:default_profile) { instance_double(::Thunderbird::Profile, title: "Default profile", root: "profile_path") }
+      let(:named_profile) { instance_double(::Thunderbird::Profile, title: "Named profile", root: "profile_path") }
       let(:serialized_folders) { instance_double(Account::SerializedFolders, none?: false) }
       let(:folder) do
         instance_double(
@@ -81,18 +86,18 @@ module Imap::Backup
 
       context "when no profile_name is supplied" do
         context "when no default Thunderbird profile is found" do
-          let(:default_install) { nil }
+          let(:default_profile) { nil }
 
           it "fails" do
             expect do
               command
-            end.to raise_error(RuntimeError, /Default .*? not found/)
+            end.to raise_error(RuntimeError, /does not have a default profile/)
           end
         end
 
         context "when there is more than one install" do
           let(:installs) { [install1, install2] }
-          let(:install2) { instance_double(::Thunderbird::Install, default: default_install) }
+          let(:install2) { instance_double(::Thunderbird::Install, default_profile: default_profile) }
 
           it "fails" do
             expect do
@@ -129,7 +134,7 @@ module Imap::Backup
           command
 
           expect(Thunderbird::MailboxExporter).to have_received(:new).
-            with(email, anything, default_install, force: true)
+            with(email, anything, default_profile, force: true)
         end
       end
 
