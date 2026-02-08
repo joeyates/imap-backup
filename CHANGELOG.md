@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 16.4.2 - 2026-02-08
+
+### Changed
+
+* Added more logging to the Thunderbird export utility.
+
 ## 16.4.1 - 2026-01-06
 
 ### Changed
