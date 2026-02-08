@@ -27,7 +27,7 @@ module Imap::Backup
             with(hash_including({email: "me", server: "host"}))
         end
 
-        it "does not pass loggint options to the class" do
+        it "does not pass logging options to the class" do
           expect(CLI::Single::Backup).to have_received(:new).
             with(hash_not_including([:quiet, :verbose]))
         end
