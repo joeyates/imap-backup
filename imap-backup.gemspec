@@ -30,7 +30,7 @@ Gem::Specification.new do |gem|
   gem.add_dependency "rake"
   gem.add_dependency "sys-proctable"
   gem.add_dependency "thor", "~> 1.1"
-  gem.add_dependency "thunderbird", "0.3.0"
+  gem.add_dependency "thunderbird", "~> 0.6.0"
 
   gem.metadata = {
     "rubygems_mfa_required" => "true"

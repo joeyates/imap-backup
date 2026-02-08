@@ -141,7 +141,7 @@ module Imap::Backup
           MESSAGE
         end
 
-        profiles.installs[0].default
+        profiles.installs[0].default_profile
       end
     end
   end
