@@ -45,7 +45,9 @@ module Imap::Backup
       end
       let(:installs) { [install1] }
       let(:install1) do
-        instance_double(::Thunderbird::Install, title: "Thunderbird install", default_profile: default_profile)
+        instance_double(
+          ::Thunderbird::Install, title: "Thunderbird install", default_profile: default_profile
+        )
       end
       let(:default_profile) { instance_double(::Thunderbird::Profile, title: "Default profile", root: "profile_path") }
       let(:named_profile) { instance_double(::Thunderbird::Profile, title: "Named profile", root: "profile_path") }
@@ -89,7 +91,7 @@ module Imap::Backup
           it "fails" do
             expect do
               command
-            end.to raise_error(RuntimeError, /Default .*? not found/)
+            end.to raise_error(RuntimeError, /does not have a default profile/)
           end
         end
 

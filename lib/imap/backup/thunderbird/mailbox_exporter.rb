@@ -23,6 +23,7 @@ module Imap::Backup
     # in the format expected by Thunderbird
     # @return [void]
     def run
+      debug "Starting export of '#{email}' to Thunderbird profile '#{profile.title}'"
       if !profile_set_up
         error "The Thunderbird profile '#{profile.title}' " \
               "has not been set up. " \
@@ -59,6 +60,7 @@ module Imap::Backup
     attr_reader :force
 
     def profile_set_up
+      debug "Checking for local folders path '#{profile.local_folders_path}'"
       File.exist?(profile.local_folders_path)
     end
 
@@ -107,6 +109,10 @@ module Imap::Backup
         prefixed_folder_path = File.join(top_level_folders, serializer.folder)
         ::Thunderbird::LocalFolder.new(profile: profile, path: prefixed_folder_path)
       end
+    end
+
+    def debug(message)
+      Logger.logger.debug("[Thunderbird::MailboxExporter] #{message}")
     end
 
     def error(message)
