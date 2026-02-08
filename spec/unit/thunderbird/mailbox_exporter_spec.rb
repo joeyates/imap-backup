@@ -4,7 +4,7 @@ require "imap/backup/serializer"
 require "imap/backup/serializer/message"
 
 module Imap::Backup
-  RSpec.describe Thunderbird::MailboxExporter do
+  RSpec.describe Thunderbird::MailboxExporter, :silence_logging do
     subject { described_class.new("email", serializer, profile, **args) }
 
     let(:args) { {} }

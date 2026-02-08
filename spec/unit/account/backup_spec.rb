@@ -6,7 +6,7 @@ require "imap/backup/downloader"
 require "imap/backup/serializer"
 
 module Imap::Backup
-  RSpec.describe Account::Backup do
+  RSpec.describe Account::Backup, :silence_logging do
     subject { described_class.new(account: account, refresh: refresh) }
 
     let(:account) do

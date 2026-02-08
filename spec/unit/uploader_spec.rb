@@ -2,7 +2,7 @@ require "imap/backup/uploader"
 require "imap/backup/client/default"
 
 module Imap::Backup
-  RSpec.describe Uploader do
+  RSpec.describe Uploader, :silence_logging do
     subject { described_class.new(folder, serializer) }
 
     let(:folder) do

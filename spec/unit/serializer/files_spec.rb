@@ -118,7 +118,7 @@ module Imap::Backup
     end
   end
 
-  RSpec.describe Serializer::Files do
+  RSpec.describe Serializer::Files, :silence_logging do
     subject { described_class.new(files_path: files_path) }
 
     let(:files_path) do

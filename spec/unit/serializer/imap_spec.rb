@@ -1,7 +1,7 @@
 require "imap/backup/serializer/imap"
 
 module Imap::Backup
-  RSpec.describe Serializer::Imap do
+  RSpec.describe Serializer::Imap, :silence_logging do
     subject { described_class.new(files_path: files_path) }
 
     let(:files_path) { "folder_path" }

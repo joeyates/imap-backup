@@ -7,7 +7,7 @@ require "imap/backup/configuration"
 require "imap/backup/lockfile"
 
 module Imap::Backup
-  RSpec.describe CLI::Backup do
+  RSpec.describe CLI::Backup, :silence_logging do
     subject { described_class.new(options) }
 
     let(:options) { {} }

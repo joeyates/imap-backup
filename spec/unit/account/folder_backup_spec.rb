@@ -2,7 +2,7 @@ require "imap/backup/account/folder"
 require "imap/backup/account/folder_backup"
 
 module Imap::Backup
-  RSpec.describe Account::FolderBackup do
+  RSpec.describe Account::FolderBackup, :silence_logging do
     subject { described_class.new(account: account, folder: folder, refresh: refresh) }
 
     let(:account) do

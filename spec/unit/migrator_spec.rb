@@ -5,7 +5,7 @@ require "imap/backup/serializer"
 require "imap/backup/serializer/message"
 
 module Imap::Backup
-  RSpec.describe Migrator do
+  RSpec.describe Migrator, :silence_logging do
     subject { described_class.new(serializer, folder, reset: reset) }
 
     let(:serializer) { instance_double(Serializer, uids: [1]) }

@@ -22,6 +22,7 @@ RSpec.describe "imap-backup backup", :container, type: :aruba do
   let(:config_options) { {accounts: [account_config]} }
   let(:write_config) { create_config(**config_options) }
 
+  let!(:logger) { stub_logger }
   let!(:pre) { test_server.warn_about_non_default_folders }
   let!(:setup) do
     test_server.create_folder folder

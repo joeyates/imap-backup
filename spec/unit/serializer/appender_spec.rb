@@ -5,7 +5,7 @@ require "imap/backup/serializer/mbox"
 require "imap/backup/serializer/message"
 
 module Imap::Backup
-  RSpec.describe Serializer::Appender do
+  RSpec.describe Serializer::Appender, :silence_logging do
     subject { described_class.new(files: files) }
 
     let(:files) do

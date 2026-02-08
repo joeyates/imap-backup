@@ -34,6 +34,7 @@ module Imap::Backup
       allow(Configuration).to receive(:exist?) { true }
       allow(Configuration).to receive(:new) { config }
       allow(Serializer).to receive(:new) { serializer }
+      stub_logger
     end
 
     describe "#export_to_thunderbird" do
