@@ -11,6 +11,9 @@ end
 
 require "imap/backup/cli"
 require "imap/backup/logger"
+require "imap/backup/translator"
+
+Imap::Backup::Translator.new.setup
 
 Imap::Backup::Logger.sanitize_stderr do
   Imap::Backup::CLI.start(ARGV)

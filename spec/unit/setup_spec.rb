@@ -1,4 +1,5 @@
 require "imap/backup/setup"
+require "imap/backup/translator"
 
 module Imap::Backup
   RSpec.describe Setup do
@@ -50,6 +51,7 @@ module Imap::Backup
 
     describe "#run" do
       before do
+        Translator.new.setup
         allow(Logger).to receive(:setup_logging)
         allow(input).to receive(:eof?) { false }
         allow(input).to receive(:gets) { "q\n" }

@@ -1,3 +1,11 @@
 ---
 en:
-  # English translations will be added here
+  setup:
+    main_menu:
+      title: "Main Menu"
+      choose_action: "Choose an action"
+      add_account: "add account"
+      modify_global_options: "modify global options"
+      save_and_exit: "save and exit"
+      exit_without_saving: "exit without saving changes"
+      quit: "(q) quit"
