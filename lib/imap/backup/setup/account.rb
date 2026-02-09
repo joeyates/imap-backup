@@ -58,7 +58,7 @@ module Imap::Backup
         toggle_reset_seen_flags_after_fetch menu
         rotate_status menu
         delete_account menu
-        menu.choice("(q) return to main menu") { throw :done }
+        menu.choice(I18n.t("setup.account.return_to_main_menu")) { throw :done }
         menu.hidden("quit") { throw :done }
       end
     end
@@ -68,13 +68,13 @@ module Imap::Backup
     end
 
     def modify_email(menu)
-      menu.choice("modify email") do
+      menu.choice(I18n.t("setup.account.modify_email")) do
         Setup::EmailChanger.new(account: account, config: config).run
       end
     end
 
     def modify_password(menu)
-      menu.choice("modify password") do
+      menu.choice(I18n.t("setup.account.modify_password")) do
         password = Setup::Asker.password
 
         account.password = password if !password.nil?
@@ -82,13 +82,13 @@ module Imap::Backup
     end
 
     def modify_backup_path(menu)
-      menu.choice("modify backup path") do
+      menu.choice(I18n.t("setup.account.modify_backup_path")) do
         Setup::BackupPath.new(account: account, config: config).run
       end
     end
 
     def toggle_folder_blacklist(menu)
-      menu_item = "toggle folder inclusion mode (whitelist/blacklist)"
+      menu_item = I18n.t("setup.account.toggle_folder_blacklist")
       new_value = account.folder_blacklist ? nil : true
       menu.choice(menu_item) do
         account.folder_blacklist = new_value
@@ -96,14 +96,15 @@ module Imap::Backup
     end
 
     def choose_folders(menu)
-      action = account.folder_blacklist ? "exclude from backups" : "include in backups"
-      menu.choice("choose folders to #{action}") do
+      action_key = account.folder_blacklist ? "exclude_from_backups" : "include_in_backups"
+      action = I18n.t("setup.account.#{action_key}")
+      menu.choice(I18n.t("setup.account.choose_folders", action: action)) do
         Setup::FolderChooser.new(account).run
       end
     end
 
     def toggle_mirror_mode(menu)
-      menu_item = "toggle mode (keep/mirror)"
+      menu_item = I18n.t("setup.account.toggle_mirror_mode")
       new_value = account.mirror_mode ? nil : true
       menu.choice(menu_item) do
         account.mirror_mode = new_value
@@ -111,29 +112,29 @@ module Imap::Backup
     end
 
     def modify_multi_fetch_size(menu)
-      menu.choice("modify multi-fetch size (number of emails to fetch at a time)") do
-        size = highline.ask("size: ")
+      menu.choice(I18n.t("setup.account.modify_multi_fetch_size")) do
+        size = highline.ask(I18n.t("setup.account.size_prompt"))
         int = size.to_i
         account.multi_fetch_size = int if int.positive?
       end
     end
 
     def modify_server(menu)
-      menu.choice("modify server") do
-        server = highline.ask("server: ")
+      menu.choice(I18n.t("setup.account.modify_server")) do
+        server = highline.ask(I18n.t("setup.account.server_prompt"))
         account.server = server if !server.nil?
       end
     end
 
     def modify_connection_options(menu)
-      menu.choice("modify connection options") do
-        connection_options = highline.ask("connections options (as JSON): ")
+      menu.choice(I18n.t("setup.account.modify_connection_options")) do
+        connection_options = highline.ask(I18n.t("setup.account.connection_options_prompt"))
         if !connection_options.nil?
           begin
             account.connection_options = connection_options
           rescue JSON::ParserError
-            Kernel.puts "Malformed JSON, please try again"
-            highline.ask "Press a key "
+            Kernel.puts I18n.t("setup.account.malformed_json")
+            highline.ask I18n.t("setup.account.press_key")
           end
         end
       end
@@ -142,9 +143,9 @@ module Imap::Backup
     def toggle_reset_seen_flags_after_fetch(menu)
       menu_item =
         if account.reset_seen_flags_after_fetch
-          "don't fix changes to unread flags during download"
+          I18n.t("setup.account.dont_fix_unread_flags")
         else
-          "fix changes to unread flags during download"
+          I18n.t("setup.account.fix_unread_flags")
         end
       new_value = account.reset_seen_flags_after_fetch ? nil : true
       menu.choice(menu_item) do
@@ -159,23 +160,27 @@ module Imap::Backup
       next_index = (current_index + 1) % statuses.length
       next_status = statuses[next_index]
 
-      menu_item = "change status (currently: #{current_status} -> #{next_status})"
+      menu_item = I18n.t(
+        "setup.account.change_status",
+        current: current_status,
+        next: next_status
+      )
       menu.choice(menu_item) do
         account.status = next_status
       end
     end
 
     def test_connection(menu)
-      menu.choice("test connection") do
+      menu.choice(I18n.t("setup.account.test_connection")) do
         result = Setup::ConnectionTester.new(account).test
         Kernel.puts result
-        highline.ask "Press a key "
+        highline.ask I18n.t("setup.account.press_key")
       end
     end
 
     def delete_account(menu)
-      menu.choice("delete") do
-        if highline.agree("Are you sure? (y/n) ")
+      menu.choice(I18n.t("setup.account.delete")) do
+        if highline.agree(I18n.t("setup.account.delete_confirm"))
           account.mark_for_deletion
           throw :done
         end

@@ -1,6 +1,7 @@
 require "imap/backup/setup/account"
 require "highline"
 require "imap/backup/configuration"
+require "imap/backup/translator"
 
 module Imap::Backup
   RSpec.describe Setup::Account do
@@ -70,6 +71,7 @@ module Imap::Backup
           block.call(menu)
           throw :done
         end
+        Translator.new.setup
       end
 
       describe "preparation" do

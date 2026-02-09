@@ -35,11 +35,11 @@ module Imap::Backup
       ].compact
 
       menu.header = <<~HEADER.chomp
-        #{helpers.title_prefix} Account#{modified_flag}
+        #{helpers.title_prefix} #{I18n.t('setup.account.title')}#{modified_flag}
 
         #{format_rows(rows)}
 
-        Choose an action
+        #{I18n.t('setup.account.choose_action')}
       HEADER
     end
 
@@ -53,17 +53,17 @@ module Imap::Backup
     end
 
     def email
-      ["email", account.username]
+      [I18n.t("setup.account.email"), account.username]
     end
 
     def password
       masked_password =
         if (account.password == "") || account.password.nil?
-          "(unset)"
+          I18n.t("setup.account.unset")
         else
           account.password.gsub(/./, "x")
         end
-      ["password", masked_password]
+      [I18n.t("setup.account.password"), masked_password]
     end
 
     def path
@@ -71,15 +71,15 @@ module Imap::Backup
       # does an eval (!) on its templates, we need to doubly
       # escape them
       local_path = account.local_path.gsub("\\", "\\\\\\\\")
-      ["path", local_path]
+      [I18n.t("setup.account.path"), local_path]
     end
 
     def folders
       label =
         if account.folder_blacklist
-          "exclude"
+          I18n.t("setup.account.exclude")
         else
-          "include"
+          I18n.t("setup.account.include")
         end
       items = account.folders || []
       list =
@@ -87,9 +87,9 @@ module Imap::Backup
         when items.any?
           items.join(", ")
         when !account.folder_blacklist
-          "(all folders)"
+          I18n.t("setup.account.all_folders")
         else
-          "(all folders) <- you have opted to not backup any folders!"
+          I18n.t("setup.account.no_folders_warning")
         end
       [label, list]
     end
@@ -97,21 +97,21 @@ module Imap::Backup
     def mode
       value =
         if account.mirror_mode
-          "mirror emails"
+          I18n.t("setup.account.mirror_emails")
         else
-          "keep all emails"
+          I18n.t("setup.account.keep_all_emails")
         end
-      ["mode", value]
+      [I18n.t("setup.account.mode"), value]
     end
 
     def multi_fetch
       return nil if account.multi_fetch_size == 1
 
-      ["multi-fetch", account.multi_fetch_size]
+      [I18n.t("setup.account.multi_fetch"), account.multi_fetch_size]
     end
 
     def server
-      ["server", account.server]
+      [I18n.t("setup.account.server"), account.server]
     end
 
     def connection_options
@@ -119,19 +119,19 @@ module Imap::Backup
 
       escaped = JSON.generate(account.connection_options)
       escaped.gsub!('"', '\"')
-      ["connection options", "'#{escaped}'"]
+      [I18n.t("setup.account.connection_options"), "'#{escaped}'"]
     end
 
     def reset_seen_flags_after_fetch
       return nil if !account.reset_seen_flags_after_fetch
 
-      ["changes to unread flags will be reset during download"]
+      [I18n.t("setup.account.reset_seen_flags_message")]
     end
 
     def status_row
       return nil if account.status == "active"
 
-      ["status", account.status]
+      [I18n.t("setup.account.status"), account.status]
     end
 
     def format_rows(rows)
