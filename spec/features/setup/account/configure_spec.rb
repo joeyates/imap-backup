@@ -102,14 +102,13 @@ RSpec.describe "imap-backup setup - configuring accounts", :container, type: :ar
       it "indicates the account is modified" do
         run_command "imap-backup setup"
         last_command_started.write "#{email}\n"
-        last_command_started.write "9\n"
+        last_command_started.write "choose folders\n"
         last_command_started.write "1\n"
         last_command_started.write "q\n"
         last_command_started.write "q\n"
-        last_command_started.write "4\n"
-        last_command_started.stop
+        last_command_started.write "exit\n"
 
-        expect(last_command_started).to have_output(/Account\*/)
+        expect(last_command_started).to have_output(/#{email} */)
       end
     end
 
@@ -121,11 +120,10 @@ RSpec.describe "imap-backup setup - configuring accounts", :container, type: :ar
       it "does not throw errors" do
         run_command "imap-backup setup"
         last_command_started.write "#{email}\n"
-        last_command_started.write "9\n"
+        last_command_started.write "choose folders\n"
         last_command_started.write "q\n"
         last_command_started.write "q\n"
-        last_command_started.write "4\n"
-        last_command_started.stop
+        last_command_started.write "q\n"
 
         expect(last_command_started).to have_exit_status(0)
       end

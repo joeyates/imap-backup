@@ -6,6 +6,15 @@ en:
       choose_action: "Choose an action"
       add_account: "add account"
       modify_global_options: "modify global options"
+      help: "help"
+      help_text: |
+        imap-backup helps you backup and restore your email accounts.
+
+        From this main menu, you can:
+        - Add new email accounts to backup
+        - Edit existing account settings
+        - Modify global options
+      press_key: "Press a key "
       save_and_exit: "save and exit"
       exit_without_saving: "exit without saving changes"
       quit: "(q) quit"
