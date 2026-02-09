@@ -100,3 +100,11 @@ en:
       password_prompt: "password: "
       password_confirmation_prompt: "repeat password: "
       password_mismatch: "the password and confirmation did not match.\nContinue? (y/n) "
+    folder_chooser:
+      title: "Add/remove folders"
+      select_folder: "Select a folder (toggles)"
+      return_to_account_menu: "(q) return to the account menu"
+      press_key: "Press a key "
+      unable_to_get_folder_list: "Unable to get folder list"
+      folders_removed: "The following folders have been removed: %{folders}"
+      connection_failed: "Connection failed"
