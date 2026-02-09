@@ -9,7 +9,7 @@ Add internationalization support to imap-backup using the `i18n` and `locale` ge
 
 ## Tasks
 
-- [ ] Add `i18n` and `locale` gems to runtime dependencies
+- [x] Add `i18n` and `locale` gems to runtime dependencies
 - [ ] Create locale infrastructure with directory structure at [lib/imap/backup/locales](lib/imap/backup/locales)
 - [ ] Implement locale detection using the `locale` gem with override for LANG=C → :en
 - [ ] Extract and translate strings from [lib/imap/backup/setup.rb](lib/imap/backup/setup.rb) main menu

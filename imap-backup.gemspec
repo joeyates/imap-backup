@@ -13,6 +13,7 @@ Gem::Specification.new do |gem|
   gem.files         = %w[bin/imap-backup]
   gem.files         += Dir.glob("docs/*.md")
   gem.files         += Dir.glob("lib/**/*.rb")
+  gem.files         += Dir.glob("lib/imap/backup/locales/*.yml")
   gem.files         += %w[imap-backup.gemspec]
   gem.files         += %w[LICENSE README.md]
 
@@ -21,6 +22,8 @@ Gem::Specification.new do |gem|
   gem.required_ruby_version = ">= 3.2"
 
   gem.add_dependency "highline"
+  gem.add_dependency "i18n"
+  gem.add_dependency "locale"
   gem.add_dependency "logger"
   gem.add_dependency "mail", "2.7.1"
   gem.add_dependency "net-imap", ">= 0.3.2"
