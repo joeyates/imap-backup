@@ -74,7 +74,7 @@ module Imap::Backup
       end
     end
 
-    # @return [String] the cofigured download strategy
+    # @return [String] the configured download strategy
     def download_strategy
       ensure_loaded!
 
