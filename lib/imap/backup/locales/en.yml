@@ -51,3 +51,46 @@ en:
       connection_options: "connection options"
       reset_seen_flags_message: "changes to unread flags will be reset during download"
       status: "status"
+    global_options:
+      title: "Global Options"
+      description: "These settings affect all accounts."
+      choose_action: "Choose an action"
+      change_download_strategy: "change download strategy (currently: '%{current}')"
+      return_to_main_menu: "(q) return to main menu"
+      download_strategy_chooser:
+        title: "Choose a Download Strategy"
+        current_marker: " <- current"
+        help: "help"
+        help_text: |
+          This setting changes how often data is written to disk during backups.
+
+          imap-backup uses two files per folder, a .mbox file with the actual
+          messages and a .imap file with metadata like message lengths and their
+          offsets within the .mbox file.
+
+          # write straight to disk
+
+          With this setting, each message and its metadata are written to disk
+          as they are downloaded.
+
+          This choice uses least memory and so is suitable for backing up onto
+          devices with limited memory, like Raspberry Pis.
+
+          # delay writing metadata
+
+          This is the default setting.
+
+          Here, messages (which are potentially very large) are appended to the
+          .mbox file as they are received, but the metadata is only written to
+          the .imap file once all the folder's messages have been downloaded.
+
+          This choice uses a little more memory than the previous setting, but
+          is **much** faster for large folders (potentially >30 times for
+          folders with >100k messages) and is less wearing on the disk.
+
+          # Other Performance Settings
+
+          Another configuration which affects backup performance is the
+          `multi_fetch_size` account-level setting.
+        press_key: "Press a key "
+        return_to_main_menu: "(q) return to main menu"

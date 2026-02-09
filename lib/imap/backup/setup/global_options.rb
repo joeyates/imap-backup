@@ -31,14 +31,14 @@ module Imap::Backup
     def show_menu
       highline.choose do |menu|
         menu.header = <<~MENU.chomp
-          Global Options
+          #{I18n.t('setup.global_options.title')}
 
-          These settings affect all accounts.
+          #{I18n.t('setup.global_options.description')}
 
-          Choose an action
+          #{I18n.t('setup.global_options.choose_action')}
         MENU
         change_download_strategy menu
-        menu.choice("(q) return to main menu") { throw :done }
+        menu.choice(I18n.t("setup.global_options.return_to_main_menu")) { throw :done }
         menu.hidden("quit") { throw :done }
       end
     end
@@ -47,7 +47,8 @@ module Imap::Backup
       strategies = Imap::Backup::Configuration::DOWNLOAD_STRATEGIES
       current = strategies.find { |s| s[:key] == config.download_strategy }
       changed = config.download_strategy_modified? ? " *" : ""
-      menu.choice("change download strategy (currently: '#{current[:description]}')#{changed}") do
+      menu.choice(I18n.t("setup.global_options.change_download_strategy",
+                         current: current[:description]) + changed) do
         DownloadStrategyChooser.new(config: config).run
       end
     end

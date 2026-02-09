@@ -1,4 +1,5 @@
 require "imap/backup/setup/global_options/download_strategy_chooser"
+require "imap/backup/translator"
 
 module Imap::Backup
   RSpec.describe Setup::GlobalOptions::DownloadStrategyChooser do
@@ -18,6 +19,7 @@ module Imap::Backup
     let(:output) { highline_streams[1] }
 
     before do
+      Translator.new.setup
       allow(Kernel).to receive(:system)
       allow(Kernel).to receive(:puts)
     end

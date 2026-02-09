@@ -14,7 +14,7 @@ Add internationalization support to imap-backup using the `i18n` and `locale` ge
 - [x] Implement locale detection using the `locale` gem with override for LANG=C → :en
 - [x] Extract and translate strings from [lib/imap/backup/setup.rb](lib/imap/backup/setup.rb) main menu
 - [x] Extract and translate strings from [lib/imap/backup/setup/account.rb](lib/imap/backup/setup/account.rb) and [lib/imap/backup/setup/account/header.rb](lib/imap/backup/setup/account/header.rb)
-- [ ] Extract and translate strings from [lib/imap/backup/setup/global_options.rb](lib/imap/backup/setup/global_options.rb) and [lib/imap/backup/setup/global_options/download_strategy_chooser.rb](lib/imap/backup/setup/global_options/download_strategy_chooser.rb)
+- [x] Extract and translate strings from [lib/imap/backup/setup/global_options.rb](lib/imap/backup/setup/global_options.rb) and [lib/imap/backup/setup/global_options/download_strategy_chooser.rb](lib/imap/backup/setup/global_options/download_strategy_chooser.rb)
 - [ ] Extract and translate strings from [lib/imap/backup/setup/asker.rb](lib/imap/backup/setup/asker.rb)
 - [ ] Extract and translate strings from [lib/imap/backup/setup/folder_chooser.rb](lib/imap/backup/setup/folder_chooser.rb)
 - [ ] Extract and translate strings from [lib/imap/backup/setup/backup_path.rb](lib/imap/backup/setup/backup_path.rb)
