@@ -1,4 +1,5 @@
 require "imap/backup/cli/local/check"
+require "imap/backup/translator"
 
 module Imap::Backup
   RSpec.describe CLI::Local::Check do
@@ -19,6 +20,7 @@ module Imap::Backup
     let(:serialized_folders) { instance_double(Account::SerializedFolders) }
 
     before do
+      Translator.new.setup
       allow(subject).to receive(:load_config) { config }
       allow(subject).to receive(:requested_accounts).with(config) { [account] }
       allow(Account::SerializedFolders).to receive(:new).

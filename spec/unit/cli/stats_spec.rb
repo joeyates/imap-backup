@@ -1,4 +1,5 @@
 require "imap/backup/cli/stats"
+require "imap/backup/translator"
 
 require "imap/backup/account/backup_folders"
 require "imap/backup/logger"
@@ -52,6 +53,7 @@ module Imap::Backup
       end
 
       before do
+        Translator.new.setup
         allow(Logger).to receive(:logger) { logger }
         allow(subject).to receive(:load_config).with(**options) { config }
         allow(subject).to receive(:account).with(config, email) { account }

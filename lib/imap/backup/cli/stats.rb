@@ -42,10 +42,10 @@ module Imap::Backup
     private
 
     TEXT_COLUMNS = [
-      {name: :folder, width: 20, alignment: :left},
-      {name: :remote, width: 8, alignment: :right},
-      {name: :both, width: 8, alignment: :right},
-      {name: :local, width: 8, alignment: :right}
+      {name: :folder, i18n_key: "cli.stats.folder", width: 20, alignment: :left},
+      {name: :remote, i18n_key: "cli.stats.remote", width: 8, alignment: :right},
+      {name: :both, i18n_key: "cli.stats.both", width: 8, alignment: :right},
+      {name: :local, i18n_key: "cli.stats.local", width: 8, alignment: :right}
     ].freeze
     ALIGNMENT_FORMAT_SYMBOL = {left: "-", right: " "}.freeze
     private_constant :TEXT_COLUMNS, :ALIGNMENT_FORMAT_SYMBOL
@@ -96,7 +96,7 @@ module Imap::Backup
 
     def text_header
       titles = TEXT_COLUMNS.map do |column|
-        format("%-#{column[:width]}s", column[:name])
+        format("%-#{column[:width]}s", I18n.t(column[:i18n_key]))
       end.join("|")
 
       underline = TEXT_COLUMNS.map do |column|

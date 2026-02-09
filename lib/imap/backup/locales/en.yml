@@ -112,3 +112,19 @@ en:
       prompt: "backup directory: "
       validation_error: "Choose a different directory "
       path_in_use: "The path '%{path}' is used to backup the account '%{username}'"
+  cli:
+    version: "imap-backup %{version}"
+    stats:
+      folder: "folder"
+      remote: "remote"
+      both: "both"
+      local: "local"
+    local:
+      check:
+        account: "Account: %{account}"
+    remote:
+      namespaces:
+        name: "Name"
+        prefix: "Prefix"
+        delimiter: "Delimiter"
+        not_defined: "(Not defined)"

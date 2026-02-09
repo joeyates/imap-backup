@@ -1,4 +1,5 @@
 require "imap/backup/cli"
+require "imap/backup/translator"
 
 require "support/shared_examples/an_action_that_handles_logger_options"
 
@@ -347,6 +348,7 @@ module Imap::Backup
       let(:version) { "99.99.99" }
 
       before do
+        Translator.new.setup
         stub_const("Imap::Backup::VERSION", version)
         allow(Kernel).to receive(:puts)
       end
