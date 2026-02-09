@@ -5,6 +5,7 @@ require "imap/backup/account/locker"
 require "imap/backup/client/default"
 require "imap/backup/configuration"
 require "support/shared_examples/an_action_that_handles_logger_options"
+require "imap/backup/translator"
 
 module Imap::Backup
   RSpec.describe CLI::Utils do
@@ -31,6 +32,8 @@ module Imap::Backup
     let(:config) { instance_double(Configuration, accounts: [account]) }
 
     before do
+      Translator.new.setup
+
       allow(Configuration).to receive(:exist?) { true }
       allow(Configuration).to receive(:new) { config }
       allow(Serializer).to receive(:new) { serializer }

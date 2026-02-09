@@ -16,13 +16,13 @@ module Imap::Backup
     # @return [void]
     def run
       if client.nil?
-        highline.ask "Press a key "
+        highline.ask I18n.t("setup.folder_chooser.press_key")
         return
       end
 
       if folder_names.empty?
-        Logger.logger.warn "Unable to get folder list"
-        highline.ask "Press a key "
+        Logger.logger.warn I18n.t("setup.folder_chooser.unable_to_get_folder_list")
+        highline.ask I18n.t("setup.folder_chooser.press_key")
         return
       end
 
@@ -43,13 +43,13 @@ module Imap::Backup
     def show_menu
       highline.choose do |menu|
         menu.header = <<~MENU.chomp
-          #{helpers.title_prefix} Add/remove folders
+          #{helpers.title_prefix} #{I18n.t('setup.folder_chooser.title')}
 
-          Select a folder (toggles)
+          #{I18n.t('setup.folder_chooser.select_folder')}
         MENU
         menu.index = :number
         add_folders menu
-        menu.choice("(q) return to the account menu") { throw :done }
+        menu.choice(I18n.t("setup.folder_chooser.return_to_account_menu")) { throw :done }
         menu.hidden("quit") { throw :done }
       end
     end
@@ -83,11 +83,9 @@ module Imap::Backup
 
       account.folders = config_folders
 
-      Kernel.puts <<~MESSAGE
-        The following folders have been removed: #{removed.join(', ')}
-      MESSAGE
+      Kernel.puts I18n.t("setup.folder_chooser.folders_removed", folders: removed.join(", "))
 
-      highline.ask "Press a key "
+      highline.ask I18n.t("setup.folder_chooser.press_key")
     end
 
     def toggle_selection(folder_name)
@@ -103,7 +101,7 @@ module Imap::Backup
     def client
       @client ||= account.client
     rescue StandardError
-      Logger.logger.warn "Connection failed"
+      Logger.logger.warn I18n.t("setup.folder_chooser.connection_failed")
       nil
     end
 

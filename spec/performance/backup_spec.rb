@@ -33,7 +33,7 @@ RSpec.describe "imap-backup backup performance", :container, :performance, type:
   COUNTS.each do |message_count|
     context "with #{message_count} emails" do
       Imap::Backup::Configuration::DOWNLOAD_STRATEGIES.each do |strategy|
-        context "with #{strategy[:key]} download strategy" do
+        context "with #{strategy} download strategy" do
           1.upto(RUNS) do |run|
             context "with run #{run}" do
               let(:account_config) do
@@ -45,7 +45,7 @@ RSpec.describe "imap-backup backup performance", :container, :performance, type:
               let(:multi_fetch_size) { 25 }
               let(:folder) { "bulk-#{message_count}" }
               let(:config_options) do
-                {accounts: [account_config], download_strategy: strategy[:key]}
+                {accounts: [account_config], download_strategy: strategy}
               end
               let(:t_start_run) { Time.now }
               let(:t_finish_run) { Time.now }
@@ -64,8 +64,8 @@ RSpec.describe "imap-backup backup performance", :container, :performance, type:
                 t_finish_run
                 time_taken = t_finish_run - t_start_run
                 count_runs = results[message_count]
-                count_runs[strategy[:key]] ||= []
-                count_runs[strategy[:key]] << time_taken
+                count_runs[strategy] ||= []
+                count_runs[strategy] << time_taken
                 email = account_config[:username]
                 metadata = imap_parsed(email, folder)
                 expect(metadata[:messages].count).to eq(message_count)

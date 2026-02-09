@@ -224,7 +224,7 @@ module Imap::Backup
     # Prints the program version
     # @return [void]
     def version
-      Kernel.puts "imap-backup #{Imap::Backup::VERSION}"
+      Kernel.puts I18n.t("cli.version", version: Imap::Backup::VERSION)
     end
   end
 end

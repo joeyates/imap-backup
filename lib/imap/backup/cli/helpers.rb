@@ -72,9 +72,7 @@ module Imap::Backup
       erb_config_path = options[:erb_configuration]
 
       # Check mutual exclusivity
-      if config_path && erb_config_path
-        raise "Cannot specify both --config and --erb-configuration options"
-      end
+      raise I18n.t("cli.helpers.config_mutual_exclusivity") if config_path && erb_config_path
 
       # Handle ERB configuration
       return load_erb_config(erb_config_path, options) if erb_config_path
@@ -86,7 +84,7 @@ module Imap::Backup
         exists = Configuration.exist?(path: path)
         if !exists
           expected = path || Configuration.default_pathname
-          raise ConfigurationNotFound, "Configuration file '#{expected}' not found"
+          raise ConfigurationNotFound, I18n.t("cli.helpers.config_not_found", path: expected)
         end
       end
       Configuration.new(path: path)
@@ -96,7 +94,7 @@ module Imap::Backup
     # @return [Account] the Account information for the email address
     def account(config, email)
       account = config.accounts.find { |a| a.username == email }
-      raise "#{email} is not a configured account" if !account
+      raise I18n.t("cli.helpers.account_not_configured", email: email) if !account
 
       account
     end
@@ -123,7 +121,7 @@ module Imap::Backup
     def load_erb_config(erb_path, _options)
       # Check if file exists
       unless File.exist?(erb_path)
-        raise ConfigurationNotFound, "ERB configuration file '#{erb_path}' not found"
+        raise ConfigurationNotFound, I18n.t("cli.helpers.erb_config_not_found", path: erb_path)
       end
 
       begin
@@ -132,16 +130,16 @@ module Imap::Backup
         erb = ERB.new(erb_content)
         rendered_json = erb.result
       rescue SyntaxError => e
-        raise "ERB template has syntax error: #{e.message}"
+        raise I18n.t("cli.helpers.erb_syntax_error", message: e.message)
       rescue StandardError => e
-        raise "Error processing ERB template: #{e.message}"
+        raise I18n.t("cli.helpers.erb_processing_error", message: e.message)
       end
 
       # Validate rendered JSON
       begin
         JSON.parse(rendered_json)
       rescue JSON::ParserError => e
-        raise "ERB template rendered invalid JSON: #{e.message}"
+        raise I18n.t("cli.helpers.erb_invalid_json", message: e.message)
       end
 
       # Create temporary file with rendered JSON

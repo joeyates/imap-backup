@@ -1,6 +1,7 @@
 require "imap/backup/setup/account"
 require "highline"
 require "imap/backup/configuration"
+require "imap/backup/translator"
 
 module Imap::Backup
   RSpec.describe Setup::Account do
@@ -70,6 +71,7 @@ module Imap::Backup
           block.call(menu)
           throw :done
         end
+        Translator.new.setup
       end
 
       describe "preparation" do
@@ -116,7 +118,7 @@ module Imap::Backup
           "modify multi-fetch size (number of emails to fetch at a time)",
           "modify server",
           "modify connection options",
-          "fix changes to unread flags during download",
+          "fix changes to 'UNSEEN' flags during download",
           "test connection",
           "delete",
           "(q) return to main menu",
@@ -284,7 +286,7 @@ module Imap::Backup
           let(:json) { "{}" }
 
           before do
-            allow(highline).to receive(:ask).with("connections options (as JSON): ") { json }
+            allow(highline).to receive(:ask).with("connection options (as JSON): ") { json }
             allow(account).to receive(:"connection_options=")
 
             subject.run
@@ -299,7 +301,7 @@ module Imap::Backup
 
         context "when an empty string is entered" do
           before do
-            allow(highline).to receive(:ask).with("connections options (as JSON): ") { "" }
+            allow(highline).to receive(:ask).with("connection options (as JSON): ") { "" }
             allow(account).to receive(:"connection_options=")
 
             subject.run
@@ -315,7 +317,7 @@ module Imap::Backup
         context "when the JSON is malformed" do
           before do
             allow(Kernel).to receive(:puts)
-            allow(highline).to receive(:ask).with("connections options (as JSON): ") { "xx" }
+            allow(highline).to receive(:ask).with("connection options (as JSON): ") { "xx" }
             allow(account).to receive(:"connection_options=").and_raise(JSON::ParserError)
             allow(highline).to receive(:ask).with("Press a key ")
 
@@ -336,7 +338,7 @@ module Imap::Backup
 
         context "when the user cancels input" do
           before do
-            allow(highline).to receive(:ask).with("connections options (as JSON): ") { nil }
+            allow(highline).to receive(:ask).with("connection options (as JSON): ") { nil }
             allow(account).to receive(:"connection_options=")
 
             subject.run
@@ -355,7 +357,7 @@ module Imap::Backup
         context "when mirror_mode is not set" do
           before do
             subject.run
-            menu.choices["toggle mode (keep/mirror)"].call
+            menu.choices["toggle mode ('keep'/'mirror')"].call
           end
 
           it "sets the flag" do
@@ -368,7 +370,7 @@ module Imap::Backup
 
           before do
             subject.run
-            menu.choices["toggle mode (keep/mirror)"].call
+            menu.choices["toggle mode ('keep'/'mirror')"].call
           end
 
           it "sets the flag" do
@@ -383,7 +385,7 @@ module Imap::Backup
             allow(account).to receive(:reset_seen_flags_after_fetch=)
 
             subject.run
-            menu.choices["fix changes to unread flags during download"].call
+            menu.choices["fix changes to 'UNSEEN' flags during download"].call
           end
 
           it "sets the flag" do
@@ -398,7 +400,7 @@ module Imap::Backup
             allow(account).to receive(:reset_seen_flags_after_fetch=)
 
             subject.run
-            menu.choices["don't fix changes to unread flags during download"].call
+            menu.choices["don't fix changes to 'UNSEEN' flags during download"].call
           end
 
           it "unsets the flag" do
@@ -437,7 +439,7 @@ module Imap::Backup
         end
 
         it "moves from active to archived" do
-          menu.choices["change status (currently: active -> archived)"].call
+          menu.choices["change status (active -> archived)"].call
 
           expect(account).to have_received(:status=).with("archived")
         end
@@ -446,7 +448,7 @@ module Imap::Backup
           let(:account_status) { "archived" }
 
           it "moves to offline" do
-            menu.choices["change status (currently: archived -> offline)"].call
+            menu.choices["change status (archived -> offline)"].call
 
             expect(account).to have_received(:status=).with("offline")
           end
@@ -456,7 +458,7 @@ module Imap::Backup
           let(:account_status) { "offline" }
 
           it "wraps back to active" do
-            menu.choices["change status (currently: offline -> active)"].call
+            menu.choices["change status (offline -> active)"].call
 
             expect(account).to have_received(:status=).with("active")
           end

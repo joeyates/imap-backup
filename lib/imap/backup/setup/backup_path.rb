@@ -16,10 +16,10 @@ module Imap::Backup
     #
     # @return [void]
     def run
-      account.local_path = highline.ask("backup directory: ") do |q|
+      account.local_path = highline.ask(I18n.t("setup.backup_path.prompt")) do |q|
         q.default  = account.local_path
         q.validate = ->(path) { path_modification_validator(path) }
-        q.responses[:not_valid] = "Choose a different directory "
+        q.responses[:not_valid] = I18n.t("setup.backup_path.validation_error")
       end
     end
 
@@ -37,8 +37,8 @@ module Imap::Backup
         a.username != account.username && a.local_path == path
       end
       if same
-        Kernel.puts "The path '#{path}' is used to backup " \
-                    "the account '#{same.username}'"
+        Kernel.puts I18n.t("setup.backup_path.path_in_use",
+                           path: path, username: same.username)
         false
       else
         true

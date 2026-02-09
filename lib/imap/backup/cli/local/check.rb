@@ -64,7 +64,7 @@ module Imap::Backup
 
     def print_check_results_as_text(results)
       results.each do |account_results|
-        Kernel.puts "Account: #{account_results[:account]}"
+        Kernel.puts I18n.t("cli.local.check.account", account: account_results[:account])
         account_results[:folders].each do |folder_results|
           Kernel.puts "\t#{folder_results[:name]}: #{folder_results[:result]}"
         end

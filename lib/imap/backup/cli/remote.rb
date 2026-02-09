@@ -115,7 +115,9 @@ module Imap::Backup
     def list_namespaces(namespaces)
       Kernel.puts format(
         NAMESPACE_TEMPLATE,
-        {name: "Name", prefix: "Prefix", delim: "Delimiter"}
+        {name: I18n.t("cli.remote.namespaces.name"),
+         prefix: I18n.t("cli.remote.namespaces.prefix"),
+         delim: I18n.t("cli.remote.namespaces.delimiter")}
       )
       list_namespace namespaces, :personal
       list_namespace namespaces, :other
@@ -127,7 +129,8 @@ module Imap::Backup
       if info
         Kernel.puts format(NAMESPACE_TEMPLATE, name: name, **info)
       else
-        Kernel.puts format("%-10<name>s (Not defined)", name: name)
+        Kernel.puts format("%-10<name>s %<not_defined>s",
+                           name: name, not_defined: I18n.t("cli.remote.namespaces.not_defined"))
       end
     end
 

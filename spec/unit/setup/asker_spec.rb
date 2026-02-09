@@ -1,4 +1,5 @@
 require "imap/backup/setup/asker"
+require "imap/backup/translator"
 
 module Imap::Backup
   RSpec.describe Setup::Asker do
@@ -18,6 +19,7 @@ module Imap::Backup
     let(:answer) { "foo" }
 
     before do
+      Translator.new.setup
       allow(Setup).to receive(:highline) { highline }
       allow(highline).to receive(:ask) do |&b|
         b.call query

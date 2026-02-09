@@ -1,4 +1,5 @@
 require "imap/backup/setup/folder_chooser"
+require "imap/backup/translator"
 
 module Imap::Backup
   RSpec.describe Setup::FolderChooser do
@@ -23,6 +24,7 @@ module Imap::Backup
       let(:output) { highline_streams[1] }
 
       before do
+        Translator.new.setup
         allow(Kernel).to receive(:system)
         allow(Logger.logger).to receive(:warn)
       end

@@ -1,0 +1,166 @@
+---
+en:
+  setup:
+    main_menu:
+      title: "Main Menu"
+      choose_action: "Choose an action"
+      add_account: "add account"
+      modify_global_options: "modify global options"
+      save_and_exit: "save and exit"
+      exit_without_saving: "exit without saving changes"
+      quit: "(q) quit"
+    account:
+      title: "Account"
+      choose_action: "Choose an action"
+      modify_email: "modify email"
+      modify_password: "modify password"
+      modify_backup_path: "modify backup path"
+      toggle_folder_blacklist: "toggle folder inclusion mode (whitelist/blacklist)"
+      choose_folders: "choose folders to %{action}"
+      exclude_from_backups: "exclude from backups"
+      include_in_backups: "include in backups"
+      toggle_mirror_mode: "toggle mode ('keep'/'mirror')"
+      modify_multi_fetch_size: "modify multi-fetch size (number of emails to fetch at a time)"
+      size_prompt: "size: "
+      modify_server: "modify server"
+      server_prompt: "server: "
+      modify_connection_options: "modify connection options"
+      connection_options_prompt: "connection options (as JSON): "
+      malformed_json: "Malformed JSON, please try again"
+      press_key: "Press a key "
+      dont_fix_unread_flags: "don't fix changes to 'UNSEEN' flags during download"
+      fix_unread_flags: "fix changes to 'UNSEEN' flags during download"
+      change_status: "change status (%{current} -> %{next})"
+      test_connection: "test connection"
+      delete: "delete"
+      delete_confirm: "Are you sure? (y/n) "
+      return_to_main_menu: "(q) return to main menu"
+      email: "email"
+      password: "password"
+      unset: "(unset)"
+      path: "path"
+      exclude: "exclude"
+      include: "include"
+      all_folders: "(all folders)"
+      no_folders_warning: "(all folders) <- you have opted to not backup any folders!"
+      mirror_emails: "mirror emails"
+      keep_all_emails: "keep all emails"
+      mode: "mode"
+      multi_fetch: "multi-fetch"
+      server: "server"
+      connection_options: "connection options"
+      reset_seen_flags_message: "changes to 'UNSEEN' flags will be reset during download"
+      status: "status"
+    global_options:
+      title: "Global Options"
+      description: "These settings affect all accounts."
+      choose_action: "Choose an action"
+      change_download_strategy: "change download strategy (currently: '%{current}')"
+      return_to_main_menu: "(q) return to main menu"
+      download_strategy_chooser:
+        title: "Choose a Download Strategy"
+        current_marker: " <- current"
+        help: "help"
+        help_text: |
+          This setting changes how often data is written to disk during backups.
+
+          imap-backup uses two files per folder, a .mbox file with the actual
+          messages and a .imap file with metadata like message lengths and their
+          offsets within the .mbox file.
+
+          # write straight to disk
+
+          With this setting, each message and its metadata are written to disk
+          as they are downloaded.
+
+          This choice uses least memory and so is suitable for backing up onto
+          devices with limited memory, like Raspberry Pis.
+
+          # delay writing metadata
+
+          This is the default setting.
+
+          Here, messages (which are potentially very large) are appended to the
+          .mbox file as they are received, but the metadata is only written to
+          the .imap file once all the folder's messages have been downloaded.
+
+          This choice uses a little more memory than the previous setting, but
+          is **much** faster for large folders (potentially >30 times for
+          folders with >100k messages) and is less wearing on the disk.
+
+          # Other Performance Settings
+
+          Another configuration which affects backup performance is the
+          `multi_fetch_size` account-level setting.
+        press_key: "Press a key "
+        return_to_main_menu: "(q) return to main menu"
+    asker:
+      email_prompt: "email address: "
+      email_validation_error: "Enter a valid email address "
+      password_prompt: "password: "
+      password_confirmation_prompt: "repeat password: "
+      password_mismatch: "the password and confirmation did not match.\nContinue? (y/n) "
+    folder_chooser:
+      title: "Add/remove folders"
+      select_folder: "Select a folder (toggles)"
+      return_to_account_menu: "(q) return to the account menu"
+      press_key: "Press a key "
+      unable_to_get_folder_list: "Unable to get folder list"
+      folders_removed: "The following folders have been removed: %{folders}"
+      connection_failed: "Connection failed"
+    backup_path:
+      prompt: "backup directory: "
+      validation_error: "Choose a different directory "
+      path_in_use: "The path '%{path}' is used to backup the account '%{username}'"
+  cli:
+    version: "imap-backup %{version}"
+    stats:
+      folder: "folder"
+      remote: "remote"
+      both: "both"
+      local: "local"
+    local:
+      check:
+        account: "Account: %{account}"
+    remote:
+      namespaces:
+        name: "Name"
+        prefix: "Prefix"
+        delimiter: "Delimiter"
+        not_defined: "(Not defined)"
+    restore:
+      missing_email_parameter: "Missing EMAIL parameter"
+    transfer:
+      same_account_error: "Source and destination accounts cannot be the same!"
+      destination_not_found: "Account '%{email}' does not exist"
+      source_not_found: "Account '%{email}' does not exist"
+      source_not_available: "Account '%{email}' is not available for migration (status: %{status})"
+      destination_not_available: "Account '%{email}' is not available for migration (status: %{status})"
+      incompatible_destination_delimiter: "--automatic-namespaces is incompatible with --destination-delimiter"
+      incompatible_destination_prefix: "--automatic-namespaces is incompatible with --destination-prefix"
+      incompatible_source_delimiter: "--automatic-namespaces is incompatible with --source-delimiter"
+      incompatible_source_prefix: "--automatic-namespaces is incompatible with --source-prefix"
+    helpers:
+      config_mutual_exclusivity: "Cannot specify both --config and --erb-configuration options"
+      config_not_found: "Configuration file '%{path}' not found"
+      account_not_configured: "%{email} is not a configured account"
+      erb_config_not_found: "ERB configuration file '%{path}' not found"
+      erb_syntax_error: "ERB template has syntax error: %{message}"
+      erb_processing_error: "Error processing ERB template: %{message}"
+      erb_invalid_json: "ERB template rendered invalid JSON: %{message}"
+    local:
+      check:
+        account: "Account: %{account}"
+      folder_not_found: "Folder '%{folder}' not found"
+    utils:
+      thunderbird_profile_not_found: "Thunderbird profile '%{profile}' not found"
+      default_thunderbird_profile_not_found: "Default Thunderbird profile not found"
+      no_serialized_folders: "No serialized folders were found for account '%{email}'"
+  configuration:
+    download_strategy:
+      direct:
+        short: "write straight to disk"
+        long: "write to disk as messages are downloaded"
+      delay_metadata:
+        short: "delay writing metadata"
+        long: "delay writing metadata until all messages are downloaded"

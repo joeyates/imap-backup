@@ -16,10 +16,7 @@ module Imap::Backup
     # The default download strategy key
     DEFAULT_STRATEGY = "delay_metadata".freeze
     # The available download strategies
-    DOWNLOAD_STRATEGIES = [
-      {key: "direct", description: "write straight to disk"},
-      {key: DEFAULT_STRATEGY, description: "delay writing metadata"}
-    ].freeze
+    DOWNLOAD_STRATEGIES = ["direct", DEFAULT_STRATEGY].freeze
     # The current file version
     VERSION = "2.2".freeze
 
@@ -77,7 +74,7 @@ module Imap::Backup
       end
     end
 
-    # @return [String] the cofigured download strategy
+    # @return [String] the configured download strategy
     def download_strategy
       ensure_loaded!
 
@@ -87,7 +84,7 @@ module Imap::Backup
     # @param value [String] the new strategy
     # @return [void]
     def download_strategy=(value)
-      raise "Unknown strategy '#{value}'" if !DOWNLOAD_STRATEGIES.find { |s| s[:key] == value }
+      raise "Unknown strategy '#{value}'" if !DOWNLOAD_STRATEGIES.include?(value)
 
       ensure_loaded!
 
@@ -133,7 +130,7 @@ module Imap::Backup
           contents = File.read(pathname)
           data = JSON.parse(contents, symbolize_names: true)
           data[:download_strategy] =
-            if DOWNLOAD_STRATEGIES.find { |s| s[:key] == data[:download_strategy] }
+            if DOWNLOAD_STRATEGIES.include?(data[:download_strategy])
               data[:download_strategy]
             else
               DEFAULT_STRATEGY

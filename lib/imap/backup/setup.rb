@@ -1,4 +1,5 @@
 require "highline"
+require "i18n"
 
 require "imap/backup/account"
 require "imap/backup/email/provider"
@@ -41,21 +42,21 @@ module Imap::Backup
     def show_menu
       self.class.highline.choose do |menu|
         menu.header = <<~MENU.chomp
-          #{helpers.title_prefix} Main Menu
+          #{helpers.title_prefix} #{I18n.t('setup.main_menu.title')}
 
-          Choose an action
+          #{I18n.translate('setup.main_menu.choose_action')}
         MENU
         account_items menu
         add_account_item menu
         modify_global_options menu
         if config.modified?
-          menu.choice("save and exit") do
+          menu.choice(I18n.t("setup.main_menu.save_and_exit")) do
             config.save
             throw :done
           end
-          menu.choice("exit without saving changes") { throw :done }
+          menu.choice(I18n.t("setup.main_menu.exit_without_saving")) { throw :done }
         else
-          menu.choice("(q) quit") { throw :done }
+          menu.choice(I18n.t("setup.main_menu.quit")) { throw :done }
           menu.hidden("quit") { throw :done }
         end
       end
@@ -74,7 +75,7 @@ module Imap::Backup
     end
 
     def add_account_item(menu)
-      menu.choice("add account") do
+      menu.choice(I18n.t("setup.main_menu.add_account")) do
         username = Asker.email
         edit_account username
       end
@@ -82,7 +83,7 @@ module Imap::Backup
 
     def modify_global_options(menu)
       changed = config.download_strategy_modified? ? " *" : ""
-      menu.choice("modify global options#{changed}") do
+      menu.choice("#{I18n.t('setup.main_menu.modify_global_options')}#{changed}") do
         GlobalOptions.new(config: config).run
       end
     end

@@ -9,19 +9,19 @@ Add internationalization support to imap-backup using the `i18n` and `locale` ge
 
 ## Tasks
 
-- [ ] Add `i18n` and `locale` gems to runtime dependencies
-- [ ] Create locale infrastructure with directory structure at [lib/imap/backup/locales](lib/imap/backup/locales)
-- [ ] Implement locale detection using the `locale` gem with override for LANG=C → :en
-- [ ] Extract and translate strings from [lib/imap/backup/setup.rb](lib/imap/backup/setup.rb) main menu
-- [ ] Extract and translate strings from [lib/imap/backup/setup/account.rb](lib/imap/backup/setup/account.rb) and [lib/imap/backup/setup/account/header.rb](lib/imap/backup/setup/account/header.rb)
-- [ ] Extract and translate strings from [lib/imap/backup/setup/global_options.rb](lib/imap/backup/setup/global_options.rb) and [lib/imap/backup/setup/global_options/download_strategy_chooser.rb](lib/imap/backup/setup/global_options/download_strategy_chooser.rb)
-- [ ] Extract and translate strings from [lib/imap/backup/setup/asker.rb](lib/imap/backup/setup/asker.rb)
-- [ ] Extract and translate strings from [lib/imap/backup/setup/folder_chooser.rb](lib/imap/backup/setup/folder_chooser.rb)
-- [ ] Extract and translate strings from [lib/imap/backup/setup/backup_path.rb](lib/imap/backup/setup/backup_path.rb)
-- [ ] Update CLI error messages and user-facing outputs outside setup
-- [ ] Create Italian (it.yml) locale file with translations
-- [ ] Create [docs/i18n.md](docs/i18n.md) documenting i18n usage and contribution guidelines for translators
-- [ ] Add an (undated, unversioned) entry to [Changelog.md](Changelog.md) describing the changes
+- [x] Add `i18n` and `locale` gems to runtime dependencies
+- [x] Create locale infrastructure with directory structure at [lib/imap/backup/locales](lib/imap/backup/locales)
+- [x] Implement locale detection using the `locale` gem with override for LANG=C → :en
+- [x] Extract and translate strings from [lib/imap/backup/setup.rb](lib/imap/backup/setup.rb) main menu
+- [x] Extract and translate strings from [lib/imap/backup/setup/account.rb](lib/imap/backup/setup/account.rb) and [lib/imap/backup/setup/account/header.rb](lib/imap/backup/setup/account/header.rb)
+- [x] Extract and translate strings from [lib/imap/backup/setup/global_options.rb](lib/imap/backup/setup/global_options.rb) and [lib/imap/backup/setup/global_options/download_strategy_chooser.rb](lib/imap/backup/setup/global_options/download_strategy_chooser.rb)
+- [x] Extract and translate strings from [lib/imap/backup/setup/asker.rb](lib/imap/backup/setup/asker.rb)
+- [x] Extract and translate strings from [lib/imap/backup/setup/folder_chooser.rb](lib/imap/backup/setup/folder_chooser.rb)
+- [x] Extract and translate strings from [lib/imap/backup/setup/backup_path.rb](lib/imap/backup/setup/backup_path.rb)
+- [x] Update CLI error messages and user-facing outputs outside setup
+- [x] Create Italian (it.yml) locale file with translations
+- [x] Create [docs/i18n.md](docs/i18n.md) documenting i18n usage and contribution guidelines for translators
+- [x] Add an (undated, unversioned) entry to [Changelog.md](Changelog.md) describing the changes
 
 ## Principal Files
 

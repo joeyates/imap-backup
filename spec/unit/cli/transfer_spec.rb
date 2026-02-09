@@ -4,6 +4,7 @@ require "net/imap"
 require "imap/backup/account/folder"
 require "imap/backup/account/locker"
 require "imap/backup/serializer"
+require "imap/backup/translator"
 
 module Imap::Backup
   RSpec.describe CLI::Transfer do
@@ -43,6 +44,8 @@ module Imap::Backup
     let(:destination_locker) { instance_double(Account::Locker, "Destination locker", with_lock: nil) }
 
     before do
+      Translator.new.setup
+
       allow(Configuration).to receive(:exist?) { true }
       allow(Configuration).to receive(:new) { config }
       allow(CLI::Backup).to receive(:new) { backup }

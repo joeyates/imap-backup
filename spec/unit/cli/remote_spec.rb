@@ -1,4 +1,5 @@
 require "imap/backup/cli/remote"
+require "imap/backup/translator"
 
 require "ostruct"
 require "imap/backup/client/default"
@@ -28,6 +29,7 @@ module Imap::Backup
     end
 
     before do
+      Translator.new.setup
       allow(Configuration).to receive(:exist?) { true }
       allow(Configuration).to receive(:new) { config }
       allow(Kernel).to receive(:puts)

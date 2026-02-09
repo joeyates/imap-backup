@@ -1,4 +1,5 @@
 require "imap/backup/setup/backup_path"
+require "imap/backup/translator"
 
 module Imap::Backup
   RSpec.describe Setup::BackupPath do
@@ -25,6 +26,7 @@ module Imap::Backup
     let(:new_backup_path) { "/new/path" }
 
     before do
+      Translator.new.setup
       allow(Kernel).to receive(:puts)
       allow(account).to receive(:"local_path=")
       allow(Setup.highline).to receive(:get_response_line_mode) { new_backup_path }

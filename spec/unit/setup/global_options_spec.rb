@@ -1,4 +1,5 @@
 require "imap/backup/setup/global_options"
+require "imap/backup/translator"
 
 module Imap::Backup
   RSpec.describe Setup::GlobalOptions do
@@ -22,6 +23,7 @@ module Imap::Backup
     let(:download_strategy_modified) { false }
 
     before do
+      Translator.new.setup
       allow(Kernel).to receive(:system)
       allow(Setup::GlobalOptions::DownloadStrategyChooser).
         to receive(:new) { download_strategy_chooser }

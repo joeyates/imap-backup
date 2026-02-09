@@ -1,6 +1,7 @@
 require "imap/backup/setup/account/header"
 require "highline"
 require "imap/backup/account"
+require "imap/backup/translator"
 
 module Imap::Backup
   RSpec.describe Setup::Account::Header do
@@ -34,6 +35,11 @@ module Imap::Backup
     let(:reset_seen_flags_after_fetch) { false }
     let(:status) { "active" }
 
+    before do
+      Translator.new.setup
+      subject.run
+    end
+
     [
       ["email", /email\s+user@example.com/],
       ["password", /password\s+x+/],
@@ -42,8 +48,6 @@ module Imap::Backup
       ["mode", /keep/],
       ["server", /server\s+imap.example.com/]
     ].each do |attribute, value|
-      before { subject.run }
-
       it "shows the #{attribute}" do
         expect(menu.header).to match(value)
       end
@@ -99,7 +103,7 @@ module Imap::Backup
       let(:reset_seen_flags_after_fetch) { true }
 
       it "indicates the flag is set" do
-        expect(menu.header).to match(/^changes to unread flags will be reset/)
+        expect(menu.header).to match(/^changes to 'UNSEEN' flags will be reset/)
       end
     end
 

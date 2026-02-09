@@ -97,23 +97,24 @@ module Imap::Backup
     end
 
     def check_accounts!
-      if destination_email == source_email
-        raise "Source and destination accounts cannot be the same!"
+      raise I18n.t("cli.transfer.same_account_error") if destination_email == source_email
+
+      if !destination_account
+        raise I18n.t("cli.transfer.destination_not_found",
+                     email: destination_email)
       end
 
-      raise "Account '#{destination_email}' does not exist" if !destination_account
-
-      raise "Account '#{source_email}' does not exist" if !source_account
+      raise I18n.t("cli.transfer.source_not_found", email: source_email) if !source_account
 
       if !source_account.available_for_migration?
-        raise "Account '#{source_email}' is not available for migration " \
-              "(status: #{source_account.status})"
+        raise I18n.t("cli.transfer.source_not_available",
+                     email: source_email, status: source_account.status)
       end
 
       return if destination_account.available_for_migration?
 
-      raise "Account '#{destination_email}' is not available for migration " \
-            "(status: #{destination_account.status})"
+      raise I18n.t("cli.transfer.destination_not_available",
+                   email: destination_email, status: destination_account.status)
     end
 
     def choose_prefixes_and_delimiters!
@@ -126,12 +127,10 @@ module Imap::Backup
     end
 
     def ensure_no_prefix_or_delimiter_parameters!
-      if destination_delimiter
-        raise "--automatic-namespaces is incompatible with --destination-delimiter"
-      end
-      raise "--automatic-namespaces is incompatible with --destination-prefix" if destination_prefix
-      raise "--automatic-namespaces is incompatible with --source-delimiter" if source_delimiter
-      raise "--automatic-namespaces is incompatible with --source-prefix" if source_prefix
+      raise I18n.t("cli.transfer.incompatible_destination_delimiter") if destination_delimiter
+      raise I18n.t("cli.transfer.incompatible_destination_prefix") if destination_prefix
+      raise I18n.t("cli.transfer.incompatible_source_delimiter") if source_delimiter
+      raise I18n.t("cli.transfer.incompatible_source_prefix") if source_prefix
     end
 
     def query_servers_for_settings
