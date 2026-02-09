@@ -1,3 +1,4 @@
+require "ostruct"
 require "imap/backup/setup/connection_tester"
 
 module Imap::Backup
