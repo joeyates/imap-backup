@@ -39,7 +39,7 @@ module Imap::Backup
 
         #{format_rows(rows)}
 
-        #{I18n.t('setup.account.choose_action')}
+        #{I18n.t('setup.account.connection_configuration')}
       HEADER
     end
 
@@ -59,7 +59,7 @@ module Imap::Backup
     def password
       masked_password =
         if (account.password == "") || account.password.nil?
-          I18n.t("setup.account.unset")
+          I18n.t("setup.account.password_unset")
         else
           account.password.gsub(/./, "x")
         end

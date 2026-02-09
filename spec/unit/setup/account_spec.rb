@@ -74,6 +74,10 @@ module Imap::Backup
         Translator.new.setup
       end
 
+      def menu_item(prefix)
+        menu.choices.find { |name, _| name.start_with?(prefix) }&.last
+      end
+
       describe "preparation" do
         it "clears the screen" do
           expect(Kernel).to receive(:system).with("clear")
@@ -121,13 +125,14 @@ module Imap::Backup
           "fix changes to 'UNSEEN' flags during download",
           "test connection",
           "delete",
+          "help",
           "(q) return to main menu",
           "quit" # TODO: quit is hidden
         ].each do |item|
           before { subject.run }
 
           it "has a '#{item}' item" do
-            expect(menu.choices).to include(item)
+            expect(menu_item(item)).to_not be_nil
           end
         end
       end
@@ -439,7 +444,7 @@ module Imap::Backup
         end
 
         it "moves from active to archived" do
-          menu.choices["change status (active -> archived)"].call
+          menu_item("change status").call
 
           expect(account).to have_received(:status=).with("archived")
         end
@@ -448,7 +453,7 @@ module Imap::Backup
           let(:account_status) { "archived" }
 
           it "moves to offline" do
-            menu.choices["change status (archived -> offline)"].call
+            menu_item("change status").call
 
             expect(account).to have_received(:status=).with("offline")
           end
@@ -458,7 +463,7 @@ module Imap::Backup
           let(:account_status) { "offline" }
 
           it "wraps back to active" do
-            menu.choices["change status (offline -> active)"].call
+            menu_item("change status").call
 
             expect(account).to have_received(:status=).with("active")
           end
@@ -478,7 +483,7 @@ module Imap::Backup
             to receive(:new) { connection_tester }
           allow(highline).to receive(:ask)
           subject.run
-          menu.choices["test connection"].call
+          menu_item("test connection").call
         end
 
         it "tests the connection" do
@@ -494,7 +499,7 @@ module Imap::Backup
           allow(highline).to receive(:agree) { confirmed }
           subject.run
           catch :done do
-            menu.choices["delete"].call
+            menu_item("delete").call
           end
         end
 
@@ -514,6 +519,19 @@ module Imap::Backup
           it "doesn't flag the account to be deleted" do
             expect(account).to_not have_received(:mark_for_deletion)
           end
+        end
+      end
+
+      describe "choosing 'help'" do
+        before do
+          allow(Kernel).to receive(:puts)
+          allow(highline).to receive(:ask)
+          subject.run
+          menu_item("help").call
+        end
+
+        it "shows help text" do
+          expect(Kernel).to have_received(:puts).with(/This screen allows you to configure/)
         end
       end
     end

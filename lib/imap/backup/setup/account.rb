@@ -58,6 +58,7 @@ module Imap::Backup
         toggle_reset_seen_flags_after_fetch menu
         rotate_status menu
         delete_account menu
+        show_help menu
         menu.choice(I18n.t("setup.account.return_to_main_menu")) { throw :done }
         menu.hidden("quit") { throw :done }
       end
@@ -78,6 +79,45 @@ module Imap::Backup
         password = Setup::Asker.password
 
         account.password = password if !password.nil?
+      end
+    end
+
+    def modify_server(menu)
+      menu.choice(I18n.t("setup.account.modify_server")) do
+        server = highline.ask(I18n.t("setup.account.server_prompt"))
+        account.server = server if !server.nil?
+      end
+    end
+
+    def modify_connection_options(menu)
+      menu.choice(I18n.t("setup.account.modify_connection_options")) do
+        connection_options = highline.ask(I18n.t("setup.account.connection_options_prompt"))
+        if !connection_options.nil?
+          begin
+            account.connection_options = connection_options
+          rescue JSON::ParserError
+            Kernel.puts I18n.t("setup.account.malformed_json")
+            highline.ask I18n.t("setup.account.press_key")
+          end
+        end
+      end
+    end
+
+    def test_connection(menu)
+      text = "#{I18n.t('setup.account.test_connection')}\n\n" \
+             "#{I18n.t('setup.account.backup_configuration')}:"
+      menu.choice(text) do
+        result = Setup::ConnectionTester.new(account).test
+        Kernel.puts result
+        highline.ask I18n.t("setup.account.press_key")
+      end
+    end
+
+    def toggle_mirror_mode(menu)
+      menu_item = I18n.t("setup.account.toggle_mirror_mode")
+      new_value = account.mirror_mode ? nil : true
+      menu.choice(menu_item) do
+        account.mirror_mode = new_value
       end
     end
 
@@ -103,40 +143,11 @@ module Imap::Backup
       end
     end
 
-    def toggle_mirror_mode(menu)
-      menu_item = I18n.t("setup.account.toggle_mirror_mode")
-      new_value = account.mirror_mode ? nil : true
-      menu.choice(menu_item) do
-        account.mirror_mode = new_value
-      end
-    end
-
     def modify_multi_fetch_size(menu)
       menu.choice(I18n.t("setup.account.modify_multi_fetch_size")) do
         size = highline.ask(I18n.t("setup.account.size_prompt"))
         int = size.to_i
         account.multi_fetch_size = int if int.positive?
-      end
-    end
-
-    def modify_server(menu)
-      menu.choice(I18n.t("setup.account.modify_server")) do
-        server = highline.ask(I18n.t("setup.account.server_prompt"))
-        account.server = server if !server.nil?
-      end
-    end
-
-    def modify_connection_options(menu)
-      menu.choice(I18n.t("setup.account.modify_connection_options")) do
-        connection_options = highline.ask(I18n.t("setup.account.connection_options_prompt"))
-        if !connection_options.nil?
-          begin
-            account.connection_options = connection_options
-          rescue JSON::ParserError
-            Kernel.puts I18n.t("setup.account.malformed_json")
-            highline.ask I18n.t("setup.account.press_key")
-          end
-        end
       end
     end
 
@@ -165,25 +176,29 @@ module Imap::Backup
         current: current_status,
         next: next_status
       )
-      menu.choice(menu_item) do
+      following_section = I18n.t("setup.account.danger_area")
+      text = "#{menu_item}\n\n#{following_section}:"
+      menu.choice(text) do
         account.status = next_status
       end
     end
 
-    def test_connection(menu)
-      menu.choice(I18n.t("setup.account.test_connection")) do
-        result = Setup::ConnectionTester.new(account).test
-        Kernel.puts result
-        highline.ask I18n.t("setup.account.press_key")
-      end
-    end
-
     def delete_account(menu)
-      menu.choice(I18n.t("setup.account.delete")) do
+      menu_item = I18n.t("setup.account.delete")
+      following_section = I18n.t("setup.account.other_actions")
+      text = "#{menu_item}\n\n#{following_section}:"
+      menu.choice(text) do
         if highline.agree(I18n.t("setup.account.delete_confirm"))
           account.mark_for_deletion
           throw :done
         end
+      end
+    end
+
+    def show_help(menu)
+      menu.choice(I18n.t("setup.account.help")) do
+        Kernel.puts I18n.t("setup.account.help_text")
+        highline.ask I18n.t("setup.account.press_key")
       end
     end
   end
