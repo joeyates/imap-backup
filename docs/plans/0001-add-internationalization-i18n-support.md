@@ -20,7 +20,7 @@ Add internationalization support to imap-backup using the `i18n` and `locale` ge
 - [x] Extract and translate strings from [lib/imap/backup/setup/backup_path.rb](lib/imap/backup/setup/backup_path.rb)
 - [x] Update CLI error messages and user-facing outputs outside setup
 - [x] Create Italian (it.yml) locale file with translations
-- [ ] Create [docs/i18n.md](docs/i18n.md) documenting i18n usage and contribution guidelines for translators
+- [x] Create [docs/i18n.md](docs/i18n.md) documenting i18n usage and contribution guidelines for translators
 - [ ] Add an (undated, unversioned) entry to [Changelog.md](Changelog.md) describing the changes
 
 ## Principal Files
