@@ -94,3 +94,9 @@ en:
           `multi_fetch_size` account-level setting.
         press_key: "Press a key "
         return_to_main_menu: "(q) return to main menu"
+    asker:
+      email_prompt: "email address: "
+      email_validation_error: "Enter a valid email address "
+      password_prompt: "password: "
+      password_confirmation_prompt: "repeat password: "
+      password_mismatch: "the password and confirmation did not match.\nContinue? (y/n) "

@@ -15,10 +15,10 @@ module Imap::Backup
     # @param default [String] the existing email address
     # @return [String] the email address
     def email(default = "")
-      highline.ask("email address: ") do |q|
+      highline.ask(I18n.t("setup.asker.email_prompt")) do |q|
         q.default               = default
         q.validate              = EMAIL_MATCHER
-        q.responses[:not_valid] = "Enter a valid email address "
+        q.responses[:not_valid] = I18n.t("setup.asker.email_validation_error")
       end
     end
 
@@ -26,11 +26,15 @@ module Imap::Backup
     #
     # @return [String] the password
     def password
-      password     = highline.ask("password: ")        { |q| q.echo = false }
-      confirmation = highline.ask("repeat password: ") { |q| q.echo = false }
+      password = highline.ask(I18n.t("setup.asker.password_prompt")) do |q|
+        q.echo = false
+      end
+      confirmation = highline.ask(I18n.t("setup.asker.password_confirmation_prompt")) do |q|
+        q.echo = false
+      end
       if password != confirmation
         return nil if !highline.agree(
-          "the password and confirmation did not match.\nContinue? (y/n) "
+          I18n.t("setup.asker.password_mismatch")
         )
 
         return self.password
