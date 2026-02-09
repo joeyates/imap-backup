@@ -39,11 +39,9 @@ end
 
 # Testing
 
-- When creating new tests, use existing tests in the same directory as examples,
-  if available.
+- When creating new tests, use existing tests in the same directory as examples, if available.
 - In tests, prefer one assertion per example.
-- Never test private methods, instead write tests for public methods that exercise the
-  private methods.
+- Never test private methods, instead write tests for public methods that exercise the private methods.
 - When returning a value from RSPec's `allow` use a block, don't use `and_return`.
 
 ## Test Coverage
