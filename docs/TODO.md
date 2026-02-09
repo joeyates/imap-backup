@@ -1,6 +1,6 @@
 # Add Internationalization (i18n) Support
 
-Status: [ ]
+Status: [x]
 
 ## Description
 
