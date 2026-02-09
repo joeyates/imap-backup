@@ -53,9 +53,8 @@ module Imap::Backup
       before do
         Translator.new.setup
         allow(Logger).to receive(:setup_logging)
-        allow(input).to receive(:eof?) { false }
-        allow(input).to receive(:gets) { "q\n" }
         allow(Kernel).to receive(:system)
+        set_highline_input("q\n")
       end
 
       describe "main menu" do
@@ -73,7 +72,7 @@ module Imap::Backup
           let(:config_modified) { true }
 
           before do
-            allow(input).to receive(:gets) { "exit\n" }
+            set_highline_input("exit\n")
             subject.run
           end
 
@@ -129,7 +128,7 @@ module Imap::Backup
         let(:global_options) { instance_double(Setup::GlobalOptions, run: nil) }
 
         before do
-          allow(input).to receive(:gets).and_return("3\n", "q\n")
+          set_highline_input("3\n", "q\n")
           allow(Setup::GlobalOptions).
             to receive(:new).with(config: config) { global_options }
         end
@@ -148,7 +147,7 @@ module Imap::Backup
         let(:config_modified) { true }
 
         before do
-          allow(input).to receive(:gets).and_return("1\n", "exit\n")
+          set_highline_input("1\n", "exit\n")
           allow(Setup::Asker).to receive(:email).
             with(no_args) { "new@example.com" }
           allow(Setup::Account).to receive(:new).
@@ -179,8 +178,8 @@ module Imap::Backup
         end
 
         before do
-          allow(input).to receive(:gets).and_return("add\n", "exit\n")
           allow(config.accounts).to receive(:<<)
+          set_highline_input("add\n", "exit\n")
           allow(Setup::Asker).to receive(:email).
             with(no_args) { added_email }
           allow(Setup::Account).to receive(:new).
@@ -244,7 +243,7 @@ module Imap::Backup
         let(:config_modified) { true }
 
         before do
-          allow(input).to receive(:gets) { "save\n" }
+          set_highline_input("save\n")
         end
 
         it "exits" do
@@ -263,7 +262,7 @@ module Imap::Backup
         let(:config_modified) { true }
 
         before do
-          allow(input).to receive(:gets) { "exit\n" }
+          set_highline_input("exit\n")
         end
 
         it "exits" do

@@ -27,6 +27,7 @@ module Imap::Backup
         Translator.new.setup
         allow(Kernel).to receive(:system)
         allow(Logger.logger).to receive(:warn)
+        set_highline_input("q\n")
       end
 
       describe "display" do
@@ -51,7 +52,11 @@ module Imap::Backup
         end
 
         describe "display" do
-          before { subject.run }
+          before do
+            set_highline_input("q\n")
+
+            subject.run
+          end
 
           it "shows folders which are being backed up" do
             expect(output.string).to include("+ my_folder")
@@ -64,7 +69,7 @@ module Imap::Backup
 
         context "when adding folders" do
           before do
-            allow(input).to receive(:gets).and_return("2\n", "q\n")
+            set_highline_input("2\n", "q\n")
 
             subject.run
           end
@@ -77,7 +82,7 @@ module Imap::Backup
 
         context "when removing folders" do
           before do
-            allow(input).to receive(:gets).and_return("1\n", "q\n")
+            set_highline_input("1\n", "q\n")
 
             subject.run
           end

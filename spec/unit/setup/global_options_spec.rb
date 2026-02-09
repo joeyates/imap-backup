@@ -27,6 +27,7 @@ module Imap::Backup
       allow(Kernel).to receive(:system)
       allow(Setup::GlobalOptions::DownloadStrategyChooser).
         to receive(:new) { download_strategy_chooser }
+      set_highline_input("q\n")
     end
 
     it "clears the screen" do
@@ -58,7 +59,7 @@ module Imap::Backup
     end
 
     it "accepts choices" do
-      allow(input).to receive(:gets).and_return("1\n", "q\n")
+      set_highline_input("1\n", "q\n")
 
       subject.run
 

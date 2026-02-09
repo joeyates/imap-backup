@@ -22,6 +22,7 @@ module Imap::Backup
       Translator.new.setup
       allow(Kernel).to receive(:system)
       allow(Kernel).to receive(:puts)
+      set_highline_input("q\n")
     end
 
     it "clears the screen" do
@@ -37,7 +38,7 @@ module Imap::Backup
     end
 
     it "accepts choices" do
-      allow(input).to receive(:gets).and_return("2\n", "q\n")
+      set_highline_input("2\n", "q\n")
 
       subject.run
 
@@ -45,7 +46,7 @@ module Imap::Backup
     end
 
     it "shows help" do
-      allow(input).to receive(:gets).and_return("help\n", "q\n")
+      set_highline_input("help\n", "q\n")
 
       subject.run
 
@@ -62,7 +63,7 @@ module Imap::Backup
       end
 
       it "marks the entry as current" do
-        allow(input).to receive(:gets) { "q\n" }
+        set_highline_input("q\n")
 
         subject.run
 
