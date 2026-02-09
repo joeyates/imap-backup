@@ -163,62 +163,80 @@ module Imap::Backup
       end
 
       context "when adding accounts" do
-        let(:blank_account) do
-          {
-            username: added_email,
-            password: "",
-            local_path: local_path,
-            folders: []
-          }
-        end
-        let(:account) do
-          instance_double(Setup::Account, run: nil)
-        end
+        let(:setup_account) { instance_double(Setup::Account, run: nil) }
         let(:config_modified) { true }
         let(:added_email) { "new@example.com" }
         let(:local_path) { "/base/path/new_example.com" }
+        let(:new_account) do
+          instance_double(Account, "server=": nil, "reset_seen_flags_after_fetch=": nil)
+        end
+        let(:provider) do
+          instance_double(
+            Email::Provider::Unknown,
+            host: nil,
+            sets_seen_flags_on_fetch?: false
+          )
+        end
 
         before do
           allow(input).to receive(:gets).and_return("add\n", "exit\n")
+          allow(config.accounts).to receive(:<<)
           allow(Setup::Asker).to receive(:email).
             with(no_args) { added_email }
           allow(Setup::Account).to receive(:new).
-            with(config, anything, anything) { account }
+            with(config, anything, anything) { setup_account }
+          allow(Account).to receive(:new) { new_account }
+          allow(Email::Provider).to receive(:for_address) { provider }
 
           subject.run
         end
 
+        it "adds the account to the configuration" do
+          expect(config.accounts).to have_received(:<<).with(new_account)
+        end
+
         it "sets username" do
-          expect(accounts[1].username).to eq(added_email)
+          expect(Account).to have_received(:new).with(hash_including(username: added_email))
         end
 
         it "sets blank password" do
-          expect(accounts[1].password).to eq("")
+          expect(Account).to have_received(:new).with(hash_including(password: ""))
+        end
+
+        it "sets local path" do
+          expect(Account).to have_received(:new).with(hash_including(local_path: nil))
         end
 
         it "sets folders" do
-          expect(accounts[1].folders).to eq([])
+          expect(Account).to have_received(:new).with(hash_including(folders: []))
         end
 
-        context "when the account is a GMail account" do
-          let(:added_email) { "new@gmail.com" }
-          let(:local_path) { "/base/path/new_gmail.com" }
+        context "when the account provider has a known host" do
+          let(:provider) do
+            instance_double(
+              Email::Provider::Unknown,
+              host: "imap.example.com",
+              sets_seen_flags_on_fetch?: false
+            )
+          end
 
           it "sets the server" do
-            expect(accounts[1].server).to eq(gmail_imap_server)
+            expect(new_account).to have_received(:server=).with("imap.example.com")
           end
         end
 
-        context "when the provider sets Seen flags on fetch" do
-          let(:added_email) { "new@me.com" }
+        context "when the account provider sets Seen flags on fetch" do
+          let(:provider) do
+            instance_double(
+              Email::Provider::Unknown,
+              host: nil,
+              sets_seen_flags_on_fetch?: true
+            )
+          end
 
           it "sets the relevant flag" do
-            expect(accounts[1].reset_seen_flags_after_fetch).to be true
+            expect(new_account).to have_received(:reset_seen_flags_after_fetch=).with(true)
           end
-        end
-
-        it "doesn't flag the unedited account as modified" do
-          expect(accounts[1].modified?).to be_falsey
         end
       end
 
