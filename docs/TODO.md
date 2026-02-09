@@ -17,7 +17,7 @@ Add internationalization support to make imap-backup accessible to non-English-s
 
 # Add Localized Help to All Setup Screens
 
-Status: [ ]
+Status: [x]
 
 ## Description
 
