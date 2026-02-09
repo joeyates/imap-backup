@@ -76,14 +76,14 @@ module Imap::Backup
       profile = thunderbird_profile(profile_name)
 
       if !profile
-        raise "Thunderbird profile '#{profile_name}' not found" if profile_name
+        raise I18n.t("cli.utils.thunderbird_profile_not_found", profile: profile_name) if profile_name
 
-        raise "Default Thunderbird profile not found"
+        raise I18n.t("cli.utils.default_thunderbird_profile_not_found")
       end
 
       serialized_folders = Account::SerializedFolders.new(account: account)
 
-      raise "No serialized folders were found for account '#{email}'" if serialized_folders.none?
+      raise I18n.t("cli.utils.no_serialized_folders", email: email) if serialized_folders.none?
 
       serialized_folders.each_key do |serializer|
         Thunderbird::MailboxExporter.new(

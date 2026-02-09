@@ -128,3 +128,31 @@ en:
         prefix: "Prefix"
         delimiter: "Delimiter"
         not_defined: "(Not defined)"
+    restore:
+      missing_email_parameter: "Missing EMAIL parameter"
+    transfer:
+      same_account_error: "Source and destination accounts cannot be the same!"
+      destination_not_found: "Account '%{email}' does not exist"
+      source_not_found: "Account '%{email}' does not exist"
+      source_not_available: "Account '%{email}' is not available for migration (status: %{status})"
+      destination_not_available: "Account '%{email}' is not available for migration (status: %{status})"
+      incompatible_destination_delimiter: "--automatic-namespaces is incompatible with --destination-delimiter"
+      incompatible_destination_prefix: "--automatic-namespaces is incompatible with --destination-prefix"
+      incompatible_source_delimiter: "--automatic-namespaces is incompatible with --source-delimiter"
+      incompatible_source_prefix: "--automatic-namespaces is incompatible with --source-prefix"
+    helpers:
+      config_mutual_exclusivity: "Cannot specify both --config and --erb-configuration options"
+      config_not_found: "Configuration file '%{path}' not found"
+      account_not_configured: "%{email} is not a configured account"
+      erb_config_not_found: "ERB configuration file '%{path}' not found"
+      erb_syntax_error: "ERB template has syntax error: %{message}"
+      erb_processing_error: "Error processing ERB template: %{message}"
+      erb_invalid_json: "ERB template rendered invalid JSON: %{message}"
+    local:
+      check:
+        account: "Account: %{account}"
+      folder_not_found: "Folder '%{folder}' not found"
+    utils:
+      thunderbird_profile_not_found: "Thunderbird profile '%{profile}' not found"
+      default_thunderbird_profile_not_found: "Default Thunderbird profile not found"
+      no_serialized_folders: "No serialized folders were found for account '%{email}'"

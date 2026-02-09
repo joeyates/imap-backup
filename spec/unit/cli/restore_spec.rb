@@ -2,6 +2,7 @@ require "imap/backup/cli/restore"
 
 require "imap/backup/account"
 require "imap/backup/configuration"
+require "imap/backup/translator"
 
 module Imap::Backup
   RSpec.describe CLI::Restore do
@@ -14,6 +15,8 @@ module Imap::Backup
     let(:restore) { instance_double(Account::Restore, run: nil) }
 
     before do
+      Translator.new.setup
+
       allow(Configuration).to receive(:exist?) { true }
       allow(Configuration).to receive(:new) { config }
       allow(Account::Restore).to receive(:new) { restore }

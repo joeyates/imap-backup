@@ -95,7 +95,7 @@ module Imap::Backup
       serializer, _folder = serialized_folders.find do |_s, f|
         f.name == folder_name
       end
-      raise "Folder '#{folder_name}' not found" if !serializer
+      raise I18n.t("cli.local.folder_not_found", folder: folder_name) if !serializer
 
       case options[:format]
       when "json"
@@ -126,7 +126,7 @@ module Imap::Backup
       serializer, _folder = serialized_folders.find do |_s, f|
         f.name == folder_name
       end
-      raise "Folder '#{folder_name}' not found" if !serializer
+      raise I18n.t("cli.local.folder_not_found", folder: folder_name) if !serializer
 
       uid_list = uids.split(",")
 

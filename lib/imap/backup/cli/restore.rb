@@ -38,7 +38,7 @@ module Imap::Backup
           account = account(config, email)
           restore(account, **restore_options)
         when email && options.key?(:accounts)
-          raise "Missing EMAIL parameter"
+          raise I18n.t("cli.restore.missing_email_parameter")
         when !email && options.key?(:accounts)
           Logger.logger.info(
             "Calling restore with the --account option is deprecated, " \

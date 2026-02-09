@@ -1,6 +1,7 @@
 require "imap/backup/cli/helpers"
 
 require "imap/backup/account"
+require "imap/backup/translator"
 
 module Imap::Backup
   class WithHelpers < Thor
@@ -27,6 +28,8 @@ module Imap::Backup
       let(:config) { "Configuration" }
 
       before do
+        Translator.new.setup
+
         allow(Configuration).to receive(:new).with(params) { config }
         allow(Configuration).to receive(:exist?) { exists }
       end
