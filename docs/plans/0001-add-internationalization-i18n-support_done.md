@@ -21,7 +21,7 @@ Add internationalization support to imap-backup using the `i18n` and `locale` ge
 - [x] Update CLI error messages and user-facing outputs outside setup
 - [x] Create Italian (it.yml) locale file with translations
 - [x] Create [docs/i18n.md](docs/i18n.md) documenting i18n usage and contribution guidelines for translators
-- [ ] Add an (undated, unversioned) entry to [Changelog.md](Changelog.md) describing the changes
+- [x] Add an (undated, unversioned) entry to [Changelog.md](Changelog.md) describing the changes
 
 ## Principal Files
 
