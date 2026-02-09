@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## 16.5.0 - 2026-02-08
+
+### Added
+
+* Added internationalization (i18n) support using the `i18n` and `locale` gems.
+* The application now detects the user's preferred language from environment
+  variables (LANGUAGE, LANG, LC_*) and displays messages in that language.
+* Added Italian (it) translations for all user-facing strings in the setup interface and CLI commands.
+* English (en) is used as the default fallback language.
+* Added `docs/i18n.md` with documentation for contributors on how to add new translations.
+
 ## 16.4.2 - 2026-02-08
 
 ### Changed
