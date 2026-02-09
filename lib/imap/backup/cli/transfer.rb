@@ -97,11 +97,12 @@ module Imap::Backup
     end
 
     def check_accounts!
-      if destination_email == source_email
-        raise I18n.t("cli.transfer.same_account_error")
-      end
+      raise I18n.t("cli.transfer.same_account_error") if destination_email == source_email
 
-      raise I18n.t("cli.transfer.destination_not_found", email: destination_email) if !destination_account
+      if !destination_account
+        raise I18n.t("cli.transfer.destination_not_found",
+                     email: destination_email)
+      end
 
       raise I18n.t("cli.transfer.source_not_found", email: source_email) if !source_account
 
@@ -126,9 +127,7 @@ module Imap::Backup
     end
 
     def ensure_no_prefix_or_delimiter_parameters!
-      if destination_delimiter
-        raise I18n.t("cli.transfer.incompatible_destination_delimiter")
-      end
+      raise I18n.t("cli.transfer.incompatible_destination_delimiter") if destination_delimiter
       raise I18n.t("cli.transfer.incompatible_destination_prefix") if destination_prefix
       raise I18n.t("cli.transfer.incompatible_source_delimiter") if source_delimiter
       raise I18n.t("cli.transfer.incompatible_source_prefix") if source_prefix

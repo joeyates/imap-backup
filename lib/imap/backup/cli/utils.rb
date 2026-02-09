@@ -76,7 +76,10 @@ module Imap::Backup
       profile = thunderbird_profile(profile_name)
 
       if !profile
-        raise I18n.t("cli.utils.thunderbird_profile_not_found", profile: profile_name) if profile_name
+        if profile_name
+          raise I18n.t("cli.utils.thunderbird_profile_not_found",
+                       profile: profile_name)
+        end
 
         raise I18n.t("cli.utils.default_thunderbird_profile_not_found")
       end

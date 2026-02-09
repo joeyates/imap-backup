@@ -1,0 +1,167 @@
+---
+it:
+  setup:
+    main_menu:
+      title: "Menu Principale"
+      choose_action: "Scegli un'azione"
+      add_account: "aggiungi account"
+      modify_global_options: "modifica opzioni globali"
+      save_and_exit: "salva ed esci"
+      exit_without_saving: "esci senza salvare le modifiche"
+      quit: "(q) esci"
+    account:
+      title: "Account"
+      choose_action: "Scegli un'azione"
+      modify_email: "modifica email"
+      modify_password: "modifica password"
+      modify_backup_path: "modifica percorso di backup"
+      toggle_folder_blacklist: "attiva/disattiva modalità di inclusione cartelle (whitelist/blacklist)"
+      choose_folders: "scegli cartelle da %{action}"
+      exclude_from_backups: "escludere dai backup"
+      include_in_backups: "includere nei backup"
+      toggle_mirror_mode: "attiva/disattiva modalità ('keep'/'mirror')"
+      modify_multi_fetch_size: "modifica dimensione multi-fetch (numero di email da scaricare alla volta)"
+      size_prompt: "dimensione: "
+      modify_server: "modifica server"
+      server_prompt: "server: "
+      modify_connection_options: "modifica opzioni di connessione"
+      connection_options_prompt: "opzioni di connessione (in formato JSON): "
+      malformed_json: "JSON malformato, riprova"
+      press_key: "Premi un tasto "
+      dont_fix_unread_flags: "non correggere modifiche ai flag 'UNSEEN' durante il download"
+      fix_unread_flags: "correggi modifiche ai flag 'UNSEEN' durante il download"
+      change_status: "cambia stato (%{current} -> %{next})"
+      test_connection: "testare la connessione"
+      delete: "elimina"
+      delete_confirm: "Sei sicuro? (y/n) "
+      return_to_main_menu: "(q) torna al menu principale"
+      email: "email"
+      password: "password"
+      unset: "(non impostato)"
+      path: "percorso"
+      exclude: "escludi"
+      include: "includi"
+      all_folders: "(tutte le cartelle)"
+      no_folders_warning: "(tutte le cartelle) <- hai scelto di non fare il backup di nessuna cartella!"
+      mirror_emails: "modalità 'mirror'"
+      keep_all_emails: "modalità 'keep'"
+      mode: "modalità"
+      multi_fetch: "multi-fetch"
+      server: "server"
+      connection_options: "opzioni di connessione"
+      reset_seen_flags_message: "le modifiche ai flag 'UNSEEN' verranno ripristinate durante il download"
+      status: "stato"
+    global_options:
+      title: "Opzioni Globali"
+      description: "Queste impostazioni influenzano tutti gli account."
+      choose_action: "Scegli un'azione"
+      change_download_strategy: "cambia strategia di download (attualmente: '%{current}')"
+      return_to_main_menu: "(q) torna al menu principale"
+      download_strategy_chooser:
+        title: "Scegli una Strategia di Download"
+        current_marker: " <- attuale"
+        help: "aiuto"
+        help_text: |
+          Questa impostazione modifica la frequenza con cui i dati vengono scritti
+          su disco durante i backup.
+
+          imap-backup utilizza due file per cartella, un file .mbox con i messaggi
+          effettivi e un file .imap con metadati come le lunghezze dei messaggi e
+          i loro offset all'interno del file .mbox.
+
+          # scrivi direttamente su disco
+
+          Con questa impostazione, ogni messaggio e i suoi metadati vengono scritti
+          su disco man mano che vengono scaricati.
+
+          Questa scelta utilizza meno memoria ed è quindi adatta per fare backup su
+          dispositivi con memoria limitata, come i Raspberry Pi.
+
+          # ritarda la scrittura dei metadati
+
+          Questa è l'impostazione predefinita.
+
+          Qui, i messaggi (che possono essere molto grandi) vengono aggiunti al file
+          .mbox man mano che vengono ricevuti, ma i metadati vengono scritti nel file
+          .imap solo dopo che tutti i messaggi della cartella sono stati scaricati.
+
+          Questa scelta utilizza un po' più di memoria rispetto all'impostazione
+          precedente, ma è **molto** più veloce per cartelle grandi (potenzialmente
+          >30 volte per cartelle con >100k messaggi) e consuma meno il disco.
+
+          # Altre Impostazioni di Prestazioni
+
+          Un'altra configurazione che influisce sulle prestazioni del backup è
+          l'impostazione `multi_fetch_size` a livello di account.
+        press_key: "Premi un tasto "
+        return_to_main_menu: "(q) torna al menu principale"
+    asker:
+      email_prompt: "indirizzo email: "
+      email_validation_error: "Inserisci un indirizzo email valido "
+      password_prompt: "password: "
+      password_confirmation_prompt: "ripeti password: "
+      password_mismatch: "la password e la conferma non corrispondono.\nContinuare? (s/n) "
+    folder_chooser:
+      title: "Aggiungi/rimuovi cartelle"
+      select_folder: "Seleziona una cartella (attiva/disattiva)"
+      return_to_account_menu: "(q) torna al menu account"
+      press_key: "Premi un tasto "
+      unable_to_get_folder_list: "Impossibile ottenere l'elenco delle cartelle"
+      folders_removed: "Le seguenti cartelle sono state rimosse: %{folders}"
+      connection_failed: "Connessione fallita"
+    backup_path:
+      prompt: "directory di backup: "
+      validation_error: "Scegli una directory diversa "
+      path_in_use: "Il percorso '%{path}' è utilizzato per il backup dell'account '%{username}'"
+  cli:
+    version: "imap-backup %{version}"
+    stats:
+      folder: "cartella"
+      remote: "remoto"
+      both: "entrambi"
+      local: "locale"
+    local:
+      check:
+        account: "Account: %{account}"
+    remote:
+      namespaces:
+        name: "Nome"
+        prefix: "Prefisso"
+        delimiter: "Delimitatore"
+        not_defined: "(Non definito)"
+    restore:
+      missing_email_parameter: "Parametro EMAIL mancante"
+    transfer:
+      same_account_error: "Gli account di origine e destinazione non possono essere gli stessi!"
+      destination_not_found: "L'account '%{email}' non esiste"
+      source_not_found: "L'account '%{email}' non esiste"
+      source_not_available: "L'account '%{email}' non è disponibile per la migrazione (stato: %{status})"
+      destination_not_available: "L'account '%{email}' non è disponibile per la migrazione (stato: %{status})"
+      incompatible_destination_delimiter: "--automatic-namespaces è incompatibile con --destination-delimiter"
+      incompatible_destination_prefix: "--automatic-namespaces è incompatibile con --destination-prefix"
+      incompatible_source_delimiter: "--automatic-namespaces è incompatibile con --source-delimiter"
+      incompatible_source_prefix: "--automatic-namespaces è incompatibile con --source-prefix"
+    helpers:
+      config_mutual_exclusivity: "Non è possibile specificare entrambe le opzioni --config e --erb-configuration"
+      config_not_found: "File di configurazione '%{path}' non trovato"
+      account_not_configured: "%{email} non è un account configurato"
+      erb_config_not_found: "File di configurazione ERB '%{path}' non trovato"
+      erb_syntax_error: "Il template ERB ha un errore di sintassi: %{message}"
+      erb_processing_error: "Errore durante l'elaborazione del template ERB: %{message}"
+      erb_invalid_json: "Il template ERB ha generato JSON non valido: %{message}"
+    local:
+      check:
+        account: "Account: %{account}"
+      folder_not_found: "Cartella '%{folder}' non trovata"
+    utils:
+      thunderbird_profile_not_found: "Profilo Thunderbird '%{profile}' non trovato"
+      default_thunderbird_profile_not_found: "Profilo Thunderbird predefinito non trovato"
+      no_serialized_folders: "Nessuna cartella serializzata trovata per l'account '%{email}'"
+  configuration:
+    download_strategy:
+      direct:
+        short: "scrivi direttamente su disco"
+        long: "scrivi su disco man mano che i messaggi vengono scaricati"
+      delay_metadata:
+        short: "rimanda la scrittura dei metadati"
+        long: "rimanda la scrittura dei metadati fino a quando tutti i messaggi non sono stati scaricati"

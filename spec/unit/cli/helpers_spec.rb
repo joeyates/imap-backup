@@ -22,14 +22,14 @@ module Imap::Backup
     let(:config) { instance_double(Configuration, accounts: accounts) }
     let(:options) { {} }
 
+    before { Translator.new.setup }
+
     describe ".load_config" do
       let(:exists) { true }
       let(:params) { {path: nil} }
       let(:config) { "Configuration" }
 
       before do
-        Translator.new.setup
-
         allow(Configuration).to receive(:new).with(params) { config }
         allow(Configuration).to receive(:exist?) { exists }
       end

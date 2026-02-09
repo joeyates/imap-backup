@@ -45,10 +45,14 @@ module Imap::Backup
 
     def change_download_strategy(menu)
       strategies = Imap::Backup::Configuration::DOWNLOAD_STRATEGIES
-      current = strategies.find { |s| s[:key] == config.download_strategy }
+      current = strategies.find { |s| s == config.download_strategy }
       changed = config.download_strategy_modified? ? " *" : ""
-      menu.choice(I18n.t("setup.global_options.change_download_strategy",
-                         current: current[:description]) + changed) do
+      current_short = I18n.t("configuration.download_strategy.#{current}.short")
+      label = I18n.t(
+        "setup.global_options.change_download_strategy",
+        current: current_short
+      ) + changed
+      menu.choice(label) do
         DownloadStrategyChooser.new(config: config).run
       end
     end

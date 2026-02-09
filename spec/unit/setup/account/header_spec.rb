@@ -103,7 +103,7 @@ module Imap::Backup
       let(:reset_seen_flags_after_fetch) { true }
 
       it "indicates the flag is set" do
-        expect(menu.header).to match(/^changes to unread flags will be reset/)
+        expect(menu.header).to match(/^changes to 'UNSEEN' flags will be reset/)
       end
     end
 

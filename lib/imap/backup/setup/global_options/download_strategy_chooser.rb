@@ -32,11 +32,13 @@ class Imap::Backup::Setup::GlobalOptions
       highline.choose do |menu|
         menu.header = I18n.t("setup.global_options.download_strategy_chooser.title")
 
-        strategies.each do |s|
-          current = s[:key] == config.download_strategy ? I18n.t("setup.global_options.download_strategy_chooser.current_marker") : ""
-          topic = "#{s[:description]}#{current}"
+        current_marker = I18n.t("setup.global_options.download_strategy_chooser.current_marker")
+        strategies.each do |strategy|
+          current = strategy == config.download_strategy ? current_marker : ""
+          description = I18n.t("configuration.download_strategy.#{strategy}.short")
+          topic = "#{description}#{current}"
           menu.choice(topic) do
-            config.download_strategy = s[:key]
+            config.download_strategy = strategy
           end
         end
         show_help menu

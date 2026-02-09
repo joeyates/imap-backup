@@ -72,9 +72,7 @@ module Imap::Backup
       erb_config_path = options[:erb_configuration]
 
       # Check mutual exclusivity
-      if config_path && erb_config_path
-        raise I18n.t("cli.helpers.config_mutual_exclusivity")
-      end
+      raise I18n.t("cli.helpers.config_mutual_exclusivity") if config_path && erb_config_path
 
       # Handle ERB configuration
       return load_erb_config(erb_config_path, options) if erb_config_path
