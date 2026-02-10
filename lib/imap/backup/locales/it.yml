@@ -95,6 +95,15 @@ it:
       title: "Opzioni Globali"
       description: "Queste impostazioni influenzano tutti gli account."
       change_download_strategy: "cambia strategia di download (attualmente: '%{current}')"
+      help: "aiuto"
+      help_text: |
+        Questa schermata ti permette di configurare le impostazioni che influenzano tutti gli account.
+
+        Opzioni globali disponibili:
+        - `strategia di download` - Questa impostazione determina la frequenza con cui i dati vengono scritti su disco durante i backup.
+            L'impostazione predefinita ("ritarda la scrittura dei metadati") è più veloce e consuma meno il disco,
+            mentre "scrivi direttamente su disco" utilizza meno memoria ed è adatta per dispositivi con memoria limitata.
+            Scegli l'opzione per maggiori dettagli sulle differenze tra queste strategie.
       download_strategy_chooser:
         title: "Scegli una Strategia di Download"
         current_marker: " <- attuale"
@@ -107,7 +116,7 @@ it:
           effettivi e un file .imap con metadati come le lunghezze dei messaggi e
           i loro offset all'interno del file .mbox.
 
-          # scrivi direttamente su disco
+          # 'scrivi direttamente su disco'
 
           Con questa impostazione, ogni messaggio e i suoi metadati vengono scritti
           su disco man mano che vengono scaricati.
@@ -115,7 +124,7 @@ it:
           Questa scelta utilizza meno memoria ed è quindi adatta per fare backup su
           dispositivi con memoria limitata, come i Raspberry Pi.
 
-          # ritarda la scrittura dei metadati
+          # 'ritarda la scrittura dei metadati'
 
           Questa è l'impostazione predefinita.
 

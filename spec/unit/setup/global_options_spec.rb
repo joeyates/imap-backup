@@ -65,5 +65,19 @@ module Imap::Backup
 
       expect(download_strategy_chooser).to have_received(:run)
     end
+
+    context "when help is requested" do
+      before do
+        allow(Kernel).to receive(:puts)
+        set_highline_input("2\n", " \n", "q\n")
+      end
+
+      it "shows help text and waits for a key press" do
+        subject.run
+
+        expect(Kernel).to have_received(:puts).
+          with(/This screen allows you to configure settings that affect all accounts/)
+      end
+    end
   end
 end

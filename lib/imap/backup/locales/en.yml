@@ -98,6 +98,15 @@ en:
       title: "Global Options"
       description: "These settings affect all accounts."
       change_download_strategy: "change download strategy (currently: '%{current}')"
+      help: "help"
+      help_text: |
+        This screen allows you to configure settings that affect all accounts.
+
+        Available global options:
+        - `download strategy` - This setting determines how often data is written to disk during backups.
+            The default setting ("delay writing metadata") is faster and less wearing on the disk,
+            while "write straight to disk" uses less memory and is suitable for devices with limited memory.
+            Choose the option for more details on the differences between these strategies.
       download_strategy_chooser:
         title: "Choose a Download Strategy"
         current_marker: " <- current"
@@ -109,7 +118,7 @@ en:
           messages and a .imap file with metadata like message lengths and their
           offsets within the .mbox file.
 
-          # write straight to disk
+          # 'write straight to disk'
 
           With this setting, each message and its metadata are written to disk
           as they are downloaded.
@@ -117,7 +126,7 @@ en:
           This choice uses least memory and so is suitable for backing up onto
           devices with limited memory, like Raspberry Pis.
 
-          # delay writing metadata
+          # 'delay writing metadata'
 
           This is the default setting.
 
