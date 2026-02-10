@@ -44,6 +44,22 @@ module Imap::Backup
         end
       end
 
+      context "when selecting help" do
+        let(:online_folders) { %w[folder1 folder2] }
+
+        before do
+          allow(Kernel).to receive(:puts)
+          # Choose help (option 3) then quit
+          set_highline_input("3\n", "q\n")
+
+          subject.run
+        end
+
+        it "shows help text" do
+          expect(Kernel).to have_received(:puts).with(/Use this screen to select which folders/)
+        end
+      end
+
       describe "folder listing" do
         let(:configured_folders) { ["my_folder"] }
         let(:online_folders) do

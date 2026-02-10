@@ -1,7 +1,7 @@
 # Emphasized Rules
 
 - Never use `unless` in the codebase.
-- Use `bin/unit-test-path` to obtain the unit tast path for a code file.
+- Use `bin/unit-test-path` to obtain the unit test path for a code file.
 - In tests, never use `double`, use `instance_double` instead.
 
 # Overall

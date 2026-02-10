@@ -35,10 +35,11 @@ module Imap::Backup
 
           #{I18n.t('setup.global_options.description')}
 
-          #{I18n.t('setup.global_options.choose_action')}
+          #{I18n.t('setup.choose_action')}
         MENU
         change_download_strategy menu
-        menu.choice(I18n.t("setup.global_options.return_to_main_menu")) { throw :done }
+        show_help menu
+        menu.choice(I18n.t("setup.return_to_main_menu")) { throw :done }
         menu.hidden("quit") { throw :done }
       end
     end
@@ -54,6 +55,13 @@ module Imap::Backup
       ) + changed
       menu.choice(label) do
         DownloadStrategyChooser.new(config: config).run
+      end
+    end
+
+    def show_help(menu)
+      menu.choice(I18n.t("setup.global_options.help")) do
+        Kernel.puts I18n.t("setup.global_options.help_text")
+        highline.ask I18n.t("setup.press_key")
       end
     end
 

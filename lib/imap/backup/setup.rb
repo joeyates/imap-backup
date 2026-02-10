@@ -44,11 +44,12 @@ module Imap::Backup
         menu.header = <<~MENU.chomp
           #{helpers.title_prefix} #{I18n.t('setup.main_menu.title')}
 
-          #{I18n.translate('setup.main_menu.choose_action')}
+          #{I18n.t('setup.choose_action')}
         MENU
         account_items menu
         add_account_item menu
         modify_global_options menu
+        show_help menu
         if config.modified?
           menu.choice(I18n.t("setup.main_menu.save_and_exit")) do
             config.save
@@ -85,6 +86,13 @@ module Imap::Backup
       changed = config.download_strategy_modified? ? " *" : ""
       menu.choice("#{I18n.t('setup.main_menu.modify_global_options')}#{changed}") do
         GlobalOptions.new(config: config).run
+      end
+    end
+
+    def show_help(menu)
+      menu.choice(I18n.t("setup.main_menu.help")) do
+        Kernel.puts I18n.t("setup.main_menu.help_text")
+        self.class.highline.ask I18n.t("setup.press_key")
       end
     end
 

@@ -16,13 +16,13 @@ module Imap::Backup
     # @return [void]
     def run
       if client.nil?
-        highline.ask I18n.t("setup.folder_chooser.press_key")
+        highline.ask I18n.t("setup.press_key")
         return
       end
 
       if folder_names.empty?
         Logger.logger.warn I18n.t("setup.folder_chooser.unable_to_get_folder_list")
-        highline.ask I18n.t("setup.folder_chooser.press_key")
+        highline.ask I18n.t("setup.press_key")
         return
       end
 
@@ -49,6 +49,7 @@ module Imap::Backup
         MENU
         menu.index = :number
         add_folders menu
+        show_help menu
         menu.choice(I18n.t("setup.folder_chooser.return_to_account_menu")) { throw :done }
         menu.hidden("quit") { throw :done }
       end
@@ -60,6 +61,13 @@ module Imap::Backup
         menu.choice("#{mark} #{folder}") do
           toggle_selection folder
         end
+      end
+    end
+
+    def show_help(menu)
+      menu.choice(I18n.t("setup.folder_chooser.help")) do
+        Kernel.puts I18n.t("setup.folder_chooser.help_text")
+        highline.ask I18n.t("setup.press_key")
       end
     end
 
@@ -85,7 +93,7 @@ module Imap::Backup
 
       Kernel.puts I18n.t("setup.folder_chooser.folders_removed", folders: removed.join(", "))
 
-      highline.ask I18n.t("setup.folder_chooser.press_key")
+      highline.ask I18n.t("setup.press_key")
     end
 
     def toggle_selection(folder_name)

@@ -42,7 +42,7 @@ class Imap::Backup::Setup::GlobalOptions
           end
         end
         show_help menu
-        menu.choice(I18n.t("setup.global_options.download_strategy_chooser.return_to_main_menu")) do
+        menu.choice(I18n.t("setup.return_to_main_menu")) do
           throw :done
         end
         menu.hidden("quit") { throw :done }
@@ -52,7 +52,7 @@ class Imap::Backup::Setup::GlobalOptions
     def show_help(menu)
       menu.choice(I18n.t("setup.global_options.download_strategy_chooser.help")) do
         Kernel.puts I18n.t("setup.global_options.download_strategy_chooser.help_text")
-        highline.ask I18n.t("setup.global_options.download_strategy_chooser.press_key")
+        highline.ask I18n.t("setup.press_key")
       end
     end
 

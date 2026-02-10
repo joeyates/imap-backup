@@ -1,62 +1,109 @@
 ---
 it:
   setup:
+    return_to_main_menu: "(q) torna al menu principale"
+    press_key: "Premi un tasto "
+    choose_action: "Scegli un'azione"
     main_menu:
       title: "Menu Principale"
-      choose_action: "Scegli un'azione"
       add_account: "aggiungi account"
       modify_global_options: "modifica opzioni globali"
+      help: "aiuto"
+      help_text: |
+        imap-backup ti aiuta a fare il backup e il ripristino dei tuoi account email.
+
+        Da questo menu principale, puoi:
+        - Aggiungere nuovi account email da cui fare il backup
+        - Modificare le impostazioni degli account esistenti
+        - Modificare le opzioni globali
       save_and_exit: "salva ed esci"
       exit_without_saving: "esci senza salvare le modifiche"
       quit: "(q) esci"
     account:
       title: "Account"
-      choose_action: "Scegli un'azione"
+      email: "email"
+      password: "password"
+      password_unset: "(non impostato)"
+      server: "server"
+      connection_options: "opzioni di connessione"
+      mode: "modalità"
+      mirror_emails: "modalità 'mirror'"
+      keep_all_emails: "modalità 'keep'"
+      path: "percorso di backup"
+      exclude: "escludi"
+      include: "includi"
+      all_folders: "(tutte le cartelle)"
+      no_folders_warning: "(tutte le cartelle) <- hai scelto di non fare il backup di nessuna cartella!"
+      multi_fetch: "multi-fetch"
+      reset_seen_flags_message: "le modifiche ai flag 'UNSEEN' verranno ripristinate durante il download"
+      status: "stato"
+      connection_configuration: "Configurazione della connessione"
       modify_email: "modifica email"
       modify_password: "modifica password"
-      modify_backup_path: "modifica percorso di backup"
-      toggle_folder_blacklist: "attiva/disattiva modalità di inclusione cartelle (whitelist/blacklist)"
-      choose_folders: "scegli cartelle da %{action}"
-      exclude_from_backups: "escludere dai backup"
-      include_in_backups: "includere nei backup"
-      toggle_mirror_mode: "attiva/disattiva modalità ('keep'/'mirror')"
-      modify_multi_fetch_size: "modifica dimensione multi-fetch (numero di email da scaricare alla volta)"
-      size_prompt: "dimensione: "
       modify_server: "modifica server"
       server_prompt: "server: "
       modify_connection_options: "modifica opzioni di connessione"
       connection_options_prompt: "opzioni di connessione (in formato JSON): "
       malformed_json: "JSON malformato, riprova"
-      press_key: "Premi un tasto "
+      test_connection: "testare connessione"
+      backup_configuration: "Configurazione backup"
+      toggle_mirror_mode: "attiva/disattiva modalità ('keep'/'mirror')"
+      modify_backup_path: "modifica percorso di backup"
+      toggle_folder_blacklist: "attiva/disattiva modalità di inclusione cartelle (whitelist/blacklist)"
+      choose_folders: "scegli cartelle da %{action}"
+      exclude_from_backups: "escludere dai backup"
+      include_in_backups: "includere nei backup"
+      modify_multi_fetch_size: "modifica dimensione multi-fetch (numero di email da scaricare alla volta)"
+      size_prompt: "dimensione: "
       dont_fix_unread_flags: "non correggere modifiche ai flag 'UNSEEN' durante il download"
       fix_unread_flags: "correggi modifiche ai flag 'UNSEEN' durante il download"
       change_status: "cambia stato (%{current} -> %{next})"
-      test_connection: "testare la connessione"
+      danger_area: "Area pericolosa"
       delete: "elimina"
       delete_confirm: "Sei sicuro? (y/n) "
-      return_to_main_menu: "(q) torna al menu principale"
-      email: "email"
-      password: "password"
-      unset: "(non impostato)"
-      path: "percorso"
-      exclude: "escludi"
-      include: "includi"
-      all_folders: "(tutte le cartelle)"
-      no_folders_warning: "(tutte le cartelle) <- hai scelto di non fare il backup di nessuna cartella!"
-      mirror_emails: "modalità 'mirror'"
-      keep_all_emails: "modalità 'keep'"
-      mode: "modalità"
-      multi_fetch: "multi-fetch"
-      server: "server"
-      connection_options: "opzioni di connessione"
-      reset_seen_flags_message: "le modifiche ai flag 'UNSEEN' verranno ripristinate durante il download"
-      status: "stato"
+      other_actions: "Altre azioni"
+      help: "aiuto"
+      help_text: |
+        Questa schermata ti permette di configurare le impostazioni per un singolo account email.
+
+        Configurazione della connessione:
+        - `email` e `password` - Le credenziali per l'account
+        - `server` - Il server a cui connettersi per questo account. Non sarà necessario impostarlo se si utilizza
+            uno dei seguenti: GMail, Apple Mail, FastMail, PurelyMail.
+            Altrimenti, sarà necessario impostarlo sul server IMAP del provider di posta elettronica.
+        - `connection_options` - (Impostazione avanzata) Questa configurazione consente di specificare opzioni aggiuntive per la connessione IMAP.
+            Deve essere un oggetto JSON con chiavi corrispondenti alle opzioni descritte nella documentazione della libreria standard Ruby `net/imap`:
+            https://ruby-doc.org/stdlib-3.2/libdoc/net/imap/rdoc/Net/IMAP.html#initialize-instance_method
+            Ad esempio, se il server utilizza SSL ma ha un certificato non valido, è possibile impostare questa opzione su `{"ssl": {"verify_mode": "none"}}`.
+
+        Puoi testare se le impostazioni di connessione sono corrette selezionando l'opzione "testare connessione".
+
+        Configurazione del backup:
+        - `mode` - "modalità 'keep'" significa che le email eliminate dal server saranno comunque conservate nel backup,
+            mentre "modalità 'mirror'" significa che le email eliminate dal server saranno anche eliminate dal backup.
+        - `backup path` - La directory sul tuo computer locale dove verrà memorizzato il backup per questo account.
+        - `modalità di inclusione cartelle` - Questa opzione ti permette di scegliere se specificare le cartelle da *includere* nei backup
+            (modalità whitelist) o da *escludere* dai backup (modalità blacklist).
+            In modalità whitelist, cominci con tutte le cartelle escluse e puoi scegliere di includere solo quelle di cui vuoi fare il backup.
+            In modalità blacklist, cominci con tutte le cartelle incluse e puoi scegliere di escludere solo quelle di cui non vuoi fare il backup.
+        - `multi-fetch` - Questa opzione ti permette di configurare quanti messaggi scaricare alla volta durante i backup.
+        - `stato` - Questa opzione ti permette di modificare lo stato dell'account tra "active", "archived" e "offline".
+             Un account attivo ("active") è un account normale che viene incluso nei backup regolari.
+             Un account archiviato ("archived") è un account che non viene incluso nei backup regolari, ma i cui dati rimangono intatti su disco e possono essere migrati a un nuovo server in futuro usando il comando `copy`.
+             Un account offline ("offline") è un account che non viene incluso nei backup regolari e i cui dati vengono mantenuti su disco, ma non può essere migrato a un nuovo server in futuro usando il comando `copy`.
     global_options:
       title: "Opzioni Globali"
       description: "Queste impostazioni influenzano tutti gli account."
-      choose_action: "Scegli un'azione"
       change_download_strategy: "cambia strategia di download (attualmente: '%{current}')"
-      return_to_main_menu: "(q) torna al menu principale"
+      help: "aiuto"
+      help_text: |
+        Questa schermata ti permette di configurare le impostazioni che influenzano tutti gli account.
+
+        Opzioni globali disponibili:
+        - `strategia di download` - Questa impostazione determina la frequenza con cui i dati vengono scritti su disco durante i backup.
+            L'impostazione predefinita ("ritarda la scrittura dei metadati") è più veloce e consuma meno il disco,
+            mentre "scrivi direttamente su disco" utilizza meno memoria ed è adatta per dispositivi con memoria limitata.
+            Scegli l'opzione per maggiori dettagli sulle differenze tra queste strategie.
       download_strategy_chooser:
         title: "Scegli una Strategia di Download"
         current_marker: " <- attuale"
@@ -69,7 +116,7 @@ it:
           effettivi e un file .imap con metadati come le lunghezze dei messaggi e
           i loro offset all'interno del file .mbox.
 
-          # scrivi direttamente su disco
+          # 'scrivi direttamente su disco'
 
           Con questa impostazione, ogni messaggio e i suoi metadati vengono scritti
           su disco man mano che vengono scaricati.
@@ -77,7 +124,7 @@ it:
           Questa scelta utilizza meno memoria ed è quindi adatta per fare backup su
           dispositivi con memoria limitata, come i Raspberry Pi.
 
-          # ritarda la scrittura dei metadati
+          # 'ritarda la scrittura dei metadati'
 
           Questa è l'impostazione predefinita.
 
@@ -93,19 +140,25 @@ it:
 
           Un'altra configurazione che influisce sulle prestazioni del backup è
           l'impostazione `multi_fetch_size` a livello di account.
-        press_key: "Premi un tasto "
-        return_to_main_menu: "(q) torna al menu principale"
     asker:
       email_prompt: "indirizzo email: "
       email_validation_error: "Inserisci un indirizzo email valido "
       password_prompt: "password: "
       password_confirmation_prompt: "ripeti password: "
-      password_mismatch: "la password e la conferma non corrispondono.\nContinuare? (s/n) "
+      password_mismatch: "la password e la conferma non corrispondono.\nContinuare? (y/n) "
     folder_chooser:
       title: "Aggiungi/rimuovi cartelle"
       select_folder: "Seleziona una cartella (attiva/disattiva)"
+      help: "aiuto"
+      help_text: |
+        Utilizza questa schermata per selezionare quali cartelle eseguire il backup.
+
+        Clicca su una cartella per attivare/disattivare il suo stato di backup:
+        - Le cartelle contrassegnate con '+' verranno salvate
+        - Le cartelle contrassegnate con '-' non verranno salvate
+
+        Se non selezioni alcuna cartella, tutte le cartelle verranno salvate.
       return_to_account_menu: "(q) torna al menu account"
-      press_key: "Premi un tasto "
       unable_to_get_folder_list: "Impossibile ottenere l'elenco delle cartelle"
       folders_removed: "Le seguenti cartelle sono state rimosse: %{folders}"
       connection_failed: "Connessione fallita"

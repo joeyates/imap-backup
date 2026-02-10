@@ -1,62 +1,112 @@
 ---
 en:
   setup:
+    return_to_main_menu: "(q) return to main menu"
+    press_key: "Press a key "
+    choose_action: "Choose an action"
     main_menu:
       title: "Main Menu"
-      choose_action: "Choose an action"
       add_account: "add account"
       modify_global_options: "modify global options"
+      help: "help"
+      help_text: |
+        imap-backup helps you backup and restore your email accounts.
+
+        From this main menu, you can:
+        - Add new email accounts to backup
+        - Edit existing account settings
+        - Modify global options
       save_and_exit: "save and exit"
       exit_without_saving: "exit without saving changes"
       quit: "(q) quit"
     account:
       title: "Account"
-      choose_action: "Choose an action"
+      email: "email"
+      password: "password"
+      password_unset: "(unset)"
+      server: "server"
+      connection_options: "connection options"
+      mode: "mode"
+      mirror_emails: "mirror emails"
+      keep_all_emails: "keep all emails"
+      path: "backup path"
+      exclude: "exclude"
+      include: "include"
+      all_folders: "(all folders)"
+      no_folders_warning: "(all folders) <- you have opted to not backup any folders!"
+      multi_fetch: "multi-fetch"
+      reset_seen_flags_message: "changes to 'UNSEEN' flags will be reset during download"
+      status: "status"
+      connection_configuration: "Connection Configuration"
       modify_email: "modify email"
       modify_password: "modify password"
-      modify_backup_path: "modify backup path"
-      toggle_folder_blacklist: "toggle folder inclusion mode (whitelist/blacklist)"
-      choose_folders: "choose folders to %{action}"
-      exclude_from_backups: "exclude from backups"
-      include_in_backups: "include in backups"
-      toggle_mirror_mode: "toggle mode ('keep'/'mirror')"
-      modify_multi_fetch_size: "modify multi-fetch size (number of emails to fetch at a time)"
-      size_prompt: "size: "
       modify_server: "modify server"
       server_prompt: "server: "
       modify_connection_options: "modify connection options"
       connection_options_prompt: "connection options (as JSON): "
       malformed_json: "Malformed JSON, please try again"
-      press_key: "Press a key "
+      test_connection: "test connection"
+      backup_configuration: "Backup Configuration"
+      toggle_mirror_mode: "toggle mode ('keep'/'mirror')"
+      modify_backup_path: "modify backup path"
+      toggle_folder_blacklist: "toggle folder inclusion mode (whitelist/blacklist)"
+      choose_folders: "choose folders to %{action}"
+      exclude_from_backups: "exclude from backups"
+      include_in_backups: "include in backups"
+      modify_multi_fetch_size: "modify multi-fetch size (number of emails to fetch at a time)"
+      size_prompt: "size: "
       dont_fix_unread_flags: "don't fix changes to 'UNSEEN' flags during download"
       fix_unread_flags: "fix changes to 'UNSEEN' flags during download"
       change_status: "change status (%{current} -> %{next})"
-      test_connection: "test connection"
+      danger_area: "Danger Area"
       delete: "delete"
       delete_confirm: "Are you sure? (y/n) "
-      return_to_main_menu: "(q) return to main menu"
-      email: "email"
-      password: "password"
-      unset: "(unset)"
-      path: "path"
-      exclude: "exclude"
-      include: "include"
-      all_folders: "(all folders)"
-      no_folders_warning: "(all folders) <- you have opted to not backup any folders!"
-      mirror_emails: "mirror emails"
-      keep_all_emails: "keep all emails"
-      mode: "mode"
-      multi_fetch: "multi-fetch"
-      server: "server"
-      connection_options: "connection options"
-      reset_seen_flags_message: "changes to 'UNSEEN' flags will be reset during download"
-      status: "status"
+      other_actions: "Other Actions"
+      help: "help"
+      help_text: |
+        This screen allows you to configure connection and backup settings for a single email account.
+
+        Connection settings:
+        - `email` and `password` - The credentials for the account
+        - `server` - The server to connect to for this account. You won't need to set this if you use
+            one of the following: GMail, Apple Mail, FastMail, PurelyMail.
+            Otherwise, you'll need to set this to your email provider's IMAP server.
+        - `connection_options` - (Advanced setting) This allows you to specify additional options for the IMAP connection.
+            This should be a JSON object with keys corresponding to the options described in the `net/imap` Ruby standard library documentation:
+            https://ruby-doc.org/stdlib-3.2/libdoc/net/imap/rdoc/Net/IMAP.html#initialize-instance_method
+            For example, if your server uses SSL but has an invalid certificate, you could set this to `{"ssl": {"verify_mode": "none"}}`.
+
+        You can test whether your connection settings are correct by selecting the "test connection" option.
+
+        Backup settings:
+        - `mode` - "keep all emails" means that emails deleted from the server will still be kept in the backup,
+            while "mirror emails" means that emails deleted from the server will also be deleted from the backup.
+        - `backup path` - The directory on your local machine where the backup for this account will be stored.
+        - `folder inclusion mode` - This setting determines whether you choose folders to *include* in the backup (whitelist mode)
+            or *exclude* from the backup (blacklist mode).
+            In whitelist mode, you start with an empty set of folders and choose which folders to add to the backup.
+            In blacklist mode, you start with all folders included in the backup and choose which folders to exclude.
+        - `multi-fetch size` - The number of emails to fetch at a time when backing up.
+            Increasing this can speed up backups, but also increases memory usage.
+        - `fix changes to 'UNSEEN' flags` - Whether to reset changes to 'UNSEEN' flags during download.
+            This flag is useful when the email provider (e.g. Apple Mail) marks emails as read when they are downloaded
+            e.g. by imap-backup.
+        - `status` - By default, an account is "active" and will be backed up when you run the backup command.
+            You can set this to "archived" if you want to stop running backups, but allow it to be migrated to a new server in the future using the `copy` command.
+            Otherwise, you can set this to "offline" if you want to just keep the account's backup on disk.
     global_options:
       title: "Global Options"
       description: "These settings affect all accounts."
-      choose_action: "Choose an action"
       change_download_strategy: "change download strategy (currently: '%{current}')"
-      return_to_main_menu: "(q) return to main menu"
+      help: "help"
+      help_text: |
+        This screen allows you to configure settings that affect all accounts.
+
+        Available global options:
+        - `download strategy` - This setting determines how often data is written to disk during backups.
+            The default setting ("delay writing metadata") is faster and less wearing on the disk,
+            while "write straight to disk" uses less memory and is suitable for devices with limited memory.
+            Choose the option for more details on the differences between these strategies.
       download_strategy_chooser:
         title: "Choose a Download Strategy"
         current_marker: " <- current"
@@ -68,7 +118,7 @@ en:
           messages and a .imap file with metadata like message lengths and their
           offsets within the .mbox file.
 
-          # write straight to disk
+          # 'write straight to disk'
 
           With this setting, each message and its metadata are written to disk
           as they are downloaded.
@@ -76,7 +126,7 @@ en:
           This choice uses least memory and so is suitable for backing up onto
           devices with limited memory, like Raspberry Pis.
 
-          # delay writing metadata
+          # 'delay writing metadata'
 
           This is the default setting.
 
@@ -92,8 +142,6 @@ en:
 
           Another configuration which affects backup performance is the
           `multi_fetch_size` account-level setting.
-        press_key: "Press a key "
-        return_to_main_menu: "(q) return to main menu"
     asker:
       email_prompt: "email address: "
       email_validation_error: "Enter a valid email address "
@@ -103,8 +151,16 @@ en:
     folder_chooser:
       title: "Add/remove folders"
       select_folder: "Select a folder (toggles)"
+      help: "help"
+      help_text: |
+        Use this screen to select which folders to backup.
+
+        Click a folder to toggle its backup status:
+        - Folders marked with '+' will be backed up
+        - Folders marked with '-' will not be backed up
+
+        If you don't select any folders, all folders will be backed up.
       return_to_account_menu: "(q) return to the account menu"
-      press_key: "Press a key "
       unable_to_get_folder_list: "Unable to get folder list"
       folders_removed: "The following folders have been removed: %{folders}"
       connection_failed: "Connection failed"

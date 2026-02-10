@@ -9,10 +9,10 @@ Add localized help functionality to all setup screens in the menu-driven interfa
 
 ## Tasks
 
-- [ ] Add `show_help` method to Main Menu ([lib/imap/backup/setup.rb](lib/imap/backup/setup.rb)) and add corresponding translation keys to locale files
-- [ ] Add `show_help` method to Account Setup Menu ([lib/imap/backup/setup/account.rb](lib/imap/backup/setup/account.rb)) and add corresponding translation keys to locale files
-- [ ] Add `show_help` method to Global Options Menu ([lib/imap/backup/setup/global_options.rb](lib/imap/backup/setup/global_options.rb)) and add corresponding translation keys to locale files
-- [ ] Add `show_help` method to Folder Chooser ([lib/imap/backup/setup/folder_chooser.rb](lib/imap/backup/setup/folder_chooser.rb)) and add corresponding translation keys to locale files
+- [x] Add `show_help` method to Main Menu ([lib/imap/backup/setup.rb](lib/imap/backup/setup.rb)) and add corresponding translation keys to locale files
+- [x] Add `show_help` method to Account Setup Menu ([lib/imap/backup/setup/account.rb](lib/imap/backup/setup/account.rb)) and add corresponding translation keys to locale files
+- [x] Add `show_help` method to Global Options Menu ([lib/imap/backup/setup/global_options.rb](lib/imap/backup/setup/global_options.rb)) and add corresponding translation keys to locale files
+- [x] Add `show_help` method to Folder Chooser ([lib/imap/backup/setup/folder_chooser.rb](lib/imap/backup/setup/folder_chooser.rb)) and add corresponding translation keys to locale files
 
 ## Principal Files
 

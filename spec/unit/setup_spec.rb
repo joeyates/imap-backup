@@ -276,6 +276,19 @@ module Imap::Backup
           subject.run
         end
       end
+
+      context "when 'help' is selected" do
+        before do
+          allow(Kernel).to receive(:puts)
+          set_highline_input("help\n", "q\n")
+        end
+
+        it "shows help text" do
+          subject.run
+
+          expect(Kernel).to have_received(:puts).with(/imap-backup helps you/)
+        end
+      end
     end
   end
 end
