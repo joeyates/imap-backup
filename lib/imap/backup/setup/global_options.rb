@@ -35,10 +35,10 @@ module Imap::Backup
 
           #{I18n.t('setup.global_options.description')}
 
-          #{I18n.t('setup.global_options.choose_action')}
+          #{I18n.t('setup.choose_action')}
         MENU
         change_download_strategy menu
-        menu.choice(I18n.t("setup.global_options.return_to_main_menu")) { throw :done }
+        menu.choice(I18n.t("setup.return_to_main_menu")) { throw :done }
         menu.hidden("quit") { throw :done }
       end
     end

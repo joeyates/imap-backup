@@ -59,7 +59,7 @@ module Imap::Backup
         rotate_status menu
         delete_account menu
         show_help menu
-        menu.choice(I18n.t("setup.account.return_to_main_menu")) { throw :done }
+        menu.choice(I18n.t("setup.return_to_main_menu")) { throw :done }
         menu.hidden("quit") { throw :done }
       end
     end
@@ -97,7 +97,7 @@ module Imap::Backup
             account.connection_options = connection_options
           rescue JSON::ParserError
             Kernel.puts I18n.t("setup.account.malformed_json")
-            highline.ask I18n.t("setup.account.press_key")
+            highline.ask I18n.t("setup.press_key")
           end
         end
       end
@@ -109,7 +109,7 @@ module Imap::Backup
       menu.choice(text) do
         result = Setup::ConnectionTester.new(account).test
         Kernel.puts result
-        highline.ask I18n.t("setup.account.press_key")
+        highline.ask I18n.t("setup.press_key")
       end
     end
 
@@ -198,7 +198,7 @@ module Imap::Backup
     def show_help(menu)
       menu.choice(I18n.t("setup.account.help")) do
         Kernel.puts I18n.t("setup.account.help_text")
-        highline.ask I18n.t("setup.account.press_key")
+        highline.ask I18n.t("setup.press_key")
       end
     end
   end

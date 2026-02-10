@@ -1,9 +1,11 @@
 ---
 it:
   setup:
+    return_to_main_menu: "(q) torna al menu principale"
+    press_key: "Premi un tasto "
+    choose_action: "Scegli un'azione"
     main_menu:
       title: "Menu Principale"
-      choose_action: "Scegli un'azione"
       add_account: "aggiungi account"
       modify_global_options: "modifica opzioni globali"
       help: "aiuto"
@@ -14,12 +16,10 @@ it:
         - Aggiungere nuovi account email da cui fare il backup
         - Modificare le impostazioni degli account esistenti
         - Modificare le opzioni globali
-      press_key: "Premi un tasto "
       save_and_exit: "salva ed esci"
       exit_without_saving: "esci senza salvare le modifiche"
       quit: "(q) esci"
     account:
-      press_key: "Premi un tasto "
       title: "Account"
       email: "email"
       password: "password"
@@ -91,13 +91,10 @@ it:
              Un account attivo ("active") è un account normale che viene incluso nei backup regolari.
              Un account archiviato ("archived") è un account che non viene incluso nei backup regolari, ma i cui dati rimangono intatti su disco e possono essere migrati a un nuovo server in futuro usando il comando `copy`.
              Un account offline ("offline") è un account che non viene incluso nei backup regolari e i cui dati vengono mantenuti su disco, ma non può essere migrato a un nuovo server in futuro usando il comando `copy`.
-      return_to_main_menu: "(q) torna al menu principale"
     global_options:
       title: "Opzioni Globali"
       description: "Queste impostazioni influenzano tutti gli account."
-      choose_action: "Scegli un'azione"
       change_download_strategy: "cambia strategia di download (attualmente: '%{current}')"
-      return_to_main_menu: "(q) torna al menu principale"
       download_strategy_chooser:
         title: "Scegli una Strategia di Download"
         current_marker: " <- attuale"
@@ -134,19 +131,16 @@ it:
 
           Un'altra configurazione che influisce sulle prestazioni del backup è
           l'impostazione `multi_fetch_size` a livello di account.
-        press_key: "Premi un tasto "
-        return_to_main_menu: "(q) torna al menu principale"
     asker:
       email_prompt: "indirizzo email: "
       email_validation_error: "Inserisci un indirizzo email valido "
       password_prompt: "password: "
       password_confirmation_prompt: "ripeti password: "
-      password_mismatch: "la password e la conferma non corrispondono.\nContinuare? (s/n) "
+      password_mismatch: "la password e la conferma non corrispondono.\nContinuare? (y/n) "
     folder_chooser:
       title: "Aggiungi/rimuovi cartelle"
       select_folder: "Seleziona una cartella (attiva/disattiva)"
       return_to_account_menu: "(q) torna al menu account"
-      press_key: "Premi un tasto "
       unable_to_get_folder_list: "Impossibile ottenere l'elenco delle cartelle"
       folders_removed: "Le seguenti cartelle sono state rimosse: %{folders}"
       connection_failed: "Connessione fallita"

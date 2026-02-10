@@ -1,9 +1,11 @@
 ---
 en:
   setup:
+    return_to_main_menu: "(q) return to main menu"
+    press_key: "Press a key "
+    choose_action: "Choose an action"
     main_menu:
       title: "Main Menu"
-      choose_action: "Choose an action"
       add_account: "add account"
       modify_global_options: "modify global options"
       help: "help"
@@ -14,12 +16,10 @@ en:
         - Add new email accounts to backup
         - Edit existing account settings
         - Modify global options
-      press_key: "Press a key "
       save_and_exit: "save and exit"
       exit_without_saving: "exit without saving changes"
       quit: "(q) quit"
     account:
-      press_key: "Press a key "
       title: "Account"
       email: "email"
       password: "password"
@@ -94,14 +94,10 @@ en:
         - `status` - By default, an account is "active" and will be backed up when you run the backup command.
             You can set this to "archived" if you want to stop running backups, but allow it to be migrated to a new server in the future using the `copy` command.
             Otherwise, you can set this to "offline" if you want to just keep the account's backup on disk.
-
-      return_to_main_menu: "(q) return to main menu"
     global_options:
       title: "Global Options"
       description: "These settings affect all accounts."
-      choose_action: "Choose an action"
       change_download_strategy: "change download strategy (currently: '%{current}')"
-      return_to_main_menu: "(q) return to main menu"
       download_strategy_chooser:
         title: "Choose a Download Strategy"
         current_marker: " <- current"
@@ -137,8 +133,6 @@ en:
 
           Another configuration which affects backup performance is the
           `multi_fetch_size` account-level setting.
-        press_key: "Press a key "
-        return_to_main_menu: "(q) return to main menu"
     asker:
       email_prompt: "email address: "
       email_validation_error: "Enter a valid email address "
@@ -149,7 +143,6 @@ en:
       title: "Add/remove folders"
       select_folder: "Select a folder (toggles)"
       return_to_account_menu: "(q) return to the account menu"
-      press_key: "Press a key "
       unable_to_get_folder_list: "Unable to get folder list"
       folders_removed: "The following folders have been removed: %{folders}"
       connection_failed: "Connection failed"
