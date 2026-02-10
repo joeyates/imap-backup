@@ -479,6 +479,7 @@ module Imap::Backup
         end
 
         before do
+          allow(Kernel).to receive(:puts)
           allow(Setup::ConnectionTester).
             to receive(:new) { connection_tester }
           allow(highline).to receive(:ask)
