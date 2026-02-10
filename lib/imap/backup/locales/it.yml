@@ -149,6 +149,15 @@ it:
     folder_chooser:
       title: "Aggiungi/rimuovi cartelle"
       select_folder: "Seleziona una cartella (attiva/disattiva)"
+      help: "aiuto"
+      help_text: |
+        Utilizza questa schermata per selezionare quali cartelle eseguire il backup.
+
+        Clicca su una cartella per attivare/disattivare il suo stato di backup:
+        - Le cartelle contrassegnate con '+' verranno salvate
+        - Le cartelle contrassegnate con '-' non verranno salvate
+
+        Se non selezioni alcuna cartella, tutte le cartelle verranno salvate.
       return_to_account_menu: "(q) torna al menu account"
       unable_to_get_folder_list: "Impossibile ottenere l'elenco delle cartelle"
       folders_removed: "Le seguenti cartelle sono state rimosse: %{folders}"

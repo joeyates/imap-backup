@@ -49,6 +49,7 @@ module Imap::Backup
         MENU
         menu.index = :number
         add_folders menu
+        show_help menu
         menu.choice(I18n.t("setup.folder_chooser.return_to_account_menu")) { throw :done }
         menu.hidden("quit") { throw :done }
       end
@@ -60,6 +61,13 @@ module Imap::Backup
         menu.choice("#{mark} #{folder}") do
           toggle_selection folder
         end
+      end
+    end
+
+    def show_help(menu)
+      menu.choice(I18n.t("setup.folder_chooser.help")) do
+        Kernel.puts I18n.t("setup.folder_chooser.help_text")
+        highline.ask I18n.t("setup.press_key")
       end
     end
 

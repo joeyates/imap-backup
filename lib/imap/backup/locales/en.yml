@@ -151,6 +151,15 @@ en:
     folder_chooser:
       title: "Add/remove folders"
       select_folder: "Select a folder (toggles)"
+      help: "help"
+      help_text: |
+        Use this screen to select which folders to backup.
+
+        Click a folder to toggle its backup status:
+        - Folders marked with '+' will be backed up
+        - Folders marked with '-' will not be backed up
+
+        If you don't select any folders, all folders will be backed up.
       return_to_account_menu: "(q) return to the account menu"
       unable_to_get_folder_list: "Unable to get folder list"
       folders_removed: "The following folders have been removed: %{folders}"
