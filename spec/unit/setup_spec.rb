@@ -134,7 +134,9 @@ module Imap::Backup
         end
 
         it "runs the global options flow" do
-          subject.run
+          await_highline_completion do
+            subject.run
+          end
 
           expect(global_options).to have_received(:run)
         end
