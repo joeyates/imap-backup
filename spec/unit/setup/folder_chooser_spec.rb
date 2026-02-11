@@ -50,7 +50,7 @@ module Imap::Backup
         before do
           allow(Kernel).to receive(:puts)
           # Choose help (option 3) then quit
-          set_highline_input("3\n", "q\n")
+          set_highline_input("3\n", "", "q\n")
 
           subject.run
         end
@@ -114,6 +114,7 @@ module Imap::Backup
 
         before do
           allow(Kernel).to receive(:puts)
+          set_highline_input("", "q\n")
           subject.run
         end
 

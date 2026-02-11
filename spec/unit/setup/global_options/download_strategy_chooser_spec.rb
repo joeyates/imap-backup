@@ -46,7 +46,7 @@ module Imap::Backup
     end
 
     it "shows help" do
-      set_highline_input("help\n", "q\n")
+      set_highline_input("help\n", "", "q\n")
 
       subject.run
 

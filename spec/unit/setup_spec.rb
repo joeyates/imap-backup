@@ -282,7 +282,7 @@ module Imap::Backup
       context "when 'help' is selected" do
         before do
           allow(Kernel).to receive(:puts)
-          set_highline_input("help\n", "q\n")
+          set_highline_input("help\n", "", "q\n")
         end
 
         it "shows help text" do

@@ -44,8 +44,7 @@ module HighLineTestHelpers
     end
   end
 
-  def await_highline_completion(options, &block)
-    timeout = options.fetch(:timeout, 2)
+  def await_highline_completion(timeout: 2, &block)
     Timeout.timeout(timeout, Timeout::ExitException) do
       block.call
     rescue Timeout::ExitException

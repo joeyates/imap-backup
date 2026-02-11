@@ -5,6 +5,7 @@ require "ostruct"
 require "imap/backup/account"
 require "imap/backup/configuration"
 require "imap/backup/lockfile"
+require "imap/backup/translator"
 
 module Imap::Backup
   RSpec.describe CLI::Backup, :silence_logging do
@@ -20,6 +21,7 @@ module Imap::Backup
       allow(Configuration).to receive(:exist?) { true }
       allow(Account::Backup).to receive(:new) { backup }
       allow(subject).to receive(:requested_accounts) { [account] }
+      Translator.new.setup
     end
 
     it_behaves_like(
