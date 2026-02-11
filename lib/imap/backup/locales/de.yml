@@ -1,0 +1,218 @@
+---
+de:
+  setup:
+    return_to_main_menu: "(q) Zurück zum Hauptmenü"
+    press_key: "Drück eine Taste "
+    choose_action: "Wählen eine Aktion aus"
+    main_menu:
+      title: "Hauptmenü"
+      add_account: "Konto hinzufügen"
+      modify_global_options: "Globale Einstellungen ändern"
+      help: "Hilfe"
+      help_text: |
+        imap-backup hilft dir dabei, deine E-Mail-Konten zu sichern und wiederherzustellen.
+
+        Aus diesem Menü kannst du folgende Aktionen durchführen:
+        - Neue E-Mail-Konten für die Sicherung hinzufügen
+        - Bestehende Konto-Einstellungen bearbeiten
+        - Globale Einstellungen ändern
+      save_and_exit: "Speichern und Beenden"
+      exit_without_saving: "Ohne Speichern Beenden"
+      quit: "(q) Beenden"
+    account:
+      title: "Konto"
+      email: "E-Mail-Adresse"
+      password: "Passwort"
+      password_unset: "(Nicht festgelegt)"
+      server: "Server"
+      connection_options: "Verbindungsoptionen"
+      mode: "Modus"
+      mirror_emails: "E-Mails spiegeln"
+      keep_all_emails: "Alle E-Mails behalten"
+      path: "Sicherungspfad"
+      exclude: "Ausschließen"
+      include: "Einschließen"
+      all_folders: "(Alle Ordner)"
+      no_folders_warning: "(Alle Ordner) <- Du hast dich dazu entschieden, keine Ordner zu sichern!"
+      multi_fetch: "Multi-Abruf"
+      reset_seen_flags_message: "Änderungen an „UNGELESEN“-Kennzeichnungen werden während des Downloads zurückgesetzt"
+      status: "Status"
+      connection_configuration: "Verbindungskonfiguration"
+      modify_email: "E-Mail-Adresse ändern"
+      modify_password: "Passwort ändern"
+      modify_server: "Server ändern"
+      server_prompt: "Server: "
+      modify_connection_options: "Verbindungsoptionen ändern"
+      connection_options_prompt: "Verbindungsoptionen (als JSON): "
+      malformed_json: "Fehlerhaftes JSON, bitte versuche es erneut"
+      test_connection: "Verbindung testen"
+      backup_configuration: "Sicherungskonfiguration"
+      toggle_mirror_mode: "Modus umschalten („Beibehalten“/„Spiegeln“)"
+      modify_backup_path: "Sicherungspfad ändern"
+      toggle_folder_blacklist: "Ordner-Einschließmodus umschalten (Whitelist/Blacklist)"
+      choose_folders: "Ordner zu %{action} auswählen"
+      exclude_from_backups: "Aus Sicherungen ausschließen"
+      include_in_backups: "In Sicherungen einschließen"
+      modify_multi_fetch_size: "Größe des Multi-Abrufs ändern (Anzahl der E-Mails, die gleichzeitig abgerufen werden sollen)"
+      size_prompt: "Größe: "
+      dont_fix_unread_flags: "Änderung an „UNGELESEN“-Kennzeichnungen während des Downloads nicht korrigieren"
+      fix_unread_flags: "Änderungen an „UNGELESEN“-Kennzeichnungen während des Downloads korrigieren"
+      change_status: "Status ändern (%{current} -> %{next})"
+      danger_area: "Gefahrenbereich"
+      delete: "Löschen"
+      delete_confirm: "Bist du sicher? (y/n) "
+      other_actions: "Andere Aktionen"
+      help: "Hilfe"
+      help_text: |
+        Dieses Menü ermöglicht es dir, Verbindungs- und Sicherungseinstellungen für ein einzelnes E-Mail-Konto zu konfigurieren.
+
+        Verbindungseinstellungen:
+        - `E-Mail-Adresse` und `Passwort` - Die Zugangsdaten für das Konto
+        - `Server` - Der Server, mit dem eine Verbindung für dieses Konto hergestellt wird.
+            Du musst dies nicht einstellen, wenn du einen der folgenden Anbieter verwendest: GMail, Apple Mail, FastMail, PurelyMail.
+            Andernfalls musst du hier den IMAP-Server deines E-Mail-Anbieters angeben.
+        - `Verbindungsoptionen` - (Erweiterte Einstellung) Damit kannst du zusätzliche Optionen für die IMAP-Verbindung angeben.
+            Dies sollte ein JSON-Objekt sein mit Schlüsseln, die den in der Ruby-Standardbibliothek `net/imap` beschriebenen Optionen entsprechen:
+            https://ruby-doc.org/stdlib-3.2/libdoc/net/imap/rdoc/Net/IMAP.html#initialize-instance_method
+            Wenn dein Server zum Beispiel SSL unterstützt aber ein ungültiges Zertifikat hat, kannst du diese Einstellung verwenden: `{"ssl": {"verify_mode": "none"}}`.
+
+        Du kannst überprüfen, ob deine Verbindungseinstellungen korrekt sind, indem du die Option „Verbindung testen“ auswählst.
+
+        Sicherungseinstellungen:
+        - `Modus` - „Alle E-Mails beibehalten“ bedeutet, dass E-Mails, die vom Server gelöscht wurden, weiterhin in der Sicherung behalten werden,
+            während „E-Mails spiegeln“ bedeutet, dass E-Mails, die vom Server gelöscht wurden, auch aus der Sicherung gelöscht werden.
+        - `Sicherungspfad` - Das Verzeichnis auf deinem lokalen Rechner, in dem die Sicherung für dieses Konto gespeichert wird.
+        - `Ordner-Einbindungsmodus` - Diese Einstellung bestimmt, ob du Ordner zum *Einschließen* in die Sicherung auswählst (Whitelist-Modus)
+            oder Ordner zum *Ausschließen* aus der Sicherung auswählst (Blacklist-Modus).
+            Im Whitelist-Modus startest du ohne Ordner und wählst aus, welche Ordner zur Sicherung hinzugefügt werden sollen.
+            Im Blacklist-Modus startest du mit allen Ordnern in der Sicherung und wählst aus, welche Ordner ausgeschlossen werden sollen.
+        - `Multi-Abruf-Größe` - Die Anzahl der E-Mails, die gleichzeitig vom Server abgerufen werden, wenn die Sicherung läuft.
+            Eine Erhöhung dieser Größe kann die Sicherung beschleunigen, aber auch den Speicherverbrauch erhöhen.
+        - `Änderungen an „UNGELESEN“-Kennzeichnungen korrigieren` - Legt fest, ob Änderungen an „UNGELESEN“-Kennzeichnungen während des Downloads zurückgesetzt werden sollen.
+            Diese Kennzeichnung ist nützlich, wenn der E-Mail-Anbieter (z.B. Apple Mail) E-Mails als gelesen markiert, wenn sie z.B. durch imap-backup heruntergeladen werden.
+        - `Status`- Standardmäßig ist ein Konto „aktiv“ und wird gesichert, wenn du den Sicherungsbefehl ausführst.
+            Du kannst den Status auf „Archiviert“ stellen, wenn du die Sicherungen nicht mehr ausführen möchtest, aber sie in Zukunft mit dem `copy`-Befehl auf einen neuen Server migrieren möchtest. Andernfalls kannst du ihn auf „Offline“ stellen, wenn du nur die Sicherung des Kontos auf dem Datenträger behalten möchtest.
+    global_options:
+      title: "Globale Optionen"
+      description: "Diese Einstellungen betreffen alle Konten."
+      change_download_strategy: "Download-Strategie ändern (Ausgewählt: „%{current}“)"
+      help: "Hilfe"
+      help_text: |
+        Dieses Menü ermöglicht es dir, Einstellungen zu konfigurieren, die alle Konten betreffen.
+
+        Verfügbaren globale Optionen:
+        - `Download-Strategie` - Diese Einstellung bestimmt, wie oft Daten während der Sicherung auf den Datenträger geschrieben werden.
+            Die Standardeinstellung („Metadaten verzögert schreiben“) ist schneller und schonender für den Datenträger,
+            während „Direkt auf den Datenträger schreiben“ weniger Arbeitsspeicher verwendet und für Geräte mit begrenztem Arbeitsspeicher geeignet ist.
+            Wähle die Option für weitere Details zu den Unterschieden zwischen diesen Strategien.
+      download_strategy_chooser:
+        title: "Wähle eine Download-Strategie aus"
+        current_marker: " <- Ausgewählt"
+        help: "Hilfe"
+        help_text: |
+          Die Einstellung ändert, wie oft Daten während der Sicherung auf den Datenträger geschrieben werden.
+
+          imap-backup verwendet zwei Dateien pro Ordner, eine .mbox-Datei mit den eigentlichen
+          Nachrichten und eine .imap-Datei mit Metadaten wie Nachrichtenlängen und deren
+          Offsets innerhalb der .mbox-Datei.
+
+          # „Direkt auf den Datenträger schreiben“
+
+          Mit dieser Einstellung werden jede Nachricht und ihre Metadaten
+          auf den Datenträger geschrieben, sobald sie heruntergeladen werden.
+
+          Diese Option verwendet am wenigsten Arbeitsspeicher und ist daher für
+          Sicherungen auf Geräten mit begrenztem Arbeitsspeicher, wie Raspberry Pis, geeignet.
+
+          # „Metadaten verzögert schreiben“
+
+          Dies ist die Standardeinstellung.
+
+          Hier werden Nachrichten (die potenziell sehr groß sind) an die
+          .mbox-Datei angehängt, sobald sie empfangen werden, aber die
+          Metadaten werden erst geschrieben, wenn alle Nachrichten des
+          Ordners heruntergeladen wurden.
+
+          Diese Option verwendet etwas mehr Arbeitsspeicher als die vorherige
+          Einstellung, ist aber **viel** schneller für große Ordner (potenziell
+          >30 mal für Ordner mit >100k Nachrichten) und ist schonender für den Datenträger.
+
+          # Andere Leistungseinstellungen
+
+          Eine weitere Einstellung, die die Leistung der Sicherung beeinflusst,
+          ist die `Multi-Abruf-Größe` Kontoeinstellung.
+    asker:
+      email_prompt: "E-Mail-Adresse: "
+      email_validation_error: "Gib eine gültige E-Mail-Adresse ein "
+      password_prompt: "Passwort: "
+      password_confirmation_prompt: "Passwort wiederholen: "
+      password_mismatch: "Das Passwort und die Wiederholung stimmen nicht überein.\nWeiter? (y/n) "
+    folder_chooser:
+      title: "Ordner hinzufügen/entfernen"
+      select_folder: "Wähle eine Ordner aus (Aktivieren/Deaktivieren)"
+      help: "Hilfe"
+      help_text: |
+        Verwende dieses Menü, um auszuwählen, welche Ordner gesichert werden sollen.
+
+        Klick auf einen Ordner, um seinen Sicherungsstatus umzuschalten:
+        - Ordner mit einem „+“ markiert werden gesichert
+        - Ordner mit einem „-“ markiert werden nicht gesichert
+
+        Wenn du keine Ordner auswählst, werden alle Ordner gesichert.
+      return_to_account_menu: "(q) Zum Kontomenü zurückkehren"
+      unable_to_get_folder_list: "Ordnerliste konnte nicht abgerufen werden"
+      folders_removed: "Die folgenden Ordner wurden entfernt: %{folders}"
+      connection_failed: "Verbindung fehlgeschlagen"
+    backup_path:
+      prompt: "Sicherungsverzeichnis: "
+      validation_error: "Wähle ein anderes Verzeichnis aus "
+      path_in_use: "Der Pfad „%{path}“ wird bereits für die Sicherung des Kontos „%{username}“ verwendet"
+  cli:
+    version: "imap-backup %{version}"
+    stats:
+      folder: "Ordner"
+      remote: "Entfernt"
+      both: "Beide"
+      local: "Lokal"
+    local:
+      check:
+        account: "Konto: %{account}"
+      folder_not_found: "Ordner „%{folder}“ nicht gefunden"
+    remote:
+      namespaces:
+        name: "Name"
+        prefix: "Prefix"
+        delimiter: "Trennzeichen"
+        not_defined: "(Nicht festgelegt)"
+    restore:
+      missing_email_parameter: "Fehlender EMAIL-Parameter"
+    transfer:
+      same_account_error: "Quell- und Zielkonto dürfen nicht identisch sein!"
+      destination_not_found: "Das Konto „%{email}“ existiert nicht"
+      source_not_found: "Das Konto „%{email}“ existiert nicht"
+      source_not_available: "Das Konto „%{email}“ ist für die Migration nicht verfügbar (Status: %{status})"
+      destination_not_available: "Das Konto „%{email}“ ist für die Migration nicht verfügbar (Status: %{status})"
+      incompatible_destination_delimiter: "--automatic-namespaces ist inkompatibel mit --destination-delimiter"
+      incompatible_destination_prefix: "--automatic-namespaces ist inkompatibel mit --destination-prefix"
+      incompatible_source_delimiter: "--automatic-namespaces ist inkompatibel mit --source-delimiter"
+      incompatible_source_prefix: "--automatic-namespaces ist inkompatibel mit --source-prefix"
+    helpers:
+      config_mutual_exclusivity: "--config und --erb-configuration Optionen können nicht zusammen verwendet werden"
+      config_not_found: "Konfigurationsdatei „%{path}“ nicht gefunden"
+      account_not_configured: "%{email} ist kein konfiguriertes Konto"
+      erb_config_not_found: "Die ERB-Konfigurationsdatei „%{path}“ wurde nicht gefunden"
+      erb_syntax_error: "Die ERB-Vorlage hat einen Syntaxfehler: %{message}"
+      erb_processing_error: "Fehler beim Verarbeiten der ERB-Vorlage: %{message}"
+      erb_invalid_json: "Die ERB-Vorlage hat ein ungültiges JSON erzeugt: %{message}"
+    utils:
+      thunderbird_profile_not_found: "Thunderbird-Profil „%{profile}“ nicht gefunden"
+      default_thunderbird_profile_not_found: "Standard Thunderbird-Profil nicht gefunden"
+      no_serialized_folders: "Für das Konto „%{email}“ wurden keine serialisierten Ordner gefunden"
+  configuration:
+    download_strategy:
+      direct:
+        short: "Direkt auf den Datenträger schreiben"
+        long: "Auf Datenträger schreiben, sobald Nachrichten heruntergeladen werden"
+      delay_metadata:
+        short: "Verzögertes Schreiben der Metadaten"
+        long: "Metadaten erst schreiben, wenn alle Nachrichten heruntergeladen wurden"
