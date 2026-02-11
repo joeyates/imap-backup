@@ -47,7 +47,7 @@ de:
       malformed_json: "Fehlerhaftes JSON, bitte versuche es erneut"
       test_connection: "Verbindung testen"
       backup_configuration: "Sicherungskonfiguration"
-      toggle_mirror_mode: "Modus umschalten („Beibehalten“/„Spiegeln“)"
+      toggle_mirror_mode: "Modus umschalten („Behalten“/„Spiegeln“)"
       modify_backup_path: "Sicherungspfad ändern"
       toggle_folder_blacklist: "Ordner-Einschließmodus umschalten (Whitelist/Blacklist)"
       choose_folders: "Ordner zu %{action} auswählen"
@@ -79,7 +79,7 @@ de:
         Du kannst überprüfen, ob deine Verbindungseinstellungen korrekt sind, indem du die Option „Verbindung testen“ auswählst.
 
         Sicherungseinstellungen:
-        - `Modus` - „Alle E-Mails beibehalten“ bedeutet, dass E-Mails, die vom Server gelöscht wurden, weiterhin in der Sicherung behalten werden,
+        - `Modus` - „Alle E-Mails behalten“ bedeutet, dass E-Mails, die vom Server gelöscht wurden, weiterhin in der Sicherung behalten werden,
             während „E-Mails spiegeln“ bedeutet, dass E-Mails, die vom Server gelöscht wurden, auch aus der Sicherung gelöscht werden.
         - `Sicherungspfad` - Das Verzeichnis auf deinem lokalen Rechner, in dem die Sicherung für dieses Konto gespeichert wird.
         - `Ordner-Einbindungsmodus` - Diese Einstellung bestimmt, ob du Ordner zum *Einschließen* in die Sicherung auswählst (Whitelist-Modus)
