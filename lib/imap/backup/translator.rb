@@ -20,8 +20,10 @@ module Imap::Backup
     private
 
     def locale_files
-      locales_path = File.expand_path("locales", __dir__)
-      Dir.glob(File.join(locales_path, "*.yml"))
+      @locale_files ||= begin
+        path = File.expand_path("locales", __dir__)
+        Dir.glob(File.join(path, "*.yml"))
+      end
     end
 
     def detect_locale
@@ -40,9 +42,10 @@ module Imap::Backup
     end
 
     def available_locales
-      locale_files.map do |file|
-        File.basename(file, ".yml").to_sym
-      end
+      @available_locales ||=
+        locale_files.map do |file|
+          File.basename(file, ".yml").to_sym
+        end
     end
   end
 end
