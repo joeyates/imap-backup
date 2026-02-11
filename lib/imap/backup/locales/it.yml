@@ -176,6 +176,7 @@ it:
     local:
       check:
         account: "Account: %{account}"
+      folder_not_found: "Cartella '%{folder}' non trovata"
     remote:
       namespaces:
         name: "Nome"
@@ -202,10 +203,6 @@ it:
       erb_syntax_error: "Il template ERB ha un errore di sintassi: %{message}"
       erb_processing_error: "Errore durante l'elaborazione del template ERB: %{message}"
       erb_invalid_json: "Il template ERB ha generato JSON non valido: %{message}"
-    local:
-      check:
-        account: "Account: %{account}"
-      folder_not_found: "Cartella '%{folder}' non trovata"
     utils:
       thunderbird_profile_not_found: "Profilo Thunderbird '%{profile}' non trovato"
       default_thunderbird_profile_not_found: "Profilo Thunderbird predefinito non trovato"

@@ -178,6 +178,7 @@ en:
     local:
       check:
         account: "Account: %{account}"
+      folder_not_found: "Folder '%{folder}' not found"
     remote:
       namespaces:
         name: "Name"
@@ -204,10 +205,6 @@ en:
       erb_syntax_error: "ERB template has syntax error: %{message}"
       erb_processing_error: "Error processing ERB template: %{message}"
       erb_invalid_json: "ERB template rendered invalid JSON: %{message}"
-    local:
-      check:
-        account: "Account: %{account}"
-      folder_not_found: "Folder '%{folder}' not found"
     utils:
       thunderbird_profile_not_found: "Thunderbird profile '%{profile}' not found"
       default_thunderbird_profile_not_found: "Default Thunderbird profile not found"
