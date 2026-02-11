@@ -35,7 +35,7 @@ de:
       all_folders: "(Alle Ordner)"
       no_folders_warning: "(Alle Ordner) <- Du hast dich dazu entschieden, keine Ordner zu sichern!"
       multi_fetch: "Multi-Abruf"
-      reset_seen_flags_message: "Änderungen an „UNGELESEN“-Kennzeichnungen werden während des Downloads zurückgesetzt"
+      reset_seen_flags_message: "Änderungen an „UNREAD“-Kennzeichnungen werden während des Downloads zurückgesetzt"
       status: "Status"
       connection_configuration: "Verbindungskonfiguration"
       modify_email: "E-Mail-Adresse ändern"
@@ -55,8 +55,8 @@ de:
       include_in_backups: "In Sicherungen einschließen"
       modify_multi_fetch_size: "Größe des Multi-Abrufs ändern (Anzahl der E-Mails, die gleichzeitig abgerufen werden sollen)"
       size_prompt: "Größe: "
-      dont_fix_unread_flags: "Änderung an „UNGELESEN“-Kennzeichnungen während des Downloads nicht korrigieren"
-      fix_unread_flags: "Änderungen an „UNGELESEN“-Kennzeichnungen während des Downloads korrigieren"
+      dont_fix_unread_flags: "Änderung an „UNREAD“-Kennzeichnungen während des Downloads nicht korrigieren"
+      fix_unread_flags: "Änderungen an „UNREAD“-Kennzeichnungen während des Downloads korrigieren"
       change_status: "Status ändern (%{current} -> %{next})"
       danger_area: "Gefahrenbereich"
       delete: "Löschen"
@@ -88,7 +88,7 @@ de:
             Im Blacklist-Modus startest du mit allen Ordnern in der Sicherung und wählst aus, welche Ordner ausgeschlossen werden sollen.
         - `Multi-Abruf-Größe` - Die Anzahl der E-Mails, die gleichzeitig vom Server abgerufen werden, wenn die Sicherung läuft.
             Eine Erhöhung dieser Größe kann die Sicherung beschleunigen, aber auch den Speicherverbrauch erhöhen.
-        - `Änderungen an „UNGELESEN“-Kennzeichnungen korrigieren` - Legt fest, ob Änderungen an „UNGELESEN“-Kennzeichnungen während des Downloads zurückgesetzt werden sollen.
+        - `Änderungen an „UNREAD“-Kennzeichnungen korrigieren` - Legt fest, ob Änderungen an „UNREAD“-Kennzeichnungen während des Downloads zurückgesetzt werden sollen.
             Diese Kennzeichnung ist nützlich, wenn der E-Mail-Anbieter (z.B. Apple Mail) E-Mails als gelesen markiert, wenn sie z.B. durch imap-backup heruntergeladen werden.
         - `Status`- Standardmäßig ist ein Konto „aktiv“ und wird gesichert, wenn du den Sicherungsbefehl ausführst.
             Du kannst den Status auf „Archiviert“ stellen, wenn du die Sicherungen nicht mehr ausführen möchtest, aber sie in Zukunft mit dem `copy`-Befehl auf einen neuen Server migrieren möchtest. Andernfalls kannst du ihn auf „Offline“ stellen, wenn du nur die Sicherung des Kontos auf dem Datenträger behalten möchtest.
