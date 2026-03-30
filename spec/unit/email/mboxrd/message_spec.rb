@@ -107,6 +107,10 @@ module Imap::Backup
         expect(subject.to_serialized).to include("\n>From at the beginning")
       end
 
+      it "leaves 'From' followed by other characters unchanged" do
+        expect(subject.to_serialized).to include("\nFrom: Foo <#{from}>")
+      end
+
       it "appends > before '>+From '" do
         expect(subject.to_serialized).to include("\n>>>From quoted")
       end
