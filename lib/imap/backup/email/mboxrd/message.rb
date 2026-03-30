@@ -32,6 +32,21 @@ module Imap::Backup
         new(clean_serialized(serialized))
       end
 
+      # Deserializes a message stored with the old (v3) quoting logic,
+      # which incorrectly quoted all 'From' lines, not just 'From ' lines.
+      def self.clean_serialized_v3(serialized)
+        cleaned = serialized.gsub(/^>(>*From)/, "\\1")
+        cleaned = cleaned.sub(/^From .*[\r\n]*/, "") if cleaned.start_with?("From ")
+        cleaned
+      end
+
+      # @param serialized [String] the on-disk version of a v3 message
+      #
+      # @return [Message] the original message
+      def self.from_serialized_v3(serialized)
+        new(clean_serialized_v3(serialized))
+      end
+
       # @return [String] the original message body
       attr_reader :supplied_body
 

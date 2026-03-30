@@ -12,9 +12,9 @@ module Imap::Backup
   # Stores message metadata
   class Serializer::Imap
     # The version number to store in the metadata file
-    CURRENT_VERSION = 3
+    CURRENT_VERSION = 3.1
 
-    LOADABLE_VERSIONS = [3].freeze
+    LOADABLE_VERSIONS = [3, 3.1].freeze
 
     # @return [Serializer::Files::Path] The path of the imap metadata file, without the '.imap'
     #   extension
@@ -236,9 +236,15 @@ module Imap::Backup
 
       data = load
       if data
-        @messages = data[:messages].map { |m| Serializer::Message.new(mbox: mbox, **m) }
+        case data[:version]
+        when CURRENT_VERSION
+          @messages = data[:messages].map { |m| Serializer::Message.new(mbox: mbox, **m) }
+          @version = CURRENT_VERSION
+        when 3
+          @messages = load_v3_messages(data[:messages])
+          @version = CURRENT_VERSION
+        end
         @uid_validity = data[:uid_validity]
-        @version = data[:version]
       else
         @messages = []
         @uid_validity = nil
@@ -269,6 +275,14 @@ module Imap::Backup
 
     def loadable_version?(version)
       LOADABLE_VERSIONS.include?(version)
+    end
+
+    def load_v3_messages(message_data)
+      message_data.map do |m|
+        raw = mbox.read(m[:offset], m[:length])
+        Email::Mboxrd::Message.from_serialized_v3(raw)
+        Serializer::Message.new(mbox: mbox, **m)
+      end
     end
 
     def mbox
