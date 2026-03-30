@@ -81,6 +81,19 @@ module Imap::Backup
         raw = "Subject: Hi"
         expect(described_class.clean_serialized(raw)).to eq(raw)
       end
+
+      it "removes one level of > from lines starting with '>From '" do
+        raw = "Subject: Hi\n>From someone\n>>From other"
+        expected = "Subject: Hi\nFrom someone\n>From other"
+
+        expect(described_class.clean_serialized(raw)).to eq(expected)
+      end
+
+      it "does not remove > from lines starting with '>From:'" do
+        raw = ">From: Foo"
+
+        expect(described_class.clean_serialized(raw)).to eq(raw)
+      end
     end
 
     describe ".from_serialized" do
@@ -97,6 +110,35 @@ module Imap::Backup
       end
     end
 
+    describe ".clean_serialized_v3" do
+      it "removes one level of > quoting from any From line" do
+        raw = ">From: Foo\n>From bar\n>>From baz"
+        expected = "From: Foo\nFrom bar\n>From baz"
+
+        expect(described_class.clean_serialized_v3(raw)).to eq(expected)
+      end
+
+      it "removes the initial 'From ' line" do
+        raw = "From someone@example.com\nBody"
+
+        expect(described_class.clean_serialized_v3(raw)).to eq("Body")
+      end
+    end
+
+    describe ".from_serialized_v3" do
+      let(:serialized_message) { "From foo@a.com\n#{imap_message}" }
+      let(:imap_message) { "Delivered-To: me@example.com\n>From Me\n" }
+      let!(:result) { described_class.from_serialized_v3(serialized_message) }
+
+      it "returns the message" do
+        expect(result).to be_a(described_class)
+      end
+
+      it "removes one level of > before any From" do
+        expect(result.supplied_body).to eq("Delivered-To: me@example.com\nFrom Me\n")
+      end
+    end
+
     describe "#to_serialized" do
       it "adds a 'From ' line at the start" do
         expected = "From #{from} #{date.asctime}\n"
@@ -105,6 +147,10 @@ module Imap::Backup
 
       it "replaces existing 'From ' with '>From '" do
         expect(subject.to_serialized).to include("\n>From at the beginning")
+      end
+
+      it "leaves 'From' followed by other characters unchanged" do
+        expect(subject.to_serialized).to include("\nFrom: Foo <#{from}>")
       end
 
       it "appends > before '>+From '" do

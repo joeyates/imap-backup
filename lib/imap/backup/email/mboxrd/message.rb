@@ -14,7 +14,7 @@ module Imap::Backup
       #   and with one level of '>' quoting removed from other lines
       #   that start with 'From'
       def self.clean_serialized(serialized)
-        cleaned = serialized.gsub(/^>(>*From)/, "\\1")
+        cleaned = serialized.gsub(/^>(>*From )/, "\\1")
         # Serialized messages in this format *should* start with a line
         #   From xxx yy zz
         # rubocop:disable Style/IfUnlessModifier
@@ -30,6 +30,21 @@ module Imap::Backup
       # @return [Message] the original message
       def self.from_serialized(serialized)
         new(clean_serialized(serialized))
+      end
+
+      # Deserializes a message stored with the old (v3) quoting logic,
+      # which incorrectly quoted all 'From' lines, not just 'From ' lines.
+      def self.clean_serialized_v3(serialized)
+        cleaned = serialized.gsub(/^>(>*From)/, "\\1")
+        cleaned = cleaned.sub(/^From .*[\r\n]*/, "") if cleaned.start_with?("From ")
+        cleaned
+      end
+
+      # @param serialized [String] the on-disk version of a v3 message
+      #
+      # @return [Message] the original message
+      def self.from_serialized_v3(serialized)
+        new(clean_serialized_v3(serialized))
       end
 
       # @return [String] the original message body
@@ -110,7 +125,7 @@ module Imap::Backup
         # 'From ' can be taken as the beginning of messages.
         # http://www.digitalpreservation.gov/formats/fdd/fdd000385.shtml
         # Here we add an extra '>' before any "From" or ">From".
-        body.gsub(/\n(>*From)/, "\n>\\1")
+        body.gsub(/\n(>*From )/, "\n>\\1")
       end
 
       def asctime

@@ -56,7 +56,7 @@ RSpec.describe "imap-backup backup", :container, type: :aruba do
     it "saves a file version" do
       run_command_and_stop command
 
-      expect(imap_metadata[:version].to_s).to match(/^[0-9.]$/)
+      expect(imap_metadata[:version].to_s).to match(/^[0-9.]+$/)
     end
 
     it "records IMAP ids" do
@@ -306,6 +306,61 @@ RSpec.describe "imap-backup backup", :container, type: :aruba do
       content = mbox_content(email, folder, configuration_path: custom_config_path)
       messages_as_mbox = to_mbox_entry(**message_one)
       expect(content).to eq(messages_as_mbox)
+    end
+  end
+
+  context "with existing version 3 local data" do
+    let(:v3_from) { "old@example.com" }
+    let(:v3_subject) { "Old Subject" }
+    let(:v3_body) { "old body" }
+    let(:v3_mbox_entry) do
+      # Version 3 incorrectly quoted 'From:' to '>From:'
+      "From #{v3_from}\n>From: #{v3_from}\nSubject: #{v3_subject}\n\n#{v3_body}\n\n"
+    end
+    let(:uid_validity) { test_server.folder_uid_validity(folder) }
+    let(:server_uids) { test_server.folder_uids(folder) }
+    let(:v3_imap_data) do
+      {
+        version: 3,
+        uid_validity: uid_validity,
+        messages: [
+          {uid: server_uids.first, offset: 0, length: v3_mbox_entry.bytesize, flags: []}
+        ]
+      }
+    end
+
+    let!(:setup) do
+      test_server.create_folder folder
+      test_server.send_email folder, **message_one
+      test_server.send_email folder, **message_two
+      write_config
+      FileUtils.mkdir_p account_config[:local_path]
+      imap_file = File.join(account_config[:local_path], "#{folder}.imap")
+      mbox_file = File.join(account_config[:local_path], "#{folder}.mbox")
+      File.write(mbox_file, v3_mbox_entry)
+      File.write(imap_file, v3_imap_data.to_json)
+    end
+
+    it "migrates the old message, correcting quoting" do
+      run_command_and_stop command
+
+      content = mbox_content(email, folder)
+      expect(content).to include("From: #{v3_from}")
+      expect(content).to_not include(">From: #{v3_from}")
+    end
+
+    it "downloads the messages" do
+      run_command_and_stop command
+
+      content = mbox_content(email, folder)
+      expect(content).to include("Subject: #{message_two[:subject]}")
+    end
+
+    it "upgrades metadata versions" do
+      run_command_and_stop command
+
+      metadata = imap_parsed(email, folder)
+      expect(metadata[:version]).to eq(Imap::Backup::Serializer::Imap::CURRENT_VERSION)
     end
   end
 

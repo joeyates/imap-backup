@@ -7,15 +7,16 @@ module Imap::Backup
     let(:files_path) { "folder_path" }
     let(:pathname) { "folder_path.imap" }
     let(:exists) { true }
+    let(:message) { {uid: 42, offset: 0, length: 12_345, flags: [:AFlag]} }
     let(:existing) do
       {
         version: version,
         uid_validity: 99,
-        messages: [{uid: 42, offset: 0, length: 12_345, flags: [:AFlag]}]
+        messages: [message]
       }
     end
-    let(:version) { 3 }
     let(:file) { instance_double(File, write: nil) }
+    let(:version) { described_class::CURRENT_VERSION }
 
     before do
       allow(File).to receive(:exist?).and_call_original
@@ -28,6 +29,21 @@ module Imap::Backup
     end
 
     describe "loading the metadata file" do
+      it "loads the existing version" do
+        expect(subject.version).to eq(described_class::CURRENT_VERSION)
+      end
+
+      it "loads the existing uid_validity" do
+        expect(subject.uid_validity).to eq(99)
+      end
+
+      it "loads the existing messages" do
+        expected = message.dup
+        expected[:flags] = expected[:flags].map(&:to_s)
+
+        expect(subject.messages.map(&:to_h)).to eq([expected])
+      end
+
       context "when it is malformed" do
         before do
           allow(File).to receive(:read).with(pathname).and_raise(JSON::ParserError)
@@ -57,10 +73,74 @@ module Imap::Backup
       end
 
       context "when the 'version' key is missing" do
-        let(:existing) { {uid_validity: 99, messages: []} }
+        let(:existing) { {uid_validity: 99, messages: [message]} }
 
         it "ignores the file" do
           expect(subject.messages).to eq([])
+        end
+      end
+
+      context "when the 'version' key is for an unsupported version" do
+        let(:existing) { {version: 2.99, uid_validity: 99, messages: [message]} }
+
+        it "ignores the file" do
+          expect(subject.messages).to eq([])
+        end
+
+        it "initializes the version to the current version" do
+          expect(subject.version).to eq(described_class::CURRENT_VERSION)
+        end
+      end
+
+      context "when the 'version' key is for a previous supported version" do
+        let(:existing) { {version: 3, uid_validity: 99, messages: [message]} }
+        let(:mbox_pathname) { "folder_path.mbox" }
+        let(:raw_message) { "From foo@a.com\n>From: Foo\nBody\n\n" }
+        let(:re_serialized) { "From foo@a.com\nFrom: Foo\nBody\n\n" }
+        let(:mboxrd_message) do
+          instance_double(Email::Mboxrd::Message, to_serialized: re_serialized)
+        end
+        let(:mbox_file) { instance_double(File, write: nil) }
+
+        before do
+          allow(File).to receive(:open).with(mbox_pathname, "rb").and_yield(
+            instance_double(File, seek: nil, read: raw_message)
+          )
+          allow(File).to receive(:open).with(mbox_pathname, "wb").and_yield(mbox_file)
+          allow(Email::Mboxrd::Message).to receive(:from_serialized_v3) { mboxrd_message }
+        end
+
+        it "sets the version to CURRENT_VERSION" do
+          expect(subject.version).to eq(described_class::CURRENT_VERSION)
+        end
+
+        it "loads the existing uid_validity" do
+          expect(subject.uid_validity).to eq(99)
+        end
+
+        it "deserializes messages with from_serialized_v3" do
+          subject.messages
+
+          expect(Email::Mboxrd::Message).to have_received(:from_serialized_v3).with(raw_message)
+        end
+
+        it "rewrites the mbox file" do
+          subject.messages
+
+          expect(mbox_file).to have_received(:write).with(re_serialized)
+        end
+
+        it "updates message offsets and lengths" do
+          result = subject.messages.first
+
+          expect(result.length).to eq(re_serialized.bytesize)
+        end
+
+        it "saves the metadata immediately" do
+          subject.messages
+
+          expect(file).to have_received(:write).
+            with(/"version":#{described_class::CURRENT_VERSION}/)
         end
       end
     end

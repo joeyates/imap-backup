@@ -33,3 +33,24 @@ Currently, only the Download Strategy Chooser screen has localized help function
   - Other setup screens (folder chooser, backup path, etc.)
 - Add translation keys for help text to locale files (`lib/imap/backup/locales/en.yml` and `lib/imap/backup/locales/it.yml`)
 - Follow the pattern: menu choice for "help" that displays localized help text and waits for key press
+
+# Fix mboxrd Quote Serialization Bug
+
+Status: [x]
+
+## Description
+
+The `add_extra_quote` method in `Email::Mboxrd::Message` incorrectly quotes all lines beginning with `From` (e.g. `From:` headers), rather than only lines beginning with `From ` (with a trailing space). The corresponding `clean_serialized` method has the same problem on load. This results in mbox files storing corrupted content. The fix involves correcting both regexes, bumping the metadata format version, and migrating existing files on load.
+
+## Technical Specifics
+
+- In [lib/imap/backup/serializer/imap.rb](lib/imap/backup/serializer/imap.rb):
+  - Bump `CURRENT_VERSION` from `3` to `3.1`
+  - Add `3` to `LOADABLE_VERSIONS`: `LOADABLE_VERSIONS = [3, 3.1].freeze`
+  - In `ensure_loaded`, use a `case data[:version]` branch:
+    - `when CURRENT_VERSION` — load messages normally
+    - `when 3` — load each message using the old (buggy) deserialization logic (`from_serialized_v3`), and set `@version = CURRENT_VERSION` so the next save writes version 3.1
+- In [lib/imap/backup/email/mboxrd/message.rb](lib/imap/backup/email/mboxrd/message.rb):
+  - Fix `add_extra_quote`: change regex from `/\n(>*From)/` to `/\n(>*From )/`
+  - Fix `clean_serialized`: change regex from `/^>(>*From)/` to `/^>(>*From )/`
+  - Add `clean_serialized_v3` (using the old regex `/^>(>*From)/`) and a corresponding `from_serialized_v3` class method for use during migration of version 3 files
