@@ -125,7 +125,7 @@ module Imap::Backup
         # 'From ' can be taken as the beginning of messages.
         # http://www.digitalpreservation.gov/formats/fdd/fdd000385.shtml
         # Here we add an extra '>' before any "From" or ">From".
-        body.gsub(/\n(>*From)/, "\n>\\1")
+        body.gsub(/\n(>*From )/, "\n>\\1")
       end
 
       def asctime
