@@ -242,7 +242,11 @@ module Imap::Backup
           @version = CURRENT_VERSION
         when 3
           @messages = load_v3_messages(data[:messages])
+          @uid_validity = data[:uid_validity]
           @version = CURRENT_VERSION
+          @loaded = true
+          save_internal(version: CURRENT_VERSION, uid_validity: uid_validity, messages: messages)
+          return
         end
         @uid_validity = data[:uid_validity]
       else

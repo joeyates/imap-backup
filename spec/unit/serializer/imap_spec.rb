@@ -136,8 +136,8 @@ module Imap::Backup
           expect(result.length).to eq(re_serialized.bytesize)
         end
 
-        it "saves the file in the current version format when saving" do
-          subject.uid_validity = 567
+        it "saves the metadata immediately" do
+          subject.messages
 
           expect(file).to have_received(:write).
             with(/"version":#{described_class::CURRENT_VERSION}/)
