@@ -15,7 +15,7 @@ The mboxrd serializer incorrectly adds a `>` prefix to any line starting with `F
 - [x] In `lib/imap/backup/email/mboxrd/message.rb`, fix `add_extra_quote` regex from `/\n(>*From)/` to `/\n(>*From )/`
 - [x] In `lib/imap/backup/email/mboxrd/message.rb`, fix `clean_serialized` regex from `/^>(>*From)/` to `/^>(>*From )/`
 - [x] In `lib/imap/backup/email/mboxrd/message.rb`, add `clean_serialized_v3` (using the old regex) and `from_serialized_v3` class methods
-- [ ] Update the Changelog.
+- [x] Update the Changelog.
 - [ ] Ask the user for feedback on the state of the implementation and carry out any requested corrections.
 - [ ] Mark the plan as "done".
 
