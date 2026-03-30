@@ -278,11 +278,22 @@ module Imap::Backup
     end
 
     def load_v3_messages(message_data)
-      message_data.map do |m|
+      messages = []
+      offset = 0
+      new_content = +""
+      message_data.each do |m|
         raw = mbox.read(m[:offset], m[:length])
-        Email::Mboxrd::Message.from_serialized_v3(raw)
-        Serializer::Message.new(mbox: mbox, **m)
+        original = Email::Mboxrd::Message.from_serialized_v3(raw)
+        serialized = original.to_serialized
+        messages << Serializer::Message.new(
+          mbox: mbox, uid: m[:uid], offset: offset,
+          length: serialized.bytesize, flags: m[:flags] || []
+        )
+        new_content << serialized
+        offset += serialized.bytesize
       end
+      File.open(mbox.pathname, "wb") { |f| f.write(new_content) }
+      messages
     end
 
     def mbox

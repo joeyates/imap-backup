@@ -81,6 +81,19 @@ module Imap::Backup
         raw = "Subject: Hi"
         expect(described_class.clean_serialized(raw)).to eq(raw)
       end
+
+      it "removes one level of > from lines starting with '>From '" do
+        raw = "Subject: Hi\n>From someone\n>>From other"
+        expected = "Subject: Hi\nFrom someone\n>From other"
+
+        expect(described_class.clean_serialized(raw)).to eq(expected)
+      end
+
+      it "does not remove > from lines starting with '>From:'" do
+        raw = ">From: Foo"
+
+        expect(described_class.clean_serialized(raw)).to eq(raw)
+      end
     end
 
     describe ".from_serialized" do

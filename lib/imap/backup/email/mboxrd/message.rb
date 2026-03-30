@@ -14,7 +14,7 @@ module Imap::Backup
       #   and with one level of '>' quoting removed from other lines
       #   that start with 'From'
       def self.clean_serialized(serialized)
-        cleaned = serialized.gsub(/^>(>*From)/, "\\1")
+        cleaned = serialized.gsub(/^>(>*From )/, "\\1")
         # Serialized messages in this format *should* start with a line
         #   From xxx yy zz
         # rubocop:disable Style/IfUnlessModifier

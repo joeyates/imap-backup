@@ -13,7 +13,7 @@ The mboxrd serializer incorrectly adds a `>` prefix to any line starting with `F
 - [x] In `lib/imap/backup/serializer/imap.rb`, bump `CURRENT_VERSION` to `3.1` and update `LOADABLE_VERSIONS` to `[3, 3.1]`
 - [x] In `lib/imap/backup/serializer/imap.rb`, add a `case data[:version]` branch in `ensure_loaded`: for `CURRENT_VERSION` load normally; for `3` load messages using `from_serialized_v3` and set `@version = CURRENT_VERSION`
 - [x] In `lib/imap/backup/email/mboxrd/message.rb`, fix `add_extra_quote` regex from `/\n(>*From)/` to `/\n(>*From )/`
-- [ ] In `lib/imap/backup/email/mboxrd/message.rb`, fix `clean_serialized` regex from `/^>(>*From)/` to `/^>(>*From )/`
+- [x] In `lib/imap/backup/email/mboxrd/message.rb`, fix `clean_serialized` regex from `/^>(>*From)/` to `/^>(>*From )/`
 - [x] In `lib/imap/backup/email/mboxrd/message.rb`, add `clean_serialized_v3` (using the old regex) and `from_serialized_v3` class methods
 - [ ] Update the Changelog.
 - [ ] Ask the user for feedback on the state of the implementation and carry out any requested corrections.
