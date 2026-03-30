@@ -36,7 +36,7 @@ Currently, only the Download Strategy Chooser screen has localized help function
 
 # Fix mboxrd Quote Serialization Bug
 
-Status: [ ]
+Status: [x]
 
 ## Description
 

@@ -12,6 +12,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 * Added support for loading previous versions of the configuration file, while they are
   still supported.
 
+### Fixed
+
+* Fixed mboxrd serialization bug where lines beginning with `From:` (and other
+  `From`-prefixed tokens) were incorrectly quoted. Only lines beginning with `From `
+  (with a trailing space) are now quoted, as required by the mboxrd format.
+* Bumped imap metadata format version to 3.1. Existing version 3 files are migrated
+  on load using the previous deserialization logic.
+
 ## 16.6.0 - 2026-02-12
 
 ### Added
