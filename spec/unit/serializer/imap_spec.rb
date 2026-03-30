@@ -7,15 +7,16 @@ module Imap::Backup
     let(:files_path) { "folder_path" }
     let(:pathname) { "folder_path.imap" }
     let(:exists) { true }
+    let(:message) { {uid: 42, offset: 0, length: 12_345, flags: [:AFlag]} }
     let(:existing) do
       {
         version: version,
         uid_validity: 99,
-        messages: [{uid: 42, offset: 0, length: 12_345, flags: [:AFlag]}]
+        messages: [message]
       }
     end
-    let(:version) { 3 }
     let(:file) { instance_double(File, write: nil) }
+    let(:version) { described_class::CURRENT_VERSION }
 
     before do
       allow(File).to receive(:exist?).and_call_original
@@ -28,6 +29,21 @@ module Imap::Backup
     end
 
     describe "loading the metadata file" do
+      it "loads the existing version" do
+        expect(subject.version).to eq(described_class::CURRENT_VERSION)
+      end
+
+      it "loads the existing uid_validity" do
+        expect(subject.uid_validity).to eq(99)
+      end
+
+      it "loads the existing messages" do
+        expected = message.dup
+        expected[:flags] = expected[:flags].map(&:to_s)
+
+        expect(subject.messages.map(&:to_h)).to eq([expected])
+      end
+
       context "when it is malformed" do
         before do
           allow(File).to receive(:read).with(pathname).and_raise(JSON::ParserError)
@@ -57,10 +73,48 @@ module Imap::Backup
       end
 
       context "when the 'version' key is missing" do
-        let(:existing) { {uid_validity: 99, messages: []} }
+        let(:existing) { {uid_validity: 99, messages: [message]} }
 
         it "ignores the file" do
           expect(subject.messages).to eq([])
+        end
+      end
+
+      context "when the 'version' key is for an unsupported version" do
+        let(:existing) { {version: 2.99, uid_validity: 99, messages: [message]} }
+
+        it "ignores the file" do
+          expect(subject.messages).to eq([])
+        end
+
+        it "initializes the version to the current version" do
+          expect(subject.version).to eq(described_class::CURRENT_VERSION)
+        end
+      end
+
+      context "when the 'version' key is for a previous supported version" do
+        let(:existing) { {version: 3, uid_validity: 99, messages: [message]} }
+
+        it "loads the existing version" do
+          expect(subject.version).to eq(3)
+        end
+
+        it "loads the existing uid_validity" do
+          expect(subject.uid_validity).to eq(99)
+        end
+
+        it "loads the existing messages" do
+          expected = message.dup
+          expected[:flags] = expected[:flags].map(&:to_s)
+
+          expect(subject.messages.map(&:to_h)).to eq([expected])
+        end
+
+        it "saves the file in the current version format when saving" do
+          subject.uid_validity = 567
+
+          expect(file).to have_received(:write).
+            with(/"version":#{described_class::CURRENT_VERSION}/)
         end
       end
     end

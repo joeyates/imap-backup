@@ -14,6 +14,8 @@ module Imap::Backup
     # The version number to store in the metadata file
     CURRENT_VERSION = 3
 
+    LOADABLE_VERSIONS = [3].freeze
+
     # @return [Serializer::Files::Path] The path of the imap metadata file, without the '.imap'
     #   extension
     attr_reader :files_path
@@ -41,7 +43,9 @@ module Imap::Backup
       tsx.begin({savepoint: {messages: messages.dup, uid_validity: uid_validity}}) do
         block.call
 
-        save_internal(version: version, uid_validity: uid_validity, messages: messages) if tsx.data
+        if tsx.data
+          save_internal(version: CURRENT_VERSION, uid_validity: uid_validity, messages: messages)
+        end
       rescue Exception => e
         Logger.logger.error "#{self.class} handling #{e.class}"
         rollback
@@ -72,7 +76,7 @@ module Imap::Backup
 
     def valid?
       return false if !exist?
-      return false if version != CURRENT_VERSION
+      return false if !loadable_version?(version)
       return false if !uid_validity
 
       true
@@ -208,7 +212,7 @@ module Imap::Backup
 
       ensure_loaded
 
-      save_internal(version: version, uid_validity: uid_validity, messages: messages)
+      save_internal(version: CURRENT_VERSION, uid_validity: uid_validity, messages: messages)
     end
 
     private
@@ -255,11 +259,16 @@ module Imap::Backup
       end
 
       return nil if !data.key?(:version)
+      return nil if !loadable_version?(data[:version])
       return nil if !data.key?(:uid_validity)
       return nil if !data.key?(:messages)
       return nil if !data[:messages].is_a?(Array)
 
       data
+    end
+
+    def loadable_version?(version)
+      LOADABLE_VERSIONS.include?(version)
     end
 
     def mbox
