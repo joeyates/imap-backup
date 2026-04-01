@@ -1,0 +1,211 @@
+---
+sl:
+  setup:
+    return_to_main_menu: "(q) vrnitev v glavni meni"
+    press_key: "Pritisnite tipko "
+    choose_action: "Izberite dejanje"
+    main_menu:
+      title: "Glavni meni"
+      add_account: "dodaj račun"
+      modify_global_options: "spremeni globalne nastavitve"
+      help: "pomoč"
+      help_text: |
+        imap-backup vam pomaga pri varnostnem kopiranju in obnavljanju vaših e-poštnih računov.
+
+        V tem glavnem meniju lahko:
+        - Dodate nove e-poštne račune v varnostno kopijo
+        - Urejate obstoječe nastavitve računa
+        - Spremenite globalne možnosti
+      save_and_exit: "shrani in zapusti"
+      exit_without_saving: "zapusti brez shranjevanja sprememb"
+      quit: "(q) zapusti"
+    account:
+      title: "Račun"
+      email: "e-naslov"
+      password: "geslo"
+      password_unset: "(ni nastavljeno)"
+      server: "strežnik"
+      connection_options: "možnosti povezave"
+      mode: "način"
+      mirror_emails: "zrcali sporočila"
+      keep_all_emails: "obdrži vsa sporočila"
+      path: "pot do varnostne kopije"
+      exclude: "izključi"
+      include: "vključi"
+      all_folders: "(vse mape)"
+      no_folders_warning: "(vse mape) <- odločili ste se, da ne boste varnostno kopirali nobene mape!"
+      multi_fetch: "večkratno pridobivanje (angl. multi-fetch)"
+      reset_seen_flags_message: "spremembe zastavic »UNREAD« bodo med prenosom ponastavljene"
+      status: "status"
+      connection_configuration: "Nastavitve povezave"
+      modify_email: "spremeni e-pošto"
+      modify_password: "spremeni geslo"
+      modify_server: "spremeni strežnik"
+      server_prompt: "strežnik: "
+      modify_connection_options: "spremeni možnosti povezave"
+      connection_options_prompt: "možnosti povezave (kot JSON): "
+      malformed_json: "Napačno oblikovan JSON, poskusite znova"
+      test_connection: "preizkusi povezavo"
+      backup_configuration: "Nastavitve varnostnih kopij"
+      toggle_mirror_mode: "spremeni način ('obdrži vse'/'zrcali')"
+      modify_backup_path: "spremeni pot do varnostne kopije"
+      toggle_folder_blacklist: "preklopi način vključitve mape (beli seznam/črni seznam)"
+      choose_folders: "izberi mape za %{action}"
+      exclude_from_backups: "izključitev iz varnostnih kopij"
+      include_in_backups: "vključitev v varnostne kopije"
+      modify_multi_fetch_size: "spremeni velikost večkratnega pridobivanja (število e-poštnih sporočil, ki naj jih pridobim hkrati)"
+      size_prompt: "velikost: "
+      dont_fix_unread_flags: "ne popravljaj sprememb zastavic »UNREAD« med prenosom"
+      fix_unread_flags: "popravljaj spremembe zastavic »UNREAD« med prenosom"
+      change_status: "spremeni status (%{current} -> %{next})"
+      danger_area: "Nevarno območje"
+      delete: "izbriši"
+      delete_confirm: "Ali ste prepričani? (y/n) "
+      other_actions: "Druga dejanja"
+      help: "pomoč"
+      help_text: |
+	Ta zaslon vam omogoča konfiguracijo nastavitev povezave in varnostnega kopiranja za en sam e-poštni račun.
+
+	Nastavitve povezave:
+	- `e-račun` in `geslo` - Poverilnice za račun
+	- `server` - Strežnik, s katerim se bo povezal ta račun. Tega vam ni treba nastaviti, če uporabljate enega od naslednjih: GMail, Apple Mail, FastMail, PurelyMail.
+	V nasprotnem primeru boste morali nastaviti strežnik IMAP vašega ponudnika e-pošte.
+	- `možnosti povezave` - (Napredna nastavitev) To vam omogoča, da določite dodatne možnosti za povezavo IMAP.
+	Nastavitve morajo biti zapisane v obliki objekta JSON s ključi, ki ustrezajo možnostim, opisanim v dokumentaciji standardne knjižnice Ruby `net/imap`:
+	https://ruby-doc.org/stdlib-3.2/libdoc/net/imap/rdoc/Net/IMAP.html#initialize-instance_method
+	Če vaš strežnik na primer uporablja SSL, vendar ima neveljavno potrdilo, lahko to nastavite na `{"ssl": {"verify_mode": "none"}}`.
+
+	Da so vaše nastavitve povezave pravilne preizkusite tako da izberete možnost »preizkusi povezavo«.
+
+	Nastavitve varnostnega kopiranja:
+	- `način` - »obdrži vsa sporočila« pomeni, da bodo e-poštna sporočila, ki so kasneje izbrisana s strežnika, še vedno shranjena v varnostni kopiji, medtem ko »zrcali sporočila« pomeni, da bodo e-poštna sporočila, izbrisana s strežnika, izbrisana tudi iz varnostne kopije.
+	- `pot do varnostne kopije` - Mapa na vašem lokalnem računalniku, kjer bo shranjena varnostna kopija za ta račun.
+	- `način vključitve map` - Ta nastavitev določa, da izberete mape, ki jih želite *vključiti* v varnostno kopijo (način belega seznama) ali *izključiti* iz varnostne kopije (način črnega seznama).
+	V načinu belega seznama začnete s praznim naborom map in izberete, katere mape želite dodati v varnostno kopijo.
+	V načinu črnega seznama začnete z vsemi mapami, vključenimi v varnostno kopijo, in izberete, katere mape želite izključiti.
+	- `velikost večkratnega pridobivanja` - Število e-poštnih sporočil, ki jih med varnostnim kopiranjem pridobivam hkrati.
+	Povečanje te vrednosti lahko pospeši varnostno kopiranje, vendar tudi poveča porabo pomnilnika.
+	- `popravi spremembe zastavic 'UNREAD'` - Ali naj se spremembe zastavic 'UNREAD' med prenosom ponastavijo.
+	Ta zastavica je uporabna, ko ponudnik e-pošte (npr. Apple Mail) označi e-poštna sporočila kot prebrana, ko so prenesena, npr. z imap-backup.
+	- `status` - Račun je privzeto »aktiven« in bo varnostno kopiran, ko zaženete ukaz za varnostno kopiranje.
+	Račun lahko nastavite tudi na »arhiviran«, če želite prenehati z izvajanjem varnostnih kopij; v tem primeru lahko v prihodnosti še vedno izvedete selitev na nov strežnik z ukazom `kopiraj`.
+	Če pa želite varnostno kopijo računa samo shraniti na disku, status nastavite na »brez povezave«, .
+    global_options:
+      title: "Globalne možnosti"
+      description: "Te nastavitve vplivajo na vse račune."
+      change_download_strategy: "spremeni strategijo prenosa (trenutno: '%{current}')"
+      help: "pomoč"
+      help_text: |
+        Na tem zaslonu lahko spremenite nastavitve, ki vplivajo na vse račune.
+
+        Razpoložljive globalne možnosti:
+        - `strategija prenosa` - Ta nastavitev določa, kako pogosto se podatki zapisujejo na disk med varnostnim kopiranjem.
+           Privzeta nastavitev (»zakasnitev pisanja metapodatkov«) je hitrejša in manj obremenjuje disk,
+           medtem ko »zapiši neposredno na disk« porabi manj pomnilnika in je primerna za naprave z omejenim pomnilnikom.
+           Izberite to možnost za več podrobnosti o razlikah med tema strategijama.
+      download_strategy_chooser:
+        title: "Izberi strategijo prenosa"
+        current_marker: " <- privzeta"
+        help: "pomoč"
+        help_text: |
+          Ta nastavitev spremeni, kako pogosto se podatki zapisujejo na disk med varnostnim kopiranjem.
+
+          imap-backup uporablja dve datoteki na mapo, datoteko .mbox z dejanskimi sporočili in datoteko .imap z metapodatki, 
+          kot so dolžine sporočil in njihovi odmiki znotraj datoteke .mbox.
+
+          # 'zapiši neposredno na disk'
+
+          S to nastavitvijo se vsako sporočilo in njegovi metapodatki zapišejo na disk med prenosom.
+
+          Ta možnost porabi najmanj pomnilnika in je zato primerna za varnostno kopiranje na naprave z omejenim pomnilnikom, 
+          kot je na primer Raspberry Pi.
+
+          # 'zakasnitev pisanja metapodatkov'
+
+          To je privzeta nastavitev.
+
+          Tukaj se sporočila (ki so lahko zelo velika) dodajo v datoteko .mbox, ko so prejeta, vendar se metapodatki 
+          zapišejo v datoteko .imap šele, ko so vsa sporočila v mapi prenesena.
+
+          Ta možnost porabi nekoliko več pomnilnika kot prejšnja nastavitev, vendar je **veliko** hitrejša za 
+          velike mape (potencialno >30-krat za mape z >100.000 sporočili) in manj obremenjuje disk.
+
+          # Druge nastavitve delovanja
+
+          Druga nastavitev, ki vpliva na delovanje varnostnega kopiranja, je nastavitev na ravni 
+          računa `velikost večkratnega pridobivanja`.
+    asker:
+      email_prompt: "e-naslov: "
+      email_validation_error: "Vnesite veljaven e-naslov "
+      password_prompt: "geslo: "
+      password_confirmation_prompt: "ponovite geslo: "
+      password_mismatch: "geslo in njegova ponovitev se ne ujemata.\nNadaljujem? (y/n) "
+    folder_chooser:
+      title: "Dodaj/odstrani mape"
+      select_folder: "Izberite mapo (preklopi)"
+      help: "pomoč"
+      help_text: |
+        Na tem zaslonu izberite mape, ki jih želite varnostno kopirati.
+
+        Kliknite mapo, da preklopite stanje njenega varnostnega kopiranja:
+        - mape, označene z '+', bodo varnostno kopirane
+        - mape, označene z '-', ne bodo varnostno kopirane
+
+        Če ne izberete nobene mape, bodo varnostno kopirane vse mape.
+      return_to_account_menu: "(q) vrnitev v meni Račun"
+      unable_to_get_folder_list: "Ni mogoče pridobiti seznama map"
+      folders_removed: "Naslednje mape so bile odstranjene: %{folders}"
+      connection_failed: "Povezava ni uspela"
+    backup_path:
+      prompt: "mapa varnostnega kopiranja: "
+      validation_error: "Izberite drugo mapo "
+      path_in_use: "Pot '%{path}' je uporabljena za varnostno kopiranje računa '%{username}'"
+  cli:
+    version: "imap-backup %{version}"
+    stats:
+      folder: "mapa"
+      remote: "oddaljena"
+      both: "oboje"
+      local: "lokalna"
+    local:
+      check:
+        account: "Račun: %{account}"
+      folder_not_found: "Mapa '%{folder}' ni najdena"
+    remote:
+      namespaces:
+        name: "Ime"
+        prefix: "Predpona"
+        delimiter: "Ločilni znak"
+        not_defined: "(ni nastavljeno)"
+    restore:
+      missing_email_parameter: "Manjka EMAIL parameter"
+    transfer:
+      same_account_error: "Izvorni in ciljni račun ne moreta biti enaka!"
+      destination_not_found: "Račun '%{email}' ne obstaja"
+      source_not_found: "Račun '%{email}' ne obstaja"
+      source_not_available: "Račun '%{email}' ni na voljo za migracijo (status: %{status})"
+      destination_not_available: "Račun '%{email}' ni na voljo za migracijo (status: %{status})"
+      incompatible_destination_delimiter: "--automatic-namespaces je nekompatibilen z --destination-delimiter"
+      incompatible_destination_prefix: "--automatic-namespaces je nekompatibilen z --destination-prefix"
+      incompatible_source_delimiter: "--automatic-namespaces je nekompatibilen z --source-delimiter"
+      incompatible_source_prefix: "--automatic-namespaces je nekompatibilen z --source-prefix"
+    helpers:
+      config_mutual_exclusivity: "Ni mogoče določiti obeh možnosti, --config in --erb-configuration"
+      config_not_found: "Poti nastavitev '%{path}' ni mogoče najti"
+      account_not_configured: "%{email} ni konfiguriran račun"
+      erb_config_not_found: "ERB nastavitvene datoteke '%{path}' ni mogoče najti"
+      erb_syntax_error: "ERB predloga ima sintaktično napako: %{message}"
+      erb_processing_error: "Napaka pri procesiranju ERB predloge: %{message}"
+      erb_invalid_json: "ERB predloga je bila ustvarjena kot neveljaven JSON: %{message}"
+    utils:
+      thunderbird_profile_not_found: "Thunderbird profila '%{profile}' ni mogoče najti"
+      default_thunderbird_profile_not_found: "Privzetega Thunderbird profila ni mogoče najti"
+      no_serialized_folders: "Ni mogoče najti serializiranih map za račun '%{email}'"
+  configuration:
+    download_strategy:
+      direct:
+        short: "zapiši neposredno na disk"
+        long: "zapiši na disk takoj ko so sporočila prenesena"
+      delay_metadata:
+        short: "zakasnitev pisanja metapodatkov"
+        long: "zakasni pisanje metapodatkov dokler niso prenesena vsa sporočila"
