@@ -1,6 +1,7 @@
 require "pathname"
 
 require "imap/backup/account/folder"
+require "imap/backup/naming"
 require "imap/backup/serializer"
 require "imap/backup/serializer/directory_maker"
 require "imap/backup/serializer/files/path"
@@ -27,7 +28,7 @@ module Imap::Backup
       return enum_for(:each) if !block
 
       glob.each do |path|
-        name = path.relative_path_from(base).to_s[0..-6]
+        name = folder_name(path)
         files_path = Serializer::Files::Path.new(
           base_path: account.local_path, folder_name: name
         )
@@ -44,7 +45,7 @@ module Imap::Backup
       return enum_for(:each_key) if !block
 
       glob.each do |path|
-        name = path.relative_path_from(base).to_s[0..-6]
+        name = folder_name(path)
         files_path = Serializer::Files::Path.new(
           base_path: account.local_path, folder_name: name
         )
@@ -60,7 +61,7 @@ module Imap::Backup
       return enum_for(:each_value) if !block
 
       glob.each do |path|
-        name = path.relative_path_from(base).to_s[0..-6]
+        name = folder_name(path)
         folder = Account::Folder.new(account.client, name)
         block.call(folder)
       end
@@ -69,6 +70,11 @@ module Imap::Backup
     private
 
     attr_reader :account
+
+    def folder_name(path)
+      local_name = path.relative_path_from(base).to_s[0..-6]
+      Naming.from_local_path(local_name)
+    end
 
     def base
       @base ||= Pathname.new(account.local_path)

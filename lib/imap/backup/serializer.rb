@@ -22,6 +22,8 @@ module Imap::Backup
       delete
       each_message
       get
+      imap
+      mbox
       messages
       reload
       update

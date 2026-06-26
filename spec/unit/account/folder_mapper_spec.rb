@@ -65,6 +65,14 @@ module Imap::Backup
       end
     end
 
+    context "when the file name contains escaped characters" do
+      let(:path) { "folder_enumerator_path/Notes 10%3a;00.imap" }
+
+      it "decodes them in the folder name" do
+        expect(result[1].name).to eq("Notes 10:00")
+      end
+    end
+
     context "when source_delimiter is supplied" do
       let(:options) { super().merge(source_delimiter: ".") }
       let(:path) { "folder_enumerator_path/src/foo.imap" }
