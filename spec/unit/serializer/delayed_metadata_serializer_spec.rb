@@ -5,11 +5,11 @@ module Imap::Backup
   RSpec.describe Serializer::DelayedMetadataSerializer do
     subject(:delayed_serializer) { described_class.new(serializer: serializer) }
 
-    let(:files_path) { "folder_path" }
     let(:serializer) do
       instance_double(
         Serializer,
-        files_path: files_path,
+        imap: imap,
+        mbox: mbox,
         apply_uid_validity: nil,
         reload: nil
       )
@@ -38,8 +38,6 @@ module Imap::Backup
     let(:logger) { instance_double(::Logger, error: nil) }
 
     before do
-      allow(Serializer::Imap).to receive(:new).with(files_path: files_path) { imap }
-      allow(Serializer::Mbox).to receive(:new).with(files_path: files_path) { mbox }
       allow(imap).to receive(:transaction).and_yield
       allow(mbox).to receive(:transaction).and_yield
       allow(Email::Mboxrd::Message).to receive(:new) { mboxrd_message }

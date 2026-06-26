@@ -2,6 +2,7 @@ require "thor"
 require "pathname"
 
 require "imap/backup/account/folder"
+require "imap/backup/naming"
 require "imap/backup/serializer"
 require "imap/backup/serializer/files/path"
 
@@ -112,11 +113,15 @@ module Imap::Backup
       imap_name = imap_pathname.relative_path_from(base).to_s
       dir = File.dirname(imap_name)
       stripped = File.basename(imap_name, ".imap")
-      if dir == "."
-        stripped
-      else
-        File.join(dir, stripped)
-      end
+      local_name =
+        if dir == "."
+          stripped
+        else
+          File.join(dir, stripped)
+        end
+      # Reverse the escaping applied when the backup was written so that the
+      # original folder name (including any reserved characters) is reproduced.
+      Naming.from_local_path(local_name)
     end
   end
 end

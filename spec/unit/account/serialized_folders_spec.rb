@@ -55,5 +55,16 @@ module Imap::Backup
         expect(enumerator.to_a).to eq([folder])
       end
     end
+
+    context "when a serialized folder name contains escaped characters" do
+      let(:paths) { [Pathname.new("/backups/Notes 10%3a;00.imap")] }
+
+      it "decodes the name when building the folder" do
+        subject.each_value { |_| }
+
+        expect(Account::Folder).
+          to have_received(:new).with(client, "Notes 10:00")
+      end
+    end
   end
 end
