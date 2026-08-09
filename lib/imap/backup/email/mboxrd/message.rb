@@ -57,9 +57,24 @@ module Imap::Backup
 
       # @return [String] the message with an initial 'From ADDRESS' line
       def to_serialized
-        from_line = "From #{from}\n"
-        body = mboxrd_body.dup.force_encoding(Encoding::UTF_8)
-        from_line + body
+        # Build the entry from bytes rather than characters.
+        #
+        # `from` is derived from the parsed headers and stays ASCII-8BIT when
+        # the header carries raw 8-bit bytes, e.g. a Latin-1 sender name.
+        # Joining that with a UTF-8 body raises Encoding::CompatibilityError,
+        # and so does "From #{from}\n" on its own, because interpolating into
+        # a UTF-8 literal converts just as concatenation does.
+        #
+        # An mbox file is a byte stream and Mbox#append opens it in binary
+        # mode, so joining in ASCII-8BIT preserves the original bytes exactly
+        # and cannot raise. Messages that are plain ASCII or valid UTF-8
+        # serialize to identical bytes as before.
+        serialized = +"".b
+        serialized << "From ".b
+        serialized << from.to_s.b
+        serialized << "\n".b
+        serialized << mboxrd_body.b
+        serialized
       end
 
       # @return [Date, nil] the date of the message
@@ -95,12 +110,39 @@ module Imap::Backup
       end
 
       def best_from
-        return first_from if first_from
-        return parsed.sender if parsed.sender
-        return parsed.envelope_from if parsed.envelope_from
-        return parsed.return_path if parsed.return_path
+        decode_failed = false
 
-        ""
+        [
+          -> { first_from },
+          -> { parsed.sender },
+          -> { parsed.envelope_from },
+          -> { parsed.return_path }
+        ].each do |candidate|
+          value = candidate.call
+          return value if value
+        rescue StandardError
+          # The mail gem raises Encoding::CompatibilityError while DECODING
+          # some headers: Mail::Encodings.value_decode joins decoded
+          # encoded-words with undecoded remainders. Reading the sender can
+          # therefore blow up before this library sees a value. Present in
+          # mail 2.7.1 and still in 2.8.1.
+          decode_failed = true
+        end
+
+        # The raw fallback applies ONLY when decoding raised. A header the mail
+        # gem parsed to nothing still yields nothing, exactly as before.
+        decode_failed ? raw_from.to_s : ""
+      end
+
+      # Last resort: read the address out of the raw bytes, without asking the
+      # mail gem to decode anything. The "From " line is only an mbox
+      # separator; the real header is preserved verbatim in the message body
+      # either way.
+      def raw_from
+        line = supplied_body.b[/^From:.*$/i]
+        return nil if line.nil?
+
+        line[/[^\s<>:,"]+@[^\s<>,"]+/]
       end
 
       def first_from
