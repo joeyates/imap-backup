@@ -110,12 +110,39 @@ module Imap::Backup
       end
 
       def best_from
-        return first_from if first_from
-        return parsed.sender if parsed.sender
-        return parsed.envelope_from if parsed.envelope_from
-        return parsed.return_path if parsed.return_path
+        decode_failed = false
 
-        ""
+        [
+          -> { first_from },
+          -> { parsed.sender },
+          -> { parsed.envelope_from },
+          -> { parsed.return_path }
+        ].each do |candidate|
+          value = candidate.call
+          return value if value
+        rescue StandardError
+          # The mail gem raises Encoding::CompatibilityError while DECODING
+          # some headers: Mail::Encodings.value_decode joins decoded
+          # encoded-words with undecoded remainders. Reading the sender can
+          # therefore blow up before this library sees a value. Present in
+          # mail 2.7.1 and still in 2.8.1.
+          decode_failed = true
+        end
+
+        # The raw fallback applies ONLY when decoding raised. A header the mail
+        # gem parsed to nothing still yields nothing, exactly as before.
+        decode_failed ? raw_from.to_s : ""
+      end
+
+      # Last resort: read the address out of the raw bytes, without asking the
+      # mail gem to decode anything. The "From " line is only an mbox
+      # separator; the real header is preserved verbatim in the message body
+      # either way.
+      def raw_from
+        line = supplied_body.b[/^From:.*$/i]
+        return nil if line.nil?
+
+        line[/[^\s<>:,"]+@[^\s<>,"]+/]
       end
 
       def first_from

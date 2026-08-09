@@ -189,6 +189,29 @@ module Imap::Backup
         end
       end
 
+      context "when the mail gem cannot decode the sender" do
+        # An RFC 2047 encoded-word display name combined with a raw 8-bit
+        # address makes Mail::Encodings.value_decode raise while parsing,
+        # before this library can use the value. Reproducible on mail 2.7.1
+        # and still on 2.8.1.
+        let(:message_body) do
+          "Return-Path: <\"gru\xDFe\"@example.com>\r\n" \
+          "From: =?iso-8859-1?Q?Gr=FC=DFe?= <gru\xDFe@example.com>\r\n" \
+          "To: FirstName LastName <you@example.com>\r\n" \
+          "Subject: Re: no subject\r\n" \
+          "\r\n" \
+          "Text \xDF\r\n".b
+        end
+
+        it "does not fail" do
+          expect { subject.to_serialized }.to_not raise_error
+        end
+
+        it "falls back to the address from the raw header" do
+          expect(subject.to_serialized).to include("gru\xDFe@example.com".b)
+        end
+      end
+
       context "when date is missing" do
         let(:message_body) { msg_no_date }
 
