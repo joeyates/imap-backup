@@ -57,9 +57,24 @@ module Imap::Backup
 
       # @return [String] the message with an initial 'From ADDRESS' line
       def to_serialized
-        from_line = "From #{from}\n"
-        body = mboxrd_body.dup.force_encoding(Encoding::UTF_8)
-        from_line + body
+        # Build the entry from bytes rather than characters.
+        #
+        # `from` is derived from the parsed headers and stays ASCII-8BIT when
+        # the header carries raw 8-bit bytes, e.g. a Latin-1 sender name.
+        # Joining that with a UTF-8 body raises Encoding::CompatibilityError,
+        # and so does "From #{from}\n" on its own, because interpolating into
+        # a UTF-8 literal converts just as concatenation does.
+        #
+        # An mbox file is a byte stream and Mbox#append opens it in binary
+        # mode, so joining in ASCII-8BIT preserves the original bytes exactly
+        # and cannot raise. Messages that are plain ASCII or valid UTF-8
+        # serialize to identical bytes as before.
+        serialized = +"".b
+        serialized << "From ".b
+        serialized << from.to_s.b
+        serialized << "\n".b
+        serialized << mboxrd_body.b
+        serialized
       end
 
       # @return [Date, nil] the date of the message

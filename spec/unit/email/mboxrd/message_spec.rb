@@ -157,6 +157,38 @@ module Imap::Backup
         expect(subject.to_serialized).to include("\n>>>From quoted")
       end
 
+      context "when the sender address and the body both contain raw 8-bit bytes" do
+        # Latin-1 bytes in the address itself, as still sent by older clients.
+        # The From line keeps the header's ASCII-8BIT encoding while the body
+        # was forced to UTF-8, so joining the two raised
+        # Encoding::CompatibilityError.
+        #
+        # Both sides need non-ASCII bytes to trigger it: Ruby joins ASCII-8BIT
+        # with UTF-8 happily as long as one side is pure ASCII. The bytes must
+        # also be in the address, not just a display name, because the display
+        # name is discarded during parsing.
+        let(:message_body) do
+          "Return-Path: <\"test_us\xE9r\"@example.com>\r\n" \
+          "From: \"Test Sender\" <test_us\xE9r@example.com>\r\n" \
+          "To: FirstName LastName <you@example.com>\r\n" \
+          "Subject: Re: no subject\r\n" \
+          "\r\n" \
+          "Text with a Latin-1 byte: \xE1\r\n".b
+        end
+
+        it "does not fail" do
+          expect { subject.to_serialized }.to_not raise_error
+        end
+
+        it "preserves the original bytes of the sender" do
+          expect(subject.to_serialized).to include("test_us\xE9r".b)
+        end
+
+        it "preserves the original bytes of the body" do
+          expect(subject.to_serialized).to include("Latin-1 byte: \xE1".b)
+        end
+      end
+
       context "when date is missing" do
         let(:message_body) { msg_no_date }
 
