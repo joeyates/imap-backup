@@ -1,3 +1,5 @@
+require "fileutils"
+
 require "imap/backup/mirror"
 
 require "imap/backup/client/default"
@@ -43,7 +45,12 @@ module Imap::Backup
       )
     end
     let(:serializer_message) do
-      instance_double(Serializer::Message, uid: 1, flags: serializer_flags)
+      instance_double(
+        Serializer::Message,
+        uid: 1,
+        flags: serializer_flags,
+        imap_body: "email-body"
+      )
     end
     let(:serializer_flags) { [:Seen] }
     let(:destination_exists) { true }
@@ -178,6 +185,29 @@ module Imap::Backup
           expect(folder).to have_received(:append) do |message|
             expect(message.flags).to eq([:Seen])
           end
+        end
+      end
+
+      context "when continue_on_error is enabled" do
+        subject { described_class.new(serializer, folder, reset: reset, continue_on_error: true) }
+
+        before do
+          FileUtils.rm_rf("/tmp/Net_IMAP_BadResponseError")
+          allow(folder).to receive(:append).and_raise(Net::IMAP::BadResponseError, "too big")
+          allow(Logger.logger).to receive(:warn)
+        end
+
+        after do
+          FileUtils.rm_rf("/tmp/Net_IMAP_BadResponseError")
+        end
+
+        it "continues processing and saves failed emails" do
+          expect { subject.run }.not_to raise_error
+          expect(Logger.logger).to have_received(:warn).with(/Could not copy message UID 1/)
+
+          saved_files = Dir["/tmp/Net_IMAP_BadResponseError/*.eml"]
+          expect(saved_files).not_to be_empty
+          expect(File.read(saved_files.first)).to eq("email-body")
         end
       end
     end

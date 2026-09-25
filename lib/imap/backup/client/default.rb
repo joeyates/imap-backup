@@ -3,6 +3,7 @@ require "net/imap"
 
 require "imap/backup/email/provider"
 require "imap/backup/logger"
+require "imap/backup/retry_on_error"
 
 module Imap; end
 
@@ -19,6 +20,53 @@ module Imap::Backup
       responses uid_fetch uid_search uid_store
     )
 
+    include Imap::Backup::RetryOnError
+
+    # Errors for which a reconnect + retry may succeed
+    TRANSIENT_ERRORS = [
+      IOError,
+      EOFError,
+      Net::IMAP::NoResponseError,
+      Net::IMAP::BadResponseError
+    ]
+
+    MAX_RETRIES = 10
+
+    # Wraps a block in the retry-on-error behaviour and reconnects on error.
+    # Uses capped exponential backoff between attempts.
+    def execute_with_retries(limit: MAX_RETRIES)
+      retry_on_error(errors: TRANSIENT_ERRORS, limit: limit, on_error: lambda do |err, attempt|
+        # If the server explicitly states that the mailbox does not exist,
+        # do not retry — let higher level code handle the missing folder
+        if err.is_a?(Net::IMAP::NoResponseError) && err.message =~ /Mailbox .* does not exist|Mailbox .* not found|does not exist/i
+          raise err
+        end
+
+        Logger.logger.warn(
+          "IMAP error (#{err.class}): #{err.message}. Reconnecting and retrying (attempt #{attempt}/#{limit})"
+        )
+
+        safe_reconnect
+
+        # Capped exponential backoff to avoid excessive waits while still
+        # backing off in rate-limit situations
+        sleep_time = [2**(attempt - 1), 60].min
+        sleep(sleep_time)
+      end) do
+        yield
+      end
+    end
+
+    def safe_reconnect
+      begin
+        # Force re-establishing a fresh connection
+        reconnect
+      rescue StandardError => e
+        Logger.logger.debug "Reconnect failed: #{e.class}: #{e.message}"
+      end
+    end
+
+
     # @param account [Account] the account whose server is accessed
     def initialize(account)
       @account = account
@@ -29,7 +77,7 @@ module Imap::Backup
     def list
       root = provider_root
       Logger.logger.debug "Listing all account folders"
-      mailbox_lists = imap.list(root, "*")
+      mailbox_lists = execute_with_retries { imap.list(root, "*") }
 
       return [] if mailbox_lists.nil?
 
@@ -62,8 +110,14 @@ module Imap::Backup
     # Disconects from the server
     # @return [void]
     def disconnect
-      imap.disconnect
-      self.state = nil
+      begin
+        @imap&.disconnect
+      rescue StandardError => e
+        Logger.logger.debug "Error during disconnect: #{e.class}: #{e.message}"
+      ensure
+        @imap = nil
+        self.state = nil
+      end
     end
 
     # Prepares read-only access to a folder
@@ -71,8 +125,10 @@ module Imap::Backup
     def examine(mailbox)
       return if state == [:examine, mailbox]
 
-      imap.examine(mailbox)
-      self.state = [:examine, mailbox]
+      execute_with_retries do
+        imap.examine(mailbox)
+        self.state = [:examine, mailbox]
+      end
     end
 
     # Prepares read-write access to a folder
@@ -80,8 +136,10 @@ module Imap::Backup
     def select(mailbox)
       return if state == [:select, mailbox]
 
-      imap.select(mailbox)
-      self.state = [:select, mailbox]
+      execute_with_retries do
+        imap.select(mailbox)
+        self.state = [:select, mailbox]
+      end
     end
 
     private
@@ -125,7 +183,7 @@ module Imap::Backup
           provider.root
         else
           Logger.logger.debug "Fetching provider root"
-          result = imap.list("", "")
+          result = execute_with_retries { imap.list("", "") }
           raise "IMAP server did not return root folder for #{account.username}" if result.empty?
 
           root_info = result[0]

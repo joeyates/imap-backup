@@ -30,6 +30,7 @@ module Imap::Backup
       @destination_locker = nil
       @destination_prefix = nil
       @reset = nil
+      @continue_on_error = nil
       @source_delimiter = nil
       @source_locker = nil
       @source_prefix = nil
@@ -67,6 +68,7 @@ module Imap::Backup
     attr_accessor :destination_prefix
     attr_reader :options
     attr_accessor :reset
+    attr_accessor :continue_on_error
     attr_accessor :source_delimiter
     attr_reader :source_email
     attr_accessor :source_prefix
@@ -75,11 +77,11 @@ module Imap::Backup
       folders.each do |serializer, folder|
         case action
         when :copy
-          Mirror.new(serializer, folder, reset: false).run
+          Mirror.new(serializer, folder, reset: false, continue_on_error: continue_on_error).run
         when :migrate
           Migrator.new(serializer, folder, reset: reset).run
         when :mirror
-          Mirror.new(serializer, folder, reset: true).run
+          Mirror.new(serializer, folder, reset: true, continue_on_error: continue_on_error).run
         end
       end
     end
@@ -92,6 +94,7 @@ module Imap::Backup
       self.source_delimiter = options[:source_delimiter]
       self.source_prefix = options[:source_prefix]
       self.reset = options[:reset] || false
+      self.continue_on_error = options[:continue_on_error] || false
       check_accounts!
       choose_prefixes_and_delimiters!
     end

@@ -20,7 +20,7 @@ module Imap::Backup
       if tries < limit
         message = "#{e}, attempt #{tries} of #{limit}"
         Logger.logger.debug message
-        on_error&.call
+        on_error&.call(e, tries)
         tries += 1
         retry
       end

@@ -132,6 +132,11 @@ module Imap::Backup
       desc: "the prefix (namespace) to strip from source folder names",
       aliases: ["-s"]
     )
+    method_option(
+      "continue-on-error",
+      type: :boolean,
+      desc: "do not abort the copy when an individual message fails to upload"
+    )
     # Copies messages from one email account to another
     # @return [void]
     def copy(source_email, destination_email)
