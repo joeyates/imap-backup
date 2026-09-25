@@ -103,7 +103,17 @@ module Imap::Backup
       it "instructs the mirror class to not reset the destination folder" do
         subject.run
 
-        expect(Mirror).to have_received(:new).with(anything, anything, reset: false) { mirror }
+        expect(Mirror).to have_received(:new).with(anything, anything, reset: false, continue_on_error: false) { mirror }
+      end
+
+      context "when continue_on_error is enabled" do
+        let(:options) { {continue_on_error: true} }
+
+        it "passes the option to the mirror" do
+          subject.run
+
+          expect(Mirror).to have_received(:new).with(anything, anything, reset: false, continue_on_error: true) { mirror }
+        end
       end
     end
 
@@ -138,7 +148,7 @@ module Imap::Backup
       it "instructs the mirror class to reset the destination folder" do
         subject.run
 
-        expect(Mirror).to have_received(:new).with(anything, anything, reset: true) { mirror }
+        expect(Mirror).to have_received(:new).with(anything, anything, reset: true, continue_on_error: false) { mirror }
       end
     end
 

@@ -68,6 +68,11 @@ module Imap::Backup
           desc: "the prefix (namespace) to strip from source folder names",
           aliases: ["-s"]
         )
+        method_option(
+          "continue-on-error",
+          type: :boolean,
+          desc: "do not abort the mirror when an individual message fails to upload"
+        )
         # Keeps one email account in line with another
         # @return [void]
         def mirror(source_email, destination_email)
