@@ -177,6 +177,10 @@ module Imap::Backup
       it "logs in again" do
         expect(imap).to have_received(:login)
       end
+
+      it "opens a new connection" do
+        expect(Net::IMAP).to have_received(:new).twice
+      end
     end
 
     describe "#username" do

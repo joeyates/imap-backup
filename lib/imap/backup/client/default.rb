@@ -64,6 +64,7 @@ module Imap::Backup
     def disconnect
       imap.disconnect
       self.state = nil
+      self.imap = nil
     end
 
     # Prepares read-only access to a folder
@@ -88,6 +89,7 @@ module Imap::Backup
 
     attr_reader :account
     attr_accessor :state
+    attr_writer :imap
 
     def imap
       @imap ||= Net::IMAP.new(server, options)

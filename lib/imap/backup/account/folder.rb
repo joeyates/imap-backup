@@ -92,8 +92,9 @@ module Imap::Backup
     # @return [Array<Hash>, nil] the requested messages
     def fetch_multi(uids, attr = [BODY_ATTRIBUTE, "FLAGS"])
       examine
+      on_error = method(:reconnect)
       fetch_data_items =
-        retry_on_error(errors: UID_FETCH_RETRY_CLASSES) do
+        retry_on_error(errors: UID_FETCH_RETRY_CLASSES, on_error: on_error) do
           client.uid_fetch(uids, attr)
         end
       return nil if fetch_data_items.nil?
@@ -180,7 +181,13 @@ module Imap::Backup
     private
 
     BODY_ATTRIBUTE = "BODY[]".freeze
-    UID_FETCH_RETRY_CLASSES = [::EOFError, ::Errno::ECONNRESET, ::IOError].freeze
+    UID_FETCH_RETRY_CLASSES = [
+      ::EOFError,
+      ::Errno::ECONNRESET,
+      ::IOError,
+      ::Net::IMAP::ByeResponseError,
+      ::Net::IMAP::ResponseParseError
+    ].freeze
     UID_SEARCH_RETRY_CLASSES = [::EOFError, ::Errno::ECONNRESET, ::IOError].freeze
     APPEND_RETRY_CLASSES = [::Net::IMAP::BadResponseError].freeze
     CREATE_RETRY_CLASSES = [::Net::IMAP::BadResponseError].freeze
@@ -200,6 +207,12 @@ module Imap::Backup
       message = "Folder '#{name}' does not exist on server"
       Imap::Backup::Logger.logger.warn message
       raise FolderNotFound, message
+    end
+
+    # The server may have dropped the connection (e.g. Yahoo ends sessions after ~5 minutes)
+    def reconnect
+      client.reconnect
+      examine
     end
 
     def extract_uid(response)

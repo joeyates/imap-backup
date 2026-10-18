@@ -15,6 +15,7 @@ module Imap::Backup
         create: nil,
         examine: nil,
         expunge: nil,
+        reconnect: nil,
         responses: responses,
         select: nil,
         uid_store: nil
@@ -159,6 +160,50 @@ module Imap::Backup
           expect do
             subject.fetch_multi([123])
           end.to_not raise_error
+        end
+      end
+
+      context "when the server has closed the connection" do
+        before do
+          outcomes = [-> { raise IOError, "closed stream" }, -> { [fetch_data_item] }]
+          allow(client).to receive(:uid_fetch) { outcomes.shift.call }
+          subject.fetch_multi([123])
+        end
+
+        it "reconnects" do
+          expect(client).to have_received(:reconnect)
+        end
+
+        it "re-examines the folder" do
+          expect(client).to have_received(:examine).twice
+        end
+      end
+
+      context "when the server says BYE during the fetch" do
+        before do
+          error = Net::IMAP::ByeResponseError.new(missing_mailbox_response)
+          outcomes = [-> { raise error }, -> { [fetch_data_item] }]
+          allow(client).to receive(:uid_fetch) { outcomes.shift.call }
+        end
+
+        it "retries" do
+          subject.fetch_multi([123])
+
+          expect(client).to have_received(:uid_fetch).twice
+        end
+      end
+
+      context "when the response is truncated" do
+        before do
+          error = Net::IMAP::ResponseParseError.new("unexpected end")
+          outcomes = [-> { raise error }, -> { [fetch_data_item] }]
+          allow(client).to receive(:uid_fetch) { outcomes.shift.call }
+        end
+
+        it "retries" do
+          subject.fetch_multi([123])
+
+          expect(client).to have_received(:uid_fetch).twice
         end
       end
     end
